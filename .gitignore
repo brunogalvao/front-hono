@@ -1,24 +1,57 @@
+# Node
+node_modules/
+dist/
+build/
+.cache/
+.tmp/
+
+# TypeScript
+*.tsbuildinfo
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# OS
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+Thumbs.db
+
+# Env files
+.env
+.env.*
+!.env.example
+.env.local
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Bun
+.bun
+
+# Testing
+coverage/
+*.lcov
+
+# Git
+.git/
+.gitignore
+
+# Others
+*.swp
+*.swo
+.vercel
+
+# Supabse
+.supabase
+# Remova isso se existir:
+supabase/
+
+# OU adicione a exceção:
+!supabase/client.ts

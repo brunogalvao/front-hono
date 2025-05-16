@@ -1,7 +1,7 @@
 import { API_BASE_URL } from "@/config/api";
-import type { Task } from "@/model/tasks.model";
+import type { NewTask } from "@/model/tasks.model";
 
-export async function createTask(task: Task): Promise<Task> {
+export async function createTask(task: NewTask): Promise<NewTask> {
   const res = await fetch(`${API_BASE_URL}/tasks`, {
     method: "POST",
     headers: {

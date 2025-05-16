@@ -7,6 +7,7 @@ import {
   TableRow,
   TableHead,
   TableCell,
+  TableCaption,
 } from "@/components/ui/table";
 import {
   Dialog,
@@ -40,22 +41,28 @@ import type { Task } from "@/model/tasks.model";
 // icons
 import { AiFillDelete } from "react-icons/ai";
 import { MdModeEditOutline } from "react-icons/md";
+import { formatToBRL } from "@/utils/format";
 
-export function TasksTable({
-  tasks,
-  onTasksChange,
-}: {
+import { NumericFormat } from "react-number-format";
+
+type Props = {
   tasks: Task[];
+  total: number;
   onTasksChange: () => void;
-}) {
+};
+
+export function TasksTable({ tasks, total, onTasksChange }: Props) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [title, setTitle] = useState("");
+  const [price, setPrice] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [done, setDone] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEditClick = (task: Task) => {
     setEditingTask(task);
     setTitle(task.title);
+    setPrice(task.price?.toString() ?? "");
     setDialogOpen(true);
     setDone(task.done);
   };
@@ -63,7 +70,11 @@ export function TasksTable({
   const handleSave = async () => {
     if (editingTask) {
       try {
-        const updated = await editTask(editingTask.id, { title, done });
+        const updated = await editTask(editingTask.id, {
+          title,
+          done,
+          price: price ? Number(price) : null,
+        });
         console.log("🟢 Editado com sucesso:", updated);
         setEditingTask(null);
         // Fecha o dialog
@@ -77,11 +88,12 @@ export function TasksTable({
   };
 
   const handleDelete = async (id: string) => {
+    setIsSubmitting(true);
     try {
       await deleteTask(id);
       // Atualiza a tabela
       onTasksChange();
-      // console.log("🗑️ Deletado com sucesso:", id);
+      setIsSubmitting(false);
     } catch (err) {
       console.error("❌ Erro ao deletar:", err);
     }
@@ -89,9 +101,15 @@ export function TasksTable({
 
   return (
     <Table>
+      <TableCaption>
+        <div className="flex flex-1 justify-start">
+          Total de Tarefas {total}
+        </div>
+      </TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead className="w-[200px]">Título</TableHead>
+          <TableHead className="text-start">Preço</TableHead>
           <TableHead className="text-center">Status</TableHead>
           <TableHead className="text-center">Ações</TableHead>
         </TableRow>
@@ -100,6 +118,7 @@ export function TasksTable({
         {tasks.map((task) => (
           <TableRow key={task.id}>
             <TableCell className="w-[50%]">{task.title}</TableCell>
+            <TableCell>{formatToBRL(task.price ?? 0)}</TableCell>
             <TableCell>
               <div className="flex justify-center">
                 <StatusDropdown task={task} onStatusChanged={onTasksChange} />
@@ -126,10 +145,30 @@ export function TasksTable({
                   </DialogHeader>
                   <div className="flex flex-row space-x-2">
                     <div className="flex flex-col space-y-2">
-                      <Label>Status</Label>
+                      <Label>Titulo</Label>
                       <Input
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                      <Label>Preço</Label>
+                      {/* <Input
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                      /> */}
+                      <NumericFormat
+                        value={price}
+                        onValueChange={(values) => {
+                          setPrice(String(values.floatValue ?? ""));
+                        }}
+                        thousandSeparator="."
+                        decimalSeparator=","
+                        prefix="R$ "
+                        decimalScale={2}
+                        allowNegative={false}
+                        fixedDecimalScale={false} // 👈 isso remove zeros fixos no final
+                        customInput={Input}
                       />
                     </div>
 
@@ -160,9 +199,17 @@ export function TasksTable({
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDelete(task.id)}>
+                    <AlertDialogAction
+                      onClick={() => handleDelete(task.id)}
+                      disabled={isSubmitting}
+                    >
                       Confirmar
+                      {isSubmitting ? "Deletando..." : "Confirmar"}
                     </AlertDialogAction>
+
+                    {/* <Button onClick={handleSubmit} disabled={isSubmitting}>
+                      {isSubmitting ? "Salvando..." : "Salvar"}
+                    </Button> */}
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
