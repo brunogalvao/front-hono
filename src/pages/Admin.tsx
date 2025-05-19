@@ -33,7 +33,10 @@ function Admin() {
       if (error) throw error;
       navigate("/login");
     } catch (error) {
-      console.error("Erro ao fazer logout:", error instanceof Error ? error.message : "Erro desconhecido");
+      console.error(
+        "Erro ao fazer logout:",
+        error instanceof Error ? error.message : "Erro desconhecido",
+      );
     } finally {
       setIsLoggingOut(false);
     }
@@ -44,7 +47,10 @@ function Admin() {
       const data = await getTasks();
       setTasks(data);
     } catch (err) {
-      console.error("Erro ao carregar tarefas:", err instanceof Error ? err.message : "Erro desconhecido");
+      console.error(
+        "Erro ao carregar tarefas:",
+        err instanceof Error ? err.message : "Erro desconhecido",
+      );
     } finally {
       setLoading(false);
     }
@@ -59,7 +65,10 @@ function Admin() {
       setTotal(totalResult);
       setPrice(priceResult);
     } catch (err) {
-      console.error("Erro ao atualizar totais:", err instanceof Error ? err.message : "Erro desconhecido");
+      console.error(
+        "Erro ao atualizar totais:",
+        err instanceof Error ? err.message : "Erro desconhecido",
+      );
     }
   }, []);
 
