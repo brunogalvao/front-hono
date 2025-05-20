@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { editTask } from "@/service/editTask";
 import type { Task } from "@/model/tasks.model";
-import { Badge } from "./ui/badge";
+import { Badge } from "@/components/ui/badge";
 
 function StatusDropdown({
   task,

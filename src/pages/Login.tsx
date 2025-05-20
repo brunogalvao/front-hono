@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { Github } from "lucide-react";
@@ -56,7 +56,7 @@ function Login() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "github",
         options: {
-          redirectTo: `${window.location.origin}/admin`,
+          redirectTo: `${window.location.origin}/admin/list`,
         },
       });
       if (error) throw error;
@@ -73,6 +73,19 @@ function Login() {
     setError("");
     await handleEmailLogin();
   };
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/admin");
+      }
+    };
+
+    checkSession();
+  }, [navigate]);
 
   return (
     <div className="grid grid-cols-2">
