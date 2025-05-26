@@ -34,8 +34,8 @@ import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
 import StatusDropdown from "./StatusDropdown";
 // service
-import { editTask } from "@/service/editTask";
-import { deleteTask } from "@/service/deleteTask";
+import { editTask } from "@/service/task/editTask";
+import { deleteTask } from "@/service/task/deleteTask";
 // model
 import type { Task } from "@/model/tasks.model";
 // icons

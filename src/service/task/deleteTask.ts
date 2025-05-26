@@ -1,7 +1,7 @@
 import { API_BASE_URL } from "@/config/api";
 
 export const deleteTask = async (id: string) => {
-  const res = await fetch(`${API_BASE_URL}/tasks/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {
     method: "DELETE",
   });
 

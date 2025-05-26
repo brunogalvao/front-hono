@@ -28,7 +28,7 @@ export function NavMain({
               className={({ isActive }) =>
                 `flex w-full text-left px-4 py-2 rounded-md transition-colors ${
                   isActive
-                    ? "bg-muted text-primary font-semibold"
+                    ? "bg-primary text-white font-semibold"
                     : "hover:bg-accent hover:text-accent-foreground text-muted-foreground"
                 }`
               }

@@ -144,6 +144,7 @@ function Login() {
                 variant="outline"
                 className="w-full flex items-center gap-2"
                 onClick={handleGithubLogin}
+                disabled={loading}
               >
                 <Github /> Entrar com GitHub
               </Button>

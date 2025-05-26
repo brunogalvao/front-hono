@@ -2,7 +2,7 @@ import { API_BASE_URL } from "@/config/api";
 import type { Task } from "@/model/tasks.model";
 
 export const editTask = async (id: string, updated: Partial<Task>) => {
-  const res = await fetch(`${API_BASE_URL}/tasks/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

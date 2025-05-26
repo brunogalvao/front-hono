@@ -1,7 +1,7 @@
 import { API_BASE_URL } from "@/config/api";
 
 export const totalItems = async (): Promise<number> => {
-  const res = await fetch(`${API_BASE_URL}/tasks/total`);
+  const res = await fetch(`${API_BASE_URL}/api/tasks/total`);
 
   if (!res.ok) {
     console.error(`Erro: ${res.status}`);
@@ -13,7 +13,7 @@ export const totalItems = async (): Promise<number> => {
 };
 
 export const totalPrice = async (): Promise<number> => {
-  const res = await fetch(`${API_BASE_URL}/tasks/total-price`);
+  const res = await fetch(`${API_BASE_URL}/api/tasks/total-price`);
 
   if (!res.ok) {
     console.error(`Erro: ${res.status}`);

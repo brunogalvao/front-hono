@@ -12,18 +12,21 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { NavMain } from "@/components/nav/nav-main";
-import { SidebarOptInForm } from "@/components/nav/sidebar-opt-in-form";
+import { SidebarUser } from "@/components/nav/sidebar-user";
 
-// This is sample data.
 const data = {
   navMain: [
     {
       title: "Lista",
       url: "/admin/list",
     },
+    // {
+    //   title: "User",
+    //   url: "/admin/user",
+    // },
     {
-      title: "User",
-      url: "/admin/user",
+      title: "Rendimento",
+      url: "/admin/income",
     },
   ],
 };
@@ -40,8 +43,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <GalleryVerticalEnd className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">Documentation</span>
-                  <span className="">v1.0.0</span>
+                  <span className="font-semibold">Hono Project</span>
+                  <span className="text-xs">v1.0.0</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -52,9 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <div className="p-1">
-          <SidebarOptInForm />
-        </div>
+        <SidebarUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

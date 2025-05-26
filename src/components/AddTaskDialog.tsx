@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createTask } from "@/service/createTask";
+import { createTask } from "@/service/task/createTask";
 import {
   Dialog,
   DialogTrigger,
@@ -52,7 +52,7 @@ export function AddTaskDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="rounded-full">
+        <Button className="rounded-full cursor-pointer">
           Adicionar
           <AiOutlinePlus />
         </Button>

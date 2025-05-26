@@ -5,6 +5,7 @@ import User from "@/pages/User";
 import RegisterUser from "@/components/RegisterUser";
 import Admin from "@/pages/Admin";
 import List from "@/pages/List";
+import Income from "@/pages/Income";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,7 @@ const router = createBrowserRouter([
   // Rota protegida para o CRUD (você precisará implementar a lógica de proteção)
   // Rotas Administrativas
   {
-    path: "/admin",
+    path: "/admin/list",
     element: <Admin />,
     // Aqui você pode adicionar uma verificação de autenticação
   },
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
   {
     path: "/admin/list",
     element: <List />,
+  },
+  {
+    path: "/admin/income",
+    element: <Income />,
   },
 ]);
 

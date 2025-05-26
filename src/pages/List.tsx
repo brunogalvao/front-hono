@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 // components
 import { TasksTable } from "@/components/TasksTable";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
@@ -11,12 +10,12 @@ import Loading from "@/components/Loading";
 import type { Task } from "@/model/tasks.model";
 
 // service
-import { getTasks } from "@/service/getTasks";
+import { getTasks } from "@/service/task/getTasks";
 import { totalPrice, totalItems } from "@/service/total";
 import { formatToBRL } from "@/utils/format";
-// import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import TituloPage from "@/components/TituloPage";
+import { Loader } from "lucide-react";
 
 function List() {
   const navigate = useNavigate();
@@ -91,8 +90,14 @@ function List() {
       <div className="flex flex-row justify-between items-center">
         <div className="flex items-center text-2xl gap-3">
           Total
-          <span className="bg-primary w-auto h-8 px-3 flex items-center justify-center rounded-full text-sm">
-            {price > 0 ? formatToBRL(price) : "Carregando ..."}
+          <span className="bg-primary py-2 px-6 text-xl font-semibold flex items-center justify-center rounded-full">
+            {price > 0 ? (
+              formatToBRL(price)
+            ) : (
+              <span className="flex items-center gap-3">
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+              </span>
+            )}
           </span>
         </div>
         <AddTaskDialog

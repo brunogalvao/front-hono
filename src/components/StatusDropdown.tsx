@@ -4,7 +4,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { editTask } from "@/service/editTask";
+import { editTask } from "@/service/task/editTask";
 import type { Task } from "@/model/tasks.model";
 import { Badge } from "@/components/ui/badge";
 

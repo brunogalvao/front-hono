@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import { CircleX, Loader } from "lucide-react";
 
 function Admin() {
   const navigate = useNavigate();
@@ -31,6 +32,20 @@ function Admin() {
   };
 
   useEffect(() => {
+    const logToken = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("❌ Erro ao obter sessão:", error);
+        return;
+      }
+
+      const token = data.session?.access_token;
+      console.log("🔑 Access Token:");
+      console.log(token); // isso evita corte
+    };
+
+    logToken();
+
     const checkUser = async () => {
       const {
         data: { session },
@@ -51,10 +66,11 @@ function Admin() {
       return subscription;
     };
 
-    checkUser();
     const subscription = setupAuthListener();
 
     return () => subscription.unsubscribe();
+
+    checkUser();
   }, [navigate]);
 
   return (
@@ -66,14 +82,24 @@ function Admin() {
 
           <Separator orientation="vertical" className="mr-2 h-4" />
           {/* sair */}
-          <Button
-            className="cursor-pointer"
-            variant="outline"
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-          >
-            {isLoggingOut ? "Saindo..." : "Sair"}
-          </Button>
+          <div className="flex justify-end w-full">
+            <Button
+              className="cursor-pointer w-36 flex gap-3"
+              variant="outline"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? (
+                <>
+                  Saindo <Loader className="mr-2 h-4 w-4 animate-spin" />
+                </>
+              ) : (
+                <>
+                  Sair <CircleX />
+                </>
+              )}
+            </Button>
+          </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4">
           <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min px-8 py-6">
