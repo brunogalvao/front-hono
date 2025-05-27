@@ -1,7 +1,18 @@
 import { API_BASE_URL } from "@/config/api";
+import { supabase } from "@/lib/supabase";
 
+// Soma total de tarefas do usuário logado
 export const totalItems = async (): Promise<number> => {
-  const res = await fetch(`${API_BASE_URL}/api/tasks/total`);
+  const session = await supabase.auth.getSession();
+  const token = session.data.session?.access_token;
+
+  if (!token) throw new Error("Usuário não autenticado.");
+
+  const res = await fetch(`${API_BASE_URL}/api/tasks/total`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!res.ok) {
     console.error(`Erro: ${res.status}`);
@@ -9,11 +20,21 @@ export const totalItems = async (): Promise<number> => {
   }
 
   const data = await res.json();
-  return data.total; // ✅ retorna apenas o número
+  return data.total;
 };
 
+// Soma total de preço das tarefas do usuário logado
 export const totalPrice = async (): Promise<number> => {
-  const res = await fetch(`${API_BASE_URL}/api/tasks/total-price`);
+  const session = await supabase.auth.getSession();
+  const token = session.data.session?.access_token;
+
+  if (!token) throw new Error("Usuário não autenticado.");
+
+  const res = await fetch(`${API_BASE_URL}/api/tasks/total-price`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!res.ok) {
     console.error(`Erro: ${res.status}`);
@@ -21,5 +42,5 @@ export const totalPrice = async (): Promise<number> => {
   }
 
   const data = await res.json();
-  return data.totalPrice; // ✅ garante retorno como número, e não objeto
+  return data.totalPrice;
 };

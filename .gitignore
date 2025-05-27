@@ -55,3 +55,7 @@ supabase/
 
 # OU adicione a exceção:
 !supabase/client.ts
+
+
+#Anotações
+.note.md

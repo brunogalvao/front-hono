@@ -5,6 +5,7 @@ import { TasksTable } from "@/components/TasksTable";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import Loading from "@/components/Loading";
+import { FaCreativeCommonsZero } from "react-icons/fa";
 
 // model
 import type { Task } from "@/model/tasks.model";
@@ -23,6 +24,7 @@ function List() {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState<number>(0);
   const [price, setPrice] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -75,9 +77,22 @@ function List() {
       return subscription;
     };
 
+    const fetchPrice = async () => {
+      setIsLoading(true);
+      try {
+        const total = await totalPrice(); // sua função que busca o valor
+        setPrice(total);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     checkUser();
     fetchTasks();
     updateTotalData();
+    fetchPrice();
     const subscription = setupAuthListener();
 
     return () => subscription.unsubscribe();
@@ -91,12 +106,15 @@ function List() {
         <div className="flex items-center text-2xl gap-3">
           Total
           <span className="bg-primary py-2 px-6 text-xl font-semibold flex items-center justify-center rounded-full">
-            {price > 0 ? (
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <Loader className="h-4 w-4 animate-spin" />
+                Carregando...
+              </span>
+            ) : price > 0 ? (
               formatToBRL(price)
             ) : (
-              <span className="flex items-center gap-3">
-                <Loader className="mr-2 h-4 w-4 animate-spin" />
-              </span>
+              <FaCreativeCommonsZero />
             )}
           </span>
         </div>

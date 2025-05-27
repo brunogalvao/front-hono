@@ -32,19 +32,19 @@ function Admin() {
   };
 
   useEffect(() => {
-    const logToken = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error("❌ Erro ao obter sessão:", error);
-        return;
-      }
+    // const logToken = async () => {
+    //   const { data, error } = await supabase.auth.getSession();
+    //   if (error) {
+    //     console.error("❌ Erro ao obter sessão:", error);
+    //     return;
+    //   }
 
-      const token = data.session?.access_token;
-      console.log("🔑 Access Token:");
-      console.log(token); // isso evita corte
-    };
+    //   const token = data.session?.access_token;
+    //   console.log("🔑 Access Token:");
+    //   console.log(token); // isso evita corte
+    // };
 
-    logToken();
+    // logToken();
 
     const checkUser = async () => {
       const {
