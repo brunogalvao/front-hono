@@ -49,9 +49,10 @@ type Props = {
   tasks: Task[];
   total: number;
   onTasksChange: () => void;
+  totalPrice: number;
 };
 
-export function TasksTable({ tasks, total, onTasksChange }: Props) {
+export function TasksTable({ tasks, totalPrice, total, onTasksChange }: Props) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
@@ -102,8 +103,10 @@ export function TasksTable({ tasks, total, onTasksChange }: Props) {
   return (
     <Table>
       <TableCaption>
-        <div className="flex flex-1 justify-start">
-          Total de Tarefas {total}
+        <div className="flex flex-1 justify-between">
+          <span className="flex gap-3">Total de Tarefas {total}</span>
+
+          <span className="flex gap-3">Total{formatToBRL(totalPrice)}</span>
         </div>
       </TableCaption>
       <TableHeader>
@@ -153,10 +156,6 @@ export function TasksTable({ tasks, total, onTasksChange }: Props) {
                     </div>
                     <div className="flex flex-col space-y-2">
                       <Label>Preço</Label>
-                      {/* <Input
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
-                      /> */}
                       <NumericFormat
                         value={price}
                         onValueChange={(values) => {

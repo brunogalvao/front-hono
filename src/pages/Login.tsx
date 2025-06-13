@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { Github } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -13,6 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { FaGithub } from "react-icons/fa";
+import { GradientText } from "@/components/animate-ui/text/gradient";
 
 function Login() {
   const navigate = useNavigate();
@@ -100,6 +102,26 @@ function Login() {
 
           <CardContent>
             <form className="space-y-6" onSubmit={handleSubmit}>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full flex items-center gap-2 py-6 cursor-pointer"
+                onClick={handleGithubLogin}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <FaGithub /> Acessando a aplicação
+                  </>
+                ) : (
+                  <>
+                    <FaGithub /> Entrar com GitHub
+                  </>
+                )}
+              </Button>
+
+              <Separator className="my-4" />
+
               {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                   {error}
@@ -135,18 +157,8 @@ function Login() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full py-6" disabled={loading}>
                 {loading ? "Carregando..." : "Entrar"}
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full flex items-center gap-2"
-                onClick={handleGithubLogin}
-                disabled={loading}
-              >
-                <Github /> Entrar com GitHub
               </Button>
             </form>
           </CardContent>
@@ -169,9 +181,14 @@ function Login() {
 
       <div className="h-screen flex items-center border-l border-dashed px-4">
         <div className="flex flex-col space-y-2 px-10">
-          <h1 className="text-primary text-3xl font-bold">
+          {/* <h1 className="text-primary text-3xl font-bold">
             Texto para introdução
-          </h1>
+          </h1> */}
+
+          <GradientText
+            className="text-5xl font-bold mb-3"
+            text="Task's Finance"
+          />
           <p className="text-zinc-400">
             Lorem Ipsum is simply dummy text of the printing and typesetting
             industry...

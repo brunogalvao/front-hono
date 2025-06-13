@@ -17,6 +17,7 @@ import { AiOutlinePlus } from "react-icons/ai";
 
 import { taskSchema } from "@/schema/taskSchema";
 import { NumericFormat } from "react-number-format";
+import { LiquidButton } from "./animate-ui/buttons/liquid";
 
 export function AddTaskDialog({
   onTaskCreated,
@@ -52,10 +53,13 @@ export function AddTaskDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="rounded-full cursor-pointer">
+        <LiquidButton className="text-white">
           Adicionar
           <AiOutlinePlus />
-        </Button>
+        </LiquidButton>
+        {/* <Button className="rounded-full cursor-pointer">
+          Adicionar
+        </Button> */}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

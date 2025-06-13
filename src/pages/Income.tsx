@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
+import { NumericFormat } from "react-number-format";
+// ui
 import TituloPage from "@/components/TituloPage";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { createIncome } from "@/service/income/createIncome";
-import { getIncomes } from "@/service/income/getIncome";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -13,25 +13,48 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-import { editIncome } from "@/service/income/editIncome";
-import type { IncomeItem } from "@/model/incomes.model";
-import { NumericFormat } from "react-number-format";
-import { deleteIncome } from "@/service/income/deleteIncome";
+import {
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Table } from "@/components/ui/table";
+import { Loader } from "@/components/animate-ui/icons/loader";
+import { toast } from "sonner";
 import { formatToBRL } from "@/utils/format";
+// service
+import { editIncome } from "@/service/income/editIncome";
+import { createIncome } from "@/service/income/createIncome";
+import { deleteIncome } from "@/service/income/deleteIncome";
+import { totalIncomes } from "@/service/income/totalIncome";
+import { getIncomes } from "@/service/income/getIncome";
+// model's
+import type { IncomeItem } from "@/model/incomes.model";
 import { getNomeMes, MESES_LISTA } from "@/model/mes.enum";
-import Loading from "@/components/Loading";
 
 function Income() {
   const [incomes, setIncomes] = useState<IncomeItem[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState<number>(0);
   const [form, setForm] = useState({
     descricao: "",
     valor: 0,
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
   });
+
+  const loadTotal = async () => {
+    try {
+      const total = await totalIncomes();
+      setTotal(total);
+    } catch (err) {
+      console.error("Erro ao carregar total de rendimentos:", err);
+    }
+  };
 
   const load = async () => {
     try {
@@ -51,12 +74,17 @@ function Income() {
 
         const updated = await editIncome({ ...form, id: editingId });
         setIncomes((prev) =>
-          prev.map((item) => (item.id === editingId ? updated : item)),
+          prev.map((item) => (item.id === editingId ? updated : item))
         );
+        toast.success("Cadastro Editado");
       } else {
         const newIncome = await createIncome(form);
         setIncomes((prev) => [...prev, newIncome as IncomeItem]);
+
+        toast.success("Salvo novo cadastro");
       }
+
+      await loadTotal();
 
       setForm({
         descricao: "",
@@ -67,6 +95,15 @@ function Income() {
       setEditingId(null);
     } catch (err) {
       console.error("Erro ao salvar:", err);
+
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+          ? err
+          : "Erro desconhecido";
+
+      toast.error(errorMessage);
     }
   };
 
@@ -74,6 +111,7 @@ function Income() {
     try {
       await deleteIncome(id);
       setIncomes((prev) => prev.filter((item) => item.id !== id));
+      await loadTotal();
     } catch (err) {
       console.error("Erro ao deletar:", err);
     }
@@ -81,6 +119,7 @@ function Income() {
 
   useEffect(() => {
     load();
+    loadTotal();
   }, []);
 
   return (
@@ -160,9 +199,77 @@ function Income() {
       </div>
 
       <Card>
-        <CardHeader>Aqui será a tabela de rendimentos</CardHeader>
         <CardContent>
-          {loading ? (
+          {/* <CardHeader>
+            Aqui será a tabela de rendimentos
+            <CardDescription>
+              Total de Rendimentos {formatToBRL(total)}
+            </CardDescription>
+          </CardHeader> */}
+
+          {incomes.length <= 0 ? (
+            <p className="p-0 text-center">Sem Rendimento</p>
+          ) : (
+            <Table>
+              {loading ? (
+                <Loader className="h-4 w-4 animate-spin" />
+              ) : (
+                <TableCaption className="text-left">
+                  Valor Total {formatToBRL(total)}
+                </TableCaption>
+              )}
+
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[200px]">Nome</TableHead>
+                  <TableHead className="w-[200px]">Valor</TableHead>
+                  <TableHead className="w-1/5 text-center">Mês e Ano</TableHead>
+                  <TableHead className="w-1/5 text-center">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {incomes.map((incomes) => (
+                  <TableRow key={incomes.id}>
+                    <TableCell>{incomes.descricao}</TableCell>
+                    <TableCell>{formatToBRL(incomes.valor)}</TableCell>
+                    <TableCell>
+                      {getNomeMes(incomes.mes)} / {incomes.ano}
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex gap-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setForm({
+                              descricao: incomes.descricao ?? "",
+                              valor: incomes.valor,
+                              mes: incomes.mes,
+                              ano: incomes.ano,
+                            });
+                            setEditingId(incomes.id);
+                          }}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDelete(incomes.id)}
+                        >
+                          Deletar
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+
+          {/* {loading ? (
             <Loading />
           ) : incomes.length === 0 ? (
             <p className="text-sm text-muted-foreground">
@@ -208,7 +315,7 @@ function Income() {
                 </li>
               ))}
             </ul>
-          )}
+          )} */}
         </CardContent>
       </Card>
     </div>

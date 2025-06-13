@@ -8,8 +8,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
-import { CircleX, Loader } from "lucide-react";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { LogOut } from "@/components/animate-ui/icons/log-out";
+import { Loader } from "@/components/animate-ui/icons/loader";
+import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 
 function Admin() {
   const navigate = useNavigate();
@@ -24,7 +26,7 @@ function Admin() {
     } catch (error) {
       console.error(
         "Erro ao fazer logout:",
-        error instanceof Error ? error.message : "Erro desconhecido",
+        error instanceof Error ? error.message : "Erro desconhecido"
       );
     } finally {
       setIsLoggingOut(false);
@@ -84,24 +86,34 @@ function Admin() {
           {/* sair */}
           <div className="flex justify-end w-full">
             <Button
-              className="cursor-pointer w-36 flex gap-3"
+              className="cursor-pointer flex gap-3"
               variant="outline"
               onClick={handleLogout}
               disabled={isLoggingOut}
             >
               {isLoggingOut ? (
                 <>
-                  Saindo <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  Saindo
+                  <AnimateIcon animateOnHover>
+                    <Loader />
+                  </AnimateIcon>
                 </>
               ) : (
                 <>
-                  Sair <CircleX />
+                  Sair
+                  <AnimateIcon animateOnHover>
+                    <LogOut />
+                  </AnimateIcon>
                 </>
               )}
             </Button>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4">
+          <Link to="/" onClick={handleLogout}>
+            <LogOut animateOnHover />
+          </Link>
+
           <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min px-8 py-6">
             <Outlet />
           </div>
