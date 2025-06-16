@@ -13,18 +13,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Table } from "@/components/ui/table";
-import { Loader } from "@/components/animate-ui/icons/loader";
+// import {
+//   TableBody,
+//   TableCaption,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from "@/components/ui/table";
+// import { Table } from "@/components/ui/table";
+// import { Loader } from "@/components/animate-ui/icons/loader";
 import { toast } from "sonner";
-import { formatToBRL } from "@/utils/format";
+// import { formatToBRL } from "@/utils/format";
 // service
 import { editIncome } from "@/service/income/editIncome";
 import { createIncome } from "@/service/income/createIncome";
@@ -33,7 +33,9 @@ import { totalIncomes } from "@/service/income/totalIncome";
 import { getIncomes } from "@/service/income/getIncome";
 // model's
 import type { IncomeItem } from "@/model/incomes.model";
-import { getNomeMes, MESES_LISTA } from "@/model/mes.enum";
+import { MESES_LISTA } from "@/model/mes.enum";
+// import { Pencil, Trash } from "lucide-react";
+import CardIncome from "@/components/CardIncome";
 
 function Income() {
   const [incomes, setIncomes] = useState<IncomeItem[]>([]);
@@ -46,6 +48,7 @@ function Income() {
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
   });
+  // const [isOpen, setIsOpen] = useState(false);
 
   const loadTotal = async () => {
     try {
@@ -58,7 +61,7 @@ function Income() {
 
   const load = async () => {
     try {
-      const data = await getIncomes(); // IncomeItem[]
+      const data = await getIncomes();
       setIncomes(data);
     } catch (err) {
       console.error(err);
@@ -200,122 +203,18 @@ function Income() {
 
       <Card>
         <CardContent>
-          {/* <CardHeader>
-            Aqui será a tabela de rendimentos
-            <CardDescription>
-              Total de Rendimentos {formatToBRL(total)}
-            </CardDescription>
-          </CardHeader> */}
-
           {incomes.length <= 0 ? (
             <p className="p-0 text-center">Sem Rendimento</p>
           ) : (
-            <Table>
-              {loading ? (
-                <Loader className="h-4 w-4 animate-spin" />
-              ) : (
-                <TableCaption className="text-left">
-                  Valor Total {formatToBRL(total)}
-                </TableCaption>
-              )}
-
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[200px]">Nome</TableHead>
-                  <TableHead className="w-[200px]">Valor</TableHead>
-                  <TableHead className="w-1/5 text-center">Mês e Ano</TableHead>
-                  <TableHead className="w-1/5 text-center">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                {incomes.map((incomes) => (
-                  <TableRow key={incomes.id}>
-                    <TableCell>{incomes.descricao}</TableCell>
-                    <TableCell>{formatToBRL(incomes.valor)}</TableCell>
-                    <TableCell>
-                      {getNomeMes(incomes.mes)} / {incomes.ano}
-                    </TableCell>
-
-                    <TableCell>
-                      <div className="flex gap-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setForm({
-                              descricao: incomes.descricao ?? "",
-                              valor: incomes.valor,
-                              mes: incomes.mes,
-                              ano: incomes.ano,
-                            });
-                            setEditingId(incomes.id);
-                          }}
-                        >
-                          Editar
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDelete(incomes.id)}
-                        >
-                          Deletar
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <CardIncome
+              incomes={incomes}
+              loading={loading}
+              total={total}
+              setForm={setForm}
+              setEditingId={setEditingId}
+              handleDelete={handleDelete}
+            />
           )}
-
-          {/* {loading ? (
-            <Loading />
-          ) : incomes.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Nenhum rendimento cadastrado.
-            </p>
-          ) : (
-            <ul className="space-y-2">
-              {incomes.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex justify-between border-b py-1"
-                >
-                  <span>{item.descricao || "Sem descrição"}</span>
-                  <span>{formatToBRL(item.valor)}</span>
-                  <span>
-                    {getNomeMes(item.mes)} / {item.ano}
-                  </span>
-
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setForm({
-                          descricao: item.descricao ?? "",
-                          valor: item.valor,
-                          mes: item.mes,
-                          ano: item.ano,
-                        });
-                        setEditingId(item.id);
-                      }}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(item.id)}
-                    >
-                      Deletar
-                    </Button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )} */}
         </CardContent>
       </Card>
     </div>

@@ -18,16 +18,6 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogFooter,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "./ui/label";
@@ -37,22 +27,23 @@ import StatusDropdown from "./StatusDropdown";
 import { editTask } from "@/service/task/editTask";
 import { deleteTask } from "@/service/task/deleteTask";
 // model
-import type { Task } from "@/model/tasks.model";
+import type { Task, TaskTable } from "@/model/tasks.model";
 // icons
 import { AiFillDelete } from "react-icons/ai";
 import { MdModeEditOutline } from "react-icons/md";
 import { formatToBRL } from "@/utils/format";
 
 import { NumericFormat } from "react-number-format";
+import { DialogConfirmDelete } from "./DialogConfirmDelete";
+import { AnimateIcon } from "./animate-ui/icons/icon";
+import { Loader } from "./animate-ui/icons/loader";
 
-type Props = {
-  tasks: Task[];
-  total: number;
-  onTasksChange: () => void;
-  totalPrice: number;
-};
-
-export function TasksTable({ tasks, totalPrice, total, onTasksChange }: Props) {
+export function TasksTable({
+  tasks,
+  totalPrice,
+  total,
+  onTasksChange,
+}: TaskTable) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
@@ -183,35 +174,26 @@ export function TasksTable({ tasks, totalPrice, total, onTasksChange }: Props) {
               </Dialog>
 
               {/* Deletar */}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="flex gap-3">
-                    {/* Deletar */}
+              <DialogConfirmDelete
+                description={task.title ?? ""}
+                onConfirm={() => handleDelete(task.id)}
+              >
+                <Button
+                  variant="destructive"
+                  className="flex gap-3"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <AnimateIcon animateOnHover>
+                        <Loader />
+                      </AnimateIcon>
+                    </>
+                  ) : (
                     <AiFillDelete />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Deseja realmente deletar?
-                    </AlertDialogTitle>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => handleDelete(task.id)}
-                      disabled={isSubmitting}
-                    >
-                      Confirmar
-                      {isSubmitting ? "Deletando..." : "Confirmar"}
-                    </AlertDialogAction>
-
-                    {/* <Button onClick={handleSubmit} disabled={isSubmitting}>
-                      {isSubmitting ? "Salvando..." : "Salvar"}
-                    </Button> */}
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                  )}
+                </Button>
+              </DialogConfirmDelete>
             </TableCell>
           </TableRow>
         ))}
