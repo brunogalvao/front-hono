@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { AnimatePresence, Transition, motion } from 'motion/react';
+import { AnimatePresence, type Transition } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
 
@@ -245,6 +246,11 @@ function MotionHighlight<T extends string>({
                     },
                   }}
                   transition={transition}
+                  style={{
+                    position: 'absolute',
+                    background: 'var(--muted, #f3f3f3)',
+                    zIndex: 0,
+                  }}
                   className={cn(
                     'absolute bg-muted z-0',
                     className,

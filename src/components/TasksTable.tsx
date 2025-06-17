@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 // ui
 import {
   Table,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableCell,
   TableCaption,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Dialog,
   DialogTrigger,
@@ -17,26 +17,26 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "./ui/label";
-import { Switch } from "./ui/switch";
-import StatusDropdown from "./StatusDropdown";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from './ui/label';
+import { Switch } from './ui/switch';
+import StatusDropdown from './StatusDropdown';
 // service
-import { editTask } from "@/service/task/editTask";
-import { deleteTask } from "@/service/task/deleteTask";
+import { editTask } from '@/service/task/editTask';
+import { deleteTask } from '@/service/task/deleteTask';
 // model
-import type { Task, TaskTable } from "@/model/tasks.model";
+import type { Task, TaskTable } from '@/model/tasks.model';
 // icons
-import { AiFillDelete } from "react-icons/ai";
-import { MdModeEditOutline } from "react-icons/md";
-import { formatToBRL } from "@/utils/format";
+import { AiFillDelete } from 'react-icons/ai';
+import { MdModeEditOutline } from 'react-icons/md';
+import { formatToBRL } from '@/utils/format';
 
-import { NumericFormat } from "react-number-format";
-import { DialogConfirmDelete } from "./DialogConfirmDelete";
-import { AnimateIcon } from "./animate-ui/icons/icon";
-import { Loader } from "./animate-ui/icons/loader";
+import { NumericFormat } from 'react-number-format';
+import { DialogConfirmDelete } from './DialogConfirmDelete';
+import { AnimateIcon } from './animate-ui/icons/icon';
+import { Loader } from './animate-ui/icons/loader';
 
 export function TasksTable({
   tasks,
@@ -45,8 +45,8 @@ export function TasksTable({
   onTasksChange,
 }: TaskTable) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [title, setTitle] = useState("");
-  const [price, setPrice] = useState("");
+  const [title, setTitle] = useState('');
+  const [price, setPrice] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [done, setDone] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,7 +54,7 @@ export function TasksTable({
   const handleEditClick = (task: Task) => {
     setEditingTask(task);
     setTitle(task.title);
-    setPrice(task.price?.toString() ?? "");
+    setPrice(task.price?.toString() ?? '');
     setDialogOpen(true);
     setDone(task.done);
   };
@@ -67,14 +67,14 @@ export function TasksTable({
           done,
           price: price ? Number(price) : null,
         });
-        console.log("🟢 Editado com sucesso:", updated);
+        console.log('🟢 Editado com sucesso:', updated);
         setEditingTask(null);
         // Fecha o dialog
         setDialogOpen(false);
         // Atualiza a tabela
         onTasksChange();
       } catch (err) {
-        console.error("❌ Erro ao editar:", err);
+        console.error('❌ Erro ao editar:', err);
       }
     }
   };
@@ -87,7 +87,7 @@ export function TasksTable({
       onTasksChange();
       setIsSubmitting(false);
     } catch (err) {
-      console.error("❌ Erro ao deletar:", err);
+      console.error('❌ Erro ao deletar:', err);
     }
   };
 
@@ -95,9 +95,15 @@ export function TasksTable({
     <Table>
       <TableCaption>
         <div className="flex flex-1 justify-between">
+          {/* paginação */}
           <span className="flex gap-3">Total de Tarefas {total}</span>
 
-          <span className="flex gap-3">Total{formatToBRL(totalPrice)}</span>
+          <div className="flex gap-2 items-center w-1/2">
+            <span>Total</span>
+            <span className="font-bold text-base bg-primary text-white px-1 rounded">
+              {formatToBRL(totalPrice)}
+            </span>
+          </div>
         </div>
       </TableCaption>
       <TableHeader>
@@ -150,14 +156,14 @@ export function TasksTable({
                       <NumericFormat
                         value={price}
                         onValueChange={(values) => {
-                          setPrice(String(values.floatValue ?? ""));
+                          setPrice(String(values.floatValue ?? ''));
                         }}
                         thousandSeparator="."
                         decimalSeparator=","
                         prefix="R$ "
                         decimalScale={2}
                         allowNegative={false}
-                        fixedDecimalScale={false} // 👈 isso remove zeros fixos no final
+                        fixedDecimalScale={false}
                         customInput={Input}
                       />
                     </div>
@@ -175,7 +181,7 @@ export function TasksTable({
 
               {/* Deletar */}
               <DialogConfirmDelete
-                description={task.title ?? ""}
+                description={task.title ?? ''}
                 onConfirm={() => handleDelete(task.id)}
               >
                 <Button
