@@ -7,36 +7,51 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./ui/card";
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const RegisterUser = () => {
-  const [email, setEmail] = useState("");
+  const [form, setForm] = useState({
+    email: "",
+    name: "",
+    password: "",
+  });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleMagicLink = async (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
     setError("");
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
+    // Armazena o nome no localStorage para possível uso pós-login
+    localStorage.setItem("signup_name", form.name);
+
+    const { error } = await supabase.auth.signUp({
+      email: form.email,
+      password: form.password,
       options: {
-        shouldCreateUser: true, // cria usuário se não existir
-        emailRedirectTo: `${window.location.origin}/admin`, // onde será redirecionado após login
+        data: {
+          displayName: form.name,
+        },
+        emailRedirectTo: `${window.location.origin}/admin/list`,
       },
     });
 
     if (error) {
-      setError(error.message);
+      setError("Erro ao cadastrar: " + error.message);
     } else {
-      setMessage("Enviamos um link mágico para seu e-mail.");
+      setMessage("Verifique seu e-mail para confirmar o cadastro.");
     }
 
     setLoading(false);
@@ -46,50 +61,66 @@ const RegisterUser = () => {
     <div className="min-h-screen flex items-center justify-center">
       <Card className="w-96">
         <CardHeader>
-          <CardTitle className="text-2xl">Entrar com Magic Link</CardTitle>
+          <CardTitle>Cadastro</CardTitle>
           <CardDescription>
-            Digite seu e-mail e receba um link de acesso.
+            Preencha seus dados para criar uma conta. Você receberá um e-mail de
+            confirmação.
           </CardDescription>
         </CardHeader>
 
         <CardContent>
-          <form className="space-y-4" onSubmit={handleMagicLink}>
-            {message && (
-              <p className="text-green-600 text-sm bg-green-100 p-2 rounded">
-                {message}
-              </p>
-            )}
-            {error && (
-              <p className="text-red-600 text-sm bg-red-100 p-2 rounded">
-                {error}
-              </p>
-            )}
+          <form className="space-y-4" onSubmit={handleRegister}>
+            {message && <p className="text-green-600">{message}</p>}
+            {error && <p className="text-red-600">{error}</p>}
+
+            <div className="flex flex-col space-y-2">
+              <Label htmlFor="name">Nome</Label>
+              <Input
+                id="name"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
             <div className="flex flex-col space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
+                value={form.email}
+                onChange={handleChange}
                 required
-                value={email}
-                placeholder="seu@email.com"
-                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+
+            <div className="flex flex-col space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                placeholder="********"
+                value={form.password}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, password: e.target.value }))
+                }
+              />
+            </div>
+
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Enviando..." : "Enviar Magic Link"}
+              {loading ? "Cadastrando..." : "Cadastrar"}
             </Button>
           </form>
         </CardContent>
 
         <CardFooter>
-          <div className="flex justify-between w-full text-primary">
-            <Link
-              to="/login"
-              className="text-sm hover:border-b hover:border-dashed"
-            >
-              Voltar
-            </Link>
-          </div>
+          <Link to="/login" className="text-sm hover:underline">
+            Voltar
+          </Link>
         </CardFooter>
       </Card>
     </div>

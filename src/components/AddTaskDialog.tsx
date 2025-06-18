@@ -13,11 +13,14 @@ import {
 import { Label } from "./ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { AiOutlinePlus } from "react-icons/ai";
+// import { AiOutlinePlus } from "react-icons/ai";
 
 import { taskSchema } from "@/schema/taskSchema";
 import { NumericFormat } from "react-number-format";
 import { LiquidButton } from "./animate-ui/buttons/liquid";
+import { AnimateIcon } from "./animate-ui/icons/icon";
+// import { RefreshCcw } from "./animate-ui/icons/refresh-ccw";
+import { Plus } from "./animate-ui/icons/plus";
 
 export function AddTaskDialog({
   onTaskCreated,
@@ -27,6 +30,7 @@ export function AddTaskDialog({
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState<string | number>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [msg, setMsg] = useState("");
 
   // Salvar
   const handleSubmit = async () => {
@@ -39,7 +43,9 @@ export function AddTaskDialog({
 
     if (!result.success) {
       console.error(result.error.format());
-      alert("Erro no formulário.");
+      // alert("Erro no formulário.");
+      setMsg("Erro no formulário.");
+
       return;
     }
 
@@ -54,44 +60,48 @@ export function AddTaskDialog({
     <Dialog>
       <DialogTrigger asChild>
         <LiquidButton className="text-white">
-          Adicionar
-          <AiOutlinePlus />
+          <AnimateIcon animateOnHover>
+            <div className="px-12 flex flex-row items-center gap-3">
+              Adicionar
+              <Plus className="size-5" />
+            </div>
+          </AnimateIcon>
         </LiquidButton>
-        {/* <Button className="rounded-full cursor-pointer">
-          Adicionar
-        </Button> */}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Adicionar nova tarefa</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="flex flex-col gap-3">
             Insira o título da tarefa que deseja adicionar.
+            <p>{msg}</p>
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col space-y-2">
-          <Label>Titulo</Label>
-          <Input
-            placeholder="Título da tarefa"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
-        <div className="flex flex-col space-y-2">
-          <Label>Preço</Label>
-          <NumericFormat
-            value={price}
-            onValueChange={(values) => {
-              setPrice(values.floatValue ?? "");
-            }}
-            thousandSeparator="."
-            decimalSeparator=","
-            prefix="R$ "
-            decimalScale={2}
-            allowNegative={false}
-            fixedDecimalScale={false} // 👈 isso remove zeros fixos no final
-            customInput={Input}
-          />
+        <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-2">
+            <Label>Titulo</Label>
+            <Input
+              placeholder="Título da tarefa"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col space-y-2">
+            <Label>Preço</Label>
+            <NumericFormat
+              value={price}
+              onValueChange={(values) => {
+                setPrice(values.floatValue ?? "");
+              }}
+              thousandSeparator="."
+              decimalSeparator=","
+              prefix="R$ "
+              decimalScale={2}
+              allowNegative={false}
+              fixedDecimalScale={false} // 👈 isso remove zeros fixos no final
+              customInput={Input}
+            />
+          </div>
         </div>
 
         <DialogFooter className="sm:justify-end">

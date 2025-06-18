@@ -8,6 +8,7 @@ import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import { LogIn } from "@/components/animate-ui/icons/log-in";
 import { GradientText } from "@/components/animate-ui/text/gradient";
 import { HighlightText } from "@/components/animate-ui/text/highlight";
+import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,7 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Home() {
   const ICONS = {
@@ -54,6 +55,12 @@ function Home() {
     },
   ];
 
+  const navigate = useNavigate();
+
+  const goLogin = () => {
+    navigate("/login", { state: { textoHeader } });
+  };
+
   const tituloHeader = "Gerencie suas finanças de forma simples e eficiente.";
   const textoHeader =
     "Task’s Finance é uma plataforma que organiza suas receitas, despesas e tarefas financeiras mensais em um só lugar. Acompanhe seus gastos, visualize seus rendimentos e mantenha o controle do seu orçamento com clareza e praticidade.";
@@ -65,7 +72,11 @@ function Home() {
           <Button variant="link">
             <AnimateIcon animateOnHover>
               <Link
-                to="/login"
+                to="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  goLogin();
+                }}
                 className="text-white font-semibold py-2 px-4 rounded transition duration-300 flex items-center gap-3"
               >
                 Login
@@ -120,18 +131,25 @@ function Home() {
         </div>
 
         {/* Target */}
-        <div className="py-12 flex flex-row gap-3 items-center text-xl justify-center relative">
+        <div className="h-48 flex flex-row gap-3 items-center text-xl justify-center relative">
           <StarsBackground className="absolute inset-0 flex items-center justify-center rounded-xl -z-10" />
-          <span>Conheça agora mesmo</span>
-          <Link to="/login">
+          <span className="font-bold">Conheça agora mesmo</span>
+          <Link
+            to="#"
+            onClick={(e) => {
+              e.preventDefault();
+              goLogin();
+            }}
+          >
             <HighlightText
               text="Faça o login"
               inViewOnce
-              className="px-4 text-bold"
+              className="px-8 py-1 font-bold cursor-pointer hover:underline"
             />
           </Link>
         </div>
-        <Separator orientation="horizontal" className="mt-0" />
+
+        <Footer />
       </div>
     </div>
   );

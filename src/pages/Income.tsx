@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { NumericFormat } from "react-number-format";
 // ui
 import TituloPage from "@/components/TituloPage";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,18 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// import {
-//   TableBody,
-//   TableCaption,
-//   TableCell,
-//   TableHead,
-//   TableHeader,
-//   TableRow,
-// } from "@/components/ui/table";
-// import { Table } from "@/components/ui/table";
-// import { Loader } from "@/components/animate-ui/icons/loader";
 import { toast } from "sonner";
-// import { formatToBRL } from "@/utils/format";
 // service
 import { editIncome } from "@/service/income/editIncome";
 import { createIncome } from "@/service/income/createIncome";
@@ -36,6 +24,16 @@ import type { IncomeItem } from "@/model/incomes.model";
 import { MESES_LISTA } from "@/model/mes.enum";
 // import { Pencil, Trash } from "lucide-react";
 import CardIncome from "@/components/CardIncome";
+import { LiquidButton } from "@/components/animate-ui/buttons/liquid";
+import { Plus } from "@/components/animate-ui/icons/plus";
+import { AnimateIcon } from "@/components/animate-ui/icons/icon";
+import { RefreshCcw } from "@/components/animate-ui/icons/refresh-ccw";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/animate-ui/components/tooltip";
 
 function Income() {
   const [incomes, setIncomes] = useState<IncomeItem[]>([]);
@@ -48,7 +46,6 @@ function Income() {
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
   });
-  // const [isOpen, setIsOpen] = useState(false);
 
   const loadTotal = async () => {
     try {
@@ -79,6 +76,7 @@ function Income() {
         setIncomes((prev) =>
           prev.map((item) => (item.id === editingId ? updated : item))
         );
+
         toast.success("Cadastro Editado");
       } else {
         const newIncome = await createIncome(form);
@@ -194,9 +192,23 @@ function Income() {
             />
           </div>
           <div className="flex items-end">
-            <Button onClick={handleAddOrEdit} className="px-10">
-              {editingId ? "Atualizar" : "Adicionar"}
-            </Button>
+            <AnimateIcon animateOnHover>
+              <LiquidButton className="text-white" onClick={handleAddOrEdit}>
+                <div className="px-12 flex flex-row items-center gap-3">
+                  {editingId ? (
+                    <>
+                      Atualizar
+                      <RefreshCcw />
+                    </>
+                  ) : (
+                    <>
+                      Adicionar
+                      <Plus className="size-5" />
+                    </>
+                  )}
+                </div>
+              </LiquidButton>
+            </AnimateIcon>
           </div>
         </div>
       </div>
@@ -204,7 +216,19 @@ function Income() {
       <Card>
         <CardContent>
           {incomes.length <= 0 ? (
-            <p className="p-0 text-center">Sem Rendimento</p>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  {/* <span>Hover me</span> */}
+                  <p className="p-0 text-center text-sm text-zinc-500 cursor-pointer">
+                    Sem Rendimento
+                  </p>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Adicione seus rendimento nos campos acima.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           ) : (
             <CardIncome
               incomes={incomes}

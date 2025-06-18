@@ -1,22 +1,29 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 // components
-import { TasksTable } from '@/components/TasksTable';
-import { AddTaskDialog } from '@/components/AddTaskDialog';
-import { Card, CardContent } from '@/components/ui/card';
-import Loading from '@/components/Loading';
+import { TasksTable } from "@/components/TasksTable";
+import { AddTaskDialog } from "@/components/AddTaskDialog";
+import { Card, CardContent } from "@/components/ui/card";
+import Loading from "@/components/Loading";
 // import { FaCreativeCommonsZero } from "react-icons/fa";
 
 // model
-import type { Task } from '@/model/tasks.model';
+import type { Task } from "@/model/tasks.model";
 
 // service
-import { getTasks } from '@/service/task/getTasks';
-import { totalPrice, totalItems, totalPaid } from '@/service/total';
-import { supabase } from '@/lib/supabase';
-import TituloPage from '@/components/TituloPage';
-import { BanknoteArrowUp, Loader } from 'lucide-react';
-import { formatToBRL } from '@/utils/format';
+import { getTasks } from "@/service/task/getTasks";
+import { totalPrice, totalItems, totalPaid } from "@/service/total";
+import { supabase } from "@/lib/supabase";
+import TituloPage from "@/components/TituloPage";
+import { BanknoteArrowUp, Loader } from "lucide-react";
+import { formatToBRL } from "@/utils/format";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/animate-ui/components/tooltip";
 // import { px } from "motion/react";
 
 function List() {
@@ -34,8 +41,8 @@ function List() {
       setTasks(data);
     } catch (err) {
       console.error(
-        'Erro ao carregar tarefas:',
-        err instanceof Error ? err.message : 'Erro desconhecido',
+        "Erro ao carregar tarefas:",
+        err instanceof Error ? err.message : "Erro desconhecido"
       );
     } finally {
       setLoading(false);
@@ -54,8 +61,8 @@ function List() {
       setPaid(resultPaid);
     } catch (err) {
       console.error(
-        'Erro ao atualizar totais:',
-        err instanceof Error ? err.message : 'Erro desconhecido',
+        "Erro ao atualizar totais:",
+        err instanceof Error ? err.message : "Erro desconhecido"
       );
     }
   }, []);
@@ -66,7 +73,7 @@ function List() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) {
-        navigate('/login');
+        navigate("/login");
       }
     };
 
@@ -75,7 +82,7 @@ function List() {
         data: { subscription },
       } = supabase.auth.onAuthStateChange((_event, session) => {
         if (!session) {
-          navigate('/login');
+          navigate("/login");
         }
       });
       return subscription;
@@ -107,7 +114,6 @@ function List() {
   return (
     <div className="space-y-6">
       <TituloPage titulo="Lista" />
-
       <div className="flex flex-row justify-between items-center">
         <div className="flex gap-3 items-center">
           {isLoading || paid == null ? (
@@ -121,7 +127,21 @@ function List() {
               <BanknoteArrowUp />
             </span>
           ) : (
-            <p className="p-0 text-sm text-zinc-500">Sem Pagamento Efetuado</p>
+            <>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    {/* <span>Hover me</span> */}
+                    <p className="p-0 text-sm text-zinc-500 cursor-pointer">
+                      Sem Pagamento Efetuado
+                    </p>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Mude o na tabela para somar os valores pagos
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </>
           )}
         </div>
 
@@ -132,23 +152,33 @@ function List() {
           }}
         />
       </div>
-      <Card>
-        <CardContent>
-          {loading ? (
-            <Loading />
-          ) : (
-            <TasksTable
-              tasks={tasks}
-              total={total}
-              totalPrice={price}
-              onTasksChange={() => {
-                fetchTasks();
-                updateTotalData();
-              }}
-            />
-          )}
-        </CardContent>
-      </Card>
+      {tasks && tasks.length > 0 ? (
+        <Card>
+          <CardContent>
+            {loading ? (
+              <Loading />
+            ) : (
+              <TasksTable
+                tasks={tasks}
+                total={total}
+                totalPrice={price}
+                onTasksChange={() => {
+                  fetchTasks();
+                  updateTotalData();
+                }}
+              />
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent>
+            <p className="p-0 text-sm text-zinc-500">
+              Nenhuma Tarefa Encontrada
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

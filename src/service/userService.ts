@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { API_BASE_URL } from "@/config/api";
 import type { UserProfile } from "@/model/user.model";
 
+// ✅ GET USER com displayName corretamente
 export const getUser = async (): Promise<UserProfile> => {
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) throw error ?? new Error("Usuário não encontrado");
@@ -11,14 +12,15 @@ export const getUser = async (): Promise<UserProfile> => {
   return {
     email: email || "",
     phone: user_metadata?.phone || "",
-    name: user_metadata?.name || "",
+    name: user_metadata?.name || user_metadata?.displayName || "",
     avatar_url: user_metadata?.avatar_url || "",
+    displayName: user_metadata?.displayName || "",
   };
 };
 
-// não funcional
+// ✅ PATCH para atualizar user no back-end
 export const updateUser = async (
-  data: UserProfile,
+  data: UserProfile
 ): Promise<{ success: boolean; user: UserProfile }> => {
   const { data: sessionData, error: sessionError } =
     await supabase.auth.getSession();
@@ -51,7 +53,11 @@ export const updateUser = async (
     success: result.success,
     user: {
       email: result.user.email || "",
-      name: result.user.user_metadata?.name || "",
+      name:
+        result.user.user_metadata?.name ||
+        result.user.user_metadata?.displayName ||
+        "",
+      displayName: result.user.user_metadata?.displayName || "",
       phone: result.user.user_metadata?.phone || "",
       avatar_url: result.user.user_metadata?.avatar_url || "",
     },

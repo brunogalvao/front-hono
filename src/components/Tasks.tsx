@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Task } from "@/model/tasks.model";
-import { getTasks } from "@/service/getTasks";
+import { getTasks } from "@/service/task/getTasks";
+// ui
 import {
   Table,
   TableBody,
