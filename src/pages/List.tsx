@@ -1,29 +1,28 @@
-import { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 // components
-import { TasksTable } from "@/components/TasksTable";
-import { AddTaskDialog } from "@/components/AddTaskDialog";
-import { Card, CardContent } from "@/components/ui/card";
-import Loading from "@/components/Loading";
+import { TasksTable } from '@/components/TasksTable';
+import { AddTaskDialog } from '@/components/AddTaskDialog';
+import { Card, CardContent } from '@/components/ui/card';
+import Loading from '@/components/Loading';
 // import { FaCreativeCommonsZero } from "react-icons/fa";
 
 // model
-import type { Task } from "@/model/tasks.model";
+import type { Task } from '@/model/tasks.model';
 
 // service
-import { getTasks } from "@/service/task/getTasks";
-import { totalPrice, totalItems, totalPaid } from "@/service/total";
-import { supabase } from "@/lib/supabase";
-import TituloPage from "@/components/TituloPage";
-import { BanknoteArrowUp, Loader } from "lucide-react";
-import { formatToBRL } from "@/utils/format";
-import { Button } from "@/components/ui/button";
+import { getTasks } from '@/service/task/getTasks';
+import { totalPrice, totalItems, totalPaid } from '@/service/total';
+import { supabase } from '@/lib/supabase';
+import TituloPage from '@/components/TituloPage';
+import { BanknoteArrowUp, Loader } from 'lucide-react';
+import { formatToBRL } from '@/utils/format';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/animate-ui/components/tooltip";
+} from '@/components/animate-ui/components/tooltip';
 // import { px } from "motion/react";
 
 function List() {
@@ -41,8 +40,8 @@ function List() {
       setTasks(data);
     } catch (err) {
       console.error(
-        "Erro ao carregar tarefas:",
-        err instanceof Error ? err.message : "Erro desconhecido"
+        'Erro ao carregar tarefas:',
+        err instanceof Error ? err.message : 'Erro desconhecido',
       );
     } finally {
       setLoading(false);
@@ -61,8 +60,8 @@ function List() {
       setPaid(resultPaid);
     } catch (err) {
       console.error(
-        "Erro ao atualizar totais:",
-        err instanceof Error ? err.message : "Erro desconhecido"
+        'Erro ao atualizar totais:',
+        err instanceof Error ? err.message : 'Erro desconhecido',
       );
     }
   }, []);
@@ -73,7 +72,7 @@ function List() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) {
-        navigate("/login");
+        navigate('/login');
       }
     };
 
@@ -82,7 +81,7 @@ function List() {
         data: { subscription },
       } = supabase.auth.onAuthStateChange((_event, session) => {
         if (!session) {
-          navigate("/login");
+          navigate('/login');
         }
       });
       return subscription;

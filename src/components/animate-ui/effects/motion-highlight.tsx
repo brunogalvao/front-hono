@@ -1,8 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { AnimatePresence, type Transition } from 'framer-motion';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion, type Transition } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
 
@@ -248,14 +247,10 @@ function MotionHighlight<T extends string>({
                   transition={transition}
                   style={{
                     position: 'absolute',
-                    background: 'var(--muted, #f3f3f3)',
+                    backgroundColor: 'var(--muted)',
                     zIndex: 0,
                   }}
-                  className={cn(
-                    'absolute bg-muted z-0',
-                    className,
-                    activeClassNameState,
-                  )}
+                  // removido, pois causava conflito com MotionProps
                 />
               )}
             </AnimatePresence>
@@ -377,7 +372,6 @@ function MotionHighlightItem({
     clearBounds,
     hover,
     enabled,
-    className: contextClassName,
     transition: contextTransition,
     id: contextId,
     disabled: contextDisabled,
@@ -473,6 +467,15 @@ function MotionHighlightItem({
         },
       };
 
+  // Filter props incompatible with motion.div
+  const safeProps = { ...props };
+  delete safeProps.defaultChecked;
+  delete safeProps.defaultValue;
+  delete safeProps.suppressContentEditableWarning;
+  delete safeProps.suppressHydrationWarning;
+  delete safeProps.onAnimationStart;
+  delete safeProps.onAnimationEnd;
+
   if (asChild) {
     if (mode === 'children') {
       return React.cloneElement(
@@ -486,7 +489,7 @@ function MotionHighlightItem({
             'data-slot': 'motion-highlight-item-container',
           }),
           ...commonHandlers,
-          ...props,
+          ...safeProps,
         },
         <>
           <AnimatePresence initial={false}>
@@ -494,11 +497,6 @@ function MotionHighlightItem({
               <motion.div
                 layoutId={`transition-background-${contextId}`}
                 data-slot="motion-highlight"
-                className={cn(
-                  'absolute inset-0 bg-muted z-0',
-                  contextClassName,
-                  activeClassName,
-                )}
                 transition={itemTransition}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -511,7 +509,18 @@ function MotionHighlightItem({
                       (exitDelay ?? contextExitDelay ?? 0),
                   },
                 }}
-                {...dataAttributes}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundColor: 'var(--muted)',
+                  zIndex: 0,
+                }}
+                data-active={dataAttributes['data-active']}
+                aria-selected={dataAttributes['aria-selected']}
+                data-disabled={dataAttributes['data-disabled']}
+                data-value={dataAttributes['data-value']}
+                data-highlight={dataAttributes['data-highlight']}
+                // removido, pois causava conflito com MotionProps
               />
             )}
           </AnimatePresence>
@@ -544,7 +553,7 @@ function MotionHighlightItem({
       data-slot="motion-highlight-item-container"
       className={cn(mode === 'children' && 'relative', className)}
       {...dataAttributes}
-      {...props}
+      {...safeProps}
       {...commonHandlers}
     >
       {mode === 'children' && (
@@ -553,11 +562,12 @@ function MotionHighlightItem({
             <motion.div
               layoutId={`transition-background-${contextId}`}
               data-slot="motion-highlight"
-              className={cn(
-                'absolute inset-0 bg-muted z-0',
-                contextClassName,
-                activeClassName,
-              )}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                backgroundColor: 'var(--muted)',
+                zIndex: 0,
+              }}
               transition={itemTransition}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -570,7 +580,12 @@ function MotionHighlightItem({
                     (exitDelay ?? contextExitDelay ?? 0),
                 },
               }}
-              {...dataAttributes}
+              data-active={dataAttributes['data-active']}
+              aria-selected={dataAttributes['aria-selected']}
+              data-disabled={dataAttributes['data-disabled']}
+              data-value={dataAttributes['data-value']}
+              data-highlight={dataAttributes['data-highlight']}
+              // removido, pois causava conflito com MotionProps
             />
           )}
         </AnimatePresence>

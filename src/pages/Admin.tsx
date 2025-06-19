@@ -1,17 +1,17 @@
-import { AppSidebar } from "@/components/nav/app-sidebar";
-import { Separator } from "@/components/ui/separator";
+import { AppSidebar } from '@/components/nav/app-sidebar';
+import { Separator } from '@/components/ui/separator';
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabase";
-import { useEffect, useState } from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
-import { LogOut } from "@/components/animate-ui/icons/log-out";
-import { Loader } from "@/components/animate-ui/icons/loader";
-import { AnimateIcon } from "@/components/animate-ui/icons/icon";
+} from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/lib/supabase';
+import { useEffect, useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { LogOut } from '@/components/animate-ui/icons/log-out';
+import { Loader } from '@/components/animate-ui/icons/loader';
+import { AnimateIcon } from '@/components/animate-ui/icons/icon';
 
 function Admin() {
   const navigate = useNavigate();
@@ -22,11 +22,11 @@ function Admin() {
       setIsLoggingOut(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      navigate("/login");
+      navigate('/login');
     } catch (error) {
       console.error(
-        "Erro ao fazer logout:",
-        error instanceof Error ? error.message : "Erro desconhecido"
+        'Erro ao fazer logout:',
+        error instanceof Error ? error.message : 'Erro desconhecido',
       );
     } finally {
       setIsLoggingOut(false);
@@ -53,7 +53,7 @@ function Admin() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) {
-        navigate("/login");
+        navigate('/login');
       }
     };
 
@@ -62,7 +62,7 @@ function Admin() {
         data: { subscription },
       } = supabase.auth.onAuthStateChange((_event, session) => {
         if (!session) {
-          navigate("/login");
+          navigate('/login');
         }
       });
       return subscription;
