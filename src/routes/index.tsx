@@ -1,37 +1,41 @@
-import { createBrowserRouter } from "react-router-dom";
-import Home from "@/pages/Home";
-import Login from "@/pages/Login";
-import List from "@/pages/List";
-import Income from "@/pages/Income";
-import RegisterUser from "@/components/RegisterUser";
-import EditUser from "@/pages/EditUser";
+import { createBrowserRouter } from 'react-router-dom';
+import Home from '@/pages/Home';
+import Login from '@/pages/Login';
+import List from '@/pages/List';
+import Income from '@/pages/Income';
+import RegisterUser from '@/components/RegisterUser';
+import EditUser from '@/pages/EditUser';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <Home />,
   },
   {
-    path: "/login",
+    path: '/login',
     element: <Login />,
   },
   {
-    path: "/register",
+    path: '/register',
     element: <RegisterUser />,
   },
   // Rota protegida para o CRUD (você precisará implementar a lógica de proteção)
   // Rotas Administrativas
   {
-    path: "/admin/editUser",
+    path: '/admin/editUser',
     element: <EditUser />,
   },
   {
-    path: "/admin/list",
+    path: '/admin/list',
     element: <List />,
   },
   {
-    path: "/admin/income",
+    path: '/admin/income',
     element: <Income />,
+  },
+  {
+    path: '*',
+    element: <Login />,
   },
 ]);
 
