@@ -71,7 +71,7 @@ function Home() {
           </div>
 
           <p className="text-gray-600 mt-8 w-[40%] ps-8 text-end text-base">
-            {textoChamada[0].tituloHeader}
+            {textoChamada[0].textoHeader}
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
