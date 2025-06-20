@@ -23,7 +23,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/animate-ui/components/tooltip';
-// import { px } from "motion/react";
 
 function List() {
   const navigate = useNavigate();
@@ -136,7 +135,9 @@ function List() {
                     </p>
                   </TooltipTrigger>
                   <TooltipContent>
-                    Mude o na tabela para somar os valores pagos
+                    {tasks.length > 0
+                      ? 'Mude o status na tabela para somar os valores pagos.'
+                      : 'Nenhuma tarefa encontrada.'}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -172,9 +173,18 @@ function List() {
       ) : (
         <Card>
           <CardContent>
-            <p className="p-0 text-sm text-zinc-500">
-              Nenhuma Tarefa Encontrada
-            </p>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <p className="p-0 text-sm text-zinc-500 text-center cursor-pointer">
+                    Nenhuma Tarefa Encontrada
+                  </p>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Adicione uma tarefa no botão acima "Adicionar"
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </CardContent>
         </Card>
       )}

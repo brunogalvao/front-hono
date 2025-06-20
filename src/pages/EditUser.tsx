@@ -10,21 +10,21 @@ import { uploadAvatarImage } from '@/service/uploadAvatarImage';
 import { z } from 'zod';
 import { phoneSchema } from '@/model/phone.model';
 import { PatternFormat } from 'react-number-format';
-import TituloPage from '../components/TituloPage';
+import TituloPage from '@/components/TituloPage';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '../components/ui/card';
+} from '@/components/ui/card';
 import { FaGithub } from 'react-icons/fa';
 import { IoMail } from 'react-icons/io5';
 import { AnimateIcon } from '@/components/animate-ui/icons/icon';
 import { LiquidButton } from '@/components/animate-ui/buttons/liquid';
 import { RefreshCcw } from '@/components/animate-ui/icons/refresh-ccw';
 import { toast } from 'sonner';
-import { useUser } from '@/context/UserContext'; // IMPORTANTE
+import { useUser } from '@/context/UserContext';
 
 const EditUser = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -35,7 +35,7 @@ const EditUser = () => {
   const [message, setMessage] = useState('');
   const [provider, setProvider] = useState('');
 
-  const { setProfile } = useUser(); // <-- Aqui usamos o contexto para atualizar globalmente
+  const { setProfile } = useUser();
 
   const schema = z.object({
     phone: phoneSchema,

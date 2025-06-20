@@ -249,6 +249,7 @@ function MotionHighlight<T extends string>({
                     position: 'absolute',
                     backgroundColor: 'var(--muted)',
                     zIndex: 0,
+                    borderRadius: 'calc(var(--radius) + 4px)',
                   }}
                   // removido, pois causava conflito com MotionProps
                 />
@@ -514,13 +515,13 @@ function MotionHighlightItem({
                   inset: 0,
                   backgroundColor: 'var(--muted)',
                   zIndex: 0,
+                  borderRadius: 'calc(var(--radius) + 4px)',
                 }}
                 data-active={dataAttributes['data-active']}
                 aria-selected={dataAttributes['aria-selected']}
                 data-disabled={dataAttributes['data-disabled']}
                 data-value={dataAttributes['data-value']}
                 data-highlight={dataAttributes['data-highlight']}
-                // removido, pois causava conflito com MotionProps
               />
             )}
           </AnimatePresence>
@@ -567,6 +568,7 @@ function MotionHighlightItem({
                 inset: 0,
                 backgroundColor: 'var(--muted)',
                 zIndex: 0,
+                borderRadius: 'calc(var(--radius) + 4px)',
               }}
               transition={itemTransition}
               initial={{ opacity: 0 }}
