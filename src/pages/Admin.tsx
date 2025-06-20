@@ -54,6 +54,8 @@ function Admin() {
       } = await supabase.auth.getSession();
       if (!session) {
         navigate('/login');
+      } else {
+        console.log('Usuário autenticado:', session.user.email);
       }
     };
 
@@ -68,11 +70,11 @@ function Admin() {
       return subscription;
     };
 
+    checkUser();
+
     const subscription = setupAuthListener();
 
     return () => subscription.unsubscribe();
-
-    checkUser();
   }, [navigate]);
 
   return (
