@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { CARDS } from "@/data/cardsIntro";
+import { textoChamada } from "@/data/textoTitulo";
 import { Link, useNavigate } from "react-router-dom";
 
 function Home() {
@@ -29,43 +30,11 @@ function Home() {
     Cog,
   } as const;
 
-  // type IconName = keyof typeof ICONS;
-
-  // const CARDS: { title: string; description: string; icons: IconName }[] = [
-  //   {
-  //     title: "Registre na hora",
-  //     description: "Adicione receitas e despesas rapidamente, sem complicação.",
-  //     icons: "Clock7",
-  //   },
-  //   {
-  //     title: "Aqui para te lembras",
-  //     description:
-  //       "Mantenha suas tarefas financeiras organizadas e nunca perca um compromisso.",
-  //     icons: "Bell",
-  //   },
-  //   {
-  //     title: "Controle de tudo",
-  //     description:
-  //       "Gerencie suas finanças com ferramentas intuitivas e completas.",
-  //     icons: "Cog",
-  //   },
-  //   {
-  //     title: "Você vai adorar",
-  //     description:
-  //       "Experimente uma plataforma feita para facilitar sua vida financeira.",
-  //     icons: "Heart",
-  //   },
-  // ];
-
   const navigate = useNavigate();
 
   const goLogin = () => {
-    navigate("/login", { state: { textoHeader } });
+    navigate("/login");
   };
-
-  const tituloHeader = "Gerencie suas finanças de forma simples e eficiente.";
-  const textoHeader =
-    "Task’s Finance é uma plataforma que organiza suas receitas, despesas e tarefas financeiras mensais em um só lugar. Acompanhe seus gastos, visualize seus rendimentos e mantenha o controle do seu orçamento com clareza e praticidade.";
 
   return (
     <div className="min-h-screen ">
@@ -96,11 +65,13 @@ function Home() {
               className="text-8xl font-bold mb-3 w-full"
               text="Task's Finance"
             />
-            <p className="text-gray-600 text-base">{tituloHeader}</p>
+            <p className="text-gray-600 text-base">
+              {textoChamada[0].tituloHeader}
+            </p>
           </div>
 
           <p className="text-gray-600 mt-8 w-[40%] ps-8 text-end text-base">
-            {textoHeader}
+            {textoChamada[0].tituloHeader}
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -132,11 +103,12 @@ function Home() {
         </div>
 
         {/* Target */}
-        <div className="h-48 flex flex-row gap-3 items-center text-xl justify-center relative">
+        <div className="h-80 flex flex-col gap-8 items-center text-xl justify-center relative">
           <StarsBackground className="absolute inset-0 flex items-center justify-center rounded-xl -z-10" />
           <span className="font-bold">Conheça agora mesmo</span>
           <Link
             to="#"
+            className="flex gap-3"
             onClick={(e) => {
               e.preventDefault();
               goLogin();
@@ -145,11 +117,10 @@ function Home() {
             <HighlightText
               text="Faça o login"
               inViewOnce
-              className="px-8 py-1 font-bold cursor-pointer hover:underline"
+              className="py-2 px-16 font-bold cursor-pointer hover:underline"
             />
           </Link>
         </div>
-
         <Footer />
       </div>
     </div>

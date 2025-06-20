@@ -15,10 +15,10 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { FaGithub } from "react-icons/fa";
 import { GradientText } from "@/components/animate-ui/text/gradient";
-import { useLocation } from "react-router-dom";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import { LogIn } from "@/components/animate-ui/icons/log-in";
 import { Loader } from "@/components/animate-ui/icons/loader";
+import { textoChamada } from "@/data/textoTitulo";
 
 interface FormData {
   name: string;
@@ -28,8 +28,6 @@ interface FormData {
 
 function Login() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const textoHeader = location.state?.textoHeader;
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -62,7 +60,7 @@ function Login() {
       if (user && !user.user_metadata?.displayName) {
         await supabase.auth.updateUser({
           data: {
-            displayName: formData.name, // <-- Certifique-se de ter o nome aqui
+            displayName: formData.name,
           },
         });
       }
@@ -87,7 +85,7 @@ function Login() {
       if (error) throw error;
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Erro ao fazer login com GitHub"
+        err instanceof Error ? err.message : "Erro ao fazer login com GitHub",
       );
       setLoading(false);
     }
@@ -105,7 +103,7 @@ function Login() {
       if (error) throw error;
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Erro ao fazer login com Google"
+        err instanceof Error ? err.message : "Erro ao fazer login com Google",
       );
       setLoading(false);
     }
@@ -268,9 +266,7 @@ function Login() {
             className="text-5xl font-bold mb-3"
             text="Task's Finance"
           />
-          <p className="text-zinc-400">
-            {textoHeader ?? "Texto para introdução"}
-          </p>
+          <p className="text-zinc-400">{textoChamada[0].textoHeader}</p>
         </div>
       </div>
     </div>
