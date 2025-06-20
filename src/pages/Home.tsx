@@ -17,9 +17,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { CARDS } from "@/data/cardsIntro";
 import { Link, useNavigate } from "react-router-dom";
 
 function Home() {
+  // icon
   const ICONS = {
     Clock7,
     Bell,
@@ -27,33 +29,33 @@ function Home() {
     Cog,
   } as const;
 
-  type IconName = keyof typeof ICONS;
+  // type IconName = keyof typeof ICONS;
 
-  const CARDS: { title: string; description: string; icons: IconName }[] = [
-    {
-      title: "Registre na hora",
-      description: "Adicione receitas e despesas rapidamente, sem complicação.",
-      icons: "Clock7",
-    },
-    {
-      title: "Aqui para te lembras",
-      description:
-        "Mantenha suas tarefas financeiras organizadas e nunca perca um compromisso.",
-      icons: "Bell",
-    },
-    {
-      title: "Controle de tudo",
-      description:
-        "Gerencie suas finanças com ferramentas intuitivas e completas.",
-      icons: "Cog",
-    },
-    {
-      title: "Você vai adorar",
-      description:
-        "Experimente uma plataforma feita para facilitar sua vida financeira.",
-      icons: "Heart",
-    },
-  ];
+  // const CARDS: { title: string; description: string; icons: IconName }[] = [
+  //   {
+  //     title: "Registre na hora",
+  //     description: "Adicione receitas e despesas rapidamente, sem complicação.",
+  //     icons: "Clock7",
+  //   },
+  //   {
+  //     title: "Aqui para te lembras",
+  //     description:
+  //       "Mantenha suas tarefas financeiras organizadas e nunca perca um compromisso.",
+  //     icons: "Bell",
+  //   },
+  //   {
+  //     title: "Controle de tudo",
+  //     description:
+  //       "Gerencie suas finanças com ferramentas intuitivas e completas.",
+  //     icons: "Cog",
+  //   },
+  //   {
+  //     title: "Você vai adorar",
+  //     description:
+  //       "Experimente uma plataforma feita para facilitar sua vida financeira.",
+  //     icons: "Heart",
+  //   },
+  // ];
 
   const navigate = useNavigate();
 
@@ -118,7 +120,6 @@ function Home() {
                           className="size-8 text-primary"
                           animate="default"
                         />
-                        {/* <span className="text-xl w-full">{card.title}</span> */}
                         {card.title}
                       </CardTitle>
                     </AnimateIcon>
