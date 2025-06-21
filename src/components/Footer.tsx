@@ -13,7 +13,7 @@ const Footer = () => {
   return (
     <footer className="text-white h-52">
       <div className="container mx-auto px-4 h-full items-center flex justify-center relative">
-        <ul className="flex flex-row gap-8">
+        <ul className="flex flex-row gap-12">
           {mediaSocial.map((item, index) => (
             <TooltipProvider>
               <Tooltip>

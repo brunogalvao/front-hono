@@ -1,17 +1,17 @@
-import { AppSidebar } from '@/components/nav/app-sidebar';
-import { Separator } from '@/components/ui/separator';
+import { AppSidebar } from "@/components/nav/app-sidebar";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { LogOut } from '@/components/animate-ui/icons/log-out';
-import { Loader } from '@/components/animate-ui/icons/loader';
-import { AnimateIcon } from '@/components/animate-ui/icons/icon';
+} from "@/components/ui/sidebar";
+import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import { LogOut } from "@/components/animate-ui/icons/log-out";
+import { Loader } from "@/components/animate-ui/icons/loader";
+import { AnimateIcon } from "@/components/animate-ui/icons/icon";
+import { RippleButton } from "@/components/animate-ui/buttons/ripple";
 
 function Admin() {
   const navigate = useNavigate();
@@ -22,11 +22,11 @@ function Admin() {
       setIsLoggingOut(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      navigate('/login');
+      navigate("/login");
     } catch (error) {
       console.error(
-        'Erro ao fazer logout:',
-        error instanceof Error ? error.message : 'Erro desconhecido',
+        "Erro ao fazer logout:",
+        error instanceof Error ? error.message : "Erro desconhecido",
       );
     } finally {
       setIsLoggingOut(false);
@@ -53,9 +53,9 @@ function Admin() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) {
-        navigate('/login');
+        navigate("/login");
       } else {
-        console.log('Usuário autenticado:', session.user.email);
+        console.log("Usuário autenticado:", session.user.email);
       }
     };
 
@@ -64,7 +64,7 @@ function Admin() {
         data: { subscription },
       } = supabase.auth.onAuthStateChange((_event, session) => {
         if (!session) {
-          navigate('/login');
+          navigate("/login");
         }
       });
       return subscription;
@@ -87,28 +87,25 @@ function Admin() {
           <Separator orientation="vertical" className="mr-2 h-4" />
           {/* sair */}
           <div className="flex justify-end w-full">
-            <Button
-              className="cursor-pointer flex gap-3"
-              variant="outline"
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-            >
-              {isLoggingOut ? (
-                <>
-                  Saindo
-                  <AnimateIcon animateOnHover>
+            <AnimateIcon animateOnHover>
+              <RippleButton
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="w-40"
+              >
+                {isLoggingOut ? (
+                  <>
+                    Saindo
                     <Loader />
-                  </AnimateIcon>
-                </>
-              ) : (
-                <>
-                  Sair
-                  <AnimateIcon animateOnHover>
+                  </>
+                ) : (
+                  <>
+                    Sair
                     <LogOut />
-                  </AnimateIcon>
-                </>
-              )}
-            </Button>
+                  </>
+                )}
+              </RippleButton>
+            </AnimateIcon>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4">

@@ -129,9 +129,9 @@ function Login() {
   }, [navigate]);
 
   return (
-    <div className="grid grid-cols-2">
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-[72%]">
+    <div className="grid md:grid-cols-2 grid-cols-1">
+      <div className="md:min-h-screen h-auto py-8 md:p-0 flex items-center justify-center md:order-1 order-last">
+        <Card className="md:w-[72%] w-[90%]">
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
@@ -260,11 +260,11 @@ function Login() {
         </Card>
       </div>
 
-      <div className="h-screen flex items-center border-l border-dashed px-4">
-        <div className="flex flex-col space-y-2 px-10">
+      <div className="md:h-screen h-auto md:pt-8 py-8 flex items-center border-l border-dashed px-4 md:order-2">
+        <div className="flex flex-col space-y-2 md:px-10 px-2">
           <GradientText
-            className="text-5xl font-bold mb-3"
-            text="Task's Finance"
+            className="text-5xl font-bold mb-3 capitalize"
+            text={textoChamada[0].title}
           />
           <p className="text-zinc-400">{textoChamada[0].textoHeader}</p>
         </div>

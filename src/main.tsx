@@ -13,9 +13,9 @@ createRoot(document.getElementById("root")!).render(
     <UserProvider>
       <StrictMode>
         <App />
-        <Toaster />
+        <Toaster richColors position="top-center" />
         <Analytics />
       </StrictMode>
     </UserProvider>
-  </ThemeProvider>
+  </ThemeProvider>,
 );

@@ -12,15 +12,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import { registerSchema } from "@/schema/registerSchema";
+import { AnimateIcon } from "./animate-ui/icons/icon";
+import { Send } from "./animate-ui/icons/send";
+import { Loader } from "./animate-ui/icons/loader";
+import { GradientText } from "./animate-ui/text/gradient";
+import { textoChamada } from "@/data/textoTitulo";
 
 const RegisterUser = () => {
   const [form, setForm] = useState({
     email: "",
     name: "",
     password: "",
+    confirmPassword: "",
   });
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,11 +36,22 @@ const RegisterUser = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage("");
-    setError("");
+
+    const result = registerSchema.safeParse(form);
+
+    if (!result.success) {
+      const errorMessages = result.error.flatten().fieldErrors;
+      console.log(errorMessages); // 👈 teste se esse log aparece
+
+      // Pega a primeira mensagem de erro e exibe no toast
+      const firstError = Object.values(errorMessages)[0]?.[0];
+      if (firstError) toast.error(firstError);
+
+      return;
+    }
+
     setLoading(true);
 
-    // Armazena o nome no localStorage para possível uso pós-login
     localStorage.setItem("signup_name", form.name);
 
     const { error } = await supabase.auth.signUp({
@@ -49,80 +66,125 @@ const RegisterUser = () => {
     });
 
     if (error) {
-      setError("Erro ao cadastrar: " + error.message);
+      toast.error(`Erro ao cadastrar: ${error.message}`);
     } else {
-      setMessage("Verifique seu e-mail para confirmar o cadastro.");
+      toast.success("Cadastro realizado com sucesso! Verifique seu e-mail.");
+      setForm({
+        email: "",
+        name: "",
+        password: "",
+        confirmPassword: "",
+      });
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Card className="w-96">
-        <CardHeader>
-          <CardTitle>Cadastro</CardTitle>
-          <CardDescription>
-            Preencha seus dados para criar uma conta. Você receberá um e-mail de
-            confirmação.
-          </CardDescription>
-        </CardHeader>
+    <div className="min-h-screen items-center justify-center grid md:grid-cols-2 grid-cols-1">
+      <div className="md:min-h-screen h-auto py-8 md:p-0 flex items-center justify-center md:order-1 order-last">
+        <Card className="md:w-[72%] w-[90%]">
+          <CardHeader>
+            <CardTitle className="text-2xl">Cadastro</CardTitle>
+            <CardDescription>
+              {textoChamada[0].subTituloCadastroCard}
+            </CardDescription>
+          </CardHeader>
 
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleRegister}>
-            {message && <p className="text-green-600">{message}</p>}
-            {error && <p className="text-red-600">{error}</p>}
+          <CardContent>
+            <form className="space-y-4" onSubmit={handleRegister}>
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="name">Nome</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  placeholder="Preencha com o seu nome"
+                  value={form.name}
+                  onChange={handleChange}
+                />
+              </div>
 
-            <div className="flex flex-col space-y-2">
-              <Label htmlFor="name">Nome</Label>
-              <Input
-                id="name"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Preencha com o seu E-mail"
+                  value={form.email}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="********"
+                  value={form.password}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="********"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <AnimateIcon animateOnHover>
+                <Button
+                  type="submit"
+                  className="w-full flex gap-3 items-center"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      Cadastrando <Loader />
+                    </>
+                  ) : (
+                    <>
+                      {" "}
+                      Cadastrar <Send />
+                    </>
+                  )}
+                </Button>
+              </AnimateIcon>
+            </form>
+          </CardContent>
+
+          <CardFooter>
+            <div className="flex justify-between w-full text-primary">
+              <Link
+                to="/login"
+                className="text-sm hover:border-b border-dashed"
+              >
+                Voltar
+              </Link>
             </div>
+          </CardFooter>
+        </Card>
+      </div>
 
-            <div className="flex flex-col space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="flex flex-col space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                required
-                placeholder="********"
-                value={form.password}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, password: e.target.value }))
-                }
-              />
-            </div>
-
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Cadastrando..." : "Cadastrar"}
-            </Button>
-          </form>
-        </CardContent>
-
-        <CardFooter>
-          <Link to="/login" className="text-sm hover:underline">
-            Voltar
-          </Link>
-        </CardFooter>
-      </Card>
+      <div className="md:h-screen h-auto md:pt-8 py-8 flex items-center border-l border-dashed px-4 md:order-2">
+        <div className="flex flex-col space-y-2 md:px-10 px-2">
+          <GradientText
+            className="text-5xl font-bold mb-3 capitalize"
+            text={textoChamada[0].title}
+          />
+          <p className="text-zinc-400">
+            {textoChamada[0].textoAuxilioRegister}
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

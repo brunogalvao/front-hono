@@ -59,21 +59,22 @@ function Home() {
 
         <Separator orientation="horizontal" />
 
-        <div className="flex py-20 flex-row gap-3 items-center">
-          <div className="flex w-[60%] flex-col">
+        <div className="flex py-20 md:flex-row flex-col gap-3 items-center">
+          <div className="flex w-full md:w-[60%] flex-col">
             <GradientText
-              className="text-8xl font-bold mb-3 w-full"
-              text="Task's Finance"
+              className="text-8xl font-bold mb-3 w-full capitalize"
+              text={textoChamada[0].title}
             />
             <p className="text-gray-600 text-base">
               {textoChamada[0].tituloHeader}
             </p>
           </div>
 
-          <p className="text-gray-600 mt-8 w-[40%] ps-8 text-end text-base">
+          <p className="text-gray-600 mt-8 w-full md:w-[40%] md:ps-8 md:text-end text-center text-base">
             {textoChamada[0].textoHeader}
           </p>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <MotionHighlight hover className="rounded-2xl">
             {CARDS.map((card) => {
@@ -116,8 +117,9 @@ function Home() {
           >
             <HighlightText
               text="Faça o login"
+              transition={{ duration: 4, ease: "easeInOut" }}
               inViewOnce
-              className="py-2 px-16 font-bold cursor-pointer hover:underline"
+              className="py-2 px-16 font-bold cursor-pointer rounded-full hover:underline duration-200"
             />
           </Link>
         </div>
