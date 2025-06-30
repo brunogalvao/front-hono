@@ -1,14 +1,13 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { motion, type Variants } from 'motion/react';
+import { motion, type Variants } from "motion/react";
 
 import {
   getVariants,
   useAnimateIconContext,
   IconWrapper,
   type IconProps,
-} from '@/components/animate-ui/icons/icon';
+} from "@/components/animate-ui/icons/icon";
 
 type CircleXProps = IconProps<keyof typeof animations>;
 
@@ -18,21 +17,21 @@ const animations = {
     line1: {
       initial: {
         rotate: 0,
-        transition: { ease: 'easeInOut', duration: 0.4 },
+        transition: { ease: "easeInOut", duration: 0.4 },
       },
       animate: {
         rotate: 90,
-        transition: { ease: 'easeInOut', duration: 0.4 },
+        transition: { ease: "easeInOut", duration: 0.4 },
       },
     },
     line2: {
       initial: {
         rotate: 0,
-        transition: { ease: 'easeInOut', duration: 0.4, delay: 0.1 },
+        transition: { ease: "easeInOut", duration: 0.4, delay: 0.1 },
       },
       animate: {
         rotate: 90,
-        transition: { ease: 'easeInOut', duration: 0.4, delay: 0.1 },
+        transition: { ease: "easeInOut", duration: 0.4, delay: 0.1 },
       },
     },
   } satisfies Record<string, Variants>,
