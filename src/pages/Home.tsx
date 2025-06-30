@@ -41,7 +41,7 @@ function Home() {
       <div className="container mx-auto px-4 pb-8 flex gap-y-3 flex-col">
         <div className="flex justify-end py-2">
           <Button variant="link">
-            <AnimateIcon animateOnHover>
+            <AnimateIcon animateOnHover animation="default-loop">
               <Link
                 to="#"
                 onClick={(e) => {
@@ -104,9 +104,10 @@ function Home() {
         </div>
 
         {/* Target */}
-        <div className="h-80 flex flex-col gap-8 items-center text-xl justify-center relative">
-          <StarsBackground className="absolute inset-0 flex items-center justify-center rounded-xl -z-10" />
-          <span className="font-bold">Conheça agora mesmo</span>
+        <div className="h-80 flex flex-col gap-8 items-center text-xl justify-center relative -z-10">
+          <StarsBackground className="absolute inset-0 flex items-center rounded-xl justify-center" />
+
+          <span className="font-bold z-10">Conheça agora mesmo</span>
           <Link
             to="#"
             className="flex gap-3"

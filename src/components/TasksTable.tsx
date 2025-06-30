@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from "react";
 // ui
 import {
   Table,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableCell,
   TableCaption,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogTrigger,
@@ -17,26 +17,27 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from './ui/label';
-import { Switch } from './ui/switch';
-import StatusDropdown from './StatusDropdown';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "./ui/label";
+import { Switch } from "./ui/switch";
+import StatusDropdown from "./StatusDropdown";
 // service
-import { editTask } from '@/service/task/editTask';
-import { deleteTask } from '@/service/task/deleteTask';
+import { editTask } from "@/service/task/editTask";
+import { deleteTask } from "@/service/task/deleteTask";
 // model
-import type { Task, TaskTable } from '@/model/tasks.model';
+import { TaskStatus, type Task, type TaskTable } from "@/model/tasks.model";
 // icons
-import { AiFillDelete } from 'react-icons/ai';
-import { MdModeEditOutline } from 'react-icons/md';
-import { formatToBRL } from '@/utils/format';
+import { AiFillDelete } from "react-icons/ai";
+import { MdModeEditOutline } from "react-icons/md";
+import { formatToBRL } from "@/utils/format";
 
-import { NumericFormat } from 'react-number-format';
-import { DialogConfirmDelete } from './DialogConfirmDelete';
-import { AnimateIcon } from './animate-ui/icons/icon';
-import { Loader } from './animate-ui/icons/loader';
+import { NumericFormat } from "react-number-format";
+import { DialogConfirmDelete } from "./DialogConfirmDelete";
+import { AnimateIcon } from "./animate-ui/icons/icon";
+import { Loader } from "./animate-ui/icons/loader";
+import { getExpenseTypes } from "@/service/expense-types/getExpenseTypes";
 
 export function TasksTable({
   tasks,
@@ -45,16 +46,19 @@ export function TasksTable({
   onTasksChange,
 }: TaskTable) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [title, setTitle] = useState('');
-  const [price, setPrice] = useState('');
+  const [title, setTitle] = useState("");
+  const [price, setPrice] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState<TaskStatus>(TaskStatus.Pending);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [type, setType] = useState("");
+  const [allTypes, setAllTypes] = useState<string[]>([]);
 
   const handleEditClick = (task: Task) => {
     setEditingTask(task);
     setTitle(task.title);
-    setPrice(task.price?.toString() ?? '');
+    setPrice(task.price?.toString() ?? "");
+    setType(task.type ?? "");
     setDialogOpen(true);
     setDone(task.done);
   };
@@ -66,15 +70,16 @@ export function TasksTable({
           title,
           done,
           price: price ? Number(price) : null,
+          type,
         });
-        console.log('🟢 Editado com sucesso:', updated);
+        console.log("🟢 Editado com sucesso:", updated);
         setEditingTask(null);
         // Fecha o dialog
         setDialogOpen(false);
         // Atualiza a tabela
         onTasksChange();
       } catch (err) {
-        console.error('❌ Erro ao editar:', err);
+        console.error("❌ Erro ao editar:", err);
       }
     }
   };
@@ -87,9 +92,23 @@ export function TasksTable({
       onTasksChange();
       setIsSubmitting(false);
     } catch (err) {
-      console.error('❌ Erro ao deletar:', err);
+      console.error("❌ Erro ao deletar:", err);
     }
   };
+
+  useEffect(() => {
+    const fetchTypes = async () => {
+      try {
+        const types = await getExpenseTypes();
+        console.log("✅ Tipos carregados:", types);
+        setAllTypes(types.map((t) => t.name)); // ou t.nome se não fez o mapeamento na API
+      } catch (err) {
+        console.error("Erro ao carregar tipos de gasto:", err);
+      }
+    };
+
+    fetchTypes();
+  }, []);
 
   return (
     <Table>
@@ -110,6 +129,7 @@ export function TasksTable({
         <TableRow>
           <TableHead className="w-[200px]">Título</TableHead>
           <TableHead className="text-start">Preço</TableHead>
+          <TableHead className="text-start">Tipo</TableHead>
           <TableHead className="text-center">Status</TableHead>
           <TableHead className="text-center">Ações</TableHead>
         </TableRow>
@@ -119,6 +139,7 @@ export function TasksTable({
           <TableRow key={task.id}>
             <TableCell className="w-[50%]">{task.title}</TableCell>
             <TableCell>{formatToBRL(task.price ?? 0)}</TableCell>
+            <TableCell>{task.type}</TableCell>
             <TableCell>
               <div className="flex justify-center">
                 <StatusDropdown task={task} onStatusChanged={onTasksChange} />
@@ -143,20 +164,23 @@ export function TasksTable({
                       Edite suas informações do item.
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="flex flex-row space-x-2">
+
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col space-y-2">
-                      <Label>Titulo</Label>
+                      <Label>Título</Label>
                       <Input
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Título da tarefa"
                       />
                     </div>
+
                     <div className="flex flex-col space-y-2">
                       <Label>Preço</Label>
                       <NumericFormat
                         value={price}
                         onValueChange={(values) => {
-                          setPrice(String(values.floatValue ?? ''));
+                          setPrice(String(values.floatValue ?? ""));
                         }}
                         thousandSeparator="."
                         decimalSeparator=","
@@ -168,11 +192,41 @@ export function TasksTable({
                       />
                     </div>
 
-                    <div className="flex flex-col space-y-3">
-                      <Label>Status</Label>
-                      <Switch checked={done} onCheckedChange={setDone} />
+                    <div className="flex flex-col space-y-2 col-span-2">
+                      <div className="flex flex-1 flex-row gap-2">
+                        <div className="flex flex-col w-[80%] space-y-2">
+                          <Label>Tipo</Label>
+                          <Input
+                            placeholder="Digite ou selecione um tipo"
+                            list="expense-types"
+                            value={type}
+                            onChange={(e) => setType(e.target.value)}
+                          />
+                          <datalist id="expense-types">
+                            {allTypes.map((t) => (
+                              <option key={t} value={t} />
+                            ))}
+                          </datalist>
+                        </div>
+
+                        <div className="flex flex-col space-y-2 col-span-2 ">
+                          <Label>Status</Label>
+                          <Switch
+                            className="mt-2"
+                            checked={done === TaskStatus.Completed}
+                            onCheckedChange={(checked) =>
+                              setDone(
+                                checked
+                                  ? TaskStatus.Completed
+                                  : TaskStatus.Pending,
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
+
                   <DialogFooter>
                     <Button onClick={handleSave}>Salvar</Button>
                   </DialogFooter>
@@ -181,7 +235,7 @@ export function TasksTable({
 
               {/* Deletar */}
               <DialogConfirmDelete
-                description={task.title ?? ''}
+                description={task.title ?? ""}
                 onConfirm={() => handleDelete(task.id)}
               >
                 <Button

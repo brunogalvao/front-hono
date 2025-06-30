@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { editTask } from "@/service/task/editTask";
-import type { Task } from "@/model/tasks.model";
+import { TaskStatus, type Task } from "@/model/tasks.model";
 import { Badge } from "@/components/ui/badge";
 
 function StatusDropdown({
@@ -17,8 +17,14 @@ function StatusDropdown({
 }) {
   const toggleStatus = async () => {
     try {
-      await editTask(task.id, { done: !task.done });
-      onStatusChanged(); // recarrega os dados
+      const novoStatus =
+        task.done === TaskStatus.Completed
+          ? TaskStatus.Pending
+          : TaskStatus.Completed;
+
+      await editTask(task.id, { done: novoStatus });
+
+      onStatusChanged();
     } catch (err) {
       console.error("Erro ao atualizar status:", err);
     }
@@ -28,12 +34,12 @@ function StatusDropdown({
     <DropdownMenu>
       <DropdownMenuTrigger className="cursor-pointer" asChild>
         <Badge variant={task.done ? "default" : "destructive"}>
-          {task.done ? "Concluído" : "Pendente"}
+          {task.done ? TaskStatus.Completed : TaskStatus.Pending}
         </Badge>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={toggleStatus}>
-          {task.done ? "Marcar como Pendente" : "Marcar como Concluído"}
+          {task.done ? TaskStatus.Pending : TaskStatus.Completed}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -25,6 +25,13 @@ import { LiquidButton } from "@/components/animate-ui/buttons/liquid";
 import { RefreshCcw } from "@/components/animate-ui/icons/refresh-ccw";
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
+import { ResetPassword } from "@/components/ResetPassword";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+} from "@/components/animate-ui/base/accordion";
 
 const EditUser = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -117,6 +124,8 @@ const EditUser = () => {
     }
   };
 
+  const [checked, setChecked] = useState(false);
+
   return (
     <div className="space-y-6 w-full mx-auto">
       <TituloPage titulo="Editar Perfil" />
@@ -194,12 +203,22 @@ const EditUser = () => {
             </div>
           </div>
 
-          {/* Reset Senha */}
-          <div className="flex flex-row gap-3 items-end">
-            <div className="w-full flex gap-2 flex-col">
-              <Label htmlFor="email">Reset Senha</Label>
-              <Input value={user?.email || ""} disabled />
-            </div>
+          <div className="flex flex-1 flex-row">
+            <Accordion className="w-full">
+              <AccordionItem className="w-full border-0 mb-2">
+                <AccordionTrigger
+                  onClick={() => setChecked(!checked)}
+                  className={`transition duration-300 rounded px-3 bg-accent decoration-0 hover:bg-primary ${
+                    checked ? "bg-primary text-white rounded-b-none" : ""
+                  }`}
+                >
+                  {checked ? "Troque sua senha." : "Quer resetar a Senha ?"}
+                </AccordionTrigger>
+                <AccordionPanel>
+                  {checked && <ResetPassword provider={provider} />}
+                </AccordionPanel>
+              </AccordionItem>
+            </Accordion>
           </div>
         </CardContent>
 

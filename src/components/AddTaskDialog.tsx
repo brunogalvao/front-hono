@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createTask } from "@/service/task/createTask";
 import {
   Dialog,
@@ -13,14 +13,14 @@ import {
 import { Label } from "./ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-// import { AiOutlinePlus } from "react-icons/ai";
-
 import { taskSchema } from "@/schema/taskSchema";
 import { NumericFormat } from "react-number-format";
 import { LiquidButton } from "./animate-ui/buttons/liquid";
 import { AnimateIcon } from "./animate-ui/icons/icon";
-// import { RefreshCcw } from "./animate-ui/icons/refresh-ccw";
 import { Plus } from "./animate-ui/icons/plus";
+import { getExpenseTypes } from "@/service/expense-types/getExpenseTypes";
+import { TypeSelector } from "./TypeSelector";
+import { TaskStatus } from "@/model/tasks.model";
 
 export function AddTaskDialog({
   onTaskCreated,
@@ -31,28 +31,60 @@ export function AddTaskDialog({
   const [price, setPrice] = useState<string | number>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [msg, setMsg] = useState("");
+  const [type, setType] = useState("");
+  const [allTypes, setAllTypes] = useState<string[]>([]);
 
-  // Salvar
+  useEffect(() => {
+    const fetchTypes = async () => {
+      try {
+        const types = await getExpenseTypes();
+        const names = types.map((t) => t.name);
+        setAllTypes(names);
+      } catch (error) {
+        console.error("Erro ao carregar tipos de gasto:", error);
+      }
+    };
+
+    fetchTypes();
+  }, []);
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     const result = taskSchema.safeParse({
       title,
       price,
-      done: false,
+      done: TaskStatus.Pending,
+      type,
     });
 
     if (!result.success) {
       console.error(result.error.format());
-      // alert("Erro no formulário.");
       setMsg("Erro no formulário.");
-
+      setIsSubmitting(false);
       return;
     }
 
-    await createTask(result.data);
+    if (!type.trim()) {
+      setMsg("Tipo de gasto é obrigatório.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Fix: Ensure 'done' is TaskStatus.Pending, not boolean
+    await createTask({
+      ...result.data,
+      done: TaskStatus.Pending,
+    });
+
+    // Atualizar a Lista
+    if (type.trim() && !allTypes.includes(type.trim())) {
+      setAllTypes((prev) => [...prev, type.trim()]);
+    }
+
     onTaskCreated();
     setTitle("");
     setPrice("");
+    setType("");
     setIsSubmitting(false);
   };
 
@@ -68,24 +100,26 @@ export function AddTaskDialog({
           </AnimateIcon>
         </LiquidButton>
       </DialogTrigger>
+
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Adicionar nova tarefa</DialogTitle>
           <DialogDescription className="flex flex-col gap-3">
             Insira o título da tarefa que deseja adicionar.
-            <p>{msg}</p>
+            {msg && <p className="text-destructive text-sm mt-2">{msg}</p>}
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col space-y-4">
           <div className="flex flex-col space-y-2">
-            <Label>Titulo</Label>
+            <Label>Título</Label>
             <Input
               placeholder="Título da tarefa"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
+
           <div className="flex flex-col space-y-2">
             <Label>Preço</Label>
             <NumericFormat
@@ -98,9 +132,20 @@ export function AddTaskDialog({
               prefix="R$ "
               decimalScale={2}
               allowNegative={false}
-              fixedDecimalScale={false} // 👈 isso remove zeros fixos no final
+              fixedDecimalScale={false}
               customInput={Input}
             />
+          </div>
+
+          <div className="flex flex-col space-y-2">
+            {/* <Label>Tipo de Gasto</Label> */}
+            <div className="flex flex-wrap gap-2 p-2 border rounded-md bg-background items-center">
+              <TypeSelector
+                value={type}
+                onChange={setType}
+                allTypes={allTypes}
+              />
+            </div>
           </div>
         </div>
 
