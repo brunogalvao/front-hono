@@ -138,15 +138,3 @@
         @apply bg-background text-foreground;
     }
 }
-
-/* input,
-button {
-    height: 45px;
-}
-
-butotn[data-slot="switch"] {
-    display: flex;
-    width: 3rem !important;
-    height: 1.6rem !important;
-    padding: 4px !important;
-} */

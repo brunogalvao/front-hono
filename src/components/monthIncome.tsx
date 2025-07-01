@@ -17,7 +17,6 @@ function MonthIncome({ reloadTrigger, onSelectMes }: Props) {
   const [salariosPorMes, setSalariosPorMes] = useState<Record<number, number>>(
     {},
   );
-  // const [userId, setUserId] = useState<string | null>(null);
 
   const formatToBRL = (valor: number) =>
     new Intl.NumberFormat("pt-BR", {
