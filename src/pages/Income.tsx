@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { NumericFormat } from "react-number-format";
 // ui
 import TituloPage from "@/components/TituloPage";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -34,6 +34,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/animate-ui/components/tooltip";
+import MonthIncome from "@/components/monthIncome";
 
 function Income() {
   const [incomes, setIncomes] = useState<IncomeItem[]>([]);
@@ -46,6 +47,7 @@ function Income() {
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
   });
+  const [reloadFlag, setReloadFlag] = useState(Date.now());
 
   const loadTotal = async () => {
     try {
@@ -74,7 +76,7 @@ function Income() {
 
         const updated = await editIncome({ ...form, id: editingId });
         setIncomes((prev) =>
-          prev.map((item) => (item.id === editingId ? updated : item))
+          prev.map((item) => (item.id === editingId ? updated : item)),
         );
 
         toast.success("Cadastro Editado");
@@ -101,17 +103,19 @@ function Income() {
         err instanceof Error
           ? err.message
           : typeof err === "string"
-          ? err
-          : "Erro desconhecido";
+            ? err
+            : "Erro desconhecido";
 
       toast.error(errorMessage);
     }
+    setReloadFlag(Date.now()); // força nova leitura
   };
 
   const handleDelete = async (id: string) => {
     try {
       await deleteIncome(id);
       setIncomes((prev) => prev.filter((item) => item.id !== id));
+      setReloadFlag(Date.now());
       await loadTotal();
     } catch (err) {
       console.error("Erro ao deletar:", err);
@@ -126,6 +130,11 @@ function Income() {
   return (
     <div className="space-y-6">
       <TituloPage titulo="Rendimentos" />
+
+      <MonthIncome
+        reloadTrigger={reloadFlag}
+        onSelectMes={(mes) => setForm((f) => ({ ...f, mes }))}
+      />
 
       <div className="flex flex-col space-y-6">
         <div className="flex flex-row gap-3">
@@ -214,6 +223,9 @@ function Income() {
       </div>
 
       <Card>
+        <CardHeader>
+          <CardTitle>Lista de Rendimentos</CardTitle>
+        </CardHeader>
         <CardContent>
           {incomes.length <= 0 ? (
             <TooltipProvider>
