@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import type z from "zod";
 
 export function AddTaskDialog({
   onTaskCreated,
@@ -41,6 +42,10 @@ export function AddTaskDialog({
   const [type, setType] = useState("");
   const [allTypes, setAllTypes] = useState<string[]>([]);
   const [done, setDone] = useState<TaskStatus>(TASK_STATUS.Pendente);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState<
+    Partial<Record<keyof z.infer<typeof taskSchema>, string>>
+  >({});
 
   useEffect(() => {
     const fetchTypes = async () => {
@@ -56,50 +61,56 @@ export function AddTaskDialog({
     fetchTypes();
   }, []);
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    const result = taskSchema.safeParse({
-      title,
-      price,
-      done,
-      type,
-    });
-
-    if (!result.success) {
-      console.error(result.error.format());
-      setMsg("Erro no formulário.");
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (!type.trim()) {
-      setMsg("Tipo de gasto é obrigatório.");
-      setIsSubmitting(false);
-      return;
-    }
-
-    // Fix: Ensure 'done' is TaskStatus.Pending, not boolean
-    await createTask({
-      ...result.data,
-      done: TASK_STATUS.Pendente,
-    });
-
-    // Atualizar a Lista
-    if (type.trim() && !allTypes.includes(type.trim())) {
-      setAllTypes((prev) => [...prev, type.trim()]);
-    }
-
-    onTaskCreated();
+  const resetForm = () => {
     setTitle("");
     setPrice("");
     setType("");
-    setIsSubmitting(false);
+    setDone(TASK_STATUS.Pendente);
+    setFormErrors({});
+    setMsg("");
+    setDialogOpen(false);
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+
+    const result = taskSchema.safeParse({ title, price, done, type });
+
+    if (!result.success) {
+      const formatted = result.error.format();
+      const fieldErrors: Partial<Record<keyof typeof formatted, string>> = {
+        title: formatted.title?._errors?.[0],
+        price: formatted.price?._errors?.[0],
+        type: formatted.type?._errors?.[0],
+        done: formatted.done?._errors?.[0],
+      };
+
+      setFormErrors(fieldErrors);
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      await createTask({ ...result.data, done });
+      if (type.trim() && !allTypes.includes(type.trim())) {
+        setAllTypes((prev) => [...prev, type.trim()]);
+      }
+      onTaskCreated();
+      resetForm();
+    } catch (err) {
+      console.error("Erro ao criar tarefa:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <LiquidButton className="text-white">
+        <LiquidButton
+          className="text-white"
+          onClick={() => setDialogOpen(true)}
+        >
           <AnimateIcon animateOnHover>
             <div className="px-12 flex flex-row items-center gap-3">
               Adicionar
@@ -112,13 +123,17 @@ export function AddTaskDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Adicionar novo Item</DialogTitle>
-          <DialogDescription className="flex flex-col gap-3">
-            Insira o título do Item que deseja adicionar.
-            {msg && (
-              <span className="text-destructive text-sm mt-2">{msg}</span>
-            )}
-          </DialogDescription>
         </DialogHeader>
+
+        <DialogDescription className="flex flex-col">
+          Insira o título do Item que deseja adicionar.
+          {msg && <span className="text-destructive text-sm">{msg}</span>}
+          {Object.values(formErrors).length > 0 && (
+            <span className="text-destructive text-sm">
+              Preencha os campos obrigatórios.
+            </span>
+          )}
+        </DialogDescription>
 
         <div className="flex flex-col space-y-4">
           <div className="flex flex-col space-y-2">
@@ -128,6 +143,11 @@ export function AddTaskDialog({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
+            {formErrors.title && (
+              <span className="text-destructive text-sm">
+                {formErrors.title}
+              </span>
+            )}
           </div>
 
           <div className="flex flex-col space-y-2">
@@ -145,6 +165,11 @@ export function AddTaskDialog({
               fixedDecimalScale={false}
               customInput={Input}
             />
+            {formErrors.price && (
+              <span className="text-destructive text-sm">
+                {formErrors.price}
+              </span>
+            )}
           </div>
 
           <div className="flex flex-col space-y-2">
@@ -164,29 +189,42 @@ export function AddTaskDialog({
                 ))}
               </SelectContent>
             </Select>
+
+            {formErrors.done && (
+              <span className="text-destructive text-sm">
+                {formErrors.done}
+              </span>
+            )}
           </div>
 
           <div className="flex flex-col space-y-2">
             {/* <Label>Tipo de Gasto</Label> */}
-            <div className="flex flex-wrap gap-2 p-2 border rounded-md bg-background items-center">
+            <div className="flex flex-col gap-2 p-2 border rounded-md bg-background items-center">
               <TypeSelector
                 value={type}
                 onChange={setType}
                 allTypes={allTypes}
               />
+
+              {formErrors.type && (
+                <span className="text-destructive text-sm">
+                  {formErrors.type}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
         <DialogFooter className="sm:justify-end">
           <DialogClose asChild>
-            <Button variant="secondary">Cancelar</Button>
-          </DialogClose>
-          <DialogClose asChild>
-            <Button onClick={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? "Salvando..." : "Salvar"}
+            <Button variant="secondary" onClick={resetForm}>
+              Cancelar
             </Button>
           </DialogClose>
+
+          <Button onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting ? "Salvando..." : "Salvar"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

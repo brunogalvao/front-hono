@@ -22,7 +22,7 @@ export function TypeSelector({ value, onChange, allTypes }: Props) {
   };
 
   return (
-    <div className="flex flex-1 flex-col gap-2">
+    <div className="flex w-full flex-col gap-2">
       <Label htmlFor="expense-type">Tipo de Gasto</Label>
 
       {/* Chips de tipos já usados */}

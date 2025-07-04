@@ -68,11 +68,25 @@ export function TasksTable({
 
   const handleEditClick = (task: Task) => {
     setEditingTask(task);
-    setTitle(task.title);
-    setPrice(task.price?.toString() ?? "");
+
+    // Atualiza o título da tarefa
+    setTitle(task.title ?? "");
+
+    // Converte o preço para string de forma segura
+    setPrice(
+      task.price !== null && task.price !== undefined
+        ? task.price.toString()
+        : "",
+    );
+
+    // Garante um tipo mesmo se estiver undefined
     setType(task.type ?? "");
-    setDialogOpen(true);
+
+    // Define o status da tarefa
     setDone(task.done);
+
+    // Abre o modal de edição
+    setDialogOpen(true);
   };
 
   const handleSave = async () => {
