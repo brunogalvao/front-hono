@@ -100,11 +100,17 @@ export function TasksTable({
     setIsSubmitting(true);
     try {
       await deleteTask(id);
+
       // Atualiza a tabela
       onTasksChange();
-      setIsSubmitting(false);
+
+      // Atualiza a lista de tipos
+      const types = await getExpenseTypes();
+      setAllTypes(types.map((t) => t.name));
     } catch (err) {
       console.error("❌ Erro ao deletar:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
