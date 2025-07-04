@@ -21,7 +21,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "./ui/label";
-import { Switch } from "./ui/switch";
 import StatusDropdown from "./StatusDropdown";
 // service
 import { editTask } from "@/service/task/editTask";
@@ -43,6 +42,14 @@ import { DialogConfirmDelete } from "./DialogConfirmDelete";
 import { AnimateIcon } from "./animate-ui/icons/icon";
 import { Loader } from "./animate-ui/icons/loader";
 import { getExpenseTypes } from "@/service/expense-types/getExpenseTypes";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { TypeSelector } from "./TypeSelector";
 
 export function TasksTable({
   tasks,
@@ -164,13 +171,13 @@ export function TasksTable({
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Editar Tarefa</DialogTitle>
+                    <DialogTitle>Editar Item</DialogTitle>
                     <DialogDescription>
                       Edite suas informações do item.
                     </DialogDescription>
                   </DialogHeader>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="flex flex-col space-y-2">
                       <Label>Título</Label>
                       <Input
@@ -179,7 +186,10 @@ export function TasksTable({
                         placeholder="Título da tarefa"
                       />
                     </div>
+                  </div>
 
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Preço */}
                     <div className="flex flex-col space-y-2">
                       <Label>Preço</Label>
                       <NumericFormat
@@ -197,37 +207,36 @@ export function TasksTable({
                       />
                     </div>
 
-                    <div className="flex flex-col space-y-2 col-span-2">
-                      <div className="flex flex-1 flex-row gap-2">
-                        <div className="flex flex-col w-[80%] space-y-2">
-                          <Label>Tipo</Label>
-                          <Input
-                            placeholder="Digite ou selecione um tipo"
-                            list="expense-types"
-                            value={type}
-                            onChange={(e) => setType(e.target.value)}
-                          />
-                          <datalist id="expense-types">
-                            {allTypes.map((t) => (
-                              <option key={t} value={t} />
-                            ))}
-                          </datalist>
-                        </div>
+                    {/* Status */}
+                    <div className="flex flex-col space-y-0.5">
+                      <label className="text-sm font-medium">Status</label>
+                      <Select
+                        value={done}
+                        onValueChange={(value) => setDone(value as TaskStatus)}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecione o status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(TASK_STATUS).map(([key, label]) => (
+                            <SelectItem key={key} value={label}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
 
-                        <div className="flex flex-col space-y-2 col-span-2 ">
-                          <Label>Status</Label>
-                          <Switch
-                            className="mt-2"
-                            checked={done === TASK_STATUS.Pago}
-                            onCheckedChange={(checked) =>
-                              setDone(
-                                checked
-                                  ? TASK_STATUS.Pago
-                                  : TASK_STATUS.Pendente,
-                              )
-                            }
-                          />
-                        </div>
+                  <div className="grid grid-cols-1">
+                    <div className="flex flex-col space-y-2">
+                      {/* <Label>Tipo de Gasto</Label> */}
+                      <div className="flex flex-wrap gap-2 p-2 border rounded-md bg-background items-center">
+                        <TypeSelector
+                          value={type}
+                          onChange={setType}
+                          allTypes={allTypes}
+                        />
                       </div>
                     </div>
                   </div>
