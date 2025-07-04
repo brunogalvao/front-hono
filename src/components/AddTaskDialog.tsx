@@ -20,7 +20,14 @@ import { AnimateIcon } from "./animate-ui/icons/icon";
 import { Plus } from "./animate-ui/icons/plus";
 import { getExpenseTypes } from "@/service/expense-types/getExpenseTypes";
 import { TypeSelector } from "./TypeSelector";
-import { TaskStatus } from "@/model/tasks.model";
+import { TASK_STATUS, type TaskStatus } from "@/model/tasks.model";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 export function AddTaskDialog({
   onTaskCreated,
@@ -33,6 +40,7 @@ export function AddTaskDialog({
   const [msg, setMsg] = useState("");
   const [type, setType] = useState("");
   const [allTypes, setAllTypes] = useState<string[]>([]);
+  const [done, setDone] = useState<TaskStatus>(TASK_STATUS.Pendente);
 
   useEffect(() => {
     const fetchTypes = async () => {
@@ -53,7 +61,7 @@ export function AddTaskDialog({
     const result = taskSchema.safeParse({
       title,
       price,
-      done: TaskStatus.Pending,
+      done,
       type,
     });
 
@@ -73,7 +81,7 @@ export function AddTaskDialog({
     // Fix: Ensure 'done' is TaskStatus.Pending, not boolean
     await createTask({
       ...result.data,
-      done: TaskStatus.Pending,
+      done: TASK_STATUS.Pendente,
     });
 
     // Atualizar a Lista
@@ -103,10 +111,12 @@ export function AddTaskDialog({
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Adicionar nova tarefa</DialogTitle>
+          <DialogTitle>Adicionar novo Item</DialogTitle>
           <DialogDescription className="flex flex-col gap-3">
-            Insira o título da tarefa que deseja adicionar.
-            {msg && <p className="text-destructive text-sm mt-2">{msg}</p>}
+            Insira o título do Item que deseja adicionar.
+            {msg && (
+              <span className="text-destructive text-sm mt-2">{msg}</span>
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -114,7 +124,7 @@ export function AddTaskDialog({
           <div className="flex flex-col space-y-2">
             <Label>Título</Label>
             <Input
-              placeholder="Título da tarefa"
+              placeholder="Título do Item"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -135,6 +145,25 @@ export function AddTaskDialog({
               fixedDecimalScale={false}
               customInput={Input}
             />
+          </div>
+
+          <div className="flex flex-col space-y-2">
+            <label className="text-sm font-medium">Status</label>
+            <Select
+              value={done}
+              onValueChange={(value) => setDone(value as TaskStatus)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione o status" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(TASK_STATUS).map(([key, label]) => (
+                  <SelectItem key={key} value={label}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex flex-col space-y-2">

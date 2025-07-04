@@ -15,12 +15,17 @@ export type TaskTable = {
 };
 
 // Status como objeto (em vez de enum)
-export const TaskStatus = {
-  Pending: "Pendente",
-  Fixed: "Fixo",
-  Completed: "Pago",
+export const TASK_STATUS = {
+  Pago: "Pago",
+  // Fixo: "Fixo",
+  Pendente: "Pendente",
 } as const;
+
+export type TaskStatus = keyof typeof TASK_STATUS;
+
+export const TASK_STATUS_LIST = Object.entries(TASK_STATUS).map(
+  ([value, label]) => ({ value, label }),
+);
 
 // Modelo de criação
 export type NewTask = Omit<Task, "id" | "created_at">;
-export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];

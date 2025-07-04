@@ -27,7 +27,12 @@ import StatusDropdown from "./StatusDropdown";
 import { editTask } from "@/service/task/editTask";
 import { deleteTask } from "@/service/task/deleteTask";
 // model
-import { TaskStatus, type Task, type TaskTable } from "@/model/tasks.model";
+import {
+  TASK_STATUS,
+  type Task,
+  type TaskStatus,
+  type TaskTable,
+} from "@/model/tasks.model";
 // icons
 import { AiFillDelete } from "react-icons/ai";
 import { MdModeEditOutline } from "react-icons/md";
@@ -49,7 +54,7 @@ export function TasksTable({
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [done, setDone] = useState<TaskStatus>(TaskStatus.Pending);
+  const [done, setDone] = useState<TaskStatus>(TASK_STATUS.Pendente);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [type, setType] = useState("");
   const [allTypes, setAllTypes] = useState<string[]>([]);
@@ -213,12 +218,12 @@ export function TasksTable({
                           <Label>Status</Label>
                           <Switch
                             className="mt-2"
-                            checked={done === TaskStatus.Completed}
+                            checked={done === TASK_STATUS.Pago}
                             onCheckedChange={(checked) =>
                               setDone(
                                 checked
-                                  ? TaskStatus.Completed
-                                  : TaskStatus.Pending,
+                                  ? TASK_STATUS.Pago
+                                  : TASK_STATUS.Pendente,
                               )
                             }
                           />

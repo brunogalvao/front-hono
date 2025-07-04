@@ -5,7 +5,12 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { editTask } from "@/service/task/editTask";
-import { TaskStatus, type Task } from "@/model/tasks.model";
+import {
+  TASK_STATUS_LIST,
+  type TaskStatus,
+  type Task,
+  TASK_STATUS,
+} from "@/model/tasks.model";
 import { Badge } from "@/components/ui/badge";
 
 function StatusDropdown({
@@ -15,15 +20,9 @@ function StatusDropdown({
   task: Task;
   onStatusChanged: () => void;
 }) {
-  const toggleStatus = async () => {
+  const handleChangeStatus = async (newStatus: TaskStatus) => {
     try {
-      const novoStatus =
-        task.done === TaskStatus.Completed
-          ? TaskStatus.Pending
-          : TaskStatus.Completed;
-
-      await editTask(task.id, { done: novoStatus });
-
+      await editTask(task.id, { done: newStatus });
       onStatusChanged();
     } catch (err) {
       console.error("Erro ao atualizar status:", err);
@@ -32,17 +31,27 @@ function StatusDropdown({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="cursor-pointer" asChild>
-        <Badge variant={task.done ? "default" : "destructive"}>
-          {task.done ? TaskStatus.Completed : TaskStatus.Pending}
+      <DropdownMenuTrigger asChild>
+        <Badge
+          variant={task.done === TASK_STATUS.Pago ? "outline" : "default"}
+          className="cursor-pointer"
+        >
+          {task.done}
         </Badge>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={toggleStatus}>
-          {task.done ? TaskStatus.Pending : TaskStatus.Completed}
-        </DropdownMenuItem>
+        {TASK_STATUS_LIST.map((status) => (
+          <DropdownMenuItem
+            key={status.value}
+            onClick={() => handleChangeStatus(status.value as TaskStatus)}
+          >
+            {status.label}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
+
 export default StatusDropdown;
