@@ -27,19 +27,25 @@ export function TypeSelector({ value, onChange, allTypes }: Props) {
 
       {/* Chips de tipos já usados */}
       <div className="flex flex-wrap gap-2 p-2 rounded-md border bg-muted max-h-32 overflow-y-auto">
-        {allTypes.map((type) => (
-          <div
-            key={type}
-            onClick={() => handleSelect(type)}
-            className={`px-3 py-1 text-sm rounded-full cursor-pointer border ${
-              value === type
-                ? "bg-primary text-white border-primary"
-                : "bg-background hover:border-muted-foreground"
-            }`}
-          >
-            {type}
-          </div>
-        ))}
+        {allTypes && allTypes.length > 0 ? (
+          allTypes.map((type) => (
+            <div
+              key={type}
+              onClick={() => handleSelect(type)}
+              className={`px-3 py-1 text-sm rounded-full cursor-pointer border ${
+                value === type
+                  ? "bg-primary text-white border-primary"
+                  : "bg-background hover:border-muted-foreground"
+              }`}
+            >
+              {type}
+            </div>
+          ))
+        ) : (
+          <span className="text-sm text-muted-foreground">
+            Sem tipos cadastrados
+          </span>
+        )}
       </div>
 
       {/* Input para novo tipo */}
