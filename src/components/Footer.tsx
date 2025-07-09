@@ -15,10 +15,10 @@ const Footer = () => {
       <div className="container mx-auto px-4 h-full items-center flex justify-center relative">
         <ul className="flex flex-row gap-12">
           {mediaSocial.map((item, index) => (
-            <TooltipProvider>
+            <TooltipProvider key={index}>
               <Tooltip>
                 <TooltipTrigger>
-                  <li key={index}>
+                  <li>
                     <a
                       href={item.link}
                       target="_blank"

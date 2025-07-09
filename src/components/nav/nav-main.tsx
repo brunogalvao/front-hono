@@ -1,11 +1,11 @@
+import React from "react";
 import {
   SidebarGroup,
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { NavLink } from "react-router-dom";
-import { FaListAlt, FaUserCog } from "react-icons/fa";
-import React from "react";
+import { FaListAlt, FaUserCog, FaHome } from "react-icons/fa";
 import { MdPaid } from "react-icons/md";
 
 // Define os ícones disponíveis e o tipo aceito
@@ -13,6 +13,7 @@ const iconMap: Record<string, React.ElementType> = {
   list: FaListAlt,
   income: MdPaid,
   user: FaUserCog,
+  dashboard: FaHome,
 };
 
 type IconKey = keyof typeof iconMap;

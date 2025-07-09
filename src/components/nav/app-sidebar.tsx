@@ -16,6 +16,7 @@ import { SidebarUser } from "@/components/nav/sidebar-user";
 
 const data = {
   navMain: [
+    { title: "Dashboard", url: "/admin/dashboard", icon: "dashboard" as const },
     { title: "Lista", url: "/admin/list", icon: "list" as const },
     { title: "Rendimento", url: "/admin/income", icon: "income" as const },
     { title: "Usuário", url: "/admin/editUser", icon: "user" as const },
