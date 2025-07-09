@@ -74,7 +74,7 @@ function Login() {
         });
       }
 
-      navigate("/admin/list");
+      navigate("/admin/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao fazer login");
     } finally {
@@ -88,7 +88,7 @@ function Login() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "github",
         options: {
-          redirectTo: `${window.location.origin}/admin/list`,
+          redirectTo: `${window.location.origin}/admin/dashboard`,
         },
       });
       if (error) throw error;
@@ -106,7 +106,7 @@ function Login() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/admin/list`,
+          redirectTo: `${window.location.origin}/admin/dashboard`,
         },
       });
       if (error) throw error;
@@ -138,7 +138,7 @@ function Login() {
         data: { session },
       } = await supabase.auth.getSession();
       if (session) {
-        navigate("/admin/list");
+        navigate("/admin/dashboard");
       }
     };
 
