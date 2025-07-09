@@ -1,11 +1,12 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Admin from '@/pages/Admin';
-import List from '@/pages/List';
-import Login from '@/pages/Login';
-import Home from '@/pages/Home';
-import Income from './pages/Income';
-import RegisterUser from '@/components/RegisterUser';
-import EditUser from './pages/EditUser';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Admin from "@/pages/Admin";
+import Login from "@/pages/Login";
+import Home from "@/pages/Home";
+import RegisterUser from "@/components/RegisterUser";
+import List from "@/pages/admin/List";
+import Income from "./pages/admin/Income";
+import EditUser from "./pages/admin/EditUser";
+import Dashboard from "./pages/admin/Dashboard";
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route index element={<List />} /> {/* rota padrão */}
           <Route path="editUser" element={<EditUser />} />
           <Route path="list" element={<List />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="income" element={<Income />} />
         </Route>
         <Route path="*" element={<div>404</div>} />
