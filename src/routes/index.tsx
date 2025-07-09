@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
-import RegisterUser from "@/components/RegisterUser";
 
 import List from "@/pages/admin/List";
 import Income from "@/pages/admin/Income";
@@ -16,10 +15,6 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
-  },
-  {
-    path: "/register",
-    element: <RegisterUser />,
   },
   // Rota protegida para o CRUD (você precisará implementar a lógica de proteção)
   // Rotas Administrativas

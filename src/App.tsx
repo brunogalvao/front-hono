@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Admin from "@/pages/Admin";
 import Login from "@/pages/Login";
 import Home from "@/pages/Home";
-import RegisterUser from "@/components/RegisterUser";
 import List from "@/pages/admin/List";
 import Income from "./pages/admin/Income";
 import EditUser from "./pages/admin/EditUser";
@@ -14,7 +13,6 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Home />} />
-        <Route path="/register" element={<RegisterUser />} />
 
         <Route path="/admin" element={<Admin />}>
           <Route index element={<List />} /> {/* rota padrão */}
