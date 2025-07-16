@@ -15,26 +15,37 @@ import {
 function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getTasks()
+    const now = new Date();
+    const month = now.getMonth() + 1; // getMonth() retorna 0-11
+    const year = now.getFullYear();
+
+    getTasks({ month, year })
       .then((data) => {
-        console.log("🔥 Dados recebidos:", data);
         setTasks(data);
+        setError(null);
       })
-      .catch((err) => console.error("Erro ao buscar tarefas:", err))
+      .catch((err) => {
+        console.error("Erro ao buscar tarefas:", err);
+        setError("Erro ao buscar tarefas.");
+      })
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <p>Carregando...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <Table>
       <TableCaption className="text-end">{tasks.length} Tarefas</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[200px]">Título</TableHead>
-          <TableHead>Status</TableHead>
+          <TableHead className="w-[200px]" scope="col">
+            Título
+          </TableHead>
+          <TableHead scope="col">Status</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
