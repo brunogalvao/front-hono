@@ -10,4 +10,6 @@ export const taskSchema = z.object({
   ),
   type: z.string().min(1, "Tipo de gasto obrigatório"),
   done: z.enum(["Pago", "Fixo", "Pendente"]),
+  mes: z.number().int().min(1).max(12),
+  ano: z.number().int().min(2000),
 });

@@ -50,6 +50,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { TypeSelector } from "./TypeSelector";
+import { getNomeMes } from "@/model/mes.enum";
 
 export function TasksTable({
   tasks,
@@ -65,6 +66,10 @@ export function TasksTable({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [type, setType] = useState("");
   const [allTypes, setAllTypes] = useState<string[]>([]);
+  const [form, setForm] = useState({
+    mes: new Date().getMonth() + 1,
+    ano: new Date().getFullYear(),
+  });
 
   const handleEditClick = (task: Task) => {
     setEditingTask(task);
@@ -85,6 +90,11 @@ export function TasksTable({
     // Define o status da tarefa
     setDone(task.done);
 
+    setForm({
+      mes: task.mes,
+      ano: task.ano,
+    });
+
     // Abre o modal de edição
     setDialogOpen(true);
   };
@@ -97,6 +107,8 @@ export function TasksTable({
           done,
           price: price ? Number(price) : null,
           type,
+          mes: form.mes,
+          ano: form.ano,
         });
         console.log("🟢 Editado com sucesso:", updated);
         setEditingTask(null);
@@ -162,6 +174,8 @@ export function TasksTable({
           <TableHead className="w-[200px]">Título</TableHead>
           <TableHead className="text-start">Preço</TableHead>
           <TableHead className="text-start">Tipo</TableHead>
+          <TableHead className="text-start">Mês</TableHead>
+          <TableHead className="text-start">Ano</TableHead>
           <TableHead className="text-center">Status</TableHead>
           <TableHead className="text-center">Ações</TableHead>
         </TableRow>
@@ -171,7 +185,11 @@ export function TasksTable({
           <TableRow key={task.id}>
             <TableCell className="w-[50%]">{task.title}</TableCell>
             <TableCell>{formatToBRL(task.price ?? 0)}</TableCell>
+
             <TableCell>{task.type}</TableCell>
+
+            <TableCell>{getNomeMes(task.mes)}</TableCell>
+            <TableCell>{task.ano}</TableCell>
             <TableCell>
               <div className="flex justify-center">
                 <StatusDropdown task={task} onStatusChanged={onTasksChange} />
@@ -225,6 +243,48 @@ export function TasksTable({
                         fixedDecimalScale={false}
                         customInput={Input}
                       />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Mês */}
+                      <div className="flex flex-col space-y-2">
+                        <Label>Mês</Label>
+                        <Select
+                          value={String(form.mes)}
+                          onValueChange={(value) =>
+                            setForm((f) => ({ ...f, mes: parseInt(value) }))
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Mês" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 12 }).map((_, i) => {
+                              const mes = (i + 1).toString();
+                              return (
+                                <SelectItem key={mes} value={mes}>
+                                  {mes.padStart(2, "0")}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Ano */}
+                      <div className="flex flex-col space-y-2">
+                        <Label>Ano</Label>
+                        <Input
+                          type="number"
+                          value={form.ano}
+                          onChange={(e) =>
+                            setForm((f) => ({
+                              ...f,
+                              ano: parseInt(e.target.value),
+                            }))
+                          }
+                        />
+                      </div>
                     </div>
 
                     {/* Status */}

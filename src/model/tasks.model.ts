@@ -5,6 +5,8 @@ export type Task = {
   done: TaskStatus;
   created_at?: string;
   type?: string;
+  mes: number;
+  ano: number;
 };
 
 export type TaskTable = {

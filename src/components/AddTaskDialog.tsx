@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import type z from "zod";
+import { MESES_LISTA } from "@/model/mes.enum";
 
 export function AddTaskDialog({
   onTaskCreated,
@@ -46,6 +47,10 @@ export function AddTaskDialog({
   const [formErrors, setFormErrors] = useState<
     Partial<Record<keyof z.infer<typeof taskSchema>, string>>
   >({});
+  const [form, setForm] = useState({
+    mes: new Date().getMonth() + 1,
+    ano: new Date().getFullYear(),
+  });
 
   useEffect(() => {
     const fetchTypes = async () => {
@@ -74,7 +79,14 @@ export function AddTaskDialog({
   const handleSubmit = async () => {
     setIsSubmitting(true);
 
-    const result = taskSchema.safeParse({ title, price, done, type });
+    const result = taskSchema.safeParse({
+      title,
+      price,
+      done,
+      type,
+      mes: form.mes,
+      ano: form.ano,
+    });
 
     if (!result.success) {
       const formatted = result.error.format();
@@ -83,6 +95,8 @@ export function AddTaskDialog({
         price: formatted.price?._errors?.[0],
         type: formatted.type?._errors?.[0],
         done: formatted.done?._errors?.[0],
+        mes: formatted.mes?._errors?.[0],
+        ano: formatted.ano?._errors?.[0],
       };
 
       setFormErrors(fieldErrors);
@@ -91,10 +105,17 @@ export function AddTaskDialog({
     }
 
     try {
-      await createTask({ ...result.data, done });
+      await createTask({
+        ...result.data,
+        done,
+        mes: form.mes,
+        ano: form.ano,
+      });
+
       if (type.trim() && !allTypes.includes(type.trim())) {
         setAllTypes((prev) => [...prev, type.trim()]);
       }
+
       onTaskCreated();
       resetForm();
     } catch (err) {
@@ -150,26 +171,60 @@ export function AddTaskDialog({
             )}
           </div>
 
-          <div className="flex flex-col space-y-2">
-            <Label>Preço</Label>
-            <NumericFormat
-              value={price}
-              onValueChange={(values) => {
-                setPrice(values.floatValue ?? "");
-              }}
-              thousandSeparator="."
-              decimalSeparator=","
-              prefix="R$ "
-              decimalScale={2}
-              allowNegative={false}
-              fixedDecimalScale={false}
-              customInput={Input}
-            />
-            {formErrors.price && (
-              <span className="text-destructive text-sm">
-                {formErrors.price}
-              </span>
-            )}
+          <div className="flex flex-row gap-3">
+            <div className="flex flex-col space-y-2 w-[50%]">
+              <Label>Preço</Label>
+              <NumericFormat
+                value={price}
+                onValueChange={(values) => {
+                  setPrice(values.floatValue ?? "");
+                }}
+                thousandSeparator="."
+                decimalSeparator=","
+                prefix="R$ "
+                decimalScale={2}
+                allowNegative={false}
+                fixedDecimalScale={false}
+                customInput={Input}
+              />
+              {formErrors.price && (
+                <span className="text-destructive text-sm">
+                  {formErrors.price}
+                </span>
+              )}
+            </div>
+
+            <div className="flex flex-col space-y-2">
+              <Label>Mês</Label>
+              <Select
+                value={String(form.mes)}
+                onValueChange={(value) =>
+                  setForm((f) => ({ ...f, mes: parseInt(value) }))
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Mês" />
+                </SelectTrigger>
+                <SelectContent>
+                  {MESES_LISTA.map((mes) => (
+                    <SelectItem key={mes.value} value={mes.value}>
+                      {mes.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex flex-col space-y-2">
+              <Label>Ano</Label>
+              <Input
+                type="number"
+                value={form.ano}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, ano: parseInt(e.target.value) }))
+                }
+              />
+            </div>
           </div>
 
           <div className="flex flex-col space-y-2">

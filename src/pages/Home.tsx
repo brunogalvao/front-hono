@@ -8,6 +8,7 @@ import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import { LogIn } from "@/components/animate-ui/icons/log-in";
 import { GradientText } from "@/components/animate-ui/text/gradient";
 import { HighlightText } from "@/components/animate-ui/text/highlight";
+import DescriptionHome from "@/components/DescriptionHome";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { CARDS } from "@/data/cardsIntro";
 import { textoChamada } from "@/data/textoTitulo";
+import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 
 function Home() {
@@ -77,44 +79,47 @@ function Home() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <MotionHighlight hover className="rounded-2xl">
-            {CARDS.map((card) => {
+            {CARDS.map((card, idx) => {
               const IconComponent = ICONS[card.icons];
+              const isLeft = idx % 2 === 0;
+
               return (
-                <Card
+                <motion.div
                   key={card.title}
-                  data-value={card.title}
-                  className="bg-transparent"
+                  initial={{ x: isLeft ? "-50%" : "50%", opacity: 0 }}
+                  whileInView={{ x: "0%", opacity: 1 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 1.5, ease: "easeInOut" }}
                 >
-                  <CardContent>
-                    <AnimateIcon animateOnHover>
-                      <CardTitle className="flex flex-row items-center gap-3 mb-4">
-                        <IconComponent
-                          className="size-8 text-primary"
-                          animate="default"
-                        />
-                        {card.title}
-                      </CardTitle>
-                    </AnimateIcon>
-                    <CardDescription>{card.description}</CardDescription>
-                  </CardContent>
-                </Card>
+                  <Card data-value={card.title} className="bg-transparent">
+                    <CardContent>
+                      <AnimateIcon animateOnHover>
+                        <CardTitle className="flex flex-row items-center gap-3 mb-4">
+                          <IconComponent
+                            className="size-8 text-primary"
+                            animate="default"
+                          />
+                          {card.title}
+                        </CardTitle>
+                      </AnimateIcon>
+                      <CardDescription>{card.description}</CardDescription>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               );
             })}
           </MotionHighlight>
         </div>
 
         {/* Target */}
-        <div className="h-80 flex flex-col gap-8 items-center text-xl justify-center relative -z-10">
-          <StarsBackground className="absolute inset-0 flex items-center rounded-xl justify-center" />
+        <div className="h-80 flex flex-col gap-8 items-center text-xl justify-center relative">
+          <StarsBackground className="absolute inset-0 flex items-center rounded-xl justify-center z-0" />
 
           <span className="font-bold z-10">Conheça agora mesmo</span>
-          <Link
-            to="#"
-            className="flex gap-3"
-            onClick={(e) => {
-              e.preventDefault();
-              goLogin();
-            }}
+          <span
+            className="flex gap-3 z-10 cursor-pointer"
+            onClick={goLogin}
+            style={{ cursor: "pointer" }}
           >
             <HighlightText
               text="Faça o login"
@@ -122,8 +127,12 @@ function Home() {
               inViewOnce
               className="py-2 px-16 font-bold cursor-pointer rounded-full hover:underline duration-200"
             />
-          </Link>
+          </span>
         </div>
+
+        {/* Description */}
+        <DescriptionHome />
+
         <Footer />
       </div>
     </div>

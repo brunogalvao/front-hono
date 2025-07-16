@@ -6,17 +6,7 @@ import { TasksTable } from "@/components/TasksTable";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import Loading from "@/components/Loading";
-
-// model
-import type { Task } from "@/model/tasks.model";
-
-// service
-import { getTasks } from "@/service/task/getTasks";
-import { totalPrice, totalItems, totalPaid } from "@/service/total";
-import { supabase } from "@/lib/supabase";
 import TituloPage from "@/components/TituloPage";
-import { BanknoteArrowUp, Loader } from "lucide-react";
-import { formatToBRL } from "@/utils/format";
 import {
   Tooltip,
   TooltipContent,
@@ -24,29 +14,81 @@ import {
   TooltipTrigger,
 } from "@/components/animate-ui/components/tooltip";
 
+// model & utils
+import type { Task } from "@/model/tasks.model";
+import { MESES_LISTA } from "@/model/mes.enum";
+import { formatToBRL } from "@/utils/format";
+
+// services
+import { getTasks } from "@/service/task/getTasks";
+import { totalPrice, totalItems, totalPaid } from "@/service/total";
+import { supabase } from "@/lib/supabase";
+
+// icons
+import { BanknoteArrowUp, Loader } from "lucide-react";
+import {
+  Tabs,
+  TabsContent,
+  TabsContents,
+  TabsList,
+  TabsTrigger,
+} from "@/components/animate-ui/radix/tabs";
+import { FaCheckCircle } from "react-icons/fa";
+
 function List() {
   const navigate = useNavigate();
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState<number>(0);
-  const [price, setPrice] = useState<number>(0);
-  const [paid, setPaid] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(true);
 
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasksPorMes, setTasksPorMes] = useState<Record<string, Task[]>>({});
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [price, setPrice] = useState(0);
+  const [paid, setPaid] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [mesAtivo, setMesAtivo] = useState(String(new Date().getMonth() + 1));
+
+  const [form] = useState({
+    mes: new Date().getMonth() + 1,
+    ano: new Date().getFullYear(),
+  });
+
+  // 🔄 Busca tarefas conforme mês/ano
   const fetchTasks = useCallback(async () => {
+    setLoading(true);
     try {
-      const data = await getTasks();
+      const data = await getTasks({ month: form.mes, year: form.ano });
       setTasks(data);
     } catch (err) {
-      console.error(
-        "Erro ao carregar tarefas:",
-        err instanceof Error ? err.message : "Erro desconhecido",
-      );
+      console.error("Erro ao carregar tarefas:", err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [form]);
 
+  const fetchAllTasksPorAno = useCallback(async () => {
+    setLoading(true);
+    try {
+      const dadosMeses: Record<string, Task[]> = {};
+
+      await Promise.all(
+        MESES_LISTA.map(async (mes) => {
+          const data = await getTasks({
+            month: parseInt(mes.value),
+            year: form.ano,
+          });
+          dadosMeses[mes.value] = data;
+        }),
+      );
+
+      setTasksPorMes(dadosMeses);
+    } catch (err) {
+      console.error("Erro ao carregar tarefas:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [form.ano]);
+
+  // 🔄 Totais (geral)
   const updateTotalData = useCallback(async () => {
     try {
       const [totalResult, priceResult, resultPaid] = await Promise.all([
@@ -58,38 +100,33 @@ function List() {
       setPrice(priceResult);
       setPaid(resultPaid);
     } catch (err) {
-      console.error(
-        "Erro ao atualizar totais:",
-        err instanceof Error ? err.message : "Erro desconhecido",
-      );
+      console.error("Erro ao atualizar totais:", err);
     }
   }, []);
 
+  // 🔐 Verifica usuário e escuta logout
   useEffect(() => {
     const checkUser = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session) {
-        navigate("/login");
-      }
+      if (!session) navigate("/login");
     };
 
-    const setupAuthListener = () => {
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
-        if (!session) {
-          navigate("/login");
-        }
-      });
-      return subscription;
-    };
+    const subscription = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) navigate("/login");
+    }).data.subscription;
 
-    const fetchPrice = async () => {
+    checkUser();
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  // 📊 Busca totais uma vez
+  useEffect(() => {
+    const fetchTotals = async () => {
       setIsLoading(true);
       try {
-        const total = await totalPrice(); // sua função que busca o valor
+        const total = await totalPrice();
         const paid = await totalPaid();
         setPrice(total);
         setPaid(paid);
@@ -100,18 +137,24 @@ function List() {
       }
     };
 
-    checkUser();
-    fetchTasks();
+    fetchTotals();
     updateTotalData();
-    fetchPrice();
-    const subscription = setupAuthListener();
+  }, [updateTotalData]);
 
-    return () => subscription.unsubscribe();
-  }, [navigate, fetchTasks, updateTotalData]);
+  // 📅 Recarrega tarefas ao mudar mês/ano
+  useEffect(() => {
+    if (form.mes && form.ano) fetchTasks();
+  }, [form, fetchTasks]);
+
+  useEffect(() => {
+    if (form.ano) fetchAllTasksPorAno();
+  }, [form.ano, fetchAllTasksPorAno]);
 
   return (
     <div className="space-y-6">
       <TituloPage titulo="Lista" />
+
+      {/* Valor total pago + botão adicionar */}
       <div className="flex flex-row justify-between items-center">
         <div className="flex gap-3 items-center">
           {isLoading || paid == null ? (
@@ -125,69 +168,80 @@ function List() {
               <BanknoteArrowUp />
             </span>
           ) : (
-            <>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    {/* <span>Hover me</span> */}
-                    <p className="p-0 text-sm text-zinc-500 cursor-pointer">
-                      Sem Pagamento Efetuado
-                    </p>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {tasks.length > 0
-                      ? "Mude o status na tabela para somar os valores pagos."
-                      : "Nenhuma tarefa encontrada."}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <p className="text-sm text-zinc-500 cursor-pointer">
+                    Sem Pagamento Efetuado
+                  </p>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {tasks.length > 0
+                    ? "Mude o status na tabela para somar os valores pagos."
+                    : "Nenhuma tarefa encontrada."}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
 
         <AddTaskDialog
           onTaskCreated={() => {
-            fetchTasks();
+            fetchAllTasksPorAno();
             updateTotalData();
           }}
         />
       </div>
-      {tasks && tasks.length > 0 ? (
-        <Card>
-          <CardContent>
-            {loading ? (
-              <Loading />
-            ) : (
-              <TasksTable
-                tasks={tasks}
-                total={total}
-                totalPrice={price}
-                onTasksChange={() => {
-                  fetchTasks();
-                  updateTotalData();
-                }}
-              />
-            )}
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardContent>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <p className="p-0 text-sm text-zinc-500 text-center cursor-pointer">
-                    Nenhuma Tarefa Encontrada
-                  </p>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Adicione uma tarefa no botão acima "Adicionar"
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </CardContent>
-        </Card>
-      )}
+
+      <Tabs value={mesAtivo} onValueChange={setMesAtivo}>
+        <TabsList className="gap-1">
+          {MESES_LISTA.map((mes) => {
+            const temTarefas = tasksPorMes[mes.value]?.length > 0;
+
+            return (
+              <TabsTrigger key={mes.value} value={mes.value} className="gap-2">
+                {temTarefas && <FaCheckCircle />}
+                {mes.label}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+        <TabsContents>
+          {MESES_LISTA.map((mes) => (
+            <TabsContent key={mes.value} value={mes.value}>
+              {loading ? (
+                <Card>
+                  <CardContent>
+                    <Loading />
+                  </CardContent>
+                </Card>
+              ) : tasksPorMes[mes.value]?.length > 0 ? (
+                <Card>
+                  <CardContent>
+                    <TasksTable
+                      tasks={tasksPorMes[mes.value]}
+                      total={total}
+                      totalPrice={price}
+                      onTasksChange={() => {
+                        fetchAllTasksPorAno();
+                        updateTotalData();
+                      }}
+                    />
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardContent>
+                    <p className="text-sm text-center text-zinc-500">
+                      Nenhum item encontrada para {mes.label}.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          ))}
+        </TabsContents>
+      </Tabs>
     </div>
   );
 }
