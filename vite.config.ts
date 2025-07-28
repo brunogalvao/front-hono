@@ -17,16 +17,72 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'react';
-            if (id.includes('lucide-react')) return 'icons';
+          // Core React libraries
+          if (id.includes('node_modules/react') || 
+              id.includes('node_modules/react-dom') || 
+              id.includes('node_modules/react-router-dom')) {
+            return 'react-vendor';
           }
-
-          if (id.includes('/components/ui/')) return 'shadcn';
-
+          
+          // UI Libraries
+          if (id.includes('node_modules/@radix-ui')) {
+            return 'ui-vendor';
+          }
+          
+          // Animation libraries
+          if (id.includes('node_modules/framer-motion') || 
+              id.includes('node_modules/motion') || 
+              id.includes('node_modules/animate-ui')) {
+            return 'animation-vendor';
+          }
+          
+          // Icons
+          if (id.includes('node_modules/lucide-react') || 
+              id.includes('node_modules/react-icons')) {
+            return 'icons-vendor';
+          }
+          
+          // Database and auth
+          if (id.includes('node_modules/@supabase')) {
+            return 'data-vendor';
+          }
+          
+          // Utilities
+          if (id.includes('node_modules/date-fns') || 
+              id.includes('node_modules/react-number-format') ||
+              id.includes('node_modules/react-use-measure') ||
+              id.includes('node_modules/sonner') ||
+              id.includes('node_modules/zod') ||
+              id.includes('node_modules/class-variance-authority') ||
+              id.includes('node_modules/clsx') ||
+              id.includes('node_modules/tailwind-merge')) {
+            return 'utils-vendor';
+          }
+          
+          // UI Components (shadcn)
+          if (id.includes('/components/ui/')) {
+            return 'shadcn';
+          }
+          
+          // Animate UI components
+          if (id.includes('/components/animate-ui/')) {
+            return 'animate-ui';
+          }
+          
           return null;
         },
       },
     },
+    chunkSizeWarningLimit: 1000, // Increase limit to 1MB
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@supabase/supabase-js',
+      'framer-motion',
+    ],
   },
 });
+

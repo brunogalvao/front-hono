@@ -1,47 +1,67 @@
 import { useEffect, useState } from "react";
 import TituloPage from "@/components/TituloPage";
-import { totalItems } from "@/service/total";
+import { getDollarRate } from "@/service/getDollarRate";
 import { totalIncomes } from "@/service/income/totalIncome";
-import { getInvestmentAdvice } from "@/service/ai/investmentAdvice";
+import { formatToBRL } from "@/utils/format";
 
 const Dashboard = () => {
-  const [advice, setAdvice] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [dollarRate, setDollarRate] = useState<number | null>(null);
+  const [rateError, setRateError] = useState<string | null>(null);
+  const [total, setTotal] = useState<number>(0);
+
+  const loadTotal = async () => {
+    try {
+      const total = await totalIncomes();
+      setTotal(total);
+    } catch (err) {
+      console.error("Erro ao carregar total de rendimentos:", err);
+    }
+  };
 
   useEffect(() => {
-    const fetchAdvice = async () => {
-      setLoading(true);
-      try {
-        const [income, paid] = await Promise.all([
-          totalIncomes(),
-          totalItems(),
-        ]);
+    loadTotal();
 
-        const msg = await getInvestmentAdvice(income, paid);
-        setAdvice(msg);
-      } catch (error) {
-        console.error("Erro ao obter sugestão de investimento:", error);
-        setAdvice("Não foi possível obter uma sugestão.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAdvice();
+    getDollarRate()
+      .then((rate) => {
+        setDollarRate(rate);
+        setRateError(null);
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar cotação do dólar:", err);
+        setRateError("Erro ao buscar cotação do dólar.");
+        setDollarRate(null);
+      });
   }, []);
+
+  const valorDolar = total / (dollarRate ?? 0);
 
   return (
     <div className="space-y-6">
       <TituloPage titulo="Home" />
       <div className="bg-muted p-4 rounded-md">
-        <h2 className="text-lg font-semibold mb-2">
-          💡 Sugestão de Investimento
-        </h2>
-        {loading ? (
-          <p>Carregando sugestão...</p>
-        ) : (
-          <p className="text-muted-foreground">{advice}</p>
-        )}
+        <div className="flex flex-row items-center justify-between">
+          <h2 className="text-lg font-semibold">💡 Sugestão de Investimento</h2>
+          {rateError && <span className="text-red-500">{rateError}</span>}
+          {dollarRate !== null && (
+            <span className="text-sm text-muted-foreground flex flex-col text-center">
+              Dólar <b>R$ {dollarRate.toFixed(2)}</b>
+            </span>
+          )}
+        </div>
+      </div>
+      {/*
+        Trazer o total de rendimento,
+        e ajustar para trazer o total de rendimentos Mensal
+        e Task total mensal
+      */}
+      <div>Total de Rendimentos{formatToBRL(total)}</div>
+      <div>{dollarRate}</div>
+      <div className="flex flex-col">
+        <span>Total de Dolar x Rendimento</span>
+        {valorDolar.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        })}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 // components
@@ -38,7 +38,6 @@ import { FaCheckCircle } from "react-icons/fa";
 function List() {
   const navigate = useNavigate();
 
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [tasksPorMes, setTasksPorMes] = useState<Record<string, Task[]>>({});
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
@@ -46,6 +45,7 @@ function List() {
   const [paid, setPaid] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [mesAtivo, setMesAtivo] = useState(String(new Date().getMonth() + 1));
+  const [loadedMonths, setLoadedMonths] = useState<Set<string>>(new Set());
 
   const [form] = useState({
     mes: new Date().getMonth() + 1,
@@ -56,8 +56,8 @@ function List() {
   const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getTasks({ month: form.mes, year: form.ano });
-      setTasks(data);
+      await getTasks({ month: form.mes, year: form.ano });
+      // Não precisamos mais desta função, mas mantemos para compatibilidade
     } catch (err) {
       console.error("Erro ao carregar tarefas:", err);
     } finally {
@@ -65,28 +65,31 @@ function List() {
     }
   }, [form]);
 
-  const fetchAllTasksPorAno = useCallback(async () => {
-    setLoading(true);
-    try {
-      const dadosMeses: Record<string, Task[]> = {};
-
-      await Promise.all(
-        MESES_LISTA.map(async (mes) => {
-          const data = await getTasks({
-            month: parseInt(mes.value),
-            year: form.ano,
-          });
-          dadosMeses[mes.value] = data;
-        }),
-      );
-
-      setTasksPorMes(dadosMeses);
-    } catch (err) {
-      console.error("Erro ao carregar tarefas:", err);
-    } finally {
-      setLoading(false);
+  // 🔄 Carrega tarefas de um mês específico sob demanda
+  const fetchTasksForMonth = useCallback(async (month: string, year: number) => {
+    const monthKey = `${month}-${year}`;
+    
+    // Se já foi carregado, não carrega novamente
+    if (loadedMonths.has(monthKey)) {
+      return;
     }
-  }, [form.ano]);
+
+    try {
+      const data = await getTasks({
+        month: parseInt(month),
+        year: year,
+      });
+      
+      setTasksPorMes(prev => ({
+        ...prev,
+        [month]: data
+      }));
+      
+      setLoadedMonths(prev => new Set([...prev, monthKey]));
+    } catch (err) {
+      console.error(`Erro ao carregar tarefas do mês ${month}:`, err);
+    }
+  }, [loadedMonths]);
 
   // 🔄 Totais (geral)
   const updateTotalData = useCallback(async () => {
@@ -103,6 +106,28 @@ function List() {
       console.error("Erro ao atualizar totais:", err);
     }
   }, []);
+
+  // 🔄 Função memoizada para atualizar tarefas de um mês específico
+  const createTasksChangeHandler = useCallback((month: string) => {
+    return async () => {
+      console.log("🔄 Atualizando tarefas do mês:", month);
+      
+      // Limpa o cache do mês para forçar recarregamento
+      setLoadedMonths(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(`${month}-${form.ano}`);
+        return newSet;
+      });
+      
+      // Recarrega as tarefas do mês
+      await fetchTasksForMonth(month, form.ano);
+      
+      // Atualiza os totais
+      await updateTotalData();
+      
+      console.log("✅ Atualização concluída para o mês:", month);
+    };
+  }, [fetchTasksForMonth, form.ano, updateTotalData]);
 
   // 🔐 Verifica usuário e escuta logout
   useEffect(() => {
@@ -146,9 +171,24 @@ function List() {
     if (form.mes && form.ano) fetchTasks();
   }, [form, fetchTasks]);
 
+  // 📅 Carrega o mês ativo quando mudar
   useEffect(() => {
-    if (form.ano) fetchAllTasksPorAno();
-  }, [form.ano, fetchAllTasksPorAno]);
+    if (mesAtivo && form.ano) {
+      fetchTasksForMonth(mesAtivo, form.ano);
+    }
+  }, [mesAtivo, form.ano, fetchTasksForMonth]);
+
+  // 🎯 Carrega o mês atual na inicialização
+  useEffect(() => {
+    const currentMonth = String(new Date().getMonth() + 1);
+    const currentYear = new Date().getFullYear();
+    fetchTasksForMonth(currentMonth, currentYear);
+  }, [fetchTasksForMonth]);
+
+  // 📊 Memoiza os totais para evitar recálculos desnecessários
+  const currentMonthTasks = useMemo(() => {
+    return tasksPorMes[mesAtivo] || [];
+  }, [tasksPorMes, mesAtivo]);
 
   return (
     <div className="space-y-6">
@@ -176,7 +216,7 @@ function List() {
                   </p>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {tasks.length > 0
+                  {currentMonthTasks.length > 0
                     ? "Mude o status na tabela para somar os valores pagos."
                     : "Nenhuma tarefa encontrada."}
                 </TooltipContent>
@@ -187,7 +227,8 @@ function List() {
 
         <AddTaskDialog
           onTaskCreated={() => {
-            fetchAllTasksPorAno();
+            // Recarrega apenas o mês atual
+            fetchTasksForMonth(mesAtivo, form.ano);
             updateTotalData();
           }}
         />
@@ -209,7 +250,7 @@ function List() {
         <TabsContents>
           {MESES_LISTA.map((mes) => (
             <TabsContent key={mes.value} value={mes.value}>
-              {loading ? (
+              {loading && mes.value === mesAtivo ? (
                 <Card>
                   <CardContent>
                     <Loading />
@@ -222,10 +263,7 @@ function List() {
                       tasks={tasksPorMes[mes.value]}
                       total={total}
                       totalPrice={price}
-                      onTasksChange={() => {
-                        fetchAllTasksPorAno();
-                        updateTotalData();
-                      }}
+                      onTasksChange={createTasksChangeHandler(mes.value)}
                     />
                   </CardContent>
                 </Card>

@@ -1,47 +1,32 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useCallback, memo, useMemo } from "react";
+import type { Task, TaskStatus } from "@/model/tasks.model";
+import { TASK_STATUS } from "@/model/tasks.model";
+import { editTask } from "@/service/task/editTask";
+import { deleteTask } from "@/service/task/deleteTask";
+import { getExpenseTypes } from "@/service/expense-types/getExpenseTypes";
+import { z } from "zod";
+import { taskSchema } from "@/schema/taskSchema";
+
 // ui
 import {
   Table,
-  TableHeader,
   TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
   TableCaption,
-} from "@/components/ui/table";
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "./ui/label";
-import StatusDropdown from "./StatusDropdown";
-// service
-import { editTask } from "@/service/task/editTask";
-import { deleteTask } from "@/service/task/deleteTask";
-// model
-import {
-  TASK_STATUS,
-  type Task,
-  type TaskStatus,
-  type TaskTable,
-} from "@/model/tasks.model";
-// icons
-import { AiFillDelete } from "react-icons/ai";
-import { MdModeEditOutline } from "react-icons/md";
-import { formatToBRL } from "@/utils/format";
-
-import { NumericFormat } from "react-number-format";
-import { DialogConfirmDelete } from "./DialogConfirmDelete";
-import { AnimateIcon } from "./animate-ui/icons/icon";
-import { Loader } from "./animate-ui/icons/loader";
-import { getExpenseTypes } from "@/service/expense-types/getExpenseTypes";
+  DialogTrigger,
+} from "./ui/dialog";
 import {
   Select,
   SelectContent,
@@ -50,12 +35,21 @@ import {
   SelectValue,
 } from "./ui/select";
 import { TypeSelector } from "./TypeSelector";
-import { getNomeMes } from "@/model/mes.enum";
+import StatusDropdown from "./StatusDropdown";
 
-export function TasksTable({
+// icons
+import { Pencil, Trash, Loader } from "lucide-react";
+
+interface TaskTable {
+  tasks: Task[];
+  totalPrice: number;
+  total: number;
+  onTasksChange: () => void;
+}
+
+export const TasksTable = memo(function TasksTable({
   tasks,
   totalPrice,
-  total,
   onTasksChange,
 }: TaskTable) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -71,7 +65,7 @@ export function TasksTable({
     ano: new Date().getFullYear(),
   });
 
-  const handleEditClick = (task: Task) => {
+  const handleEditClick = useCallback((task: Task) => {
     setEditingTask(task);
 
     // Atualiza o título da tarefa
@@ -97,9 +91,9 @@ export function TasksTable({
 
     // Abre o modal de edição
     setDialogOpen(true);
-  };
+  }, []);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (editingTask) {
       try {
         const updated = await editTask(editingTask.id, {
@@ -120,9 +114,9 @@ export function TasksTable({
         console.error("❌ Erro ao editar:", err);
       }
     }
-  };
+  }, [editingTask, title, done, price, type, form, onTasksChange]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     setIsSubmitting(true);
     try {
       await deleteTask(id);
@@ -138,7 +132,7 @@ export function TasksTable({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [onTasksChange]);
 
   useEffect(() => {
     const fetchTypes = async () => {
@@ -154,204 +148,184 @@ export function TasksTable({
     fetchTypes();
   }, []);
 
+  // Memoiza a validação do formulário
+  const formErrors = useMemo(() => {
+    try {
+      taskSchema.parse({
+        title,
+        price: price ? Number(price) : null,
+        type,
+        done,
+        mes: form.mes,
+        ano: form.ano,
+      });
+      return {};
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path) {
+            errors[err.path[0] as string] = err.message;
+          }
+        });
+        return errors;
+      }
+      return {};
+    }
+  }, [title, price, type, done, form]);
+
+  const isFormValid = Object.keys(formErrors).length === 0;
+
   return (
-    <Table>
-      <TableCaption>
-        <div className="flex flex-1 justify-between">
-          {/* paginação */}
-          <span className="flex gap-3">Total de Tarefas {total}</span>
+    <div className="space-y-4">
+      <Table>
+        <TableCaption className="text-end">
+          {tasks.length} Tarefas - Total: R$ {totalPrice.toFixed(2)}
+        </TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[200px]" scope="col">
+              Título
+            </TableHead>
+            <TableHead scope="col">Tipo</TableHead>
+            <TableHead scope="col">Preço</TableHead>
+            <TableHead scope="col">Status</TableHead>
+            <TableHead scope="col">Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {tasks.map((task) => (
+            <TableRow key={task.id}>
+              <TableCell className="font-medium">{task.title}</TableCell>
+              <TableCell>{task.type || "Sem tipo"}</TableCell>
+              <TableCell>
+                {task.price ? `R$ ${task.price.toFixed(2)}` : "Sem preço"}
+              </TableCell>
+              <TableCell>
+                <StatusDropdown 
+                  task={task} 
+                  onStatusChanged={onTasksChange}
+                />
+              </TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditClick(task)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Editar Tarefa</DialogTitle>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="title" className="text-right">
+                            Título
+                          </Label>
+                          <Input
+                            id="title"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            className="col-span-3"
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="price" className="text-right">
+                            Preço
+                          </Label>
+                          <Input
+                            id="price"
+                            type="number"
+                            step="0.01"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            className="col-span-3"
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="type" className="text-right">
+                            Tipo
+                          </Label>
+                          <div className="col-span-3">
+                            <TypeSelector
+                              value={type}
+                              onChange={setType}
+                              allTypes={allTypes}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="status" className="text-right">
+                            Status
+                          </Label>
+                          <Select
+                            value={done}
+                            onValueChange={(value) =>
+                              setDone(value as TaskStatus)
+                            }
+                          >
+                            <SelectTrigger className="col-span-3">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={TASK_STATUS.Pendente}>
+                                Pendente
+                              </SelectItem>
+                              <SelectItem value={TASK_STATUS.Pago}>
+                                Pago
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setDialogOpen(false)}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={handleSave}
+                          disabled={!isFormValid || isSubmitting}
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <Loader className="mr-2 h-4 w-4 animate-spin" />
+                              Salvando...
+                            </>
+                          ) : (
+                            "Salvar"
+                          )}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
 
-          <div className="flex gap-2 items-center w-1/2">
-            <span>Total</span>
-            <span className="font-bold text-base bg-primary text-white px-1 rounded">
-              {formatToBRL(totalPrice)}
-            </span>
-          </div>
-        </div>
-      </TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[200px]">Título</TableHead>
-          <TableHead className="text-start">Preço</TableHead>
-          <TableHead className="text-start">Tipo</TableHead>
-          <TableHead className="text-start">Mês</TableHead>
-          <TableHead className="text-start">Ano</TableHead>
-          <TableHead className="text-center">Status</TableHead>
-          <TableHead className="text-center">Ações</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {tasks.map((task) => (
-          <TableRow key={task.id}>
-            <TableCell className="w-[50%]">{task.title}</TableCell>
-            <TableCell>{formatToBRL(task.price ?? 0)}</TableCell>
-
-            <TableCell>{task.type}</TableCell>
-
-            <TableCell>{getNomeMes(task.mes)}</TableCell>
-            <TableCell>{task.ano}</TableCell>
-            <TableCell>
-              <div className="flex justify-center">
-                <StatusDropdown task={task} onStatusChanged={onTasksChange} />
-              </div>
-            </TableCell>
-            <TableCell className="flex gap-2 justify-center">
-              {/* Editar */}
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogTrigger asChild>
                   <Button
                     variant="outline"
-                    className="flex gap-3"
-                    onClick={() => handleEditClick(task)}
+                    size="sm"
+                    onClick={() => handleDelete(task.id)}
+                    disabled={isSubmitting}
                   >
-                    <MdModeEditOutline />
+                    {isSubmitting ? (
+                      <Loader className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash className="h-4 w-4" />
+                    )}
                   </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Editar Item</DialogTitle>
-                    <DialogDescription>
-                      Edite suas informações do item.
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <div className="grid grid-cols-1 gap-4">
-                    <div className="flex flex-col space-y-2">
-                      <Label>Título</Label>
-                      <Input
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Título da tarefa"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Preço */}
-                    <div className="flex flex-col space-y-2">
-                      <Label>Preço</Label>
-                      <NumericFormat
-                        value={price}
-                        onValueChange={(values) => {
-                          setPrice(String(values.floatValue ?? ""));
-                        }}
-                        thousandSeparator="."
-                        decimalSeparator=","
-                        prefix="R$ "
-                        decimalScale={2}
-                        allowNegative={false}
-                        fixedDecimalScale={false}
-                        customInput={Input}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* Mês */}
-                      <div className="flex flex-col space-y-2">
-                        <Label>Mês</Label>
-                        <Select
-                          value={String(form.mes)}
-                          onValueChange={(value) =>
-                            setForm((f) => ({ ...f, mes: parseInt(value) }))
-                          }
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Mês" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: 12 }).map((_, i) => {
-                              const mes = (i + 1).toString();
-                              return (
-                                <SelectItem key={mes} value={mes}>
-                                  {mes.padStart(2, "0")}
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {/* Ano */}
-                      <div className="flex flex-col space-y-2">
-                        <Label>Ano</Label>
-                        <Input
-                          type="number"
-                          value={form.ano}
-                          onChange={(e) =>
-                            setForm((f) => ({
-                              ...f,
-                              ano: parseInt(e.target.value),
-                            }))
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {/* Status */}
-                    <div className="flex flex-col space-y-0.5">
-                      <label className="text-sm font-medium">Status</label>
-                      <Select
-                        value={done}
-                        onValueChange={(value) => setDone(value as TaskStatus)}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Selecione o status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(TASK_STATUS).map(([key, label]) => (
-                            <SelectItem key={key} value={label}>
-                              {label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1">
-                    <div className="flex flex-col space-y-2">
-                      {/* <Label>Tipo de Gasto</Label> */}
-                      <div className="flex flex-wrap gap-2 p-2 border rounded-md bg-background items-center">
-                        <TypeSelector
-                          value={type}
-                          onChange={setType}
-                          allTypes={allTypes}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <DialogFooter>
-                    <Button onClick={handleSave}>Salvar</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-
-              {/* Deletar */}
-              <DialogConfirmDelete
-                description={task.title ?? ""}
-                onConfirm={() => handleDelete(task.id)}
-              >
-                <Button
-                  variant="destructive"
-                  className="flex gap-3"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <AnimateIcon animateOnHover>
-                        <Loader />
-                      </AnimateIcon>
-                    </>
-                  ) : (
-                    <AiFillDelete />
-                  )}
-                </Button>
-              </DialogConfirmDelete>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
-}
+});
