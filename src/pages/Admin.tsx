@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/sidebar";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "@tanstack/react-router";
 import { LogOut } from "@/components/animate-ui/icons/log-out";
 import { Loader } from "@/components/animate-ui/icons/loader";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
@@ -22,7 +22,7 @@ function Admin() {
       setIsLoggingOut(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      navigate("/login");
+      navigate({ to: "/login" });
     } catch (error) {
       console.error(
         "Erro ao fazer logout:",
@@ -53,7 +53,7 @@ function Admin() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) {
-        navigate("/login");
+        navigate({ to: "/login" });
       } else {
         console.log("Usuário autenticado:", session.user.email);
       }
@@ -64,7 +64,7 @@ function Admin() {
         data: { subscription },
       } = supabase.auth.onAuthStateChange((_event, session) => {
         if (!session) {
-          navigate("/login");
+          navigate({ to: "/login" });
         }
       });
       return subscription;

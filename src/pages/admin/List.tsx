@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 
 // components
 import { TasksTable } from "@/components/TasksTable";
@@ -23,6 +24,7 @@ import { formatToBRL } from "@/utils/format";
 import { getTasks } from "@/service/task/getTasks";
 import { totalPrice, totalItems, totalPaid } from "@/service/total";
 import { supabase } from "@/lib/supabase";
+import { queryKeys } from "@/lib/query-keys";
 
 // icons
 import { BanknoteArrowUp, Loader } from "lucide-react";
@@ -39,7 +41,6 @@ function List() {
   const navigate = useNavigate();
 
   const [tasksPorMes, setTasksPorMes] = useState<Record<string, Task[]>>({});
-  const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [price, setPrice] = useState(0);
   const [paid, setPaid] = useState(0);
@@ -52,18 +53,12 @@ function List() {
     ano: new Date().getFullYear(),
   });
 
-  // 🔄 Busca tarefas conforme mês/ano
-  const fetchTasks = useCallback(async () => {
-    setLoading(true);
-    try {
-      await getTasks({ month: form.mes, year: form.ano });
-      // Não precisamos mais desta função, mas mantemos para compatibilidade
-    } catch (err) {
-      console.error("Erro ao carregar tarefas:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [form]);
+  // 🔄 Busca tarefas usando TanStack Query (cache automático)
+  useQuery({
+    queryKey: queryKeys.tasks.list({ month: form.mes, year: form.ano }),
+    queryFn: () => getTasks({ month: form.mes, year: form.ano }),
+    staleTime: 1000 * 60 * 2, // 2 minutos
+  });
 
   // 🔄 Carrega tarefas de um mês específico sob demanda
   const fetchTasksForMonth = useCallback(async (month: string, year: number) => {
@@ -135,11 +130,11 @@ function List() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session) navigate("/login");
+      if (!session) navigate({ to: "/login" });
     };
 
     const subscription = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) navigate("/login");
+      if (!session) navigate({ to: "/login" });
     }).data.subscription;
 
     checkUser();
@@ -167,9 +162,7 @@ function List() {
   }, [updateTotalData]);
 
   // 📅 Recarrega tarefas ao mudar mês/ano
-  useEffect(() => {
-    if (form.mes && form.ano) fetchTasks();
-  }, [form, fetchTasks]);
+  // Removido fetchTasks - agora usando TanStack Query
 
   // 📅 Carrega o mês ativo quando mudar
   useEffect(() => {
@@ -250,7 +243,7 @@ function List() {
         <TabsContents>
           {MESES_LISTA.map((mes) => (
             <TabsContent key={mes.value} value={mes.value}>
-              {loading && mes.value === mesAtivo ? (
+              {isLoading && mes.value === mesAtivo ? (
                 <Card>
                   <CardContent>
                     <Loading />

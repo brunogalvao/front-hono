@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link } from "@tanstack/react-router";
 import { supabase } from "@/lib/supabase";
 import {
   Card,
@@ -74,7 +74,7 @@ function Login() {
         });
       }
 
-      navigate("/admin/dashboard");
+      navigate({ to: "/admin/dashboard" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao fazer login");
     } finally {
@@ -138,7 +138,7 @@ function Login() {
         data: { session },
       } = await supabase.auth.getSession();
       if (session) {
-        navigate("/admin/dashboard");
+        navigate({ to: "/admin/dashboard" });
       }
     };
 

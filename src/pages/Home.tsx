@@ -21,7 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { CARDS } from "@/data/cardsIntro";
 import { textoChamada } from "@/data/textoTitulo";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "@tanstack/react-router";
 
 function Home() {
   // icon
@@ -35,7 +35,7 @@ function Home() {
   const navigate = useNavigate();
 
   const goLogin = () => {
-    navigate("/login");
+    navigate({ to: "/login" });
   };
 
   return (
@@ -45,7 +45,7 @@ function Home() {
           <Button variant="link">
             <AnimateIcon animateOnHover animation="default-loop">
               <Link
-                to="#"
+                to="/login"
                 onClick={(e) => {
                   e.preventDefault();
                   goLogin();

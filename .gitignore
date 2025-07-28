@@ -59,3 +59,9 @@ supabase/
 
 #Anotações
 .note.md
+
+# Análises e Documentação de Limpeza
+ARCHITECTURE_ANALYSIS.md
+OPTIMIZATION_SUMMARY.md
+CLEANUP_ANALYSIS.md
+CLEANUP_COMPLETE.md
