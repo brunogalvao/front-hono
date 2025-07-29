@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import type { Task, TaskStatus } from '@/model/tasks.model';
 import { TASK_STATUS } from '@/model/tasks.model';
-import { editTask } from '@/service/task/editTask';
-import { deleteTask } from '@/service/task/deleteTask';
 import { getExpenseTypes } from '@/service/expense-types/getExpenseTypes';
 import { z } from 'zod';
 import { taskSchema } from '@/schema/taskSchema';

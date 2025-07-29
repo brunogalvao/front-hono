@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase';
 import { API_BASE_URL } from '@/config/api';
-import type { IncomeItem } from '@/model/incomes.model';
 
 export interface IADashboard {
   rendimentoMes: number;

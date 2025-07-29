@@ -7,18 +7,18 @@ import {
 } from './animate-ui/components/tooltip';
 import { useIncomesByMonth } from '@/hooks/use-incomes-by-month';
 
-type Props = {
+type MonthIncomeProps = {
   reloadTrigger?: number;
   onSelectMes?: (mes: number) => void;
   total: number;
 };
 
-function MonthIncome({ reloadTrigger, onSelectMes, total }: Props) {
-  const {
-    data: salariosPorMes = {},
-    isLoading,
-    error,
-  } = useIncomesByMonth(reloadTrigger);
+export default function MonthIncome({
+  reloadTrigger,
+  onSelectMes,
+  total,
+}: MonthIncomeProps) {
+  const { data: salariosPorMes = {}, error } = useIncomesByMonth(reloadTrigger);
 
   const formatToBRL = (valor: number) =>
     new Intl.NumberFormat('pt-BR', {
@@ -69,5 +69,3 @@ function MonthIncome({ reloadTrigger, onSelectMes, total }: Props) {
     </div>
   );
 }
-
-export default MonthIncome;

@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabase';
-import { API_BASE_URL } from '@/config/api';
 import { getIncomes } from './getIncome';
 
 export interface IncomeByMonth {

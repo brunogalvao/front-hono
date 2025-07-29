@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { editIncome } from '@/service/income/editIncome';
 import { queryKeys } from '@/lib/query-keys';
-import type { IncomeItem } from '@/model/incomes.model';
 
 export function useEditIncome() {
   const queryClient = useQueryClient();

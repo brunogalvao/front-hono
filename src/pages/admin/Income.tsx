@@ -40,7 +40,6 @@ import { IncomesDataTable } from '@/components/IncomesDataTable';
 function Income() {
   const [incomes, setIncomes] = useState<IncomeItem[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState<number>(0);
   const [form, setForm] = useState({
     descricao: '',
@@ -71,7 +70,7 @@ function Income() {
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      // setLoading(false); // Removed as per edit hint
     }
   };
 
