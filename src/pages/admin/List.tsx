@@ -16,7 +16,6 @@ import {
 } from '@/components/animate-ui/components/tooltip';
 
 // model & utils
-import type { Task } from '@/model/tasks.model';
 import { MESES_LISTA } from '@/model/mes.enum';
 import { formatToBRL } from '@/utils/format';
 
