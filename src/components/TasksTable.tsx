@@ -6,6 +6,7 @@ import { deleteTask } from '@/service/task/deleteTask';
 import { getExpenseTypes } from '@/service/expense-types/getExpenseTypes';
 import { z } from 'zod';
 import { taskSchema } from '@/schema/taskSchema';
+import { useEditTask, useDeleteTask } from '@/hooks/use-tasks';
 
 // ui
 import {
@@ -23,9 +24,9 @@ import { Label } from './ui/label';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from './ui/dialog';
 import {
   Select,
@@ -39,6 +40,7 @@ import StatusDropdown from './StatusDropdown';
 
 // icons
 import { Pencil, Trash, Loader } from 'lucide-react';
+import { formatToBRL } from '@/utils/format';
 
 interface TaskTable {
   tasks: Task[];
@@ -57,13 +59,16 @@ export const TasksTable = memo(function TasksTable({
   const [price, setPrice] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [done, setDone] = useState<TaskStatus>(TASK_STATUS.Pendente);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [type, setType] = useState('');
   const [allTypes, setAllTypes] = useState<string[]>([]);
   const [form, setForm] = useState({
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
   });
+
+  // Hooks para edição e deleção com invalidação automática do cache
+  const editTaskMutation = useEditTask();
+  const deleteTaskMutation = useDeleteTask();
 
   const handleEditClick = useCallback((task: Task) => {
     setEditingTask(task);
@@ -96,15 +101,18 @@ export const TasksTable = memo(function TasksTable({
   const handleSave = useCallback(async () => {
     if (editingTask) {
       try {
-        const updated = await editTask(editingTask.id, {
-          title,
-          done,
-          price: price ? Number(price) : null,
-          type,
-          mes: form.mes,
-          ano: form.ano,
+        await editTaskMutation.mutateAsync({
+          id: editingTask.id,
+          data: {
+            title,
+            done,
+            price: price ? Number(price) : null,
+            type,
+            mes: form.mes,
+            ano: form.ano,
+          },
         });
-        console.log('🟢 Editado com sucesso:', updated);
+        console.log('🟢 Editado com sucesso');
         setEditingTask(null);
         // Fecha o dialog
         setDialogOpen(false);
@@ -114,13 +122,21 @@ export const TasksTable = memo(function TasksTable({
         console.error('❌ Erro ao editar:', err);
       }
     }
-  }, [editingTask, title, done, price, type, form, onTasksChange]);
+  }, [
+    editingTask,
+    title,
+    done,
+    price,
+    type,
+    form,
+    onTasksChange,
+    editTaskMutation,
+  ]);
 
   const handleDelete = useCallback(
     async (id: string) => {
-      setIsSubmitting(true);
       try {
-        await deleteTask(id);
+        await deleteTaskMutation.mutateAsync(id);
 
         // Atualiza a tabela
         onTasksChange();
@@ -130,11 +146,9 @@ export const TasksTable = memo(function TasksTable({
         setAllTypes(types.map((t) => t.name));
       } catch (err) {
         console.error('❌ Erro ao deletar:', err);
-      } finally {
-        setIsSubmitting(false);
       }
     },
-    [onTasksChange]
+    [onTasksChange, deleteTaskMutation]
   );
 
   useEffect(() => {
@@ -182,8 +196,11 @@ export const TasksTable = memo(function TasksTable({
   return (
     <div className="space-y-4">
       <Table>
-        <TableCaption className="text-end">
-          {tasks.length} Tarefas - Total: R$ {totalPrice.toFixed(2)}
+        <TableCaption>
+          <div className="flex justify-between">
+            <div>{tasks.length} Tarefas</div>
+            <div className="font-bold">Total {formatToBRL(totalPrice)}</div>
+          </div>
         </TableCaption>
         <TableHeader>
           <TableRow>
@@ -209,112 +226,21 @@ export const TasksTable = memo(function TasksTable({
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditClick(task)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                      <DialogHeader>
-                        <DialogTitle>Editar Tarefa</DialogTitle>
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="title" className="text-right">
-                            Título
-                          </Label>
-                          <Input
-                            id="title"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className="col-span-3"
-                          />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="price" className="text-right">
-                            Preço
-                          </Label>
-                          <Input
-                            id="price"
-                            type="number"
-                            step="0.01"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
-                            className="col-span-3"
-                          />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="type" className="text-right">
-                            Tipo
-                          </Label>
-                          <div className="col-span-3">
-                            <TypeSelector
-                              value={type}
-                              onChange={setType}
-                              allTypes={allTypes}
-                            />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="status" className="text-right">
-                            Status
-                          </Label>
-                          <Select
-                            value={done}
-                            onValueChange={(value) =>
-                              setDone(value as TaskStatus)
-                            }
-                          >
-                            <SelectTrigger className="col-span-3">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value={TASK_STATUS.Pendente}>
-                                Pendente
-                              </SelectItem>
-                              <SelectItem value={TASK_STATUS.Pago}>
-                                Pago
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => setDialogOpen(false)}
-                        >
-                          Cancelar
-                        </Button>
-                        <Button
-                          onClick={handleSave}
-                          disabled={!isFormValid || isSubmitting}
-                        >
-                          {isSubmitting ? (
-                            <>
-                              <Loader className="mr-2 h-4 w-4 animate-spin" />
-                              Salvando...
-                            </>
-                          ) : (
-                            'Salvar'
-                          )}
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDelete(task.id)}
-                    disabled={isSubmitting}
+                    onClick={() => handleEditClick(task)}
                   >
-                    {isSubmitting ? (
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDelete(task.id)}
+                    disabled={deleteTaskMutation.isPending}
+                  >
+                    {deleteTaskMutation.isPending ? (
                       <Loader className="h-4 w-4 animate-spin" />
                     ) : (
                       <Trash className="h-4 w-4" />
@@ -326,6 +252,99 @@ export const TasksTable = memo(function TasksTable({
           ))}
         </TableBody>
       </Table>
+
+      {/* Dialog de edição - Movido para fora da tabela */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent
+          className="w-full max-w-2xl"
+          aria-describedby="edit-task-description"
+        >
+          <DialogHeader>
+            <DialogTitle>Editar Item</DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="pb-4" id="edit-task-description">
+            Edite os detalhes da tarefa selecionada.
+          </DialogDescription>
+          <div className="flex flex-col space-y-6">
+            {/* Título - Largura total */}
+            <div className="flex flex-col space-y-2">
+              <Label className="text-base font-medium">Título</Label>
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="h-12 text-base"
+              />
+            </div>
+
+            {/* Preço e Status - Em linha */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col space-y-2">
+                <Label className="text-base font-medium">Preço</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="h-12 text-base"
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <Label className="text-base font-medium">Status</Label>
+                <Select
+                  value={done}
+                  onValueChange={(value) => setDone(value as TaskStatus)}
+                >
+                  <SelectTrigger className="border-input bg-background !h-12 w-full border px-3 py-2 text-base">
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={TASK_STATUS.Pendente}>
+                      Pendente
+                    </SelectItem>
+                    <SelectItem value={TASK_STATUS.Pago}>Pago</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Tipo de Gasto - Largura total */}
+            <div className="flex flex-col space-y-2">
+              <Label className="text-base font-medium">Tipo de Gasto</Label>
+              <div className="bg-background flex min-h-[3rem] flex-col items-center gap-2 rounded-md border p-4">
+                <TypeSelector
+                  value={type}
+                  onChange={setType}
+                  allTypes={allTypes}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setDialogOpen(false)}
+              className="h-11 px-6"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={!isFormValid || editTaskMutation.isPending}
+              className="h-11 px-8"
+            >
+              {editTaskMutation.isPending ? (
+                <>
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                'Salvar'
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 });

@@ -23,23 +23,27 @@ export function TypeSelector({ value, onChange, allTypes }: Props) {
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <Label htmlFor="expense-type">Tipo de Gasto</Label>
-
       {/* Chips de tipos já usados */}
-      <div className="bg-muted flex max-h-32 flex-wrap gap-2 overflow-y-auto rounded-md border p-2">
+      <div
+        className="bg-muted flex max-h-32 flex-wrap gap-2 overflow-y-auto rounded-md border p-2"
+        role="group"
+        aria-label="Tipos de gasto disponíveis"
+      >
         {allTypes && allTypes.length > 0 ? (
           allTypes.map((type) => (
-            <div
+            <button
               key={type}
+              type="button"
               onClick={() => handleSelect(type)}
-              className={`cursor-pointer rounded-full border px-3 py-1 text-sm ${
+              className={`cursor-pointer rounded-full border px-3 py-1 text-sm transition-colors ${
                 value === type
                   ? 'bg-primary border-primary text-white'
-                  : 'bg-background hover:border-muted-foreground'
+                  : 'bg-background hover:border-muted-foreground hover:bg-muted'
               }`}
+              aria-pressed={value === type}
             >
               {type}
-            </div>
+            </button>
           ))
         ) : (
           <span className="text-muted-foreground text-sm">
@@ -59,7 +63,12 @@ export function TypeSelector({ value, onChange, allTypes }: Props) {
             onChange(e.target.value);
           }}
           autoComplete="off"
+          aria-describedby="expense-type-description"
         />
+        <div id="expense-type-description" className="sr-only">
+          Digite um novo tipo de gasto ou selecione um dos tipos disponíveis
+          acima
+        </div>
       </div>
     </div>
   );

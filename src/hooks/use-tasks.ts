@@ -22,10 +22,13 @@ export function useCreateTask() {
   return useMutation({
     mutationFn: createTask,
     onSuccess: (newTask, variables) => {
-      // Invalida queries relacionadas
+      // Invalida todas as queries de tarefas
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.lists() });
 
-      // Atualiza cache otimisticamente
+      // Invalida também queries específicas de totais
+      queryClient.invalidateQueries({ queryKey: queryKeys.totals.all });
+
+      // Atualiza cache otimisticamente para o mês específico
       const month = variables.mes;
       const year = variables.ano;
       queryClient.setQueryData(
@@ -46,21 +49,27 @@ export function useEditTask() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => editTask(id, data),
     onSuccess: (updatedTask, variables) => {
-      // Invalida queries relacionadas
+      // Invalida todas as queries de tarefas
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.lists() });
 
-      // Atualiza cache otimisticamente
-      const month = variables.data.mes;
-      const year = variables.data.ano;
-      queryClient.setQueryData(
-        queryKeys.tasks.list({ month, year }),
-        (oldData: Task[] | undefined) => {
-          if (!oldData) return [updatedTask];
-          return oldData.map((task) =>
-            task.id === variables.id ? updatedTask : task
-          );
-        }
-      );
+      // Invalida também queries específicas de totais
+      queryClient.invalidateQueries({ queryKey: queryKeys.totals.all });
+
+      // Atualiza cache otimisticamente para o mês específico
+      const month = variables.data.mes || updatedTask.mes;
+      const year = variables.data.ano || updatedTask.ano;
+
+      if (month && year) {
+        queryClient.setQueryData(
+          queryKeys.tasks.list({ month, year }),
+          (oldData: Task[] | undefined) => {
+            if (!oldData) return [updatedTask];
+            return oldData.map((task) =>
+              task.id === variables.id ? updatedTask : task
+            );
+          }
+        );
+      }
     },
   });
 }
@@ -74,6 +83,9 @@ export function useDeleteTask() {
     onSuccess: () => {
       // Invalida todas as queries de tarefas
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.lists() });
+
+      // Invalida também queries específicas de totais
+      queryClient.invalidateQueries({ queryKey: queryKeys.totals.all });
     },
   });
 }

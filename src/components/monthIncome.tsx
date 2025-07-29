@@ -5,18 +5,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './animate-ui/components/tooltip';
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { useIncomesByMonth } from '@/hooks/use-incomes-by-month';
 
 type Props = {
   reloadTrigger?: number;
-  onSelectMes?: (mes: number) => void; // 👈 nova prop
+  onSelectMes?: (mes: number) => void;
+  total: number;
 };
 
-function MonthIncome({ reloadTrigger, onSelectMes }: Props) {
-  const [salariosPorMes, setSalariosPorMes] = useState<Record<number, number>>(
-    {}
-  );
+function MonthIncome({ reloadTrigger, onSelectMes, total }: Props) {
+  const {
+    data: salariosPorMes = {},
+    isLoading,
+    error,
+  } = useIncomesByMonth(reloadTrigger);
 
   const formatToBRL = (valor: number) =>
     new Intl.NumberFormat('pt-BR', {
@@ -24,43 +26,12 @@ function MonthIncome({ reloadTrigger, onSelectMes }: Props) {
       currency: 'BRL',
     }).format(valor);
 
-  useEffect(() => {
-    const carregarDados = async () => {
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser();
-      if (userError || !userData.user) return;
-
-      const uid = userData.user.id;
-      // setUserId(uid);
-
-      const { data: rendimentos, error } = await supabase
-        .from('incomes')
-        .select('mes, valor')
-        .eq('user_id', uid);
-
-      if (error) {
-        console.error('Erro ao carregar salários:', error);
-        return;
-      }
-
-      const agrupadoPorMes = rendimentos.reduce(
-        (acc, curr) => {
-          const mes = Number(curr.mes);
-          const valor = Number(curr.valor ?? 0);
-          acc[mes] = (acc[mes] || 0) + valor;
-          return acc;
-        },
-        {} as Record<number, number>
-      );
-
-      setSalariosPorMes(agrupadoPorMes);
-    };
-
-    carregarDados();
-  }, [reloadTrigger]);
+  if (error) {
+    console.error('Erro ao carregar salários por mês:', error);
+  }
 
   return (
-    <div>
+    <div className="flex flex-col gap-3">
       <div className="flex flex-row gap-3">
         <TooltipProvider>
           <div className="flex flex-wrap gap-2">
@@ -94,6 +65,7 @@ function MonthIncome({ reloadTrigger, onSelectMes }: Props) {
           </div>
         </TooltipProvider>
       </div>
+      Total Anual {formatToBRL(total)}
     </div>
   );
 }

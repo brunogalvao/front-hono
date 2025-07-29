@@ -15,6 +15,7 @@ export const queryKeys = {
     all: ['incomes'] as const,
     lists: () => [...queryKeys.incomes.all, 'list'] as const,
     list: () => [...queryKeys.incomes.lists()] as const,
+    byMonth: () => [...queryKeys.incomes.all, 'by-month'] as const,
     details: () => [...queryKeys.incomes.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.incomes.details(), id] as const,
   },
@@ -50,6 +51,11 @@ export const queryKeys = {
   user: {
     all: ['user'] as const,
     profile: () => [...queryKeys.user.all, 'profile'] as const,
+  },
+
+  // IA
+  ia: {
+    all: ['ia'] as const,
   },
 } as const;
 

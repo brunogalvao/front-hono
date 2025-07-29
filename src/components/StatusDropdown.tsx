@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { Loader } from 'lucide-react';
 import { toast } from 'sonner';
+import { useEditTask } from '@/hooks/use-tasks';
 
 function StatusDropdown({
   task,
@@ -23,8 +24,10 @@ function StatusDropdown({
   task: Task;
   onStatusChanged: () => void;
 }) {
-  const [isUpdating, setIsUpdating] = useState(false);
   const [localStatus, setLocalStatus] = useState<TaskStatus>(task.done);
+
+  // Hook para edição com invalidação automática do cache
+  const editTaskMutation = useEditTask();
 
   const handleChangeStatus = async (newStatus: TaskStatus) => {
     // Evita atualização se o status for o mesmo
@@ -33,7 +36,6 @@ function StatusDropdown({
       return;
     }
 
-    setIsUpdating(true);
     console.log(
       `🔄 Atualizando status da tarefa ${task.id} de "${localStatus}" para "${newStatus}"`
     );
@@ -43,8 +45,11 @@ function StatusDropdown({
       // Atualiza o estado local imediatamente para feedback visual
       setLocalStatus(newStatus);
 
-      const updatedTask = await editTask(task.id, { done: newStatus });
-      console.log('✅ Status atualizado com sucesso:', updatedTask);
+      await editTaskMutation.mutateAsync({
+        id: task.id,
+        data: { done: newStatus },
+      });
+      console.log('✅ Status atualizado com sucesso');
 
       // Feedback para o usuário
       toast.success(`Status alterado para ${newStatus}`);
@@ -59,13 +64,11 @@ function StatusDropdown({
       // Reverte o estado local em caso de erro
       setLocalStatus(task.done);
       toast.error('Erro ao atualizar status da tarefa');
-    } finally {
-      setIsUpdating(false);
     }
   };
 
   // Atualiza o status local quando a task muda
-  if (task.done !== localStatus && !isUpdating) {
+  if (task.done !== localStatus && !editTaskMutation.isPending) {
     setLocalStatus(task.done);
   }
 
@@ -76,7 +79,9 @@ function StatusDropdown({
           variant={localStatus === TASK_STATUS.Pago ? 'outline' : 'default'}
           className="flex cursor-pointer items-center gap-1"
         >
-          {isUpdating ? <Loader className="h-3 w-3 animate-spin" /> : null}
+          {editTaskMutation.isPending ? (
+            <Loader className="h-3 w-3 animate-spin" />
+          ) : null}
           {localStatus}
         </Badge>
       </DropdownMenuTrigger>
@@ -86,7 +91,7 @@ function StatusDropdown({
           <DropdownMenuItem
             key={status.value}
             onClick={() => handleChangeStatus(status.value as TaskStatus)}
-            disabled={isUpdating}
+            disabled={editTaskMutation.isPending}
           >
             {status.label}
           </DropdownMenuItem>

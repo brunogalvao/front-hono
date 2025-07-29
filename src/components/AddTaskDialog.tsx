@@ -7,8 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { Label } from './ui/label';
 import { Input } from '@/components/ui/input';
@@ -30,6 +28,8 @@ import {
 } from './ui/select';
 import type z from 'zod';
 import { MESES_LISTA } from '@/model/mes.enum';
+import { useCreateTask } from '@/hooks/use-tasks';
+import { Loader } from 'lucide-react';
 
 export function AddTaskDialog({
   onTaskCreated,
@@ -38,7 +38,6 @@ export function AddTaskDialog({
 }) {
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState<string | number>('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [msg, setMsg] = useState('');
   const [type, setType] = useState('');
   const [allTypes, setAllTypes] = useState<string[]>([]);
@@ -51,6 +50,9 @@ export function AddTaskDialog({
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
   });
+
+  // Hook para criar tarefa com invalidação automática do cache
+  const createTaskMutation = useCreateTask();
 
   useEffect(() => {
     const fetchTypes = async () => {
@@ -77,8 +79,6 @@ export function AddTaskDialog({
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-
     const result = taskSchema.safeParse({
       title,
       price,
@@ -100,12 +100,11 @@ export function AddTaskDialog({
       };
 
       setFormErrors(fieldErrors);
-      setIsSubmitting(false);
       return;
     }
 
     try {
-      await createTask({
+      await createTaskMutation.mutateAsync({
         ...result.data,
         done,
         mes: form.mes,
@@ -120,8 +119,6 @@ export function AddTaskDialog({
       resetForm();
     } catch (err) {
       console.error('Erro ao criar tarefa:', err);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -141,13 +138,16 @@ export function AddTaskDialog({
         </LiquidButton>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent
+        className="w-full max-w-2xl"
+        aria-describedby="add-task-description"
+      >
         <DialogHeader>
           <DialogTitle>Adicionar novo Item</DialogTitle>
         </DialogHeader>
 
-        <DialogDescription className="flex flex-col">
-          Insira o título do Item que deseja adicionar.
+        <DialogDescription className="pb-4" id="add-task-description">
+          Insira os detalhes do item que deseja adicionar.
           {msg && <span className="text-destructive text-sm">{msg}</span>}
           {Object.values(formErrors).length > 0 && (
             <span className="text-destructive text-sm">
@@ -156,13 +156,15 @@ export function AddTaskDialog({
           )}
         </DialogDescription>
 
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-6">
+          {/* Título - Largura total */}
           <div className="flex flex-col space-y-2">
-            <Label>Título</Label>
+            <Label className="text-base font-medium">Título</Label>
             <Input
               placeholder="Título do Item"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              className="h-12 text-base"
             />
             {formErrors.title && (
               <span className="text-destructive text-sm">
@@ -171,9 +173,10 @@ export function AddTaskDialog({
             )}
           </div>
 
-          <div className="flex flex-row gap-3">
-            <div className="flex w-[50%] flex-col space-y-2">
-              <Label>Preço</Label>
+          {/* Preço, Mês e Ano - Em linha */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="flex flex-col space-y-2">
+              <Label className="text-base font-medium">Preço</Label>
               <NumericFormat
                 value={price}
                 onValueChange={(values) => {
@@ -186,6 +189,9 @@ export function AddTaskDialog({
                 allowNegative={false}
                 fixedDecimalScale={false}
                 customInput={Input}
+                className="h-12 text-base"
+                autoComplete="off"
+                placeholder="0,00"
               />
               {formErrors.price && (
                 <span className="text-destructive text-sm">
@@ -195,14 +201,14 @@ export function AddTaskDialog({
             </div>
 
             <div className="flex flex-col space-y-2">
-              <Label>Mês</Label>
+              <Label className="text-base font-medium">Mês</Label>
               <Select
                 value={String(form.mes)}
                 onValueChange={(value) =>
                   setForm((f) => ({ ...f, mes: parseInt(value) }))
                 }
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="!h-12 !w-full text-base">
                   <SelectValue placeholder="Mês" />
                 </SelectTrigger>
                 <SelectContent>
@@ -216,71 +222,85 @@ export function AddTaskDialog({
             </div>
 
             <div className="flex flex-col space-y-2">
-              <Label>Ano</Label>
+              <Label className="text-base font-medium">Ano</Label>
               <Input
                 type="number"
                 value={form.ano}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, ano: parseInt(e.target.value) }))
                 }
+                className="h-12 text-base"
+                placeholder="2025"
               />
             </div>
           </div>
 
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium">Status</label>
-            <Select
-              value={done}
-              onValueChange={(value) => setDone(value as TaskStatus)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecione o status" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(TASK_STATUS).map(([key, label]) => (
-                  <SelectItem key={key} value={label}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Status e Tipo de Gasto - Em linha */}
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex w-full flex-col space-y-2">
+              <Label className="text-base font-medium">Status</Label>
+              <Select
+                value={done}
+                onValueChange={(value) => setDone(value as TaskStatus)}
+              >
+                <SelectTrigger className="!h-12 !w-full text-base">
+                  <SelectValue placeholder="Selecione o status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(TASK_STATUS).map(([key, label]) => (
+                    <SelectItem key={key} value={label}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            {formErrors.done && (
-              <span className="text-destructive text-sm">
-                {formErrors.done}
-              </span>
-            )}
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            {/* <Label>Tipo de Gasto</Label> */}
-            <div className="bg-background flex flex-col items-center gap-2 rounded-md border p-2">
-              <TypeSelector
-                value={type}
-                onChange={setType}
-                allTypes={allTypes}
-              />
-
-              {formErrors.type && (
+              {formErrors.done && (
                 <span className="text-destructive text-sm">
-                  {formErrors.type}
+                  {formErrors.done}
                 </span>
               )}
+            </div>
+
+            <div className="flex flex-col space-y-2">
+              <Label className="text-base font-medium">Tipo de Gasto</Label>
+              <div className="bg-background flex min-h-[6rem] flex-col items-start gap-2 rounded-md border p-4">
+                <TypeSelector
+                  value={type}
+                  onChange={setType}
+                  allTypes={allTypes}
+                />
+
+                {formErrors.type && (
+                  <span className="text-destructive text-sm">
+                    {formErrors.type}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        <DialogFooter className="sm:justify-end">
-          <DialogClose asChild>
-            <Button variant="secondary" onClick={resetForm}>
-              Cancelar
-            </Button>
-          </DialogClose>
-
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? 'Salvando...' : 'Salvar'}
+        <div className="flex justify-end gap-3 pt-4">
+          <Button variant="outline" onClick={resetForm} className="h-11 px-6">
+            Cancelar
           </Button>
-        </DialogFooter>
+
+          <Button
+            onClick={handleSubmit}
+            disabled={createTaskMutation.isPending}
+            className="h-11 px-8"
+          >
+            {createTaskMutation.isPending ? (
+              <>
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+                Salvando...
+              </>
+            ) : (
+              'Salvar'
+            )}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

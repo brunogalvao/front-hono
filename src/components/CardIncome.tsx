@@ -25,19 +25,19 @@ function CardIncome({
 }: CardIncomeProps) {
   return (
     <Table>
+      {/* Total Anual */}
       {loading ? (
         <Loader className="h-4 w-4 animate-spin" />
       ) : (
         <TableCaption className="text-left">
           <div className="flex items-center gap-2">
-            Total
+            Total Anual
             <span className="bg-primary rounded-full px-3 text-lg font-bold text-white">
               {formatToBRL(total)}
             </span>
           </div>
         </TableCaption>
       )}
-
       <TableHeader>
         <TableRow>
           <TableHead className="w-[200px]">Nome</TableHead>
@@ -46,7 +46,6 @@ function CardIncome({
           <TableHead className="w-1/5 text-center">Ações</TableHead>
         </TableRow>
       </TableHeader>
-
       <TableBody>
         {incomes.map((incomes) => (
           <TableRow key={incomes.id}>

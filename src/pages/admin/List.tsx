@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 // components
 import { TasksTable } from '@/components/TasksTable';
@@ -39,58 +39,42 @@ import { FaCheckCircle } from 'react-icons/fa';
 
 function List() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const [tasksPorMes, setTasksPorMes] = useState<Record<string, Task[]>>({});
   const [total, setTotal] = useState(0);
   const [price, setPrice] = useState(0);
   const [paid, setPaid] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [mesAtivo, setMesAtivo] = useState(String(new Date().getMonth() + 1));
-  const [loadedMonths, setLoadedMonths] = useState<Set<string>>(new Set());
 
   const [form] = useState({
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
   });
 
-  // 🔄 Busca tarefas usando TanStack Query (cache automático)
-  useQuery({
-    queryKey: queryKeys.tasks.list({ month: form.mes, year: form.ano }),
-    queryFn: () => getTasks({ month: form.mes, year: form.ano }),
+  // 🔄 Busca tarefas do mês ativo usando TanStack Query
+  const { data: tasksCurrentMonth = [] } = useQuery({
+    queryKey: queryKeys.tasks.list({
+      month: parseInt(mesAtivo),
+      year: form.ano,
+    }),
+    queryFn: () => getTasks({ month: parseInt(mesAtivo), year: form.ano }),
     staleTime: 1000 * 60 * 2, // 2 minutos
   });
 
-  // 🔄 Carrega tarefas de um mês específico sob demanda
-  const fetchTasksForMonth = useCallback(
-    async (month: string, year: number) => {
-      const monthKey = `${month}-${year}`;
+  // 🔄 Função para invalidar cache e recarregar dados
+  const handleTasksChange = useCallback(async () => {
+    console.log('🔄 Invalidando cache e recarregando dados...');
 
-      // Se já foi carregado, não carrega novamente
-      if (loadedMonths.has(monthKey)) {
-        return;
-      }
+    // Invalida o cache do mês atual
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.tasks.list({
+        month: parseInt(mesAtivo),
+        year: form.ano,
+      }),
+    });
 
-      try {
-        const data = await getTasks({
-          month: parseInt(month),
-          year: year,
-        });
-
-        setTasksPorMes((prev) => ({
-          ...prev,
-          [month]: data,
-        }));
-
-        setLoadedMonths((prev) => new Set([...prev, monthKey]));
-      } catch (err) {
-        console.error(`Erro ao carregar tarefas do mês ${month}:`, err);
-      }
-    },
-    [loadedMonths]
-  );
-
-  // 🔄 Totais (geral)
-  const updateTotalData = useCallback(async () => {
+    // Atualiza os totais
     try {
       const [totalResult, priceResult, resultPaid] = await Promise.all([
         totalItems(),
@@ -103,32 +87,9 @@ function List() {
     } catch (err) {
       console.error('Erro ao atualizar totais:', err);
     }
-  }, []);
 
-  // 🔄 Função memoizada para atualizar tarefas de um mês específico
-  const createTasksChangeHandler = useCallback(
-    (month: string) => {
-      return async () => {
-        console.log('🔄 Atualizando tarefas do mês:', month);
-
-        // Limpa o cache do mês para forçar recarregamento
-        setLoadedMonths((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(`${month}-${form.ano}`);
-          return newSet;
-        });
-
-        // Recarrega as tarefas do mês
-        await fetchTasksForMonth(month, form.ano);
-
-        // Atualiza os totais
-        await updateTotalData();
-
-        console.log('✅ Atualização concluída para o mês:', month);
-      };
-    },
-    [fetchTasksForMonth, form.ano, updateTotalData]
-  );
+    console.log('✅ Cache invalidado e dados recarregados');
+  }, [queryClient, mesAtivo, form.ano]);
 
   // 🔐 Verifica usuário e escuta logout
   useEffect(() => {
@@ -164,30 +125,7 @@ function List() {
     };
 
     fetchTotals();
-    updateTotalData();
-  }, [updateTotalData]);
-
-  // 📅 Recarrega tarefas ao mudar mês/ano
-  // Removido fetchTasks - agora usando TanStack Query
-
-  // 📅 Carrega o mês ativo quando mudar
-  useEffect(() => {
-    if (mesAtivo && form.ano) {
-      fetchTasksForMonth(mesAtivo, form.ano);
-    }
-  }, [mesAtivo, form.ano, fetchTasksForMonth]);
-
-  // 🎯 Carrega o mês atual na inicialização
-  useEffect(() => {
-    const currentMonth = String(new Date().getMonth() + 1);
-    const currentYear = new Date().getFullYear();
-    fetchTasksForMonth(currentMonth, currentYear);
-  }, [fetchTasksForMonth]);
-
-  // 📊 Memoiza os totais para evitar recálculos desnecessários
-  const currentMonthTasks = useMemo(() => {
-    return tasksPorMes[mesAtivo] || [];
-  }, [tasksPorMes, mesAtivo]);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -215,7 +153,7 @@ function List() {
                   </p>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {currentMonthTasks.length > 0
+                  {tasksCurrentMonth.length > 0
                     ? 'Mude o status na tabela para somar os valores pagos.'
                     : 'Nenhuma tarefa encontrada.'}
                 </TooltipContent>
@@ -224,19 +162,14 @@ function List() {
           )}
         </div>
 
-        <AddTaskDialog
-          onTaskCreated={() => {
-            // Recarrega apenas o mês atual
-            fetchTasksForMonth(mesAtivo, form.ano);
-            updateTotalData();
-          }}
-        />
+        <AddTaskDialog onTaskCreated={handleTasksChange} />
       </div>
 
       <Tabs value={mesAtivo} onValueChange={setMesAtivo}>
         <TabsList className="gap-1">
           {MESES_LISTA.map((mes) => {
-            const temTarefas = tasksPorMes[mes.value]?.length > 0;
+            const temTarefas =
+              mes.value === mesAtivo && tasksCurrentMonth.length > 0;
 
             return (
               <TabsTrigger key={mes.value} value={mes.value} className="gap-2">
@@ -255,14 +188,14 @@ function List() {
                     <Loading />
                   </CardContent>
                 </Card>
-              ) : tasksPorMes[mes.value]?.length > 0 ? (
+              ) : mes.value === mesAtivo && tasksCurrentMonth.length > 0 ? (
                 <Card>
                   <CardContent>
                     <TasksTable
-                      tasks={tasksPorMes[mes.value]}
+                      tasks={tasksCurrentMonth}
                       total={total}
                       totalPrice={price}
-                      onTasksChange={createTasksChangeHandler(mes.value)}
+                      onTasksChange={handleTasksChange}
                     />
                   </CardContent>
                 </Card>

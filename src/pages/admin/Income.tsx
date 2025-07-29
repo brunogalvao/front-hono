@@ -13,17 +13,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
+// hooks
+import { useCreateIncome } from '@/hooks/use-create-income';
+import { useEditIncome } from '@/hooks/use-edit-income';
+import { useDeleteIncome } from '@/hooks/use-delete-income';
 // service
-import { editIncome } from '@/service/income/editIncome';
-import { createIncome } from '@/service/income/createIncome';
-import { deleteIncome } from '@/service/income/deleteIncome';
 import { totalIncomes } from '@/service/income/totalIncome';
 import { getIncomes } from '@/service/income/getIncome';
 // model's
 import type { IncomeItem } from '@/model/incomes.model';
 import { MESES_LISTA } from '@/model/mes.enum';
 // import { Pencil, Trash } from "lucide-react";
-import CardIncome from '@/components/CardIncome';
 import { LiquidButton } from '@/components/animate-ui/buttons/liquid';
 import { Plus } from '@/components/animate-ui/icons/plus';
 import { AnimateIcon } from '@/components/animate-ui/icons/icon';
@@ -35,6 +35,7 @@ import {
   TooltipTrigger,
 } from '@/components/animate-ui/components/tooltip';
 import MonthIncome from '@/components/monthIncome';
+import { IncomesDataTable } from '@/components/IncomesDataTable';
 
 function Income() {
   const [incomes, setIncomes] = useState<IncomeItem[]>([]);
@@ -48,6 +49,11 @@ function Income() {
     ano: new Date().getFullYear(),
   });
   const [reloadFlag, setReloadFlag] = useState(Date.now());
+
+  // Hooks para mutações
+  const createIncomeMutation = useCreateIncome();
+  const editIncomeMutation = useEditIncome();
+  const deleteIncomeMutation = useDeleteIncome();
 
   const loadTotal = async () => {
     try {
@@ -74,16 +80,10 @@ function Income() {
       if (editingId) {
         if (!editingId) return;
 
-        const updated = await editIncome({ ...form, id: editingId });
-        setIncomes((prev) =>
-          prev.map((item) => (item.id === editingId ? updated : item))
-        );
-
+        await editIncomeMutation.mutateAsync({ ...form, id: editingId });
         toast.success('Cadastro Editado');
       } else {
-        const newIncome = await createIncome(form);
-        setIncomes((prev) => [...prev, newIncome as IncomeItem]);
-
+        await createIncomeMutation.mutateAsync(form);
         toast.success('Salvo novo cadastro');
       }
 
@@ -113,13 +113,32 @@ function Income() {
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteIncome(id);
-      setIncomes((prev) => prev.filter((item) => item.id !== id));
+      await deleteIncomeMutation.mutateAsync(id);
+      toast.success('Rendimento deletado com sucesso');
       setReloadFlag(Date.now());
       await loadTotal();
     } catch (err) {
       console.error('Erro ao deletar:', err);
+
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : typeof err === 'string'
+            ? err
+            : 'Erro ao deletar rendimento';
+
+      toast.error(errorMessage);
     }
+  };
+
+  const handleEdit = (income: IncomeItem) => {
+    setForm({
+      descricao: income.descricao ?? '',
+      valor: income.valor,
+      mes: income.mes,
+      ano: income.ano,
+    });
+    setEditingId(income.id);
   };
 
   useEffect(() => {
@@ -134,6 +153,7 @@ function Income() {
       <MonthIncome
         reloadTrigger={reloadFlag}
         onSelectMes={(mes) => setForm((f) => ({ ...f, mes }))}
+        total={total}
       />
 
       <div className="flex flex-col space-y-6">
@@ -231,7 +251,6 @@ function Income() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  {/* <span>Hover me</span> */}
                   <p className="cursor-pointer p-0 text-center text-sm text-zinc-500">
                     Sem Rendimento
                   </p>
@@ -242,13 +261,10 @@ function Income() {
               </Tooltip>
             </TooltipProvider>
           ) : (
-            <CardIncome
-              incomes={incomes}
-              loading={loading}
-              total={total}
-              setForm={setForm}
-              setEditingId={setEditingId}
-              handleDelete={handleDelete}
+            <IncomesDataTable
+              data={incomes}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
             />
           )}
         </CardContent>
