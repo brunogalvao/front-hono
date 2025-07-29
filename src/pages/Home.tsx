@@ -61,7 +61,7 @@ function Home() {
 
         <Separator orientation="horizontal" />
 
-        <div className="flex flex-col items-center gap-3 py-20 md:flex-row">
+        <div className="flex min-h-[70vh] flex-col items-center gap-3 py-20 md:flex-row">
           <div className="flex w-full flex-col md:w-[60%]">
             <GradientText
               className="mb-3 w-full text-8xl font-bold capitalize"
