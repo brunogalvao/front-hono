@@ -1,10 +1,10 @@
-import { FaSquareGithub, FaSquareXTwitter } from "react-icons/fa6";
+import { FaSquareGithub, FaSquareXTwitter } from 'react-icons/fa6';
 
 export const mediaSocial = [
   {
     icon: FaSquareXTwitter,
-    link: "https://x.com/brunogalvao",
-    text: "Twitter",
+    link: 'https://x.com/brunogalvao',
+    text: 'Twitter',
   },
   // {
   //   icon: FaLinkedin,
@@ -13,7 +13,7 @@ export const mediaSocial = [
   // },
   {
     icon: FaSquareGithub,
-    link: "https://github.com/brunogalvao",
-    text: "Github",
+    link: 'https://github.com/brunogalvao',
+    text: 'Github',
   },
 ];

@@ -1,21 +1,21 @@
-import { supabase } from "@/lib/supabase";
-import { useState } from "react";
-import { toast } from "sonner";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { LiquidButton } from "@/components/animate-ui/buttons/liquid";
+import { supabase } from '@/lib/supabase';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+import { LiquidButton } from '@/components/animate-ui/buttons/liquid';
 
 export function ResetPassword({ provider }: { provider: string }) {
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleResetPassword = async () => {
     if (!newPassword || !confirmPassword) {
-      return toast.error("Preencha os dois campos de senha.");
+      return toast.error('Preencha os dois campos de senha.');
     }
 
     if (newPassword !== confirmPassword) {
-      return toast.error("As senhas não coincidem.");
+      return toast.error('As senhas não coincidem.');
     }
 
     const { error } = await supabase.auth.updateUser({
@@ -23,18 +23,18 @@ export function ResetPassword({ provider }: { provider: string }) {
     });
 
     if (error) {
-      return toast.error("Erro ao redefinir a senha.");
+      return toast.error('Erro ao redefinir a senha.');
     }
 
-    toast.success("Senha atualizada com sucesso!");
-    setNewPassword("");
-    setConfirmPassword("");
+    toast.success('Senha atualizada com sucesso!');
+    setNewPassword('');
+    setConfirmPassword('');
   };
 
-  if (provider !== "email") return null;
+  if (provider !== 'email') return null;
 
   return (
-    <div className="space-y-2 w-full p-4 bg-zinc-950 border border-zinc-800 rounded-sm rounded-t-none">
+    <div className="w-full space-y-2 rounded-sm rounded-t-none border border-zinc-800 bg-zinc-950 p-4">
       <Label>Nova senha</Label>
       <Input
         type="password"
@@ -52,7 +52,7 @@ export function ResetPassword({ provider }: { provider: string }) {
 
       <div className="flex justify-end gap-3">
         <LiquidButton className="text-white" onClick={handleResetPassword}>
-          <div className="px-12 flex flex-row items-center gap-3">
+          <div className="flex flex-row items-center gap-3 px-12">
             Confirmar nova senha
           </div>
         </LiquidButton>

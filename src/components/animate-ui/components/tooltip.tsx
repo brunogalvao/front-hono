@@ -196,10 +196,10 @@ function TooltipProvider({
       const delay = now - lastCloseTimeRef.current < closeDelay ? 0 : openDelay;
       timeoutRef.current = window.setTimeout(
         () => setCurrentTooltip(data),
-        delay,
+        delay
       );
     },
-    [openDelay, closeDelay, currentTooltip],
+    [openDelay, closeDelay, currentTooltip]
   );
 
   const hideTooltip = React.useCallback(() => {
@@ -245,13 +245,13 @@ function TooltipArrow({ side }: TooltipArrowProps) {
   return (
     <div
       className={cn(
-        'absolute bg-primary z-50 size-2.5 rotate-45 rounded-[2px]',
+        'bg-primary absolute z-50 size-2.5 rotate-45 rounded-[2px]',
         (side === 'top' || side === 'bottom') && 'left-1/2 -translate-x-1/2',
         (side === 'left' || side === 'right') && 'top-1/2 -translate-y-1/2',
         side === 'top' && '-bottom-[3px]',
         side === 'bottom' && '-top-[3px]',
         side === 'left' && '-right-[3px]',
-        side === 'right' && '-left-[3px]',
+        side === 'right' && '-left-[3px]'
       )}
     />
   );
@@ -301,7 +301,7 @@ function TooltipOverlay() {
               animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
               exit={{ opacity: 0, scale: 0, ...position.initial }}
               transition={transition}
-              className="relative rounded-md bg-primary fill-primary px-3 py-1.5 text-sm text-primary-foreground shadow-md w-fit text-balance"
+              className="bg-primary fill-primary text-primary-foreground relative w-fit rounded-md px-3 py-1.5 text-sm text-balance shadow-md"
             >
               {currentTooltip.content}
 
@@ -329,7 +329,7 @@ type TooltipContextType = {
 };
 
 const TooltipContext = React.createContext<TooltipContextType | undefined>(
-  undefined,
+  undefined
 );
 
 const useTooltip = () => {
@@ -422,7 +422,7 @@ function TooltipTrigger({ children }: TooltipTriggerProps) {
       (children.props as React.HTMLAttributes<HTMLElement>)?.onMouseEnter?.(e);
       handleOpen();
     },
-    [handleOpen, children.props],
+    [handleOpen, children.props]
   );
 
   const handleMouseLeave = React.useCallback(
@@ -430,7 +430,7 @@ function TooltipTrigger({ children }: TooltipTriggerProps) {
       (children.props as React.HTMLAttributes<HTMLElement>)?.onMouseLeave?.(e);
       hideTooltip();
     },
-    [hideTooltip, children.props],
+    [hideTooltip, children.props]
   );
 
   const handleFocus = React.useCallback(
@@ -438,7 +438,7 @@ function TooltipTrigger({ children }: TooltipTriggerProps) {
       (children.props as React.HTMLAttributes<HTMLElement>)?.onFocus?.(e);
       handleOpen();
     },
-    [handleOpen, children.props],
+    [handleOpen, children.props]
   );
 
   const handleBlur = React.useCallback(
@@ -446,7 +446,7 @@ function TooltipTrigger({ children }: TooltipTriggerProps) {
       (children.props as React.HTMLAttributes<HTMLElement>)?.onBlur?.(e);
       hideTooltip();
     },
-    [hideTooltip, children.props],
+    [hideTooltip, children.props]
   );
 
   return React.cloneElement(children, {

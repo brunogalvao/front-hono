@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback, memo, useMemo } from "react";
-import type { Task, TaskStatus } from "@/model/tasks.model";
-import { TASK_STATUS } from "@/model/tasks.model";
-import { editTask } from "@/service/task/editTask";
-import { deleteTask } from "@/service/task/deleteTask";
-import { getExpenseTypes } from "@/service/expense-types/getExpenseTypes";
-import { z } from "zod";
-import { taskSchema } from "@/schema/taskSchema";
+import { useState, useEffect, useCallback, memo, useMemo } from 'react';
+import type { Task, TaskStatus } from '@/model/tasks.model';
+import { TASK_STATUS } from '@/model/tasks.model';
+import { editTask } from '@/service/task/editTask';
+import { deleteTask } from '@/service/task/deleteTask';
+import { getExpenseTypes } from '@/service/expense-types/getExpenseTypes';
+import { z } from 'zod';
+import { taskSchema } from '@/schema/taskSchema';
 
 // ui
 import {
@@ -16,29 +16,29 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+} from './ui/table';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./ui/dialog";
+} from './ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
-import { TypeSelector } from "./TypeSelector";
-import StatusDropdown from "./StatusDropdown";
+} from './ui/select';
+import { TypeSelector } from './TypeSelector';
+import StatusDropdown from './StatusDropdown';
 
 // icons
-import { Pencil, Trash, Loader } from "lucide-react";
+import { Pencil, Trash, Loader } from 'lucide-react';
 
 interface TaskTable {
   tasks: Task[];
@@ -53,12 +53,12 @@ export const TasksTable = memo(function TasksTable({
   onTasksChange,
 }: TaskTable) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [title, setTitle] = useState("");
-  const [price, setPrice] = useState("");
+  const [title, setTitle] = useState('');
+  const [price, setPrice] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [done, setDone] = useState<TaskStatus>(TASK_STATUS.Pendente);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [type, setType] = useState("");
+  const [type, setType] = useState('');
   const [allTypes, setAllTypes] = useState<string[]>([]);
   const [form, setForm] = useState({
     mes: new Date().getMonth() + 1,
@@ -69,17 +69,17 @@ export const TasksTable = memo(function TasksTable({
     setEditingTask(task);
 
     // Atualiza o título da tarefa
-    setTitle(task.title ?? "");
+    setTitle(task.title ?? '');
 
     // Converte o preço para string de forma segura
     setPrice(
       task.price !== null && task.price !== undefined
         ? task.price.toString()
-        : "",
+        : ''
     );
 
     // Garante um tipo mesmo se estiver undefined
-    setType(task.type ?? "");
+    setType(task.type ?? '');
 
     // Define o status da tarefa
     setDone(task.done);
@@ -104,44 +104,47 @@ export const TasksTable = memo(function TasksTable({
           mes: form.mes,
           ano: form.ano,
         });
-        console.log("🟢 Editado com sucesso:", updated);
+        console.log('🟢 Editado com sucesso:', updated);
         setEditingTask(null);
         // Fecha o dialog
         setDialogOpen(false);
         // Atualiza a tabela
         onTasksChange();
       } catch (err) {
-        console.error("❌ Erro ao editar:", err);
+        console.error('❌ Erro ao editar:', err);
       }
     }
   }, [editingTask, title, done, price, type, form, onTasksChange]);
 
-  const handleDelete = useCallback(async (id: string) => {
-    setIsSubmitting(true);
-    try {
-      await deleteTask(id);
+  const handleDelete = useCallback(
+    async (id: string) => {
+      setIsSubmitting(true);
+      try {
+        await deleteTask(id);
 
-      // Atualiza a tabela
-      onTasksChange();
+        // Atualiza a tabela
+        onTasksChange();
 
-      // Atualiza a lista de tipos
-      const types = await getExpenseTypes();
-      setAllTypes(types.map((t) => t.name));
-    } catch (err) {
-      console.error("❌ Erro ao deletar:", err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [onTasksChange]);
+        // Atualiza a lista de tipos
+        const types = await getExpenseTypes();
+        setAllTypes(types.map((t) => t.name));
+      } catch (err) {
+        console.error('❌ Erro ao deletar:', err);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [onTasksChange]
+  );
 
   useEffect(() => {
     const fetchTypes = async () => {
       try {
         const types = await getExpenseTypes();
-        console.log("✅ Tipos carregados:", types);
+        console.log('✅ Tipos carregados:', types);
         setAllTypes(types.map((t) => t.name)); // ou t.nome se não fez o mapeamento na API
       } catch (err) {
-        console.error("Erro ao carregar tipos de gasto:", err);
+        console.error('Erro ao carregar tipos de gasto:', err);
       }
     };
 
@@ -197,15 +200,12 @@ export const TasksTable = memo(function TasksTable({
           {tasks.map((task) => (
             <TableRow key={task.id}>
               <TableCell className="font-medium">{task.title}</TableCell>
-              <TableCell>{task.type || "Sem tipo"}</TableCell>
+              <TableCell>{task.type || 'Sem tipo'}</TableCell>
               <TableCell>
-                {task.price ? `R$ ${task.price.toFixed(2)}` : "Sem preço"}
+                {task.price ? `R$ ${task.price.toFixed(2)}` : 'Sem preço'}
               </TableCell>
               <TableCell>
-                <StatusDropdown 
-                  task={task} 
-                  onStatusChanged={onTasksChange}
-                />
+                <StatusDropdown task={task} onStatusChanged={onTasksChange} />
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
@@ -301,7 +301,7 @@ export const TasksTable = memo(function TasksTable({
                               Salvando...
                             </>
                           ) : (
-                            "Salvar"
+                            'Salvar'
                           )}
                         </Button>
                       </div>

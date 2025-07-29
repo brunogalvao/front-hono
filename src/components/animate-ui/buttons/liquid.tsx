@@ -29,7 +29,7 @@ const buttonVariants = cva(
       variant: 'default',
       size: 'default',
     },
-  },
+  }
 );
 
 type LiquidButtonProps = HTMLMotionProps<'button'> &

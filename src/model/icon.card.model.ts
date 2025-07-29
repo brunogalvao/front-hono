@@ -1,4 +1,4 @@
-import { Clock7, Bell, Heart, Cog } from "lucide-react";
+import { Clock7, Bell, Heart, Cog } from 'lucide-react';
 
 export const ICONS = {
   Clock7,

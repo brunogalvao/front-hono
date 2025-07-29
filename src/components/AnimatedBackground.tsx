@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 const AnimatedBackground: React.FC = () => {
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-gray-100 overflow-hidden -z-10">
+      <div className="fixed top-0 right-0 bottom-0 left-0 -z-10 h-full w-full overflow-hidden bg-gray-100">
         <motion.div
           style={{
             position: 'absolute',

@@ -1,41 +1,41 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 
 // components
-import { TasksTable } from "@/components/TasksTable";
-import { AddTaskDialog } from "@/components/AddTaskDialog";
-import { Card, CardContent } from "@/components/ui/card";
-import Loading from "@/components/Loading";
-import TituloPage from "@/components/TituloPage";
+import { TasksTable } from '@/components/TasksTable';
+import { AddTaskDialog } from '@/components/AddTaskDialog';
+import { Card, CardContent } from '@/components/ui/card';
+import Loading from '@/components/Loading';
+import TituloPage from '@/components/TituloPage';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/animate-ui/components/tooltip";
+} from '@/components/animate-ui/components/tooltip';
 
 // model & utils
-import type { Task } from "@/model/tasks.model";
-import { MESES_LISTA } from "@/model/mes.enum";
-import { formatToBRL } from "@/utils/format";
+import type { Task } from '@/model/tasks.model';
+import { MESES_LISTA } from '@/model/mes.enum';
+import { formatToBRL } from '@/utils/format';
 
 // services
-import { getTasks } from "@/service/task/getTasks";
-import { totalPrice, totalItems, totalPaid } from "@/service/total";
-import { supabase } from "@/lib/supabase";
-import { queryKeys } from "@/lib/query-keys";
+import { getTasks } from '@/service/task/getTasks';
+import { totalPrice, totalItems, totalPaid } from '@/service/total';
+import { supabase } from '@/lib/supabase';
+import { queryKeys } from '@/lib/query-keys';
 
 // icons
-import { BanknoteArrowUp, Loader } from "lucide-react";
+import { BanknoteArrowUp, Loader } from 'lucide-react';
 import {
   Tabs,
   TabsContent,
   TabsContents,
   TabsList,
   TabsTrigger,
-} from "@/components/animate-ui/radix/tabs";
-import { FaCheckCircle } from "react-icons/fa";
+} from '@/components/animate-ui/radix/tabs';
+import { FaCheckCircle } from 'react-icons/fa';
 
 function List() {
   const navigate = useNavigate();
@@ -61,30 +61,33 @@ function List() {
   });
 
   // 🔄 Carrega tarefas de um mês específico sob demanda
-  const fetchTasksForMonth = useCallback(async (month: string, year: number) => {
-    const monthKey = `${month}-${year}`;
-    
-    // Se já foi carregado, não carrega novamente
-    if (loadedMonths.has(monthKey)) {
-      return;
-    }
+  const fetchTasksForMonth = useCallback(
+    async (month: string, year: number) => {
+      const monthKey = `${month}-${year}`;
 
-    try {
-      const data = await getTasks({
-        month: parseInt(month),
-        year: year,
-      });
-      
-      setTasksPorMes(prev => ({
-        ...prev,
-        [month]: data
-      }));
-      
-      setLoadedMonths(prev => new Set([...prev, monthKey]));
-    } catch (err) {
-      console.error(`Erro ao carregar tarefas do mês ${month}:`, err);
-    }
-  }, [loadedMonths]);
+      // Se já foi carregado, não carrega novamente
+      if (loadedMonths.has(monthKey)) {
+        return;
+      }
+
+      try {
+        const data = await getTasks({
+          month: parseInt(month),
+          year: year,
+        });
+
+        setTasksPorMes((prev) => ({
+          ...prev,
+          [month]: data,
+        }));
+
+        setLoadedMonths((prev) => new Set([...prev, monthKey]));
+      } catch (err) {
+        console.error(`Erro ao carregar tarefas do mês ${month}:`, err);
+      }
+    },
+    [loadedMonths]
+  );
 
   // 🔄 Totais (geral)
   const updateTotalData = useCallback(async () => {
@@ -98,31 +101,34 @@ function List() {
       setPrice(priceResult);
       setPaid(resultPaid);
     } catch (err) {
-      console.error("Erro ao atualizar totais:", err);
+      console.error('Erro ao atualizar totais:', err);
     }
   }, []);
 
   // 🔄 Função memoizada para atualizar tarefas de um mês específico
-  const createTasksChangeHandler = useCallback((month: string) => {
-    return async () => {
-      console.log("🔄 Atualizando tarefas do mês:", month);
-      
-      // Limpa o cache do mês para forçar recarregamento
-      setLoadedMonths(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(`${month}-${form.ano}`);
-        return newSet;
-      });
-      
-      // Recarrega as tarefas do mês
-      await fetchTasksForMonth(month, form.ano);
-      
-      // Atualiza os totais
-      await updateTotalData();
-      
-      console.log("✅ Atualização concluída para o mês:", month);
-    };
-  }, [fetchTasksForMonth, form.ano, updateTotalData]);
+  const createTasksChangeHandler = useCallback(
+    (month: string) => {
+      return async () => {
+        console.log('🔄 Atualizando tarefas do mês:', month);
+
+        // Limpa o cache do mês para forçar recarregamento
+        setLoadedMonths((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(`${month}-${form.ano}`);
+          return newSet;
+        });
+
+        // Recarrega as tarefas do mês
+        await fetchTasksForMonth(month, form.ano);
+
+        // Atualiza os totais
+        await updateTotalData();
+
+        console.log('✅ Atualização concluída para o mês:', month);
+      };
+    },
+    [fetchTasksForMonth, form.ano, updateTotalData]
+  );
 
   // 🔐 Verifica usuário e escuta logout
   useEffect(() => {
@@ -130,11 +136,11 @@ function List() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session) navigate({ to: "/login" });
+      if (!session) navigate({ to: '/login' });
     };
 
     const subscription = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) navigate({ to: "/login" });
+      if (!session) navigate({ to: '/login' });
     }).data.subscription;
 
     checkUser();
@@ -188,8 +194,8 @@ function List() {
       <TituloPage titulo="Lista" />
 
       {/* Valor total pago + botão adicionar */}
-      <div className="flex flex-row justify-between items-center">
-        <div className="flex gap-3 items-center">
+      <div className="flex flex-row items-center justify-between">
+        <div className="flex items-center gap-3">
           {isLoading || paid == null ? (
             <span className="flex items-center gap-2">
               <Loader className="h-4 w-4 animate-spin" />
@@ -204,14 +210,14 @@ function List() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <p className="text-sm text-zinc-500 cursor-pointer">
+                  <p className="cursor-pointer text-sm text-zinc-500">
                     Sem Pagamento Efetuado
                   </p>
                 </TooltipTrigger>
                 <TooltipContent>
                   {currentMonthTasks.length > 0
-                    ? "Mude o status na tabela para somar os valores pagos."
-                    : "Nenhuma tarefa encontrada."}
+                    ? 'Mude o status na tabela para somar os valores pagos.'
+                    : 'Nenhuma tarefa encontrada.'}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -263,7 +269,7 @@ function List() {
               ) : (
                 <Card>
                   <CardContent>
-                    <p className="text-sm text-center text-zinc-500">
+                    <p className="text-center text-sm text-zinc-500">
                       Nenhum item encontrada para {mes.label}.
                     </p>
                   </CardContent>

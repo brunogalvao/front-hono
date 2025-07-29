@@ -18,57 +18,65 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           // Core React libraries
-          if (id.includes('node_modules/react') || 
-              id.includes('node_modules/react-dom') || 
-              id.includes('node_modules/react-router-dom')) {
+          if (
+            id.includes('node_modules/react') ||
+            id.includes('node_modules/react-dom') ||
+            id.includes('node_modules/react-router-dom')
+          ) {
             return 'react-vendor';
           }
-          
+
           // UI Libraries
           if (id.includes('node_modules/@radix-ui')) {
             return 'ui-vendor';
           }
-          
+
           // Animation libraries
-          if (id.includes('node_modules/framer-motion') || 
-              id.includes('node_modules/motion') || 
-              id.includes('node_modules/animate-ui')) {
+          if (
+            id.includes('node_modules/framer-motion') ||
+            id.includes('node_modules/motion') ||
+            id.includes('node_modules/animate-ui')
+          ) {
             return 'animation-vendor';
           }
-          
+
           // Icons
-          if (id.includes('node_modules/lucide-react') || 
-              id.includes('node_modules/react-icons')) {
+          if (
+            id.includes('node_modules/lucide-react') ||
+            id.includes('node_modules/react-icons')
+          ) {
             return 'icons-vendor';
           }
-          
+
           // Database and auth
           if (id.includes('node_modules/@supabase')) {
             return 'data-vendor';
           }
-          
+
           // Utilities
-          if (id.includes('node_modules/date-fns') || 
-              id.includes('node_modules/react-number-format') ||
-              id.includes('node_modules/react-use-measure') ||
-              id.includes('node_modules/sonner') ||
-              id.includes('node_modules/zod') ||
-              id.includes('node_modules/class-variance-authority') ||
-              id.includes('node_modules/clsx') ||
-              id.includes('node_modules/tailwind-merge')) {
+          if (
+            id.includes('node_modules/date-fns') ||
+            id.includes('node_modules/react-number-format') ||
+            id.includes('node_modules/react-use-measure') ||
+            id.includes('node_modules/sonner') ||
+            id.includes('node_modules/zod') ||
+            id.includes('node_modules/class-variance-authority') ||
+            id.includes('node_modules/clsx') ||
+            id.includes('node_modules/tailwind-merge')
+          ) {
             return 'utils-vendor';
           }
-          
+
           // UI Components (shadcn)
           if (id.includes('/components/ui/')) {
             return 'shadcn';
           }
-          
+
           // Animate UI components
           if (id.includes('/components/animate-ui/')) {
             return 'animate-ui';
           }
-          
+
           return null;
         },
       },
@@ -85,4 +93,3 @@ export default defineConfig({
     ],
   },
 });
-

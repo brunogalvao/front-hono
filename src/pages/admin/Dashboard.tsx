@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import TituloPage from "@/components/TituloPage";
-import { getDollarRate } from "@/service/getDollarRate";
-import { totalIncomes } from "@/service/income/totalIncome";
-import { formatToBRL } from "@/utils/format";
+import { useEffect, useState } from 'react';
+import TituloPage from '@/components/TituloPage';
+import { getDollarRate } from '@/service/getDollarRate';
+import { totalIncomes } from '@/service/income/totalIncome';
+import { formatToBRL } from '@/utils/format';
 
 const Dashboard = () => {
   const [dollarRate, setDollarRate] = useState<number | null>(null);
@@ -14,7 +14,7 @@ const Dashboard = () => {
       const total = await totalIncomes();
       setTotal(total);
     } catch (err) {
-      console.error("Erro ao carregar total de rendimentos:", err);
+      console.error('Erro ao carregar total de rendimentos:', err);
     }
   };
 
@@ -27,8 +27,8 @@ const Dashboard = () => {
         setRateError(null);
       })
       .catch((err) => {
-        console.error("Erro ao buscar cotação do dólar:", err);
-        setRateError("Erro ao buscar cotação do dólar.");
+        console.error('Erro ao buscar cotação do dólar:', err);
+        setRateError('Erro ao buscar cotação do dólar.');
         setDollarRate(null);
       });
   }, []);
@@ -38,12 +38,12 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       <TituloPage titulo="Home" />
-      <div className="bg-muted p-4 rounded-md">
+      <div className="bg-muted rounded-md p-4">
         <div className="flex flex-row items-center justify-between">
           <h2 className="text-lg font-semibold">💡 Sugestão de Investimento</h2>
           {rateError && <span className="text-red-500">{rateError}</span>}
           {dollarRate !== null && (
-            <span className="text-sm text-muted-foreground flex flex-col text-center">
+            <span className="text-muted-foreground flex flex-col text-center text-sm">
               Dólar <b>R$ {dollarRate.toFixed(2)}</b>
             </span>
           )}
@@ -58,9 +58,9 @@ const Dashboard = () => {
       <div>{dollarRate}</div>
       <div className="flex flex-col">
         <span>Total de Dolar x Rendimento</span>
-        {valorDolar.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
+        {valorDolar.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
         })}
       </div>
     </div>

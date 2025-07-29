@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import type { Task } from "@/model/tasks.model";
-import { getTasks } from "@/service/task/getTasks";
+import { useEffect, useState } from 'react';
+import type { Task } from '@/model/tasks.model';
+import { getTasks } from '@/service/task/getTasks';
 // ui
 import {
   Table,
@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table";
+} from './ui/table';
 
 function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -28,8 +28,8 @@ function Tasks() {
         setError(null);
       })
       .catch((err) => {
-        console.error("Erro ao buscar tarefas:", err);
-        setError("Erro ao buscar tarefas.");
+        console.error('Erro ao buscar tarefas:', err);
+        setError('Erro ao buscar tarefas.');
       })
       .finally(() => setLoading(false));
   }, []);
@@ -53,8 +53,8 @@ function Tasks() {
           <TableRow key={task.id}>
             <TableCell className="font-medium">{task.title}</TableCell>
             <TableCell>
-              <span className={task.done ? "text-green-500" : "text-red-500"}>
-                {task.done ? "Concluída" : "Pendente"}
+              <span className={task.done ? 'text-green-500' : 'text-red-500'}>
+                {task.done ? 'Concluída' : 'Pendente'}
               </span>
             </TableCell>
           </TableRow>

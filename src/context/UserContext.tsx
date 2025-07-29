@@ -1,5 +1,5 @@
-import { createContext, useContext, useState } from "react";
-import type { UserProfile } from "@/model/user.model";
+import { createContext, useContext, useState } from 'react';
+import type { UserProfile } from '@/model/user.model';
 
 interface UserContextType {
   profile: UserProfile | null;
@@ -20,6 +20,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (!context) throw new Error("useUser deve estar dentro de <UserProvider>");
+  if (!context) throw new Error('useUser deve estar dentro de <UserProvider>');
   return context;
 };

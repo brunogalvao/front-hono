@@ -1,4 +1,4 @@
-import type { IncomeItem } from "@/model/incomes.model";
+import type { IncomeItem } from '@/model/incomes.model';
 
 export type CardIncomeProps = {
   incomes: IncomeItem[];

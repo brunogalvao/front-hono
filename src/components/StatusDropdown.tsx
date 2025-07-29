@@ -3,18 +3,18 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { editTask } from "@/service/task/editTask";
+} from '@/components/ui/dropdown-menu';
+import { editTask } from '@/service/task/editTask';
 import {
   TASK_STATUS_LIST,
   type TaskStatus,
   type Task,
   TASK_STATUS,
-} from "@/model/tasks.model";
-import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import { Loader } from "lucide-react";
-import { toast } from "sonner";
+} from '@/model/tasks.model';
+import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
+import { Loader } from 'lucide-react';
+import { toast } from 'sonner';
 
 function StatusDropdown({
   task,
@@ -29,34 +29,36 @@ function StatusDropdown({
   const handleChangeStatus = async (newStatus: TaskStatus) => {
     // Evita atualização se o status for o mesmo
     if (localStatus === newStatus) {
-      console.log("Status já é o mesmo, ignorando...");
+      console.log('Status já é o mesmo, ignorando...');
       return;
     }
 
     setIsUpdating(true);
-    console.log(`🔄 Atualizando status da tarefa ${task.id} de "${localStatus}" para "${newStatus}"`);
-    console.log("📤 Dados sendo enviados:", { id: task.id, done: newStatus });
+    console.log(
+      `🔄 Atualizando status da tarefa ${task.id} de "${localStatus}" para "${newStatus}"`
+    );
+    console.log('📤 Dados sendo enviados:', { id: task.id, done: newStatus });
 
     try {
       // Atualiza o estado local imediatamente para feedback visual
       setLocalStatus(newStatus);
-      
+
       const updatedTask = await editTask(task.id, { done: newStatus });
-      console.log("✅ Status atualizado com sucesso:", updatedTask);
-      
+      console.log('✅ Status atualizado com sucesso:', updatedTask);
+
       // Feedback para o usuário
       toast.success(`Status alterado para ${newStatus}`);
-      
+
       // Chama a função de callback para atualizar a tabela
-      console.log("🔄 Chamando onStatusChanged...");
+      console.log('🔄 Chamando onStatusChanged...');
       onStatusChanged();
-      
-      console.log("📊 Tabela atualizada");
+
+      console.log('📊 Tabela atualizada');
     } catch (err) {
-      console.error("❌ Erro ao atualizar status:", err);
+      console.error('❌ Erro ao atualizar status:', err);
       // Reverte o estado local em caso de erro
       setLocalStatus(task.done);
-      toast.error("Erro ao atualizar status da tarefa");
+      toast.error('Erro ao atualizar status da tarefa');
     } finally {
       setIsUpdating(false);
     }
@@ -71,12 +73,10 @@ function StatusDropdown({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Badge
-          variant={localStatus === TASK_STATUS.Pago ? "outline" : "default"}
-          className="cursor-pointer flex items-center gap-1"
+          variant={localStatus === TASK_STATUS.Pago ? 'outline' : 'default'}
+          className="flex cursor-pointer items-center gap-1"
         >
-          {isUpdating ? (
-            <Loader className="h-3 w-3 animate-spin" />
-          ) : null}
+          {isUpdating ? <Loader className="h-3 w-3 animate-spin" /> : null}
           {localStatus}
         </Badge>
       </DropdownMenuTrigger>

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React from "react";
-import type { SVGMotionProps } from "motion/react";
-import { useAnimation, type Variants, animationControls } from "motion/react";
+import React from 'react';
+import type { SVGMotionProps } from 'motion/react';
+import { useAnimation, type Variants, animationControls } from 'motion/react';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 const staticAnimations = {
   path: {
@@ -14,19 +14,19 @@ const staticAnimations = {
       opacity: [0, 1],
       transition: {
         duration: 0.8,
-        ease: "easeInOut",
+        ease: 'easeInOut',
         opacity: { duration: 0.01 },
       },
     },
   } as Variants,
-  "path-loop": {
+  'path-loop': {
     initial: { pathLength: 1, opacity: 1 },
     animate: {
       pathLength: [1, 0.05, 1],
       opacity: [1, 0, 1],
       transition: {
         duration: 1.6,
-        ease: "easeInOut",
+        ease: 'easeInOut',
         opacity: { duration: 0.01 },
       },
     },
@@ -47,7 +47,7 @@ interface DefaultIconProps<T = string> {
   animate?: TriggerProp<T>;
   onAnimateChange?: (
     value: boolean,
-    animation: StaticAnimations | string,
+    animation: StaticAnimations | string
   ) => void;
   animateOnHover?: TriggerProp<T>;
   animateOnTap?: TriggerProp<T>;
@@ -67,7 +67,7 @@ interface IconProps<T>
   extends DefaultIconProps<T>,
     Omit<
       SVGMotionProps<SVGSVGElement>,
-      "animate" | "onAnimationStart" | "onAnimationEnd"
+      'animate' | 'onAnimationStart' | 'onAnimationEnd'
     > {
   size?: number;
 }
@@ -77,7 +77,7 @@ interface IconWrapperProps<T> extends IconProps<T> {
 }
 
 const AnimateIconContext = React.createContext<AnimateIconContextValue | null>(
-  null,
+  null
 );
 
 function useAnimateIconContext() {
@@ -85,7 +85,7 @@ function useAnimateIconContext() {
   if (!context)
     return {
       controls: undefined,
-      animation: "default",
+      animation: 'default',
       loop: false,
       loopDelay: 0,
     };
@@ -97,7 +97,7 @@ function AnimateIcon({
   onAnimateChange,
   animateOnHover,
   animateOnTap,
-  animation = "default",
+  animation = 'default',
   loop = false,
   loopDelay = 0,
   onAnimateStart,
@@ -111,10 +111,10 @@ function AnimateIcon({
   const startAnimation = React.useCallback(
     (trigger: TriggerProp) => {
       currentAnimation.current =
-        typeof trigger === "string" ? trigger : animation;
+        typeof trigger === 'string' ? trigger : animation;
       setLocalAnimate(true);
     },
-    [animation],
+    [animation]
   );
 
   const stopAnimation = React.useCallback(() => {
@@ -123,19 +123,19 @@ function AnimateIcon({
 
   React.useEffect(() => {
     currentAnimation.current =
-      typeof animate === "string" ? animate : animation;
+      typeof animate === 'string' ? animate : animation;
     setLocalAnimate(!!animate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [animate]);
 
   React.useEffect(
     () => onAnimateChange?.(localAnimate, currentAnimation.current),
-    [localAnimate, onAnimateChange],
+    [localAnimate, onAnimateChange]
   );
 
   React.useEffect(() => {
     if (localAnimate) onAnimateStart?.();
-    controls.start(localAnimate ? "animate" : "initial").then(() => {
+    controls.start(localAnimate ? 'animate' : 'initial').then(() => {
       if (localAnimate) onAnimateEnd?.();
     });
   }, [localAnimate, controls, onAnimateStart, onAnimateEnd]);
@@ -223,8 +223,8 @@ function IconWrapper<T extends string>({
           size={size}
           className={cn(
             className,
-            (animationToUse === "path" || animationToUse === "path-loop") &&
-              pathClassName,
+            (animationToUse === 'path' || animationToUse === 'path-loop') &&
+              pathClassName
           )}
           {...props}
         />
@@ -255,8 +255,8 @@ function IconWrapper<T extends string>({
           size={size}
           className={cn(
             className,
-            (animationProp === "path" || animationProp === "path-loop") &&
-              pathClassName,
+            (animationProp === 'path' || animationProp === 'path-loop') &&
+              pathClassName
           )}
           {...props}
         />
@@ -269,8 +269,8 @@ function IconWrapper<T extends string>({
       size={size}
       className={cn(
         className,
-        (animationProp === "path" || animationProp === "path-loop") &&
-          pathClassName,
+        (animationProp === 'path' || animationProp === 'path-loop') &&
+          pathClassName
       )}
       {...props}
     />
@@ -291,8 +291,8 @@ function getVariants<
     result = {} as T;
     for (const key in animations.default) {
       if (
-        (animationType === "path" || animationType === "path-loop") &&
-        key.includes("group")
+        (animationType === 'path' || animationType === 'path-loop') &&
+        key.includes('group')
       )
         continue;
       result[key] = variant as T[Extract<keyof T, string>];
@@ -310,19 +310,19 @@ function getVariants<
 
       const hasNestedKeys = Object.values(transition).some(
         (v) =>
-          typeof v === "object" &&
+          typeof v === 'object' &&
           v !== null &&
-          ("ease" in v || "duration" in v || "times" in v),
+          ('ease' in v || 'duration' in v || 'times' in v)
       );
 
       if (hasNestedKeys) {
         for (const prop in transition) {
           const subTrans = transition[prop];
-          if (typeof subTrans === "object" && subTrans !== null) {
+          if (typeof subTrans === 'object' && subTrans !== null) {
             transition[prop] = {
               ...subTrans,
               repeat: Infinity,
-              repeatType: "loop",
+              repeatType: 'loop',
               repeatDelay: loopDelay,
             };
           }
@@ -331,7 +331,7 @@ function getVariants<
         state.animate.transition = {
           ...transition,
           repeat: Infinity,
-          repeatType: "loop",
+          repeatType: 'loop',
           repeatDelay: loopDelay,
         };
       }

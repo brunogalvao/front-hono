@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useEffect, useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface Props {
   value: string;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function TypeSelector({ value, onChange, allTypes }: Props) {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
 
   // Preenche o input quando muda o tipo externo
   useEffect(() => {
@@ -26,23 +26,23 @@ export function TypeSelector({ value, onChange, allTypes }: Props) {
       <Label htmlFor="expense-type">Tipo de Gasto</Label>
 
       {/* Chips de tipos já usados */}
-      <div className="flex flex-wrap gap-2 p-2 rounded-md border bg-muted max-h-32 overflow-y-auto">
+      <div className="bg-muted flex max-h-32 flex-wrap gap-2 overflow-y-auto rounded-md border p-2">
         {allTypes && allTypes.length > 0 ? (
           allTypes.map((type) => (
             <div
               key={type}
               onClick={() => handleSelect(type)}
-              className={`px-3 py-1 text-sm rounded-full cursor-pointer border ${
+              className={`cursor-pointer rounded-full border px-3 py-1 text-sm ${
                 value === type
-                  ? "bg-primary text-white border-primary"
-                  : "bg-background hover:border-muted-foreground"
+                  ? 'bg-primary border-primary text-white'
+                  : 'bg-background hover:border-muted-foreground'
               }`}
             >
               {type}
             </div>
           ))
         ) : (
-          <span className="text-sm text-muted-foreground">
+          <span className="text-muted-foreground text-sm">
             Sem tipos cadastrados
           </span>
         )}

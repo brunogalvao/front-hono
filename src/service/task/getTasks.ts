@@ -1,6 +1,6 @@
-import type { Task } from "@/model/tasks.model";
-import { API_BASE_URL } from "@/config/api";
-import { supabase } from "@/lib/supabase";
+import type { Task } from '@/model/tasks.model';
+import { API_BASE_URL } from '@/config/api';
+import { supabase } from '@/lib/supabase';
 
 export const getTasks = async ({
   month,
@@ -13,12 +13,12 @@ export const getTasks = async ({
   const accessToken = session.data.session?.access_token;
 
   if (!accessToken) {
-    throw new Error("Usuário não autenticado.");
+    throw new Error('Usuário não autenticado.');
   }
 
   const url = new URL(`${API_BASE_URL}/api/tasks`);
-  url.searchParams.append("month", String(month));
-  url.searchParams.append("year", String(year));
+  url.searchParams.append('month', String(month));
+  url.searchParams.append('year', String(year));
 
   const res = await fetch(url.toString(), {
     headers: {
@@ -28,7 +28,7 @@ export const getTasks = async ({
 
   if (!res.ok) {
     console.error(`Erro: ${res.status}`);
-    throw new Error("Erro ao buscar tarefas");
+    throw new Error('Erro ao buscar tarefas');
   }
 
   return res.json();

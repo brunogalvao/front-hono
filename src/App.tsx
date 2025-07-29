@@ -1,10 +1,10 @@
-import { QueryClientProvider } from '@tanstack/react-query'
-import { RouterProvider } from '@tanstack/react-router'
-import { ThemeProvider } from '@/components/theme-provider'
-import { UserProvider } from '@/context/UserContext'
-import { Toaster } from '@/components/ui/sonner'
-import { queryClient } from '@/lib/query-client'
-import { router } from '@/routes/tanstack-router'
+import { QueryClientProvider } from '@tanstack/react-query';
+import { RouterProvider } from '@tanstack/react-router';
+import { ThemeProvider } from '@/components/theme-provider';
+import { UserProvider } from '@/context/UserContext';
+import { Toaster } from '@/components/ui/sonner';
+import { queryClient } from '@/lib/query-client';
+import { router } from '@/routes/tanstack-router';
 
 export default function App() {
   return (
@@ -16,5 +16,5 @@ export default function App() {
         </UserProvider>
       </ThemeProvider>
     </QueryClientProvider>
-  )
+  );
 }

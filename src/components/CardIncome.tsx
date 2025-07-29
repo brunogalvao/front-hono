@@ -6,14 +6,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Pencil, Trash } from "lucide-react";
-import { Loader } from "lucide-react"; // ou seu loader customizado
-import { formatToBRL } from "@/utils/format";
-import { getNomeMes } from "@/model/mes.enum";
-import type { CardIncomeProps } from "@/model/cardIncome.model";
-import { DialogConfirmDelete } from "./DialogConfirmDelete";
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Pencil, Trash } from 'lucide-react';
+import { Loader } from 'lucide-react'; // ou seu loader customizado
+import { formatToBRL } from '@/utils/format';
+import { getNomeMes } from '@/model/mes.enum';
+import type { CardIncomeProps } from '@/model/cardIncome.model';
+import { DialogConfirmDelete } from './DialogConfirmDelete';
 
 function CardIncome({
   incomes,
@@ -29,9 +29,9 @@ function CardIncome({
         <Loader className="h-4 w-4 animate-spin" />
       ) : (
         <TableCaption className="text-left">
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-2">
             Total
-            <span className="font-bold text-lg bg-primary text-white px-3 rounded-full">
+            <span className="bg-primary rounded-full px-3 text-lg font-bold text-white">
               {formatToBRL(total)}
             </span>
           </div>
@@ -57,13 +57,13 @@ function CardIncome({
             </TableCell>
 
             <TableCell>
-              <div className="flex gap-3 justify-center">
+              <div className="flex justify-center gap-3">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => {
                     setForm({
-                      descricao: incomes.descricao ?? "",
+                      descricao: incomes.descricao ?? '',
                       valor: incomes.valor,
                       mes: incomes.mes,
                       ano: incomes.ano,
@@ -74,7 +74,7 @@ function CardIncome({
                   <Pencil />
                 </Button>
                 <DialogConfirmDelete
-                  description={incomes.descricao ?? "item"}
+                  description={incomes.descricao ?? 'item'}
                   onConfirm={() => handleDelete(incomes.id)}
                 >
                   <Button variant="destructive" size="sm">

@@ -5,10 +5,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import type { DialogDelete } from "@/model/dialogDelete.model";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import type { DialogDelete } from '@/model/dialogDelete.model';
 
 export function DialogConfirmDelete({
   onConfirm,
@@ -28,7 +28,7 @@ export function DialogConfirmDelete({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            Tem certeza que deseja deletar{" "}
+            Tem certeza que deseja deletar{' '}
             <span className="font-semibold">{description}</span>?
           </DialogTitle>
         </DialogHeader>

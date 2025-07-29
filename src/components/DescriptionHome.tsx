@@ -1,11 +1,11 @@
-import { Separator } from "./ui/separator";
+import { Separator } from './ui/separator';
 
-import img01 from "@/assets/tela-inicial.png";
+import img01 from '@/assets/tela-inicial.png';
 
 const DescriptionHome = () => {
   return (
-    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 my-8">
-      <div className="w-full p-3 flex flex-col space-y-3 text-end">
+    <div className="my-8 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+      <div className="flex w-full flex-col space-y-3 p-3 text-end">
         <h1 className="text-3xl font-bold">Bem-Vindo ao FinanceTask</h1>
         <p className="text-gray-600">
           Gerencie suas finanças de forma simples, rápida e inteligente. Aqui,
@@ -20,14 +20,14 @@ const DescriptionHome = () => {
           financeira!
         </span>
       </div>
-      <Separator orientation="vertical" className="h-12 mx-4" />
-      <div className="relative w-fit inline-block">
+      <Separator orientation="vertical" className="mx-4 h-12" />
+      <div className="relative inline-block w-fit">
         <img className="rounded-2xl" src={img01} alt="FinanceTask" />
         <div
-          className="absolute inset-0 rounded-2xl pointer-events-none"
+          className="pointer-events-none absolute inset-0 rounded-2xl"
           style={{
             background:
-              "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))",
+              'linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))',
           }}
         />
       </div>

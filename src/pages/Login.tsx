@@ -1,30 +1,30 @@
-import { useEffect, useState } from "react";
-import { useNavigate, Link } from "@tanstack/react-router";
-import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from 'react';
+import { useNavigate, Link } from '@tanstack/react-router';
+import { supabase } from '@/lib/supabase';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { FaGithub } from "react-icons/fa";
-import { GradientText } from "@/components/animate-ui/text/gradient";
-import { AnimateIcon } from "@/components/animate-ui/icons/icon";
-import { LogIn } from "@/components/animate-ui/icons/log-in";
-import { Loader } from "@/components/animate-ui/icons/loader";
-import { textoChamada } from "@/data/textoTitulo";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { FaGithub } from 'react-icons/fa';
+import { GradientText } from '@/components/animate-ui/text/gradient';
+import { AnimateIcon } from '@/components/animate-ui/icons/icon';
+import { LogIn } from '@/components/animate-ui/icons/log-in';
+import { Loader } from '@/components/animate-ui/icons/loader';
+import { textoChamada } from '@/data/textoTitulo';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/animate-ui/radix/tabs";
-import RegisterUserForm from "@/components/RegisterUserForm";
-import { AnimatePresence, motion } from "framer-motion";
+} from '@/components/animate-ui/radix/tabs';
+import RegisterUserForm from '@/components/RegisterUserForm';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface FormData {
   name: string;
@@ -36,15 +36,15 @@ function Login() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>({
-    name: "",
-    email: "",
-    password: "",
+    name: '',
+    email: '',
+    password: '',
   });
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [textoAtual, setTextoAtual] = useState<string>(
-    textoChamada[0].textoHeader,
+    textoChamada[0].textoHeader
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,9 +74,9 @@ function Login() {
         });
       }
 
-      navigate({ to: "/admin/dashboard" });
+      navigate({ to: '/admin/dashboard' });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao fazer login");
+      setError(err instanceof Error ? err.message : 'Erro ao fazer login');
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,7 @@ function Login() {
     try {
       setLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: "github",
+        provider: 'github',
         options: {
           redirectTo: `${window.location.origin}/admin/dashboard`,
         },
@@ -94,7 +94,7 @@ function Login() {
       if (error) throw error;
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Erro ao fazer login com GitHub",
+        err instanceof Error ? err.message : 'Erro ao fazer login com GitHub'
       );
       setLoading(false);
     }
@@ -104,7 +104,7 @@ function Login() {
     try {
       setLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
+        provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/admin/dashboard`,
         },
@@ -112,7 +112,7 @@ function Login() {
       if (error) throw error;
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Erro ao fazer login com Google",
+        err instanceof Error ? err.message : 'Erro ao fazer login com Google'
       );
       setLoading(false);
     }
@@ -120,7 +120,7 @@ function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     await handleEmailLogin();
   };
 
@@ -138,7 +138,7 @@ function Login() {
         data: { session },
       } = await supabase.auth.getSession();
       if (session) {
-        navigate({ to: "/admin/dashboard" });
+        navigate({ to: '/admin/dashboard' });
       }
     };
 
@@ -146,10 +146,10 @@ function Login() {
   }, [navigate]);
 
   return (
-    <div className="grid md:grid-cols-2 grid-cols-1">
-      <div className="md:min-h-screen h-auto py-8 md:p-0 flex items-center justify-center md:order-1 order-last">
-        <Tabs defaultValue="login" className="md:w-[72%] w-[90%]">
-          <Card className="bg-transparent border-none">
+    <div className="grid grid-cols-1 md:grid-cols-2">
+      <div className="order-last flex h-auto items-center justify-center py-8 md:order-1 md:min-h-screen md:p-0">
+        <Tabs defaultValue="login" className="w-[90%] md:w-[72%]">
+          <Card className="border-none bg-transparent">
             <CardHeader>
               <TabsList className="w-full">
                 <TabsTrigger
@@ -174,7 +174,7 @@ function Login() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full flex items-center gap-2 py-6 cursor-pointer"
+                    className="flex w-full cursor-pointer items-center gap-2 py-6"
                     onClick={handleGithubLogin}
                     disabled={loading}
                   >
@@ -194,7 +194,7 @@ function Login() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full flex items-center gap-2 py-6 cursor-pointer"
+                    className="flex w-full cursor-pointer items-center gap-2 py-6"
                     onClick={handleGoogleLogin}
                     disabled={loading}
                   >
@@ -202,7 +202,7 @@ function Login() {
                       <>
                         <img
                           src="https://www.svgrepo.com/show/475656/google-color.svg"
-                          className="w-5 h-5"
+                          className="h-5 w-5"
                         />
                         Acessando com Google...
                       </>
@@ -210,7 +210,7 @@ function Login() {
                       <>
                         <img
                           src="https://www.svgrepo.com/show/475656/google-color.svg"
-                          className="w-5 h-5"
+                          className="h-5 w-5"
                         />
                         Entrar com Google
                       </>
@@ -218,12 +218,12 @@ function Login() {
                   </Button>
 
                   {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    <div className="rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
                       {error}
                     </div>
                   )}
 
-                  <div className="space-y-3 border rounded-xl p-6">
+                  <div className="space-y-3 rounded-xl border p-6">
                     <div className="flex flex-col space-y-2">
                       <Label htmlFor="email">Email</Label>
                       <Input
@@ -255,7 +255,7 @@ function Login() {
                   <AnimateIcon animateOnHover>
                     <Button
                       type="submit"
-                      className="w-full py-6 cursor-pointer"
+                      className="w-full cursor-pointer py-6"
                       disabled={loading}
                     >
                       {loading ? (
@@ -278,8 +278,8 @@ function Login() {
               </TabsContent>
             </CardContent>
             <CardFooter>
-              <div className="flex justify-between w-full text-primary">
-                <Link to="/" className="text-sm hover:border-b border-dashed">
+              <div className="text-primary flex w-full justify-between">
+                <Link to="/" className="border-dashed text-sm hover:border-b">
                   voltar
                 </Link>
               </div>
@@ -288,8 +288,8 @@ function Login() {
         </Tabs>
       </div>
 
-      <div className="md:h-screen h-auto md:pt-8 py-8 flex items-center border-l border-dashed px-4 md:order-2">
-        <div className="flex flex-col space-y-2 md:px-10 px-2">
+      <div className="flex h-auto items-center border-l border-dashed px-4 py-8 md:order-2 md:h-screen md:pt-8">
+        <div className="flex flex-col space-y-2 px-2 md:px-10">
           {/* <p className="text-zinc-400 transition duration-200">{textoAtual}</p> */}
 
           <AnimatePresence mode="wait">
@@ -302,7 +302,7 @@ function Login() {
             >
               <div className="flex flex-col space-y-2">
                 <GradientText
-                  className="text-5xl font-bold mb-3 capitalize"
+                  className="mb-3 text-5xl font-bold capitalize"
                   text={textoChamada[0].title}
                 />
                 <span className="text-zinc-400">{textoAtual}</span>

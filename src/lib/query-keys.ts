@@ -4,7 +4,7 @@ export const queryKeys = {
   tasks: {
     all: ['tasks'] as const,
     lists: () => [...queryKeys.tasks.all, 'list'] as const,
-    list: (filters: { month: number; year: number }) => 
+    list: (filters: { month: number; year: number }) =>
       [...queryKeys.tasks.lists(), filters] as const,
     details: () => [...queryKeys.tasks.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.tasks.details(), id] as const,
@@ -51,7 +51,7 @@ export const queryKeys = {
     all: ['user'] as const,
     profile: () => [...queryKeys.user.all, 'profile'] as const,
   },
-} as const
+} as const;
 
 // Tipos para type safety
-export type QueryKeys = typeof queryKeys 
+export type QueryKeys = typeof queryKeys;

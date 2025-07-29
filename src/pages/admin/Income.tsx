@@ -1,40 +1,40 @@
-import { useEffect, useState } from "react";
-import { NumericFormat } from "react-number-format";
+import { useEffect, useState } from 'react';
+import { NumericFormat } from 'react-number-format';
 // ui
-import TituloPage from "@/components/TituloPage";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import TituloPage from '@/components/TituloPage';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { toast } from "sonner";
+} from '@/components/ui/select';
+import { toast } from 'sonner';
 // service
-import { editIncome } from "@/service/income/editIncome";
-import { createIncome } from "@/service/income/createIncome";
-import { deleteIncome } from "@/service/income/deleteIncome";
-import { totalIncomes } from "@/service/income/totalIncome";
-import { getIncomes } from "@/service/income/getIncome";
+import { editIncome } from '@/service/income/editIncome';
+import { createIncome } from '@/service/income/createIncome';
+import { deleteIncome } from '@/service/income/deleteIncome';
+import { totalIncomes } from '@/service/income/totalIncome';
+import { getIncomes } from '@/service/income/getIncome';
 // model's
-import type { IncomeItem } from "@/model/incomes.model";
-import { MESES_LISTA } from "@/model/mes.enum";
+import type { IncomeItem } from '@/model/incomes.model';
+import { MESES_LISTA } from '@/model/mes.enum';
 // import { Pencil, Trash } from "lucide-react";
-import CardIncome from "@/components/CardIncome";
-import { LiquidButton } from "@/components/animate-ui/buttons/liquid";
-import { Plus } from "@/components/animate-ui/icons/plus";
-import { AnimateIcon } from "@/components/animate-ui/icons/icon";
-import { RefreshCcw } from "@/components/animate-ui/icons/refresh-ccw";
+import CardIncome from '@/components/CardIncome';
+import { LiquidButton } from '@/components/animate-ui/buttons/liquid';
+import { Plus } from '@/components/animate-ui/icons/plus';
+import { AnimateIcon } from '@/components/animate-ui/icons/icon';
+import { RefreshCcw } from '@/components/animate-ui/icons/refresh-ccw';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/animate-ui/components/tooltip";
-import MonthIncome from "@/components/monthIncome";
+} from '@/components/animate-ui/components/tooltip';
+import MonthIncome from '@/components/monthIncome';
 
 function Income() {
   const [incomes, setIncomes] = useState<IncomeItem[]>([]);
@@ -42,7 +42,7 @@ function Income() {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState<number>(0);
   const [form, setForm] = useState({
-    descricao: "",
+    descricao: '',
     valor: 0,
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
@@ -54,7 +54,7 @@ function Income() {
       const total = await totalIncomes();
       setTotal(total);
     } catch (err) {
-      console.error("Erro ao carregar total de rendimentos:", err);
+      console.error('Erro ao carregar total de rendimentos:', err);
     }
   };
 
@@ -76,35 +76,35 @@ function Income() {
 
         const updated = await editIncome({ ...form, id: editingId });
         setIncomes((prev) =>
-          prev.map((item) => (item.id === editingId ? updated : item)),
+          prev.map((item) => (item.id === editingId ? updated : item))
         );
 
-        toast.success("Cadastro Editado");
+        toast.success('Cadastro Editado');
       } else {
         const newIncome = await createIncome(form);
         setIncomes((prev) => [...prev, newIncome as IncomeItem]);
 
-        toast.success("Salvo novo cadastro");
+        toast.success('Salvo novo cadastro');
       }
 
       await loadTotal();
 
       setForm({
-        descricao: "",
+        descricao: '',
         valor: 0,
         mes: new Date().getMonth() + 1,
         ano: new Date().getFullYear(),
       });
       setEditingId(null);
     } catch (err) {
-      console.error("Erro ao salvar:", err);
+      console.error('Erro ao salvar:', err);
 
       const errorMessage =
         err instanceof Error
           ? err.message
-          : typeof err === "string"
+          : typeof err === 'string'
             ? err
-            : "Erro desconhecido";
+            : 'Erro desconhecido';
 
       toast.error(errorMessage);
     }
@@ -118,7 +118,7 @@ function Income() {
       setReloadFlag(Date.now());
       await loadTotal();
     } catch (err) {
-      console.error("Erro ao deletar:", err);
+      console.error('Erro ao deletar:', err);
     }
   };
 
@@ -138,7 +138,7 @@ function Income() {
 
       <div className="flex flex-col space-y-6">
         <div className="flex flex-row gap-3">
-          <div className="flex flex-col space-y-3 w-full">
+          <div className="flex w-full flex-col space-y-3">
             <Label>Descrição</Label>
             <Input
               className="w-full"
@@ -150,7 +150,7 @@ function Income() {
             />
           </div>
 
-          <div className="flex flex-col space-y-3 w-full">
+          <div className="flex w-full flex-col space-y-3">
             <Label>Salário</Label>
             <NumericFormat
               value={form.valor}
@@ -169,7 +169,7 @@ function Income() {
         </div>
 
         <div className="flex flex-row gap-3">
-          <div className="flex flex-col space-y-3 w-full">
+          <div className="flex w-full flex-col space-y-3">
             <Label>Mês</Label>
             <Select
               value={String(form.mes)}
@@ -190,7 +190,7 @@ function Income() {
             </Select>
           </div>
 
-          <div className="flex flex-col space-y-3 w-full">
+          <div className="flex w-full flex-col space-y-3">
             <Label>Ano</Label>
             <Input
               type="number"
@@ -203,7 +203,7 @@ function Income() {
           <div className="flex items-end">
             <AnimateIcon animateOnHover>
               <LiquidButton className="text-white" onClick={handleAddOrEdit}>
-                <div className="px-12 flex flex-row items-center gap-3">
+                <div className="flex flex-row items-center gap-3 px-12">
                   {editingId ? (
                     <>
                       Atualizar
@@ -232,7 +232,7 @@ function Income() {
               <Tooltip>
                 <TooltipTrigger>
                   {/* <span>Hover me</span> */}
-                  <p className="p-0 text-center text-sm text-zinc-500 cursor-pointer">
+                  <p className="cursor-pointer p-0 text-center text-sm text-zinc-500">
                     Sem Rendimento
                   </p>
                 </TooltipTrigger>

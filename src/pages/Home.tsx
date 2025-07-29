@@ -1,27 +1,27 @@
-import { StarsBackground } from "@/components/animate-ui/backgrounds/stars";
-import { MotionHighlight } from "@/components/animate-ui/effects/motion-highlight";
-import { Bell } from "@/components/animate-ui/icons/bell";
-import { Clock7 } from "@/components/animate-ui/icons/clock-7";
-import { Cog } from "@/components/animate-ui/icons/cog";
-import { Heart } from "@/components/animate-ui/icons/heart";
-import { AnimateIcon } from "@/components/animate-ui/icons/icon";
-import { LogIn } from "@/components/animate-ui/icons/log-in";
-import { GradientText } from "@/components/animate-ui/text/gradient";
-import { HighlightText } from "@/components/animate-ui/text/highlight";
-import DescriptionHome from "@/components/DescriptionHome";
-import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
+import { StarsBackground } from '@/components/animate-ui/backgrounds/stars';
+import { MotionHighlight } from '@/components/animate-ui/effects/motion-highlight';
+import { Bell } from '@/components/animate-ui/icons/bell';
+import { Clock7 } from '@/components/animate-ui/icons/clock-7';
+import { Cog } from '@/components/animate-ui/icons/cog';
+import { Heart } from '@/components/animate-ui/icons/heart';
+import { AnimateIcon } from '@/components/animate-ui/icons/icon';
+import { LogIn } from '@/components/animate-ui/icons/log-in';
+import { GradientText } from '@/components/animate-ui/text/gradient';
+import { HighlightText } from '@/components/animate-ui/text/highlight';
+import DescriptionHome from '@/components/DescriptionHome';
+import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { CARDS } from "@/data/cardsIntro";
-import { textoChamada } from "@/data/textoTitulo";
-import { motion } from "framer-motion";
-import { Link, useNavigate } from "@tanstack/react-router";
+} from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { CARDS } from '@/data/cardsIntro';
+import { textoChamada } from '@/data/textoTitulo';
+import { motion } from 'framer-motion';
+import { Link, useNavigate } from '@tanstack/react-router';
 
 function Home() {
   // icon
@@ -35,12 +35,12 @@ function Home() {
   const navigate = useNavigate();
 
   const goLogin = () => {
-    navigate({ to: "/login" });
+    navigate({ to: '/login' });
   };
 
   return (
-    <div className="min-h-screen ">
-      <div className="container mx-auto px-4 pb-8 flex gap-y-3 flex-col">
+    <div className="min-h-screen">
+      <div className="container mx-auto flex flex-col gap-y-3 px-4 pb-8">
         <div className="flex justify-end py-2">
           <Button variant="link">
             <AnimateIcon animateOnHover animation="default-loop">
@@ -50,7 +50,7 @@ function Home() {
                   e.preventDefault();
                   goLogin();
                 }}
-                className="text-white font-semibold py-2 px-4 rounded transition duration-300 flex items-center gap-3"
+                className="flex items-center gap-3 rounded px-4 py-2 font-semibold text-white transition duration-300"
               >
                 Login
                 <LogIn className="size-6" />
@@ -61,23 +61,23 @@ function Home() {
 
         <Separator orientation="horizontal" />
 
-        <div className="flex py-20 md:flex-row flex-col gap-3 items-center">
-          <div className="flex w-full md:w-[60%] flex-col">
+        <div className="flex flex-col items-center gap-3 py-20 md:flex-row">
+          <div className="flex w-full flex-col md:w-[60%]">
             <GradientText
-              className="text-8xl font-bold mb-3 w-full capitalize"
+              className="mb-3 w-full text-8xl font-bold capitalize"
               text={textoChamada[0].title}
             />
-            <p className="text-gray-600 text-base">
+            <p className="text-base text-gray-600">
               {textoChamada[0].tituloHeader}
             </p>
           </div>
 
-          <p className="text-gray-600 mt-8 w-full md:w-[40%] md:ps-8 md:text-end text-center text-base">
+          <p className="mt-8 w-full text-center text-base text-gray-600 md:w-[40%] md:ps-8 md:text-end">
             {textoChamada[0].textoHeader}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <MotionHighlight hover className="rounded-2xl">
             {CARDS.map((card, idx) => {
               const IconComponent = ICONS[card.icons];
@@ -86,17 +86,17 @@ function Home() {
               return (
                 <motion.div
                   key={card.title}
-                  initial={{ x: isLeft ? "-50%" : "50%", opacity: 0 }}
-                  whileInView={{ x: "0%", opacity: 1 }}
+                  initial={{ x: isLeft ? '-50%' : '50%', opacity: 0 }}
+                  whileInView={{ x: '0%', opacity: 1 }}
                   viewport={{ once: false }}
-                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                  transition={{ duration: 1.5, ease: 'easeInOut' }}
                 >
                   <Card data-value={card.title} className="bg-transparent">
                     <CardContent>
                       <AnimateIcon animateOnHover>
-                        <CardTitle className="flex flex-row items-center gap-3 mb-4">
+                        <CardTitle className="mb-4 flex flex-row items-center gap-3">
                           <IconComponent
-                            className="size-8 text-primary"
+                            className="text-primary size-8"
                             animate="default"
                           />
                           {card.title}
@@ -112,20 +112,20 @@ function Home() {
         </div>
 
         {/* Target */}
-        <div className="h-80 flex flex-col gap-8 items-center text-xl justify-center relative">
-          <StarsBackground className="absolute inset-0 flex items-center rounded-xl justify-center z-0" />
+        <div className="relative flex h-80 flex-col items-center justify-center gap-8 text-xl">
+          <StarsBackground className="absolute inset-0 z-0 flex items-center justify-center rounded-xl" />
 
-          <span className="font-bold z-10">Conheça agora mesmo</span>
+          <span className="z-10 font-bold">Conheça agora mesmo</span>
           <span
-            className="flex gap-3 z-10 cursor-pointer"
+            className="z-10 flex cursor-pointer gap-3"
             onClick={goLogin}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: 'pointer' }}
           >
             <HighlightText
               text="Faça o login"
-              transition={{ duration: 4, ease: "easeInOut" }}
+              transition={{ duration: 4, ease: 'easeInOut' }}
               inViewOnce
-              className="py-2 px-16 font-bold cursor-pointer rounded-full hover:underline duration-200"
+              className="cursor-pointer rounded-full px-16 py-2 font-bold duration-200 hover:underline"
             />
           </span>
         </div>

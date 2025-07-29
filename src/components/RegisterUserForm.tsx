@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import {
   Card,
   CardContent,
@@ -7,24 +7,24 @@ import {
   // CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 // import { Link } from "react-router-dom";
-import { toast } from "sonner";
-import { registerSchema } from "@/schema/registerSchema";
-import { AnimateIcon } from "./animate-ui/icons/icon";
-import { Send } from "./animate-ui/icons/send";
-import { Loader } from "./animate-ui/icons/loader";
-import { textoChamada } from "@/data/textoTitulo";
+import { toast } from 'sonner';
+import { registerSchema } from '@/schema/registerSchema';
+import { AnimateIcon } from './animate-ui/icons/icon';
+import { Send } from './animate-ui/icons/send';
+import { Loader } from './animate-ui/icons/loader';
+import { textoChamada } from '@/data/textoTitulo';
 
 const RegisterUserForm = () => {
   const [form, setForm] = useState({
-    email: "",
-    name: "",
-    password: "",
-    confirmPassword: "",
+    email: '',
+    name: '',
+    password: '',
+    confirmPassword: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -51,7 +51,7 @@ const RegisterUserForm = () => {
 
     setLoading(true);
 
-    localStorage.setItem("signup_name", form.name);
+    localStorage.setItem('signup_name', form.name);
 
     const { error } = await supabase.auth.signUp({
       email: form.email,
@@ -67,12 +67,12 @@ const RegisterUserForm = () => {
     if (error) {
       toast.error(`Erro ao cadastrar: ${error.message}`);
     } else {
-      toast.success("Cadastro realizado com sucesso! Verifique seu e-mail.");
+      toast.success('Cadastro realizado com sucesso! Verifique seu e-mail.');
       setForm({
-        email: "",
-        name: "",
-        password: "",
-        confirmPassword: "",
+        email: '',
+        name: '',
+        password: '',
+        confirmPassword: '',
       });
     }
 
@@ -140,7 +140,7 @@ const RegisterUserForm = () => {
           <AnimateIcon animateOnHover>
             <Button
               type="submit"
-              className="w-full flex gap-3 items-center"
+              className="flex w-full items-center gap-3"
               disabled={loading}
             >
               {loading ? (
@@ -149,7 +149,7 @@ const RegisterUserForm = () => {
                 </>
               ) : (
                 <>
-                  {" "}
+                  {' '}
                   Cadastrar <Send />
                 </>
               )}

@@ -1,46 +1,46 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import type { User } from "@supabase/supabase-js";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { getInitials } from "@/utils/getInitials";
-import { uploadAvatarImage } from "@/service/uploadAvatarImage";
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import type { User } from '@supabase/supabase-js';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { getInitials } from '@/utils/getInitials';
+import { uploadAvatarImage } from '@/service/uploadAvatarImage';
 
-import { z } from "zod";
-import { phoneSchema } from "@/model/phone.model";
-import { PatternFormat } from "react-number-format";
-import TituloPage from "@/components/TituloPage";
+import { z } from 'zod';
+import { phoneSchema } from '@/model/phone.model';
+import { PatternFormat } from 'react-number-format';
+import TituloPage from '@/components/TituloPage';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { FaGithub } from "react-icons/fa";
-import { IoMail } from "react-icons/io5";
-import { AnimateIcon } from "@/components/animate-ui/icons/icon";
-import { LiquidButton } from "@/components/animate-ui/buttons/liquid";
-import { RefreshCcw } from "@/components/animate-ui/icons/refresh-ccw";
-import { toast } from "sonner";
-import { useUser } from "@/context/UserContext";
-import { ResetPassword } from "@/components/ResetPassword";
+} from '@/components/ui/card';
+import { FaGithub } from 'react-icons/fa';
+import { IoMail } from 'react-icons/io5';
+import { AnimateIcon } from '@/components/animate-ui/icons/icon';
+import { LiquidButton } from '@/components/animate-ui/buttons/liquid';
+import { RefreshCcw } from '@/components/animate-ui/icons/refresh-ccw';
+import { toast } from 'sonner';
+import { useUser } from '@/context/UserContext';
+import { ResetPassword } from '@/components/ResetPassword';
 import {
   Accordion,
   AccordionItem,
   AccordionPanel,
   AccordionTrigger,
-} from "@/components/animate-ui/base/accordion";
+} from '@/components/animate-ui/base/accordion';
 
 const EditUser = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [file, setFile] = useState<File | null>(null);
-  const [message, setMessage] = useState("");
-  const [provider, setProvider] = useState("");
+  const [message, setMessage] = useState('');
+  const [provider, setProvider] = useState('');
 
   const { setProfile } = useUser();
 
@@ -57,10 +57,10 @@ const EditUser = () => {
 
       if (user) {
         setUser(user);
-        setName(user.user_metadata?.displayName ?? "");
-        setAvatarUrl(user.user_metadata?.avatar_url ?? "");
-        setPhone(user.user_metadata?.phone ?? "");
-        setProvider(prov || "desconhecido");
+        setName(user.user_metadata?.displayName ?? '');
+        setAvatarUrl(user.user_metadata?.avatar_url ?? '');
+        setPhone(user.user_metadata?.phone ?? '');
+        setProvider(prov || 'desconhecido');
       }
     };
 
@@ -68,12 +68,12 @@ const EditUser = () => {
   }, []);
 
   const handleUpdate = async () => {
-    setMessage("");
+    setMessage('');
 
     const result = schema.safeParse({ phone });
     if (!result.success) {
       const errorMessage =
-        result.error.format().phone?._errors?.[0] || "Telefone inválido.";
+        result.error.format().phone?._errors?.[0] || 'Telefone inválido.';
       setMessage(errorMessage);
       return;
     }
@@ -81,7 +81,7 @@ const EditUser = () => {
     const formattedPhone = result.data.phone;
 
     if (!user) {
-      return setMessage("Usuário não autenticado.");
+      return setMessage('Usuário não autenticado.');
     }
 
     let newAvatarUrl = avatarUrl;
@@ -100,26 +100,26 @@ const EditUser = () => {
       });
 
       if (error) {
-        console.error("Erro ao atualizar perfil:", error);
-        return setMessage("Erro ao atualizar perfil.");
+        console.error('Erro ao atualizar perfil:', error);
+        return setMessage('Erro ao atualizar perfil.');
       }
 
       setAvatarUrl(newAvatarUrl);
-      toast.success("Perfil atualizado com sucesso!", { duration: 5000 });
+      toast.success('Perfil atualizado com sucesso!', { duration: 5000 });
 
       // Atualiza no contexto global se for login por email
-      if (provider === "email") {
+      if (provider === 'email') {
         setProfile({
           name,
-          email: user.email ?? "",
+          email: user.email ?? '',
           avatar_url: newAvatarUrl,
           phone: formattedPhone,
           displayName: name,
         });
       }
     } catch (err) {
-      console.error("Erro no processo de atualização:", err);
-      setMessage("Erro ao fazer upload da foto.");
+      console.error('Erro no processo de atualização:', err);
+      setMessage('Erro ao fazer upload da foto.');
       toast.error(message, { duration: 5000 });
     }
   };
@@ -127,21 +127,21 @@ const EditUser = () => {
   const [checked, setChecked] = useState(false);
 
   return (
-    <div className="space-y-6 w-full mx-auto">
+    <div className="mx-auto w-full space-y-6">
       <TituloPage titulo="Editar Perfil" />
 
       <div className="flex flex-row items-center space-x-4">
-        <Avatar className="w-20 h-20">
+        <Avatar className="h-20 w-20">
           {avatarUrl ? (
             <AvatarImage src={avatarUrl} alt="Avatar" />
           ) : (
             <AvatarFallback>
-              {getInitials(name || user?.email || "")}
+              {getInitials(name || user?.email || '')}
             </AvatarFallback>
           )}
         </Avatar>
 
-        {provider === "email" && (
+        {provider === 'email' && (
           <Input
             type="file"
             accept="image/*"
@@ -152,16 +152,16 @@ const EditUser = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex justify-between items-center">
+          <CardTitle className="flex items-center justify-between">
             <div>Informações do Usuario</div>
-            <div className="text-sm text-muted-foreground flex flex-row items-center gap-3">
+            <div className="text-muted-foreground flex flex-row items-center gap-3 text-sm">
               Está logado com
-              {provider === "github" ? (
+              {provider === 'github' ? (
                 <FaGithub className="size-6" />
-              ) : provider === "google" ? (
+              ) : provider === 'google' ? (
                 <img
                   src="https://www.svgrepo.com/show/475656/google-color.svg"
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                 />
               ) : (
                 <IoMail className="size-6" />
@@ -170,20 +170,20 @@ const EditUser = () => {
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="flex space-y-6 flex-col">
+        <CardContent className="flex flex-col space-y-6">
           <div className="flex flex-row gap-6">
-            <div className="w-full flex flex-col gap-2">
+            <div className="flex w-full flex-col gap-2">
               <Label htmlFor="name">Nome</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Seu nome"
-                disabled={provider !== "email"}
+                disabled={provider !== 'email'}
               />
             </div>
 
-            <div className="w-full flex flex-col gap-2">
+            <div className="flex w-full flex-col gap-2">
               <Label htmlFor="phone">Telefone</Label>
               <PatternFormat
                 id="phone"
@@ -196,23 +196,23 @@ const EditUser = () => {
             </div>
           </div>
 
-          <div className="flex flex-row gap-3 items-end">
-            <div className="w-full flex gap-2 flex-col">
+          <div className="flex flex-row items-end gap-3">
+            <div className="flex w-full flex-col gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input value={user?.email || ""} disabled />
+              <Input value={user?.email || ''} disabled />
             </div>
           </div>
 
           <div className="flex flex-1 flex-row">
             <Accordion className="w-full">
-              <AccordionItem className="w-full border-0 mb-2">
+              <AccordionItem className="mb-2 w-full border-0">
                 <AccordionTrigger
                   onClick={() => setChecked(!checked)}
-                  className={`transition duration-300 rounded px-3 bg-accent decoration-0 hover:bg-primary ${
-                    checked ? "bg-primary text-white rounded-b-none" : ""
+                  className={`bg-accent hover:bg-primary rounded px-3 decoration-0 transition duration-300 ${
+                    checked ? 'bg-primary rounded-b-none text-white' : ''
                   }`}
                 >
-                  {checked ? "Troque sua senha." : "Quer resetar a Senha ?"}
+                  {checked ? 'Troque sua senha.' : 'Quer resetar a Senha ?'}
                 </AccordionTrigger>
                 <AccordionPanel>
                   {checked && <ResetPassword provider={provider} />}
@@ -225,7 +225,7 @@ const EditUser = () => {
         <CardFooter className="flex justify-end">
           <AnimateIcon animateOnHover>
             <LiquidButton className="text-white" onClick={handleUpdate}>
-              <div className="px-12 flex flex-row items-center gap-3">
+              <div className="flex flex-row items-center gap-3 px-12">
                 Salvar Alterações
                 <RefreshCcw className="size-5" />
               </div>

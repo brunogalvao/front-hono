@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { getUser } from "@/service/userService";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { getInitials } from "@/utils/getInitials";
-import type { UserProfile } from "@/model/user.model";
-import { useUser } from "@/context/UserContext";
+import { useEffect, useState } from 'react';
+import { getUser } from '@/service/userService';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { getInitials } from '@/utils/getInitials';
+import type { UserProfile } from '@/model/user.model';
+import { useUser } from '@/context/UserContext';
 
 export function SidebarUser() {
   const [fetchedProfile, setFetchedProfile] = useState<UserProfile | null>(
@@ -17,7 +17,7 @@ export function SidebarUser() {
         const userData = await getUser();
         setFetchedProfile(userData);
       } catch (error) {
-        console.error("Erro ao carregar perfil:", error);
+        console.error('Erro ao carregar perfil:', error);
       }
     };
 
@@ -31,12 +31,12 @@ export function SidebarUser() {
     fullProfile.displayName || fullProfile.name || fullProfile.email;
 
   return (
-    <div className="flex items-center gap-3 px-6 py-4 border-t">
+    <div className="flex items-center gap-3 border-t px-6 py-4">
       <Avatar>
         <AvatarImage src={fullProfile.avatar_url} />
         <AvatarFallback>{getInitials(nameOrEmail)}</AvatarFallback>
       </Avatar>
-      <span className="font-medium text-sm truncate">{nameOrEmail}</span>
+      <span className="truncate text-sm font-medium">{nameOrEmail}</span>
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { createTask } from "@/service/task/createTask";
+import { useEffect, useState } from 'react';
+import { createTask } from '@/service/task/createTask';
 import {
   Dialog,
   DialogTrigger,
@@ -9,38 +9,38 @@ import {
   DialogDescription,
   DialogFooter,
   DialogClose,
-} from "@/components/ui/dialog";
-import { Label } from "./ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { taskSchema } from "@/schema/taskSchema";
-import { NumericFormat } from "react-number-format";
-import { LiquidButton } from "./animate-ui/buttons/liquid";
-import { AnimateIcon } from "./animate-ui/icons/icon";
-import { Plus } from "./animate-ui/icons/plus";
-import { getExpenseTypes } from "@/service/expense-types/getExpenseTypes";
-import { TypeSelector } from "./TypeSelector";
-import { TASK_STATUS, type TaskStatus } from "@/model/tasks.model";
+} from '@/components/ui/dialog';
+import { Label } from './ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { taskSchema } from '@/schema/taskSchema';
+import { NumericFormat } from 'react-number-format';
+import { LiquidButton } from './animate-ui/buttons/liquid';
+import { AnimateIcon } from './animate-ui/icons/icon';
+import { Plus } from './animate-ui/icons/plus';
+import { getExpenseTypes } from '@/service/expense-types/getExpenseTypes';
+import { TypeSelector } from './TypeSelector';
+import { TASK_STATUS, type TaskStatus } from '@/model/tasks.model';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
-import type z from "zod";
-import { MESES_LISTA } from "@/model/mes.enum";
+} from './ui/select';
+import type z from 'zod';
+import { MESES_LISTA } from '@/model/mes.enum';
 
 export function AddTaskDialog({
   onTaskCreated,
 }: {
   onTaskCreated: () => void;
 }) {
-  const [title, setTitle] = useState("");
-  const [price, setPrice] = useState<string | number>("");
+  const [title, setTitle] = useState('');
+  const [price, setPrice] = useState<string | number>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [msg, setMsg] = useState("");
-  const [type, setType] = useState("");
+  const [msg, setMsg] = useState('');
+  const [type, setType] = useState('');
   const [allTypes, setAllTypes] = useState<string[]>([]);
   const [done, setDone] = useState<TaskStatus>(TASK_STATUS.Pendente);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -59,7 +59,7 @@ export function AddTaskDialog({
         const names = types.map((t) => t.name);
         setAllTypes(names);
       } catch (error) {
-        console.error("Erro ao carregar tipos de gasto:", error);
+        console.error('Erro ao carregar tipos de gasto:', error);
       }
     };
 
@@ -67,12 +67,12 @@ export function AddTaskDialog({
   }, []);
 
   const resetForm = () => {
-    setTitle("");
-    setPrice("");
-    setType("");
+    setTitle('');
+    setPrice('');
+    setType('');
     setDone(TASK_STATUS.Pendente);
     setFormErrors({});
-    setMsg("");
+    setMsg('');
     setDialogOpen(false);
   };
 
@@ -119,7 +119,7 @@ export function AddTaskDialog({
       onTaskCreated();
       resetForm();
     } catch (err) {
-      console.error("Erro ao criar tarefa:", err);
+      console.error('Erro ao criar tarefa:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -133,7 +133,7 @@ export function AddTaskDialog({
           onClick={() => setDialogOpen(true)}
         >
           <AnimateIcon animateOnHover>
-            <div className="px-12 flex flex-row items-center gap-3">
+            <div className="flex flex-row items-center gap-3 px-12">
               Adicionar
               <Plus className="size-5" />
             </div>
@@ -172,12 +172,12 @@ export function AddTaskDialog({
           </div>
 
           <div className="flex flex-row gap-3">
-            <div className="flex flex-col space-y-2 w-[50%]">
+            <div className="flex w-[50%] flex-col space-y-2">
               <Label>Preço</Label>
               <NumericFormat
                 value={price}
                 onValueChange={(values) => {
-                  setPrice(values.floatValue ?? "");
+                  setPrice(values.floatValue ?? '');
                 }}
                 thousandSeparator="."
                 decimalSeparator=","
@@ -254,7 +254,7 @@ export function AddTaskDialog({
 
           <div className="flex flex-col space-y-2">
             {/* <Label>Tipo de Gasto</Label> */}
-            <div className="flex flex-col gap-2 p-2 border rounded-md bg-background items-center">
+            <div className="bg-background flex flex-col items-center gap-2 rounded-md border p-2">
               <TypeSelector
                 value={type}
                 onChange={setType}
@@ -278,7 +278,7 @@ export function AddTaskDialog({
           </DialogClose>
 
           <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Salvando..." : "Salvar"}
+            {isSubmitting ? 'Salvando...' : 'Salvar'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -2,11 +2,11 @@
 
 export const getDollarRate = async (): Promise<number> => {
   const res = await fetch(
-    "https://economia.awesomeapi.com.br/json/last/USD-BRL",
+    'https://economia.awesomeapi.com.br/json/last/USD-BRL'
   );
-  if (!res.ok) throw new Error("Erro ao buscar cotação do dólar");
+  if (!res.ok) throw new Error('Erro ao buscar cotação do dólar');
   const data = await res.json();
   if (!data.USDBRL || !data.USDBRL.bid)
-    throw new Error("Cotação não encontrada");
+    throw new Error('Cotação não encontrada');
   return Number(data.USDBRL.bid);
 };

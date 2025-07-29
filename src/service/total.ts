@@ -1,12 +1,12 @@
-import { API_BASE_URL } from "@/config/api";
-import { supabase } from "@/lib/supabase";
+import { API_BASE_URL } from '@/config/api';
+import { supabase } from '@/lib/supabase';
 
 // Soma total de tarefas do usuário logado
 export const totalItems = async (): Promise<number> => {
   const session = await supabase.auth.getSession();
   const token = session.data.session?.access_token;
 
-  if (!token) throw new Error("Usuário não autenticado.");
+  if (!token) throw new Error('Usuário não autenticado.');
 
   const res = await fetch(`${API_BASE_URL}/api/tasks/total`, {
     headers: {
@@ -16,7 +16,7 @@ export const totalItems = async (): Promise<number> => {
 
   if (!res.ok) {
     console.error(`Erro: ${res.status}`);
-    throw new Error("Erro ao buscar total de tarefas");
+    throw new Error('Erro ao buscar total de tarefas');
   }
 
   const data = await res.json();
@@ -28,7 +28,7 @@ export const totalPrice = async (): Promise<number> => {
   const session = await supabase.auth.getSession();
   const token = session.data.session?.access_token;
 
-  if (!token) throw new Error("Usuário não autenticado.");
+  if (!token) throw new Error('Usuário não autenticado.');
 
   const res = await fetch(`${API_BASE_URL}/api/tasks/total-price`, {
     headers: {
@@ -38,7 +38,7 @@ export const totalPrice = async (): Promise<number> => {
 
   if (!res.ok) {
     console.error(`Erro: ${res.status}`);
-    throw new Error("Erro ao buscar total");
+    throw new Error('Erro ao buscar total');
   }
 
   const data = await res.json();
@@ -50,7 +50,7 @@ export const totalPaid = async (): Promise<number> => {
   const session = await supabase.auth.getSession();
   const token = session.data.session?.access_token;
 
-  if (!token) throw new Error("Usuário não autenticado.");
+  if (!token) throw new Error('Usuário não autenticado.');
 
   const res = await fetch(`${API_BASE_URL}/api/tasks/total-paid`, {
     headers: {
@@ -60,7 +60,7 @@ export const totalPaid = async (): Promise<number> => {
 
   if (!res.ok) {
     console.error(`Erro: ${res.status}`);
-    throw new Error("Erro ao buscar total pago");
+    throw new Error('Erro ao buscar total pago');
   }
 
   const data = await res.json();
