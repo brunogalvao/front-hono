@@ -94,6 +94,14 @@ Adicione novos campos no `version.json` e atualize o hook `useVersion` para usá
 - Execute `node scripts/generate-version.js` para gerar o arquivo localmente
 - Verifique se o git está inicializado e tem commits
 
+### Erro de dependências (npm ci)
+
+Se você encontrar erros de conflito de dependências no GitHub Actions:
+
+1. **Problema**: `framer-motion` não compatível com React 19
+2. **Solução**: O workflow usa `npm ci --legacy-peer-deps` para resolver conflitos
+3. **Local**: Execute `npm install` para atualizar dependências localmente
+
 ### Fallback funcionando
 
 Se você vê "beta - v1.0.0" em produção, significa que o arquivo `version.json` não foi encontrado. Verifique:
