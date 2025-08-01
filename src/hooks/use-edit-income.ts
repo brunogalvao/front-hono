@@ -16,7 +16,7 @@ export function useEditIncome() {
         queryKey: queryKeys.incomes.byMonth(),
       });
 
-      // Invalidar cache da IA para recalcular análise
+      // Invalidar queries da IA para recalcular análises
       queryClient.invalidateQueries({
         queryKey: queryKeys.ia.all,
       });

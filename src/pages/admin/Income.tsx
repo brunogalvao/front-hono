@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { useCreateIncome } from '@/hooks/use-create-income';
 import { useEditIncome } from '@/hooks/use-edit-income';
 import { useDeleteIncome } from '@/hooks/use-delete-income';
+import { useIncomesByMonth } from '@/hooks/use-incomes-by-month';
 // service
 import { totalIncomes } from '@/service/income/totalIncome';
 import { getIncomes } from '@/service/income/getIncome';
@@ -54,6 +55,10 @@ function Income() {
   const editIncomeMutation = useEditIncome();
   const deleteIncomeMutation = useDeleteIncome();
 
+  // Hook para observar mudanças automáticas nos rendimentos
+  const { data: incomesData, refetch: refetchIncomes } =
+    useIncomesByMonth(reloadFlag);
+
   const loadTotal = async () => {
     try {
       const total = await totalIncomes();
@@ -86,7 +91,11 @@ function Income() {
         toast.success('Salvo novo cadastro');
       }
 
-      await loadTotal();
+      // Atualizar reloadFlag para forçar atualização dos componentes
+      setReloadFlag(Date.now());
+
+      // Forçar refetch dos dados
+      await Promise.all([loadTotal(), load(), refetchIncomes()]);
 
       setForm({
         descricao: '',
@@ -97,7 +106,6 @@ function Income() {
       setEditingId(null);
     } catch (err) {
       console.error('Erro ao salvar:', err);
-
       const errorMessage =
         err instanceof Error
           ? err.message
@@ -107,7 +115,6 @@ function Income() {
 
       toast.error(errorMessage);
     }
-    setReloadFlag(Date.now()); // força nova leitura
   };
 
   const handleDelete = async (id: string) => {
@@ -115,7 +122,9 @@ function Income() {
       await deleteIncomeMutation.mutateAsync(id);
       toast.success('Rendimento deletado com sucesso');
       setReloadFlag(Date.now());
-      await loadTotal();
+
+      // Forçar refetch dos dados
+      await Promise.all([loadTotal(), load(), refetchIncomes()]);
     } catch (err) {
       console.error('Erro ao deletar:', err);
 
