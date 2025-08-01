@@ -56,8 +56,7 @@ function Income() {
   const deleteIncomeMutation = useDeleteIncome();
 
   // Hook para observar mudanças automáticas nos rendimentos
-  const { data: incomesData, refetch: refetchIncomes } =
-    useIncomesByMonth(reloadFlag);
+  const { refetch: refetchIncomes } = useIncomesByMonth(reloadFlag);
 
   const loadTotal = async () => {
     try {
