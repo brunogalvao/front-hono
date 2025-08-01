@@ -2,7 +2,7 @@ export type Task = {
   id: string;
   title: string;
   price: number | null;
-  done: TaskStatus;
+  done: boolean;
   created_at?: string;
   type?: string;
   mes: number;

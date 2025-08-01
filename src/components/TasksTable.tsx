@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback, memo, useMemo } from 'react';
-import type { Task, TaskStatus } from '@/model/tasks.model';
+import type { Task } from '@/model/tasks.model';
 import { TASK_STATUS } from '@/model/tasks.model';
 import { getExpenseTypes } from '@/service/expense-types/getExpenseTypes';
 import { z } from 'zod';
 import { taskSchema } from '@/schema/taskSchema';
 import { useEditTask, useDeleteTask } from '@/hooks/use-tasks';
+import { useIA } from '@/hooks/use-ia';
+import { useIncomesByMonth } from '@/hooks/use-incomes-by-month';
 
 // ui
 import {
@@ -49,14 +51,13 @@ interface TaskTable {
 
 export const TasksTable = memo(function TasksTable({
   tasks,
-  totalPrice,
   onTasksChange,
 }: TaskTable) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [done, setDone] = useState<TaskStatus>(TASK_STATUS.Pendente);
+  const [done, setDone] = useState<boolean>(false);
   const [type, setType] = useState('');
   const [allTypes, setAllTypes] = useState<string[]>([]);
   const [form, setForm] = useState({
@@ -191,13 +192,30 @@ export const TasksTable = memo(function TasksTable({
 
   const isFormValid = Object.keys(formErrors).length === 0;
 
+  // Hook para buscar dados da IA simplificados
+  const { data: iaData } = useIA();
+
+  // Hook para buscar rendimentos por mês (ainda usado para exibição no header)
+  const { data: salariosPorMes = {} } = useIncomesByMonth();
+
+  const mesAtual = new Date().getMonth() + 1;
+
+  // Usar dados da IA ou fallback para valores locais
+  // const totalMesAtual =
+  //   iaData?.data?.rendimentoMes || salariosPorMes[mesAtual] || 0;
+
+  const totalTarefasMesAtual =
+    iaData?.data?.totalTarefas || salariosPorMes[mesAtual] || 0;
+
   return (
     <div className="space-y-4">
       <Table>
         <TableCaption>
           <div className="flex justify-between">
             <div>{tasks.length} Tarefas</div>
-            <div className="font-bold">Total {formatToBRL(totalPrice)}</div>
+            <div className="font-bold">
+              Total {formatToBRL(totalTarefasMesAtual)}
+            </div>
           </div>
         </TableCaption>
         <TableHeader>
@@ -220,7 +238,10 @@ export const TasksTable = memo(function TasksTable({
                 {task.price ? `R$ ${task.price.toFixed(2)}` : 'Sem preço'}
               </TableCell>
               <TableCell>
-                <StatusDropdown task={task} onStatusChanged={onTasksChange} />
+                <StatusDropdown
+                  task={{ ...task, done: task.done }}
+                  onStatusChanged={onTasksChange}
+                />
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
@@ -290,8 +311,8 @@ export const TasksTable = memo(function TasksTable({
               <div className="flex flex-col space-y-2">
                 <Label className="text-base font-medium">Status</Label>
                 <Select
-                  value={done}
-                  onValueChange={(value) => setDone(value as TaskStatus)}
+                  value={done ? TASK_STATUS.Pago : TASK_STATUS.Pendente}
+                  onValueChange={(value) => setDone(value === TASK_STATUS.Pago)}
                 >
                   <SelectTrigger className="border-input bg-background !h-12 w-full border px-3 py-2 text-base">
                     <SelectValue placeholder="Selecione o status" />

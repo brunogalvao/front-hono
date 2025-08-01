@@ -21,7 +21,7 @@ import { formatToBRL } from '@/utils/format';
 
 // services
 import { getTasks } from '@/service/task/getTasks';
-import { totalPrice, totalItems, totalPaid } from '@/service/total';
+import { totalPrice, totalItems } from '@/service/total';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
 
@@ -35,6 +35,7 @@ import {
   TabsTrigger,
 } from '@/components/animate-ui/radix/tabs';
 import { FaCheckCircle } from 'react-icons/fa';
+import { useIA } from '@/hooks/use-ia';
 
 function List() {
   const navigate = useNavigate();
@@ -42,9 +43,9 @@ function List() {
 
   const [total, setTotal] = useState(0);
   const [price, setPrice] = useState(0);
-  const [paid, setPaid] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [mesAtivo, setMesAtivo] = useState(String(new Date().getMonth() + 1));
+  const { data: iaData, isLoading: isLoadingIA } = useIA();
 
   const [form] = useState({
     mes: new Date().getMonth() + 1,
@@ -52,13 +53,12 @@ function List() {
   });
 
   // 🔄 Busca tarefas do mês ativo usando TanStack Query
-  const { data: tasksCurrentMonth = [] } = useQuery({
+  const { data: tasksCurrentMonth = [], refetch } = useQuery({
     queryKey: queryKeys.tasks.list({
       month: parseInt(mesAtivo),
       year: form.ano,
     }),
     queryFn: () => getTasks({ month: parseInt(mesAtivo), year: form.ano }),
-    staleTime: 1000 * 60 * 2, // 2 minutos
   });
 
   // 🔄 Função para invalidar cache e recarregar dados
@@ -66,29 +66,30 @@ function List() {
     console.log('🔄 Invalidando cache e recarregando dados...');
 
     // Invalida o cache do mês atual
-    queryClient.invalidateQueries({
+    await queryClient.invalidateQueries({
       queryKey: queryKeys.tasks.list({
         month: parseInt(mesAtivo),
         year: form.ano,
       }),
     });
 
+    // Força o refetch dos dados
+    await refetch();
+
     // Atualiza os totais
     try {
-      const [totalResult, priceResult, resultPaid] = await Promise.all([
+      const [totalResult, priceResult] = await Promise.all([
         totalItems(),
         totalPrice(),
-        totalPaid(),
       ]);
       setTotal(totalResult);
       setPrice(priceResult);
-      setPaid(resultPaid);
     } catch (err) {
       console.error('Erro ao atualizar totais:', err);
     }
 
     console.log('✅ Cache invalidado e dados recarregados');
-  }, [queryClient, mesAtivo, form.ano]);
+  }, [queryClient, mesAtivo, form.ano, refetch]);
 
   // 🔐 Verifica usuário e escuta logout
   useEffect(() => {
@@ -113,9 +114,7 @@ function List() {
       setIsLoading(true);
       try {
         const total = await totalPrice();
-        const paid = await totalPaid();
         setPrice(total);
-        setPaid(paid);
       } catch (err) {
         console.error(err);
       } finally {
@@ -133,14 +132,14 @@ function List() {
       {/* Valor total pago + botão adicionar */}
       <div className="flex flex-row items-center justify-between">
         <div className="flex items-center gap-3">
-          {isLoading || paid == null ? (
+          {isLoadingIA || !iaData?.data?.rendimentoMes ? (
             <span className="flex items-center gap-2">
               <Loader className="h-4 w-4 animate-spin" />
               Carregando...
             </span>
-          ) : paid > 0 ? (
+          ) : iaData.data.rendimentoMes > 0 ? (
             <span className="flex gap-2">
-              {formatToBRL(paid)}
+              {formatToBRL(iaData.data.rendimentoMes)}
               <BanknoteArrowUp />
             </span>
           ) : (

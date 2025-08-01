@@ -28,6 +28,9 @@ export function useCreateTask() {
       // Invalida também queries específicas de totais
       queryClient.invalidateQueries({ queryKey: queryKeys.totals.all });
 
+      // Invalida queries da IA para recalcular análises
+      queryClient.invalidateQueries({ queryKey: queryKeys.ia.all });
+
       // Atualiza cache otimisticamente para o mês específico
       const month = variables.mes;
       const year = variables.ano;
@@ -47,13 +50,17 @@ export function useEditTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => editTask(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Task> }) =>
+      editTask(id, data),
     onSuccess: (updatedTask, variables) => {
       // Invalida todas as queries de tarefas
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.lists() });
 
       // Invalida também queries específicas de totais
       queryClient.invalidateQueries({ queryKey: queryKeys.totals.all });
+
+      // Invalida queries da IA para recalcular análises
+      queryClient.invalidateQueries({ queryKey: queryKeys.ia.all });
 
       // Atualiza cache otimisticamente para o mês específico
       const month = variables.data.mes || updatedTask.mes;
@@ -86,6 +93,9 @@ export function useDeleteTask() {
 
       // Invalida também queries específicas de totais
       queryClient.invalidateQueries({ queryKey: queryKeys.totals.all });
+
+      // Invalida queries da IA para recalcular análises
+      queryClient.invalidateQueries({ queryKey: queryKeys.ia.all });
     },
   });
 }

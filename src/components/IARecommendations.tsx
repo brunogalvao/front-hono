@@ -1,386 +1,215 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
 import { useIA } from '@/hooks/use-ia';
-import { Loader, RefreshCw } from 'lucide-react';
-import { SuspenseWrapper } from '@/components/ui/suspense';
+import { formatToBRL, formatToUSD } from '@/utils/format';
+import {
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  CheckCircle,
+} from 'lucide-react';
+import { FaChartArea, FaMoneyBill } from 'react-icons/fa6';
+import { MdTipsAndUpdates } from 'react-icons/md';
 
-// Componente de loading
-function IALoading() {
-  return (
-    <div className="flex items-center justify-center p-8">
-      <Loader className="h-8 w-8 animate-spin" />
-      <span className="ml-2">Analisando seus dados com IA...</span>
-    </div>
-  );
-}
-
-// Componente de erro
-function IAError({ error, onRetry }: { error?: any; onRetry?: () => void }) {
-  const getErrorMessage = (error: any) => {
-    if (error?.message) {
-      return error.message;
-    }
-    if (typeof error === 'string') {
-      return error;
-    }
-    return 'Erro desconhecido ao carregar análise da IA';
-  };
-
-  return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="text-center">
-          <p className="text-destructive font-medium">
-            Erro ao carregar análise da IA
-          </p>
-          <p className="text-muted-foreground mt-2 text-sm">
-            {getErrorMessage(error)}
-          </p>
-          {onRetry && (
-            <Button
-              onClick={onRetry}
-              variant="outline"
-              className="mt-4"
-              size="sm"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Tentar Novamente
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// Componente principal da IA (será envolvido pelo Suspense)
-function IARecommendationsContent() {
-  const { data: iaData, error, isLoading, refetchIA } = useIA();
-
-  console.log('🔍 IARecommendations - Status:', {
-    isLoading,
-    error,
-    hasData: !!iaData,
-  });
-  console.log('📊 IA Data completo:', iaData);
+const IARecommendations = () => {
+  const { data: iaData, isLoading, error } = useIA();
 
   if (isLoading) {
-    return <IALoading />;
-  }
-
-  if (error) {
-    console.error('❌ Erro na análise IA:', error);
-    return <IAError error={error} onRetry={refetchIA} />;
-  }
-
-  if (!iaData?.data) {
-    console.warn('⚠️ Sem dados da IA');
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center">
-            <p className="text-muted-foreground">Nenhuma análise disponível</p>
-            <p className="text-muted-foreground mt-2 text-sm">
-              Verifique se você tem dados de rendimentos e tarefas
-            </p>
-            <Button
-              onClick={refetchIA}
-              variant="outline"
-              className="mt-4"
-              size="sm"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Atualizar Análise
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="bg-muted rounded-lg p-6">
+        <div className="mb-4 flex items-center gap-2">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500"></div>
+          <span className="text-lg font-semibold">
+            Analisando seus dados...
+          </span>
+        </div>
+        <div className="space-y-2">
+          <div className="h-4 animate-pulse rounded bg-gray-200"></div>
+          <div className="h-4 w-3/4 animate-pulse rounded bg-gray-200"></div>
+          <div className="h-4 w-1/2 animate-pulse rounded bg-gray-200"></div>
+        </div>
+      </div>
     );
   }
 
-  const { dashboard, investimento, cotacaoDolar, analise, metadata } =
-    iaData.data;
-
-  // Validação adicional dos dados
-  if (!dashboard || !investimento || !analise || !metadata) {
-    console.warn('⚠️ Estrutura de dados inválida:', {
-      dashboard,
-      investimento,
-      analise,
-      metadata,
-    });
+  if (error) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center">
-            <p className="text-muted-foreground">Estrutura de dados inválida</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="rounded-lg border border-red-200 bg-red-50 p-6">
+        <div className="mb-2 flex items-center gap-2">
+          <AlertTriangle className="h-5 w-5 text-red-600" />
+          <span className="text-lg font-semibold text-red-800">
+            Erro na Análise
+          </span>
+        </div>
+        <p className="text-red-700">{error.message}</p>
+      </div>
+    );
+  }
+
+  if (!iaData?.data) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
+        <p className="text-gray-600">Nenhum dado de análise disponível.</p>
+      </div>
     );
   }
 
   const {
-    statusEconomia,
-    precisaEconomizar,
-    economiaRecomendada,
-    estrategiaInvestimento,
-    dicasEconomia,
-    distribuicaoInvestimento,
-    resumo,
-  } = analise;
+    percentualGasto,
+    percentualDisponivel,
+    resultadoLiquido,
+    cotacaoDolar,
+    quantidadeDolar,
+    rendimentoMes,
+    tarefasPagas,
+  } = iaData.data;
+
+  // Determinar status financeiro baseado no percentual gasto
+  const getStatusFinanceiro = () => {
+    if (percentualGasto < 50) {
+      return {
+        status: 'Excelente',
+        color: 'text-green-600',
+        bgColor: 'bg-green-50 border-green-200',
+        icon: CheckCircle,
+        message: 'Seu controle financeiro está excelente! Continue assim.',
+      };
+    } else if (percentualGasto < 70) {
+      return {
+        status: 'Bom',
+        color: 'text-blue-600',
+        bgColor: 'bg-blue-50 border-blue-200',
+        icon: TrendingUp,
+        message: 'Bom controle financeiro, mas há espaço para melhorar.',
+      };
+    } else if (percentualGasto < 90) {
+      return {
+        status: 'Atenção',
+        color: 'text-yellow-600',
+        bgColor: 'bg-yellow-50 border-yellow-200',
+        icon: AlertTriangle,
+        message: 'Atenção: você está gastando muito da sua renda.',
+      };
+    } else {
+      return {
+        status: 'Crítico',
+        color: 'text-red-600',
+        bgColor: 'bg-red-50 border-red-200',
+        icon: TrendingDown,
+        message: 'ALERTA: Situação financeira crítica!',
+      };
+    }
+  };
+
+  const statusInfo = getStatusFinanceiro();
+  const IconComponent = statusInfo.icon;
 
   return (
-    <div className="space-y-6">
-      {/* Header com botão de atualização */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">
-            🤖 Análise de Investimento IA
-          </h2>
-          <p className="text-muted-foreground">
-            Análise inteligente baseada em seus dados financeiros
-          </p>
+    <div className="space-y-4">
+      {/* Status Financeiro */}
+      <div className={`rounded-lg border p-6 ${statusInfo.bgColor}`}>
+        <div className="mb-4 flex items-center gap-3">
+          <IconComponent className={`h-6 w-6 ${statusInfo.color}`} />
+          <div>
+            <h3 className={`text-lg font-semibold ${statusInfo.color}`}>
+              Status Financeiro: {statusInfo.status}
+            </h3>
+            <p className={`text-sm ${statusInfo.color.replace('600', '700')}`}>
+              {statusInfo.message}
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          {metadata?.timestamp && (
-            <span className="text-muted-foreground text-sm">
-              Última atualização:{' '}
-              {new Date(metadata.timestamp).toLocaleTimeString()}
-            </span>
-          )}
-          <Button
-            onClick={refetchIA}
-            variant="outline"
-            size="sm"
-            disabled={isLoading}
-          >
-            <RefreshCw
-              className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
-            />
-            Atualizar
-          </Button>
+
+        <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
+          <div>
+            <span className="text-gray-600">Gasto:</span>
+            <div className={`font-semibold ${statusInfo.color}`}>
+              {percentualGasto}%
+            </div>
+          </div>
+          <div>
+            <span className="text-gray-600">Disponível:</span>
+            <div className="font-semibold text-green-600">
+              {percentualDisponivel}%
+            </div>
+          </div>
+          <div>
+            <span className="text-gray-600">Resultado:</span>
+            <div className="font-semibold text-blue-600">
+              {formatToBRL(resultadoLiquido)}
+            </div>
+          </div>
+          <div>
+            <span className="text-gray-600">Em USD:</span>
+            <div className="font-semibold text-purple-600">
+              {/*${quantidadeDolar.toFixed(2)}*/}
+              {formatToUSD(quantidadeDolar)}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {/* Resumo Geral */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              🤖 Análise IA
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Status Econômico</h4>
-                <Badge
-                  variant={
-                    statusEconomia === 'bom'
-                      ? 'default'
-                      : statusEconomia === 'regular'
-                        ? 'secondary'
-                        : 'destructive'
-                  }
-                >
-                  {statusEconomia.toUpperCase()}
-                </Badge>
+      <div className="grid grid-cols-1 gap-4">
+        {/* Resumo Financeiro */}
+        <div className="rounded-lg border bg-white p-6">
+          <h3 className="text-primary mb-4 flex flex-row items-center gap-2 text-lg font-semibold">
+            <FaChartArea />
+            Resumo do Mês
+          </h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="rounded-lg bg-gray-50 p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">
+                {formatToBRL(rendimentoMes)}
               </div>
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Precisa Economizar</h4>
-                <Badge variant={precisaEconomizar ? 'destructive' : 'default'}>
-                  {precisaEconomizar ? 'SIM' : 'NÃO'}
-                </Badge>
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Economia Recomendada</h4>
-                <p className="text-muted-foreground text-sm">
-                  R${' '}
-                  {typeof economiaRecomendada === 'number'
-                    ? economiaRecomendada.toFixed(2)
-                    : '0.00'}
-                </p>
-              </div>
+              <div className="text-sm text-gray-600">Rendimento Total</div>
             </div>
-            <div className="border-t pt-4">
-              <p className="text-muted-foreground text-sm">{resumo}</p>
+            <div className="rounded-lg bg-gray-50 p-4 text-center">
+              <div className="text-2xl font-bold text-red-600">
+                {formatToBRL(tarefasPagas)}
+              </div>
+              <div className="text-sm text-gray-600">Gastos Realizados</div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="rounded-lg bg-gray-50 p-4 text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {formatToBRL(resultadoLiquido)}
+              </div>
+              <div className="text-sm text-gray-600">Sobrou no Mês</div>
+            </div>
+          </div>
+        </div>
 
-        {/* Recomendações de Investimento */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              💰 Recomendações de Investimento
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Poupança */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium">Poupança</h4>
-                <Badge variant="outline" className="text-xs">
-                  Baixo Risco
-                </Badge>
-              </div>
-              <Progress
-                value={
-                  typeof distribuicaoInvestimento.poupanca === 'number'
-                    ? distribuicaoInvestimento.poupanca
-                    : 0
-                }
-                className="h-2"
-              />
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-medium">
-                  {typeof distribuicaoInvestimento.poupanca === 'number'
-                    ? distribuicaoInvestimento.poupanca
-                    : 0}
-                  %
-                </span>
-                <span className="text-muted-foreground">
-                  Segurança e liquidez
-                </span>
-              </div>
+        {/* Conversão Dólar */}
+        <div className="rounded-lg border bg-white p-6">
+          <h3 className="text-primary mb-4 flex flex-row items-center gap-2 text-lg font-semibold">
+            <FaMoneyBill />
+            Conversão em Dólar
+          </h3>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Cotação atual do dólar:</p>
+              <p className="text-xl font-semibold text-green-600">
+                {formatToBRL(cotacaoDolar)}
+              </p>
             </div>
-
-            {/* Dólar */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium">Dólar</h4>
-                <Badge variant="outline" className="text-xs">
-                  Médio Risco
-                </Badge>
-              </div>
-              <Progress
-                value={
-                  typeof distribuicaoInvestimento.dolar === 'number'
-                    ? distribuicaoInvestimento.dolar
-                    : 0
-                }
-                className="h-2"
-              />
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-medium">
-                  {typeof distribuicaoInvestimento.dolar === 'number'
-                    ? distribuicaoInvestimento.dolar
-                    : 0}
-                  %
-                </span>
-                <span className="text-muted-foreground">Proteção cambial</span>
-              </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-600">Seu resultado em dólares:</p>
+              <p className="text-xl font-semibold text-blue-600">
+                ${quantidadeDolar.toFixed(2)}
+              </p>
             </div>
-
-            {/* Outros */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium">Outros Investimentos</h4>
-              </div>
-              <div className="space-y-2">
-                <div className="flex flex-wrap gap-2">
-                  {dicasEconomia.map((dica: string, index: number) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      {dica}
-                    </Badge>
-                  ))}
-                </div>
-                <p className="text-muted-foreground text-xs">
-                  Diversificação da carteira
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Estratégia */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              📈 Estratégia de Investimento
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Curto Prazo</h4>
-                <p className="text-muted-foreground text-sm">
-                  {estrategiaInvestimento.curtoPrazo}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Médio Prazo</h4>
-                <p className="text-muted-foreground text-sm">
-                  {estrategiaInvestimento.medioPrazo}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Longo Prazo</h4>
-                <p className="text-muted-foreground text-sm">
-                  {estrategiaInvestimento.longoPrazo}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Metadados */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              📊 Dados da Análise
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground text-sm">
-                  Rendimento Mensal:
-                </span>
-                <span className="text-sm font-medium">
-                  {dashboard.rendimentoMesBRL}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground text-sm">
-                  Disponível:
-                </span>
-                <span className="text-sm font-medium">
-                  {dashboard.rendimentoDisponivelBRL}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground text-sm">
-                  Cotação Dólar:
-                </span>
-                <span className="text-sm font-medium">
-                  {cotacaoDolar?.valorBRL || 'N/A'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground text-sm">
-                  Investimento Recomendado:
-                </span>
-                <span className="text-sm font-medium">
-                  {investimento.recomendadoBRL}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="mt-4 rounded-lg bg-blue-50 p-3">
+            <p className="flex flex-row items-center gap-2 text-sm text-blue-700">
+              <MdTipsAndUpdates />
+              <span>
+                Com {formatToBRL(resultadoLiquido)} você pode comprar $
+                {quantidadeDolar.toFixed(2)} dólares na cotação atual de{' '}
+                {formatToBRL(cotacaoDolar)}.
+              </span>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
-}
+};
 
-// Componente principal com Suspense
-export function IARecommendations() {
-  return (
-    <SuspenseWrapper fallback={<IALoading />}>
-      <IARecommendationsContent />
-    </SuspenseWrapper>
-  );
-}
+export default IARecommendations;

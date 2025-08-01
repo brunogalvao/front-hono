@@ -17,7 +17,7 @@ import { AnimateIcon } from './animate-ui/icons/icon';
 import { Plus } from './animate-ui/icons/plus';
 import { getExpenseTypes } from '@/service/expense-types/getExpenseTypes';
 import { TypeSelector } from './TypeSelector';
-import { TASK_STATUS, type TaskStatus } from '@/model/tasks.model';
+import { TASK_STATUS } from '@/model/tasks.model';
 import {
   Select,
   SelectContent,
@@ -40,7 +40,7 @@ export function AddTaskDialog({
   const [msg, setMsg] = useState('');
   const [type, setType] = useState('');
   const [allTypes, setAllTypes] = useState<string[]>([]);
-  const [done, setDone] = useState<TaskStatus>(TASK_STATUS.Pendente);
+  const [done, setDone] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formErrors, setFormErrors] = useState<
     Partial<Record<keyof z.infer<typeof taskSchema>, string>>
@@ -71,7 +71,7 @@ export function AddTaskDialog({
     setTitle('');
     setPrice('');
     setType('');
-    setDone(TASK_STATUS.Pendente);
+    setDone(false);
     setFormErrors({});
     setMsg('');
     setDialogOpen(false);
@@ -105,7 +105,7 @@ export function AddTaskDialog({
     try {
       await createTaskMutation.mutateAsync({
         ...result.data,
-        done,
+        done: result.data.done === TASK_STATUS.Pago,
         mes: form.mes,
         ano: form.ano,
       });
@@ -239,8 +239,8 @@ export function AddTaskDialog({
             <div className="flex w-full flex-col space-y-2">
               <Label className="text-base font-medium">Status</Label>
               <Select
-                value={done}
-                onValueChange={(value) => setDone(value as TaskStatus)}
+                value={done ? TASK_STATUS.Pago : TASK_STATUS.Pendente}
+                onValueChange={(value) => setDone(value === TASK_STATUS.Pago)}
               >
                 <SelectTrigger className="!h-12 !w-full text-base">
                   <SelectValue placeholder="Selecione o status" />

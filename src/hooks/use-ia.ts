@@ -18,29 +18,25 @@ export function useIA() {
   const query = useQuery({
     queryKey: [...queryKeys.ia.all, incomesData, tasksData],
     queryFn: () => getIA(incomesData), // Passar dados de rendimentos
-    staleTime: 1000 * 10, // 10 segundos (mais frequente para atualizações)
+    staleTime: 1000 * 5, // 5 segundos para resposta mais rápida
     gcTime: 1000 * 60 * 1, // 1 minuto
-    enabled: !!incomesData, // Só executa se tiver dados de rendimentos
+    enabled: !!incomesData && !!tasksData, // Só executa se tiver dados de rendimentos E tarefas
     refetchOnWindowFocus: true, // Rebusca quando a janela ganha foco
     refetchOnMount: true, // Rebusca quando o componente monta
     refetchOnReconnect: true, // Rebusca quando reconecta à internet
     // Atualiza automaticamente quando os dados mudam
-    refetchInterval: (data) => {
-      // Se não há dados, não refaz
-      if (!data) return false;
-
-      // Se há dados, refaz a cada 30 segundos
-      return 1000 * 30;
-    },
+    refetchInterval: false, // Desabilita refetch automático, usa invalidação de cache
     // Força refetch quando os dados de rendimentos ou tarefas mudam
-    refetchIntervalInBackground: true,
+    refetchIntervalInBackground: false,
   });
 
   // Função para forçar atualização
   const refetchIA = () => {
     console.log('🔄 Forçando atualização da análise IA...');
+    console.log('📊 Dados atuais - Rendimentos:', incomesData);
+    console.log('📋 Dados atuais - Tarefas:', tasksData);
     return queryClient.invalidateQueries({
-      queryKey: [...queryKeys.ia.all, incomesData, tasksData],
+      queryKey: queryKeys.ia.all,
     });
   };
 
