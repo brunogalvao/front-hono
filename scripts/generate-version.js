@@ -54,12 +54,16 @@ try {
   const versionPath = join(process.cwd(), 'src', 'version.json');
   writeFileSync(versionPath, JSON.stringify(versionInfo, null, 2));
 
+  // Also write to public/version.json for development
+  const publicVersionPath = join(process.cwd(), 'public', 'version.json');
+  writeFileSync(publicVersionPath, JSON.stringify(versionInfo, null, 2));
+
   console.log('✅ Version info generated:');
   console.log(`   Version: ${version}`);
   console.log(`   Commit: ${commitSha}`);
   console.log(`   Branch: ${branchName}`);
   console.log(`   Date: ${commitDate}`);
-  console.log(`   File: ${versionPath}`);
+  console.log(`   Files: ${versionPath} and ${publicVersionPath}`);
 } catch (error) {
   console.error('❌ Error generating version info:', error.message);
 
@@ -79,6 +83,10 @@ try {
   const versionPath = join(process.cwd(), 'src', 'version.json');
   writeFileSync(versionPath, JSON.stringify(fallbackVersion, null, 2));
 
+  // Also write to public/version.json for development
+  const publicVersionPath = join(process.cwd(), 'public', 'version.json');
+  writeFileSync(publicVersionPath, JSON.stringify(fallbackVersion, null, 2));
+
   console.log('⚠️  Using fallback version info');
-  console.log(`   File: ${versionPath}`);
+  console.log(`   Files: ${versionPath} and ${publicVersionPath}`);
 }

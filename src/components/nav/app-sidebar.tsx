@@ -14,6 +14,11 @@ import {
 import { NavMain } from '@/components/nav/nav-main';
 import { SidebarUser } from '@/components/nav/sidebar-user';
 import { useVersion } from '@/hooks/use-version';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const data = {
   navMain: [
@@ -39,9 +44,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">Task's Finance</span>
+                  <Tooltip>
+                    <TooltipTrigger className="cursor-pointer">
+                      <small>version</small>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {loading ? 'Carregando...' : getVersionString()}
+                    </TooltipContent>
+                  </Tooltip>
+
+                  {/* <span className="font-semibold">Task's Finance</span>
                   <span className="text-xs">
                     {loading ? 'Carregando...' : getVersionString()}
-                  </span>
+                  </span> */}
                 </div>
               </a>
             </SidebarMenuButton>

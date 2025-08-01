@@ -25,18 +25,32 @@ export function useVersion() {
           const data = await response.json();
           setVersionInfo(data);
         } else {
-          // Fallback to default version info
-          setVersionInfo({
-            version: 'beta - v1.0.0',
-            commitSha: 'dev',
-            commitShaFull: 'dev',
-            commitMessage: 'Development build',
-            commitDate: new Date().toISOString().split('T')[0],
-            branchName: 'dev',
-            tagName: '',
-            buildInfo: 'Development build',
-            buildTime: new Date().toISOString(),
-          });
+          // Try to load from src/version.json in development
+          const devResponse = await fetch('/src/version.json');
+          if (devResponse.ok) {
+            const data = await devResponse.json();
+            setVersionInfo(data);
+          } else {
+            // Try to load from public/version.json (copied by script)
+            const publicResponse = await fetch('/public/version.json');
+            if (publicResponse.ok) {
+              const data = await publicResponse.json();
+              setVersionInfo(data);
+            } else {
+              // Fallback to default version info
+              setVersionInfo({
+                version: 'beta - v1.0.0',
+                commitSha: 'dev',
+                commitShaFull: 'dev',
+                commitMessage: 'Development build',
+                commitDate: new Date().toISOString().split('T')[0],
+                branchName: 'dev',
+                tagName: '',
+                buildInfo: 'Development build',
+                buildTime: new Date().toISOString(),
+              });
+            }
+          }
         }
       } catch (err) {
         console.warn('Failed to load version info:', err);

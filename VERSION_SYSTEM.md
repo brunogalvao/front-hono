@@ -30,6 +30,9 @@ Este projeto implementa um sistema de versão automático que mostra informaçõ
 # Gerar informações de versão localmente
 npm run build:with-version
 
+# Desenvolvimento com versão
+npm run dev:with-version
+
 # Ou executar o script diretamente
 node scripts/generate-version.js
 ```
