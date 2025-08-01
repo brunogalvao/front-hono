@@ -1,0 +1,89 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for git info
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Get version info
+        id: version
+        run: |
+          # Get commit hash (short)
+          echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+          # Get commit hash (full)
+          echo "commit_sha_full=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+          # Get commit message
+          echo "commit_message=$(git log -1 --pretty=%B | head -n 1)" >> $GITHUB_OUTPUT
+
+          # Get commit date
+          echo "commit_date=$(git log -1 --format=%cd --date=short)" >> $GITHUB_OUTPUT
+
+          # Get branch name
+          echo "branch_name=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+
+          # Get tag if exists
+          echo "tag_name=$(git describe --tags --exact-match 2>/dev/null || echo '')" >> $GITHUB_OUTPUT
+
+          # Create version string
+          if [ -n "${{ steps.version.outputs.tag_name }}" ]; then
+            echo "version=${{ steps.version.outputs.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=beta - v1.0.0+${{ steps.version.outputs.commit_sha }}" >> $GITHUB_OUTPUT
+          fi
+
+          # Create build info
+          echo "build_info=Build: ${{ steps.version.outputs.commit_sha }} | ${{ steps.version.outputs.commit_date }}" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with version info
+        run: |
+          # Create a version file with build info
+          cat > src/version.json << EOF
+          {
+            "version": "${{ steps.version.outputs.version }}",
+            "commitSha": "${{ steps.version.outputs.commit_sha }}",
+            "commitShaFull": "${{ steps.version.outputs.commit_sha_full }}",
+            "commitMessage": "${{ steps.version.outputs.commit_message }}",
+            "commitDate": "${{ steps.version.outputs.commit_date }}",
+            "branchName": "${{ steps.version.outputs.branch_name }}",
+            "tagName": "${{ steps.version.outputs.tag_name }}",
+            "buildInfo": "${{ steps.version.outputs.build_info }}",
+            "buildTime": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          }
+          EOF
+
+          # Build the application
+          npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-files
+          path: dist/
+
+      - name: Deploy to Vercel (if on main branch)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          # Add your Vercel deployment command here if needed
+          echo "Deploying to production..."

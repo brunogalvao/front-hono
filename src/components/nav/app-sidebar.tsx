@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/sidebar';
 import { NavMain } from '@/components/nav/nav-main';
 import { SidebarUser } from '@/components/nav/sidebar-user';
+import { useVersion } from '@/hooks/use-version';
 
 const data = {
   navMain: [
@@ -24,6 +25,8 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { getVersionString, loading } = useVersion();
+
   return (
     <Sidebar {...props} collapsible="offcanvas">
       <SidebarHeader>
@@ -36,7 +39,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">Task's Finance</span>
-                  <span className="text-xs">beta - v1.0.0</span>
+                  <span className="text-xs">
+                    {loading ? 'Carregando...' : getVersionString()}
+                  </span>
                 </div>
               </a>
             </SidebarMenuButton>
