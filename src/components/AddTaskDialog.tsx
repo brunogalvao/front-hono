@@ -105,7 +105,7 @@ export function AddTaskDialog({
     try {
       await createTaskMutation.mutateAsync({
         ...result.data,
-        done: result.data.done === TASK_STATUS.Pago,
+        done: result.data.done,
         mes: form.mes,
         ano: form.ano,
       });
