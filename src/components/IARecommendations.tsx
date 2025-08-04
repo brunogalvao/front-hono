@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 // Componente Skeleton para o status financeiro
 const StatusSkeleton = () => (
-  <div className="rounded-lg border bg-blue-50 p-6">
+  <div className="rounded-lg border bg-white p-6">
     <div className="mb-4 flex items-center gap-3">
       <Skeleton className="h-6 w-6" />
       <div className="flex-1">
@@ -40,7 +40,7 @@ const SummarySkeleton = () => (
     </div>
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       {[1, 2, 3].map((index) => (
-        <div key={index} className="rounded-lg bg-gray-50 p-4 text-center">
+        <div key={index} className="bg-muted/50 rounded-lg p-4 text-center">
           <Skeleton className="mx-auto mb-2 h-8 w-24" />
           <Skeleton className="mx-auto h-4 w-20" />
         </div>
@@ -66,7 +66,7 @@ const DollarConversionSkeleton = () => (
         <Skeleton className="h-6 w-28" />
       </div>
     </div>
-    <div className="mt-4 rounded-lg bg-blue-50 p-3">
+    <div className="bg-muted/50 mt-4 rounded-lg p-3">
       <div className="flex items-center gap-2">
         <Skeleton className="h-4 w-4" />
         <Skeleton className="h-4 flex-1" />
@@ -104,12 +104,9 @@ const IARecommendations = () => {
     );
   }
 
+  // Verificação de segurança para iaData
   if (!iaData?.data) {
-    return (
-      <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
-        <p className="text-gray-600">Nenhum dado de análise disponível.</p>
-      </div>
-    );
+    return null; // Deixa o Dashboard controlar o skeleton
   }
 
   const {

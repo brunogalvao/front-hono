@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 // Componente Skeleton para as dicas de economia
 const TipsSkeleton = () => (
-  <div className="bg-muted rounded-lg p-6">
+  <div className="rounded-lg border bg-white p-6">
     <div className="mb-4 flex items-center gap-2">
       <Skeleton className="h-6 w-6" />
       <Skeleton className="h-6 w-32" />
@@ -31,7 +31,7 @@ const TipsSkeleton = () => (
 
 // Componente Skeleton para o status financeiro
 const StatusSkeleton = () => (
-  <div className="rounded-lg border bg-blue-50 p-6">
+  <div className="rounded-lg border bg-white p-6">
     <div className="mb-4 flex items-center gap-3">
       <Skeleton className="h-6 w-6" />
       <div className="flex-1">
@@ -59,7 +59,7 @@ const SummarySkeleton = () => (
     </div>
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       {[1, 2, 3].map((index) => (
-        <div key={index} className="rounded-lg bg-gray-50 p-4 text-center">
+        <div key={index} className="bg-muted/50 rounded-lg p-4 text-center">
           <Skeleton className="mx-auto mb-2 h-8 w-24" />
           <Skeleton className="mx-auto h-4 w-20" />
         </div>
@@ -85,7 +85,7 @@ const DollarConversionSkeleton = () => (
         <Skeleton className="h-6 w-28" />
       </div>
     </div>
-    <div className="mt-4 rounded-lg bg-blue-50 p-3">
+    <div className="bg-muted/50 mt-4 rounded-lg p-3">
       <div className="flex items-center gap-2">
         <Skeleton className="h-4 w-4" />
         <Skeleton className="h-4 flex-1" />
@@ -96,7 +96,7 @@ const DollarConversionSkeleton = () => (
 
 const Dashboard = () => {
   // Hook para buscar dados da IA simplificados
-  const { data: iaData, isLoading } = useIA();
+  const { data: iaData, isLoading, error } = useIA();
 
   // Hook para buscar rendimentos por mês (ainda usado para exibição no header)
   // const { data: salariosPorMes = {} } = useIncomesByMonth();
@@ -111,12 +111,15 @@ const Dashboard = () => {
   // const totalTasksCurrentMonth = iaData?.data?.totalTarefas || 0;
   // const dollarRate = iaData?.data?.cotacaoDolar;
 
+  // Mostrar skeleton quando está carregando OU quando não há dados
+  const shouldShowSkeleton = isLoading || !iaData?.data;
+
   return (
     <div className="space-y-6">
       <TituloPage titulo="Home" />
 
       {/* Dicas de Economia */}
-      {isLoading ? (
+      {shouldShowSkeleton ? (
         <TipsSkeleton />
       ) : (
         iaData?.data?.dicasEconomia &&
@@ -141,7 +144,7 @@ const Dashboard = () => {
       )}
 
       {/* Análise da IA */}
-      {isLoading ? (
+      {shouldShowSkeleton ? (
         <div className="space-y-4">
           <StatusSkeleton />
           <div className="grid grid-cols-1 gap-4">
