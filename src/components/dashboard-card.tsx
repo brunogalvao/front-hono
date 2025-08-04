@@ -1,4 +1,5 @@
 import { formatToBRL } from '@/utils/format';
+import { Skeleton } from './ui/skeleton';
 
 interface DashboardCardProps {
   title: string;
@@ -35,17 +36,24 @@ const DashboardCard = ({
   return (
     <div className="bg-card rounded-lg border p-4">
       <div className="flex min-h-24 flex-col items-stretch justify-between gap-2">
-        <span className="font-medium">{title}</span>
         {isLoading ? (
-          <span className="text-muted-foreground">Carregando...</span>
-        ) : error ? (
-          <span className="text-destructive">{error}</span>
+          <>
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-8 w-32 rounded-full" />
+          </>
         ) : (
-          <span
-            className={`rounded-full ${getColorClasses()} px-3 text-center text-lg font-bold text-white`}
-          >
-            {formatValue(value)}
-          </span>
+          <>
+            <span className="font-medium">{title}</span>
+            {error ? (
+              <span className="text-destructive">{error}</span>
+            ) : (
+              <span
+                className={`rounded-full ${getColorClasses()} px-3 text-center text-lg font-bold text-white`}
+              >
+                {formatValue(value)}
+              </span>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -11,6 +11,34 @@ import {
   TableHeader,
   TableRow,
 } from './ui/table';
+import { Skeleton } from './ui/skeleton';
+
+// Componente Skeleton para a tabela de tarefas
+const TasksSkeleton = () => (
+  <div className="space-y-4">
+    <div className="flex justify-end">
+      <Skeleton className="h-4 w-20" />
+    </div>
+    <div className="rounded-md border">
+      <div className="bg-muted/50 border-b px-4 py-3">
+        <div className="grid grid-cols-2 gap-4">
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-12" />
+        </div>
+      </div>
+      <div className="divide-y">
+        {[1, 2, 3, 4, 5].map((index) => (
+          <div key={index} className="px-4 py-3">
+            <div className="grid grid-cols-2 gap-4">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -34,7 +62,7 @@ function Tasks() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p>Carregando...</p>;
+  if (loading) return <TasksSkeleton />;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (

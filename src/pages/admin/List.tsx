@@ -194,6 +194,7 @@ function List() {
                       total={total}
                       totalPrice={price}
                       onTasksChange={handleTasksChange}
+                      isLoading={isLoading}
                     />
                   </CardContent>
                 </Card>

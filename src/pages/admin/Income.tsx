@@ -42,6 +42,7 @@ function Income() {
   const [incomes, setIncomes] = useState<IncomeItem[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [total, setTotal] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     descricao: '',
     valor: 0,
@@ -58,6 +59,12 @@ function Income() {
   // Hook para observar mudanças automáticas nos rendimentos
   const { refetch: refetchIncomes } = useIncomesByMonth(reloadFlag);
 
+  // Carregar dados iniciais
+  useEffect(() => {
+    load();
+    loadTotal();
+  }, []);
+
   const loadTotal = async () => {
     try {
       const total = await totalIncomes();
@@ -69,12 +76,13 @@ function Income() {
 
   const load = async () => {
     try {
+      setLoading(true);
       const data = await getIncomes();
       setIncomes(data);
     } catch (err) {
       console.error(err);
     } finally {
-      // setLoading(false); // Removed as per edit hint
+      setLoading(false);
     }
   };
 
@@ -254,7 +262,9 @@ function Income() {
           <CardTitle>Lista de Rendimentos</CardTitle>
         </CardHeader>
         <CardContent>
-          {incomes.length <= 0 ? (
+          {loading ? (
+            <p className="text-center text-sm text-zinc-500">Carregando...</p>
+          ) : incomes.length <= 0 ? (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -272,6 +282,7 @@ function Income() {
               data={incomes}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              isLoading={loading}
             />
           )}
         </CardContent>

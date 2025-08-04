@@ -31,6 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { IncomeItem } from '@/model/incomes.model';
 import { formatToBRL } from '@/utils/format';
 import { getNomeMes } from '@/model/mes.enum';
@@ -46,7 +47,57 @@ interface IncomesDataTableProps {
   data: IncomeItem[];
   onEdit: (income: IncomeItem) => void;
   onDelete: (id: string) => void;
+  isLoading?: boolean;
 }
+
+// Componente Skeleton para a tabela de rendimentos
+const IncomesDataTableSkeleton = () => (
+  <div className="w-full space-y-4">
+    {/* Header com filtro e dropdown */}
+    <div className="flex items-center py-4">
+      <Skeleton className="h-10 w-64" />
+      <Skeleton className="ml-auto h-10 w-32" />
+    </div>
+
+    {/* Tabela */}
+    <div className="rounded-md border">
+      <div className="bg-muted/50 border-b px-4 py-3">
+        <div className="grid grid-cols-5 gap-4">
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-4 w-8" />
+          <Skeleton className="h-4 w-8" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+      </div>
+      <div className="divide-y">
+        {[1, 2, 3, 4, 5].map((index) => (
+          <div key={index} className="px-4 py-3">
+            <div className="grid grid-cols-5 gap-4">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-12" />
+              <div className="flex gap-2">
+                <Skeleton className="h-8 w-8" />
+                <Skeleton className="h-8 w-8" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Footer com paginação */}
+    <div className="flex items-center justify-end space-x-2 py-4">
+      <Skeleton className="h-4 w-32 flex-1" />
+      <div className="space-x-2">
+        <Skeleton className="h-8 w-20" />
+        <Skeleton className="h-8 w-20" />
+      </div>
+    </div>
+  </div>
+);
 
 export const columns: ColumnDef<Income>[] = [
   {
@@ -159,6 +210,7 @@ export function IncomesDataTable({
   data,
   onEdit,
   onDelete,
+  isLoading,
 }: IncomesDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -192,6 +244,10 @@ export function IncomesDataTable({
       columnVisibility,
     },
   });
+
+  if (isLoading) {
+    return <IncomesDataTableSkeleton />;
+  }
 
   return (
     <div className="w-full">
