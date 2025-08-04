@@ -32,7 +32,7 @@ function Loading({ type = 'list', rows = 5 }: LoadingProps) {
           <Skeleton className="ml-auto h-10 w-32" />
         </div>
         <div className="rounded-md border">
-          <div className="bg-muted/50 border-b px-4 py-3">
+          <div className="bg-muted/70 border-b px-4 py-3">
             <div className="grid grid-cols-4 gap-4">
               <Skeleton className="h-4 w-16" />
               <Skeleton className="h-4 w-12" />

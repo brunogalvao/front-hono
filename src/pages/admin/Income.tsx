@@ -37,6 +37,10 @@ import {
 } from '@/components/animate-ui/components/tooltip';
 import MonthIncome from '@/components/monthIncome';
 import { IncomesDataTable } from '@/components/IncomesDataTable';
+import {
+  IncomeFormSkeleton,
+  IncomeListSkeleton,
+} from '@/components/SkeletonIncome';
 
 function Income() {
   const [incomes, setIncomes] = useState<IncomeItem[]>([]);
@@ -165,97 +169,106 @@ function Income() {
     <div className="space-y-6">
       <TituloPage titulo="Rendimentos" />
 
-      <MonthIncome
-        reloadTrigger={reloadFlag}
-        onSelectMes={(mes) => setForm((f) => ({ ...f, mes }))}
-        total={total}
-      />
+      {loading ? (
+        <IncomeFormSkeleton />
+      ) : (
+        <>
+          <MonthIncome
+            reloadTrigger={reloadFlag}
+            onSelectMes={(mes) => setForm((f) => ({ ...f, mes }))}
+            total={total}
+          />
 
-      <div className="flex flex-col space-y-6">
-        <div className="flex flex-row gap-3">
-          <div className="flex w-full flex-col space-y-3">
-            <Label>Descrição</Label>
-            <Input
-              className="w-full"
-              placeholder="Descrição"
-              value={form.descricao}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, descricao: e.target.value }))
-              }
-            />
-          </div>
+          <div className="flex flex-col space-y-6">
+            <div className="flex flex-row gap-3">
+              <div className="flex w-full flex-col space-y-3">
+                <Label>Descrição</Label>
+                <Input
+                  className="w-full"
+                  placeholder="Descrição"
+                  value={form.descricao}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, descricao: e.target.value }))
+                  }
+                />
+              </div>
 
-          <div className="flex w-full flex-col space-y-3">
-            <Label>Salário</Label>
-            <NumericFormat
-              value={form.valor}
-              onValueChange={({ floatValue }) => {
-                setForm((f) => ({ ...f, valor: floatValue ?? 0 }));
-              }}
-              thousandSeparator="."
-              decimalSeparator=","
-              prefix="R$ "
-              decimalScale={2}
-              allowNegative={false}
-              fixedDecimalScale={false} // 👈 isso remove zeros fixos no final
-              customInput={Input}
-            />
-          </div>
-        </div>
+              <div className="flex w-full flex-col space-y-3">
+                <Label>Salário</Label>
+                <NumericFormat
+                  value={form.valor}
+                  onValueChange={({ floatValue }) => {
+                    setForm((f) => ({ ...f, valor: floatValue ?? 0 }));
+                  }}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="R$ "
+                  decimalScale={2}
+                  allowNegative={false}
+                  fixedDecimalScale={false} // 👈 isso remove zeros fixos no final
+                  customInput={Input}
+                />
+              </div>
+            </div>
 
-        <div className="flex flex-row gap-3">
-          <div className="flex w-full flex-col space-y-3">
-            <Label>Mês</Label>
-            <Select
-              value={String(form.mes)}
-              onValueChange={(value) =>
-                setForm((f) => ({ ...f, mes: parseInt(value) }))
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Mês" />
-              </SelectTrigger>
-              <SelectContent>
-                {MESES_LISTA.map((mes) => (
-                  <SelectItem key={mes.value} value={mes.value}>
-                    {mes.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <div className="flex flex-row gap-3">
+              <div className="flex w-full flex-col space-y-3">
+                <Label>Mês</Label>
+                <Select
+                  value={String(form.mes)}
+                  onValueChange={(value) =>
+                    setForm((f) => ({ ...f, mes: parseInt(value) }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Mês" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MESES_LISTA.map((mes) => (
+                      <SelectItem key={mes.value} value={mes.value}>
+                        {mes.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="flex w-full flex-col space-y-3">
-            <Label>Ano</Label>
-            <Input
-              type="number"
-              value={form.ano}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, ano: parseInt(e.target.value) }))
-              }
-            />
+              <div className="flex w-full flex-col space-y-3">
+                <Label>Ano</Label>
+                <Input
+                  type="number"
+                  value={form.ano}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, ano: parseInt(e.target.value) }))
+                  }
+                />
+              </div>
+              <div className="flex items-end">
+                <AnimateIcon animateOnHover>
+                  <LiquidButton
+                    className="text-white"
+                    onClick={handleAddOrEdit}
+                  >
+                    <div className="flex flex-row items-center gap-3 px-12">
+                      {editingId ? (
+                        <>
+                          Atualizar
+                          <RefreshCcw />
+                        </>
+                      ) : (
+                        <>
+                          Adicionar
+                          <Plus className="size-5" />
+                        </>
+                      )}
+                    </div>
+                  </LiquidButton>
+                </AnimateIcon>
+              </div>
+            </div>
           </div>
-          <div className="flex items-end">
-            <AnimateIcon animateOnHover>
-              <LiquidButton className="text-white" onClick={handleAddOrEdit}>
-                <div className="flex flex-row items-center gap-3 px-12">
-                  {editingId ? (
-                    <>
-                      Atualizar
-                      <RefreshCcw />
-                    </>
-                  ) : (
-                    <>
-                      Adicionar
-                      <Plus className="size-5" />
-                    </>
-                  )}
-                </div>
-              </LiquidButton>
-            </AnimateIcon>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
 
       <Card>
         <CardHeader>
@@ -263,7 +276,7 @@ function Income() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="text-center text-sm text-zinc-500">Carregando...</p>
+            <IncomeListSkeleton />
           ) : incomes.length <= 0 ? (
             <TooltipProvider>
               <Tooltip>
