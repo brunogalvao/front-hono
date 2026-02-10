@@ -290,8 +290,6 @@ function Login() {
 
       <div className="flex h-auto items-center border-l border-none px-4 py-8 md:order-2 md:h-screen md:border-dashed md:pt-8">
         <div className="flex flex-col space-y-2 px-2 md:px-10">
-          {/* <p className="text-zinc-400 transition duration-200">{textoAtual}</p> */}
-
           <AnimatePresence mode="wait">
             <motion.div
               key={textoAtual}
