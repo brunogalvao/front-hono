@@ -132,7 +132,7 @@ function List() {
       {/* Valor total pago + botão adicionar */}
       <div className="flex flex-row items-center justify-between">
         <div className="flex items-center gap-3">
-          {isLoadingIA || !iaData?.data?.rendimentoMes ? (
+          {isLoadingIA || iaData?.data?.rendimentoMes === undefined ? (
             <span className="flex items-center gap-2">
               <Loader className="h-4 w-4 animate-spin" />
               Carregando...

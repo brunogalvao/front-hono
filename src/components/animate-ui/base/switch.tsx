@@ -35,7 +35,7 @@ function Switch({
   }, [props?.checked]);
 
   const handleCheckedChange = React.useCallback(
-    (checked: boolean, event: Event) => {
+    (checked: boolean, event: any) => {
       setIsChecked(checked);
       onCheckedChange?.(checked, event);
     },

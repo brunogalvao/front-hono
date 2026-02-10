@@ -23,48 +23,33 @@ function StatusDropdown({
   task: Task;
   onStatusChanged: () => void;
 }) {
-  const [localStatus, setLocalStatus] = useState<boolean>(task.done);
+  const [localStatus, setLocalStatus] = useState<TaskStatus>(task.done);
 
   // Hook para edição com invalidação automática do cache
   const editTaskMutation = useEditTask();
 
-  const handleChangeStatus = async (newStatusString: TaskStatus) => {
-    const newStatusBoolean = newStatusString === TASK_STATUS.Pago;
-
+  const handleChangeStatus = async (newStatus: TaskStatus) => {
     // Evita atualização se o status for o mesmo
-    if (localStatus === newStatusBoolean) {
-      console.log('Status já é o mesmo, ignorando...');
+    if (localStatus === newStatus) {
       return;
     }
 
-    console.log(
-      `🔄 Atualizando status da tarefa ${task.id} de "${localStatus ? TASK_STATUS.Pago : TASK_STATUS.Pendente}" para "${newStatusString}"`
-    );
-    console.log('📤 Dados sendo enviados:', {
-      id: task.id,
-      done: newStatusBoolean,
-    });
-
     try {
       // Atualiza o estado local imediatamente para feedback visual
-      setLocalStatus(newStatusBoolean);
+      setLocalStatus(newStatus);
 
       await editTaskMutation.mutateAsync({
         id: task.id,
-        data: { done: newStatusBoolean },
+        data: { done: newStatus },
       });
-      console.log('✅ Status atualizado com sucesso');
 
       // Feedback para o usuário
-      toast.success(`Status alterado para ${newStatusString}`);
+      toast.success(`Status alterado para ${newStatus}`);
 
       // Chama a função de callback para atualizar a tabela
-      console.log('🔄 Chamando onStatusChanged...');
       onStatusChanged();
-
-      console.log('📊 Tabela atualizada');
     } catch (err) {
-      console.error('❌ Erro ao atualizar status:', err);
+      console.error('Erro ao atualizar status:', err);
       // Reverte o estado local em caso de erro
       setLocalStatus(task.done);
       toast.error('Erro ao atualizar status da tarefa');
@@ -80,13 +65,13 @@ function StatusDropdown({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Badge
-          variant={localStatus ? 'outline' : 'default'}
+          variant={localStatus === TASK_STATUS.Pago ? 'outline' : 'default'}
           className="flex cursor-pointer items-center gap-1"
         >
           {editTaskMutation.isPending ? (
             <Loader className="h-3 w-3 animate-spin" />
           ) : null}
-          {localStatus ? TASK_STATUS.Pago : TASK_STATUS.Pendente}
+          {localStatus}
         </Badge>
       </DropdownMenuTrigger>
 

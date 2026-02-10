@@ -4,7 +4,7 @@ import img01 from '@/assets/tela-inicial.png';
 
 const DescriptionHome = () => {
   return (
-    <div className="my-8 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+    <div className="my-8 grid items-center gap-3 md:grid-cols-[1fr_auto_1fr]">
       <div className="flex w-full flex-col space-y-3 p-3 text-end">
         <h1 className="text-3xl font-bold">Bem-Vindo ao FinanceTask</h1>
         <p className="text-gray-600">

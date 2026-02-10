@@ -60,72 +60,38 @@ export async function getIA(
 
       if (tasksResponse.ok) {
         const tasks = (await tasksResponse.json()) as Array<{
-          done: boolean;
+          done: string; // "Pago" | "Pendente"
           price?: number;
         }>;
-        console.log('📋 Tarefas recebidas:', tasks);
-        console.log('📋 Total de tarefas:', tasks.length);
-        console.log('📋 Primeiro item para debug:', tasks[0]);
-
-        // Log de todas as tarefas para debug
-        tasks.forEach((task, index) => {
-          console.log(`📋 Tarefa ${index + 1}:`, {
-            done: task.done,
-            price: task.price,
-            tipo: typeof task.done,
-            priceValido:
-              task.price !== null && task.price !== undefined && task.price > 0,
-          });
-        });
+        console.log('📋 Tarefas recebidas:', tasks.length);
 
         const tarefasPagasArray = tasks.filter((task) => {
-          const isPago = task.done === true;
+          const isPago = task.done === 'Pago';
           const hasPrice =
             task.price !== null && task.price !== undefined && task.price > 0;
-          console.log(
-            `🔍 Tarefa análise - Pago: ${isPago}, Preço válido: ${hasPrice}, Preço: ${task.price}`
-          );
           return isPago && hasPrice;
         });
 
         const tarefasPendentesArray = tasks.filter((task) => {
-          const isPendente = task.done === false;
+          const isPendente = task.done === 'Pendente';
           const hasPrice =
             task.price !== null && task.price !== undefined && task.price > 0;
-          console.log(
-            `🔍 Tarefa análise - Pendente: ${isPendente}, Preço válido: ${hasPrice}, Preço: ${task.price}`
-          );
           return isPendente && hasPrice;
         });
 
         tarefasPagas = tarefasPagasArray.reduce((sum: number, task) => {
-          const price = Number(task.price) || 0;
-          console.log(`💰 Somando tarefa paga: ${price}`);
-          return sum + price;
+          return sum + (Number(task.price) || 0);
         }, 0);
 
         tarefasPendentes = tarefasPendentesArray.reduce((sum: number, task) => {
-          const price = Number(task.price) || 0;
-          console.log(`🔶 Somando tarefa pendente: ${price}`);
-          return sum + price;
+          return sum + (Number(task.price) || 0);
         }, 0);
 
-        console.log('📋 Debug detalhado:');
-        console.log(
-          '  - Tarefas pagas (done=true):',
-          tarefasPagasArray.length,
-          'tarefas'
-        );
-        console.log('  - Valor total pago:', tarefasPagas);
-        console.log(
-          '  - Tarefas pendentes (done=false):',
-          tarefasPendentesArray.length,
-          'tarefas'
-        );
-        console.log('  - Valor total pendente:', tarefasPendentes);
-        console.log('📋 Dados de tarefas calculados:', {
-          tarefasPagas,
-          tarefasPendentes,
+        console.log('📋 Tarefas calculadas:', {
+          pagas: tarefasPagasArray.length,
+          pendentes: tarefasPendentesArray.length,
+          valorPago: tarefasPagas,
+          valorPendente: tarefasPendentes,
         });
       } else {
         const errorText = await tasksResponse.text();

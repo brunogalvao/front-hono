@@ -9,7 +9,9 @@ export const taskSchema = z.object({
       .min(1, 'Adicionar o preço no item.')
   ),
   type: z.string().min(1, 'Tipo de gasto obrigatório'),
-  done: z.boolean(),
+  done: z.enum(['Pago', 'Pendente'], {
+    errorMap: () => ({ message: 'Status obrigatório' }),
+  }),
   mes: z.number().int().min(1).max(12),
   ano: z.number().int().min(2000),
 });

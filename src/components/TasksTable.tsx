@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo, useMemo } from 'react';
-import type { Task } from '@/model/tasks.model';
+import type { Task, TaskStatus } from '@/model/tasks.model';
 import { TASK_STATUS } from '@/model/tasks.model';
 import { getExpenseTypes } from '@/service/expense-types/getExpenseTypes';
 import { z } from 'zod';
@@ -99,7 +99,7 @@ export const TasksTable = memo(function TasksTable({
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [done, setDone] = useState<boolean>(false);
+  const [done, setDone] = useState<TaskStatus>(TASK_STATUS.Pendente);
   const [type, setType] = useState('');
   const [allTypes, setAllTypes] = useState<string[]>([]);
   const [form, setForm] = useState({
@@ -357,8 +357,8 @@ export const TasksTable = memo(function TasksTable({
               <div className="flex flex-col space-y-2">
                 <Label className="text-base font-medium">Status</Label>
                 <Select
-                  value={done ? TASK_STATUS.Pago : TASK_STATUS.Pendente}
-                  onValueChange={(value) => setDone(value === TASK_STATUS.Pago)}
+                  value={done}
+                  onValueChange={(value) => setDone(value as TaskStatus)}
                 >
                   <SelectTrigger className="border-input bg-background !h-12 w-full border px-3 py-2 text-base">
                     <SelectValue placeholder="Selecione o status" />
