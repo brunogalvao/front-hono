@@ -53,7 +53,7 @@ const RegisterUserForm = () => {
 
     localStorage.setItem('signup_name', form.name);
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
       options: {
@@ -66,6 +66,9 @@ const RegisterUserForm = () => {
 
     if (error) {
       toast.error(`Erro ao cadastrar: ${error.message}`);
+    } else if (data.user && data.user.identities?.length === 0) {
+      // Email já cadastrado — Supabase retorna 200 mas sem enviar email (repeated signup)
+      toast.error('Este e-mail já está cadastrado. Verifique sua caixa de entrada ou spam.');
     } else {
       toast.success('Cadastro realizado com sucesso! Verifique seu e-mail.');
       setForm({
