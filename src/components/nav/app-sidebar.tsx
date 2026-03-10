@@ -23,8 +23,9 @@ import {
 const data = {
   navMain: [
     { title: 'Dashboard', url: '/admin/dashboard', icon: 'dashboard' as const },
-    { title: 'Lista', url: '/admin/list', icon: 'list' as const },
+    { title: 'Despesas', url: '/admin/list', icon: 'list' as const },
     { title: 'Rendimento', url: '/admin/income', icon: 'income' as const },
+    { title: 'Histórico', url: '/admin/history', icon: 'history' as const },
     { title: 'Usuário', url: '/admin/editUser', icon: 'user' as const },
   ],
 };

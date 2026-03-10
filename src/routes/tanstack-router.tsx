@@ -7,10 +7,11 @@ import {
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
 import Admin from '@/pages/Admin';
-import List from '@/pages/admin/List';
+import Expenses from '@/pages/admin/Expenses';
 import Income from '@/pages/admin/Income';
 import EditUser from '@/pages/admin/EditUser';
 import Dashboard from '@/pages/admin/Dashboard';
+import History from '@/pages/admin/History';
 
 // Root Route
 const rootRoute = createRootRoute({
@@ -48,10 +49,10 @@ const editUserRoute = createRoute({
   component: EditUser,
 });
 
-const listRoute = createRoute({
+const expensesRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: '/list',
-  component: List,
+  component: Expenses,
 });
 
 const dashboardRoute = createRoute({
@@ -64,6 +65,12 @@ const incomeRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: '/income',
   component: Income,
+});
+
+const historyRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: '/history',
+  component: History,
 });
 
 // Catch-all route
@@ -79,9 +86,10 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   adminRoute.addChildren([
     editUserRoute,
-    listRoute,
+    expensesRoute,
     dashboardRoute,
     incomeRoute,
+    historyRoute,
   ]),
   catchAllRoute,
 ]);

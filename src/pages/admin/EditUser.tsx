@@ -35,9 +35,11 @@ import {
 
 const EditUser = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    avatarUrl: '',
+  });
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState('');
   const [provider, setProvider] = useState('');
@@ -57,9 +59,11 @@ const EditUser = () => {
 
       if (user) {
         setUser(user);
-        setName(user.user_metadata?.displayName ?? '');
-        setAvatarUrl(user.user_metadata?.avatar_url ?? '');
-        setPhone(user.user_metadata?.phone ?? '');
+        setFormData({
+          name: user.user_metadata?.displayName ?? '',
+          avatarUrl: user.user_metadata?.avatar_url ?? '',
+          phone: user.user_metadata?.phone ?? '',
+        });
         setProvider(prov || 'desconhecido');
       }
     };
@@ -70,7 +74,7 @@ const EditUser = () => {
   const handleUpdate = async () => {
     setMessage('');
 
-    const result = schema.safeParse({ phone });
+    const result = schema.safeParse({ phone: formData.phone });
     if (!result.success) {
       const errorMessage =
         result.error.format().phone?._errors?.[0] || 'Telefone inválido.';
@@ -84,7 +88,7 @@ const EditUser = () => {
       return setMessage('Usuário não autenticado.');
     }
 
-    let newAvatarUrl = avatarUrl;
+    let newAvatarUrl = formData.avatarUrl;
 
     try {
       if (file) {
@@ -93,7 +97,7 @@ const EditUser = () => {
 
       const { error } = await supabase.auth.updateUser({
         data: {
-          displayName: name,
+          displayName: formData.name,
           phone: formattedPhone,
           avatar_url: newAvatarUrl,
         },
@@ -104,17 +108,17 @@ const EditUser = () => {
         return setMessage('Erro ao atualizar perfil.');
       }
 
-      setAvatarUrl(newAvatarUrl);
+      setFormData((prev) => ({ ...prev, avatarUrl: newAvatarUrl }));
       toast.success('Perfil atualizado com sucesso!', { duration: 5000 });
 
       // Atualiza no contexto global se for login por email
       if (provider === 'email') {
         setProfile({
-          name,
+          name: formData.name,
           email: user.email ?? '',
           avatar_url: newAvatarUrl,
           phone: formattedPhone,
-          displayName: name,
+          displayName: formData.name,
         });
       }
     } catch (err) {
@@ -132,11 +136,11 @@ const EditUser = () => {
 
       <div className="flex flex-row items-center space-x-4">
         <Avatar className="h-20 w-20">
-          {avatarUrl ? (
-            <AvatarImage src={avatarUrl} alt="Avatar" />
+          {formData.avatarUrl ? (
+            <AvatarImage src={formData.avatarUrl} alt="Avatar" />
           ) : (
             <AvatarFallback>
-              {getInitials(name || user?.email || '')}
+              {getInitials(formData.name || user?.email || '')}
             </AvatarFallback>
           )}
         </Avatar>
@@ -176,8 +180,8 @@ const EditUser = () => {
               <Label htmlFor="name">Nome</Label>
               <Input
                 id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={formData.name}
+                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="Seu nome"
                 disabled={provider !== 'email'}
               />
@@ -187,8 +191,8 @@ const EditUser = () => {
               <Label htmlFor="phone">Telefone</Label>
               <PatternFormat
                 id="phone"
-                value={phone}
-                onValueChange={(values) => setPhone(values.formattedValue)}
+                value={formData.phone}
+                onValueChange={(values) => setFormData((prev) => ({ ...prev, phone: values.formattedValue }))}
                 format="(##) #####-####"
                 mask="_"
                 customInput={Input}

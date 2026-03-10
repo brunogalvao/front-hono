@@ -6,20 +6,22 @@ import { Input } from './ui/input';
 import { LiquidButton } from '@/components/animate-ui/buttons/liquid';
 
 export function ResetPassword({ provider }: { provider: string }) {
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwords, setPasswords] = useState({
+    newPassword: '',
+    confirmPassword: '',
+  });
 
   const handleResetPassword = async () => {
-    if (!newPassword || !confirmPassword) {
+    if (!passwords.newPassword || !passwords.confirmPassword) {
       return toast.error('Preencha os dois campos de senha.');
     }
 
-    if (newPassword !== confirmPassword) {
+    if (passwords.newPassword !== passwords.confirmPassword) {
       return toast.error('As senhas não coincidem.');
     }
 
     const { error } = await supabase.auth.updateUser({
-      password: newPassword,
+      password: passwords.newPassword,
     });
 
     if (error) {
@@ -27,8 +29,7 @@ export function ResetPassword({ provider }: { provider: string }) {
     }
 
     toast.success('Senha atualizada com sucesso!');
-    setNewPassword('');
-    setConfirmPassword('');
+    setPasswords({ newPassword: '', confirmPassword: '' });
   };
 
   if (provider !== 'email') return null;
@@ -38,15 +39,15 @@ export function ResetPassword({ provider }: { provider: string }) {
       <Label>Nova senha</Label>
       <Input
         type="password"
-        value={newPassword}
-        onChange={(e) => setNewPassword(e.target.value)}
+        value={passwords.newPassword}
+        onChange={(e) => setPasswords((prev) => ({ ...prev, newPassword: e.target.value }))}
         placeholder="Nova senha"
       />
 
       <Input
         type="password"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
+        value={passwords.confirmPassword}
+        onChange={(e) => setPasswords((prev) => ({ ...prev, confirmPassword: e.target.value }))}
         placeholder="Confirmar nova senha"
       />
 

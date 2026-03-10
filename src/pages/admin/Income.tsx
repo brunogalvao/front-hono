@@ -1,30 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { NumericFormat } from 'react-number-format';
 // ui
 import TituloPage from '@/components/TituloPage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { toast } from 'sonner';
 // hooks
 import { useCreateIncome } from '@/hooks/use-create-income';
 import { useEditIncome } from '@/hooks/use-edit-income';
 import { useDeleteIncome } from '@/hooks/use-delete-income';
-import { useIncomesByMonth } from '@/hooks/use-incomes-by-month';
 // service
 import { totalIncomes } from '@/service/income/totalIncome';
 import { getIncomes } from '@/service/income/getIncome';
 // model's
 import type { IncomeItem } from '@/model/incomes.model';
-import { MESES_LISTA } from '@/model/mes.enum';
-// import { Pencil, Trash } from "lucide-react";
 import { LiquidButton } from '@/components/animate-ui/buttons/liquid';
 import { Plus } from '@/components/animate-ui/icons/plus';
 import { AnimateIcon } from '@/components/animate-ui/icons/icon';
@@ -36,77 +27,48 @@ import {
   TooltipTrigger,
 } from '@/components/animate-ui/components/tooltip';
 import MonthIncome from '@/components/monthIncome';
+import { MonthYearPicker } from '@/components/MonthYearPicker';
 import { IncomesDataTable } from '@/components/IncomesDataTable';
 import {
   IncomeFormSkeleton,
   IncomeListSkeleton,
 } from '@/components/SkeletonIncome';
+import { queryKeys } from '@/lib/query-keys';
 
 function Income() {
-  const [incomes, setIncomes] = useState<IncomeItem[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [total, setTotal] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     descricao: '',
     valor: 0,
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
   });
-  const [reloadFlag, setReloadFlag] = useState(Date.now());
 
   // Hooks para mutações
   const createIncomeMutation = useCreateIncome();
   const editIncomeMutation = useEditIncome();
   const deleteIncomeMutation = useDeleteIncome();
 
-  // Hook para observar mudanças automáticas nos rendimentos
-  const { refetch: refetchIncomes } = useIncomesByMonth(reloadFlag);
+  // React Query gerencia os dados — sem useEffect manual
+  const { data: incomes = [], isLoading } = useQuery({
+    queryKey: queryKeys.incomes.list(),
+    queryFn: getIncomes,
+  });
 
-  // Carregar dados iniciais
-  useEffect(() => {
-    load();
-    loadTotal();
-  }, []);
-
-  const loadTotal = async () => {
-    try {
-      const total = await totalIncomes();
-      setTotal(total);
-    } catch (err) {
-      console.error('Erro ao carregar total de rendimentos:', err);
-    }
-  };
-
-  const load = async () => {
-    try {
-      setLoading(true);
-      const data = await getIncomes();
-      setIncomes(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: total = 0 } = useQuery({
+    queryKey: queryKeys.totals.incomes(),
+    queryFn: totalIncomes,
+  });
 
   const handleAddOrEdit = async () => {
     try {
       if (editingId) {
-        if (!editingId) return;
-
         await editIncomeMutation.mutateAsync({ ...form, id: editingId });
         toast.success('Cadastro Editado');
       } else {
         await createIncomeMutation.mutateAsync(form);
         toast.success('Salvo novo cadastro');
       }
-
-      // Atualizar reloadFlag para forçar atualização dos componentes
-      setReloadFlag(Date.now());
-
-      // Forçar refetch dos dados
-      await Promise.all([loadTotal(), load(), refetchIncomes()]);
 
       setForm({
         descricao: '',
@@ -132,10 +94,6 @@ function Income() {
     try {
       await deleteIncomeMutation.mutateAsync(id);
       toast.success('Rendimento deletado com sucesso');
-      setReloadFlag(Date.now());
-
-      // Forçar refetch dos dados
-      await Promise.all([loadTotal(), load(), refetchIncomes()]);
     } catch (err) {
       console.error('Erro ao deletar:', err);
 
@@ -160,21 +118,15 @@ function Income() {
     setEditingId(income.id);
   };
 
-  useEffect(() => {
-    load();
-    loadTotal();
-  }, []);
-
   return (
     <div className="space-y-6">
       <TituloPage titulo="Rendimentos" />
 
-      {loading ? (
+      {isLoading ? (
         <IncomeFormSkeleton />
       ) : (
         <>
           <MonthIncome
-            reloadTrigger={reloadFlag}
             onSelectMes={(mes) => setForm((f) => ({ ...f, mes }))}
             total={total}
           />
@@ -205,42 +157,17 @@ function Income() {
                   prefix="R$ "
                   decimalScale={2}
                   allowNegative={false}
-                  fixedDecimalScale={false} // 👈 isso remove zeros fixos no final
+                  fixedDecimalScale={false}
                   customInput={Input}
                 />
               </div>
-            </div>
-
-            <div className="flex flex-row gap-3">
-              <div className="flex w-full flex-col space-y-3">
-                <Label>Mês</Label>
-                <Select
-                  value={String(form.mes)}
-                  onValueChange={(value) =>
-                    setForm((f) => ({ ...f, mes: parseInt(value) }))
-                  }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Mês" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {MESES_LISTA.map((mes) => (
-                      <SelectItem key={mes.value} value={mes.value}>
-                        {mes.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
 
               <div className="flex w-full flex-col space-y-3">
-                <Label>Ano</Label>
-                <Input
-                  type="number"
-                  value={form.ano}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, ano: parseInt(e.target.value) }))
-                  }
+                <Label>Mês / Ano</Label>
+                <MonthYearPicker
+                  mes={form.mes}
+                  ano={form.ano}
+                  onChange={(mes, ano) => setForm((f) => ({ ...f, mes, ano }))}
                 />
               </div>
               <div className="flex items-end">
@@ -275,7 +202,7 @@ function Income() {
           <CardTitle>Lista de Rendimentos</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {isLoading ? (
             <IncomeListSkeleton />
           ) : incomes.length <= 0 ? (
             <TooltipProvider>
@@ -295,7 +222,7 @@ function Income() {
               data={incomes}
               onEdit={handleEdit}
               onDelete={handleDelete}
-              isLoading={loading}
+              isLoading={isLoading}
             />
           )}
         </CardContent>

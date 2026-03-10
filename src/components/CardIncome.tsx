@@ -47,12 +47,12 @@ function CardIncome({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {incomes.map((incomes) => (
-          <TableRow key={incomes.id}>
-            <TableCell>{incomes.descricao}</TableCell>
-            <TableCell>{formatToBRL(incomes.valor)}</TableCell>
+        {incomes.map(({ id, descricao, valor, mes, ano }) => (
+          <TableRow key={id}>
+            <TableCell>{descricao}</TableCell>
+            <TableCell>{formatToBRL(valor)}</TableCell>
             <TableCell className="text-center">
-              {getNomeMes(incomes.mes)} / {incomes.ano}
+              {getNomeMes(mes)} / {ano}
             </TableCell>
 
             <TableCell>
@@ -62,19 +62,19 @@ function CardIncome({
                   size="sm"
                   onClick={() => {
                     setForm({
-                      descricao: incomes.descricao ?? '',
-                      valor: incomes.valor,
-                      mes: incomes.mes,
-                      ano: incomes.ano,
+                      descricao: descricao ?? '',
+                      valor,
+                      mes,
+                      ano,
                     });
-                    setEditingId(incomes.id);
+                    setEditingId(id);
                   }}
                 >
                   <Pencil />
                 </Button>
                 <DialogConfirmDelete
-                  description={incomes.descricao ?? 'item'}
-                  onConfirm={() => handleDelete(incomes.id)}
+                  description={descricao ?? 'item'}
+                  onConfirm={() => handleDelete(id)}
                 >
                   <Button variant="destructive" size="sm">
                     <Trash className="h-4 w-4" />

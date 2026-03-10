@@ -54,3 +54,16 @@ git push origin main
 Veja a documentação completa em [VERSION_SYSTEM.md](./VERSION_SYSTEM.md).
 
 ---
+
+# Comandos Docker do Supabase
+
+- **Start**: `supabase start`
+- **Pausar**: `supabase stop`
+- **Forcar Parada**: `supabase stop --project-id front-hono`
+- **Reiniciar**: `supabase restart`
+- **Atualizar**: `supabase update`
+
+# Comandos Docker
+- **Iniciar**: `docker-compose up -d`
+- **Parar**: `docker-compose down`
+- **Logs**: `docker-compose logs -f`

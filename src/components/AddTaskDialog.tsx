@@ -30,28 +30,39 @@ import { MESES_LISTA } from '@/model/mes.enum';
 import { useCreateTask } from '@/hooks/use-tasks';
 import { Loader } from 'lucide-react';
 
+interface AddTaskDialogProps {
+  onTaskCreated: () => void;
+  mesSelecionado?: number;
+}
+
 export function AddTaskDialog({
   onTaskCreated,
-}: {
-  onTaskCreated: () => void;
-}) {
-  const [title, setTitle] = useState('');
-  const [price, setPrice] = useState<string | number>('');
+  mesSelecionado,
+}: AddTaskDialogProps) {
   const [msg, setMsg] = useState('');
-  const [type, setType] = useState('');
   const [allTypes, setAllTypes] = useState<string[]>([]);
-  const [done, setDone] = useState<TaskStatus>(TASK_STATUS.Pendente);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formErrors, setFormErrors] = useState<
     Partial<Record<keyof z.infer<typeof taskSchema>, string>>
   >({});
   const [form, setForm] = useState({
-    mes: new Date().getMonth() + 1,
+    title: '',
+    price: '' as string | number,
+    type: '',
+    done: TASK_STATUS.Pendente as TaskStatus,
+    mes: mesSelecionado ?? new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
   });
 
   // Hook para criar tarefa com invalidação automática do cache
   const createTaskMutation = useCreateTask();
+
+  // Atualiza o mês quando o mês selecionado na aba mudar
+  useEffect(() => {
+    if (mesSelecionado) {
+      setForm((f) => ({ ...f, mes: mesSelecionado }));
+    }
+  }, [mesSelecionado]);
 
   useEffect(() => {
     const fetchTypes = async () => {
@@ -68,10 +79,14 @@ export function AddTaskDialog({
   }, []);
 
   const resetForm = () => {
-    setTitle('');
-    setPrice('');
-    setType('');
-    setDone(TASK_STATUS.Pendente);
+    setForm({
+      title: '',
+      price: '',
+      type: '',
+      done: TASK_STATUS.Pendente,
+      mes: mesSelecionado ?? new Date().getMonth() + 1,
+      ano: new Date().getFullYear(),
+    });
     setFormErrors({});
     setMsg('');
     setDialogOpen(false);
@@ -79,10 +94,10 @@ export function AddTaskDialog({
 
   const handleSubmit = async () => {
     const result = taskSchema.safeParse({
-      title,
-      price,
-      done,
-      type,
+      title: form.title,
+      price: form.price,
+      done: form.done,
+      type: form.type,
       mes: form.mes,
       ano: form.ano,
     });
@@ -110,8 +125,8 @@ export function AddTaskDialog({
         ano: form.ano,
       });
 
-      if (type.trim() && !allTypes.includes(type.trim())) {
-        setAllTypes((prev) => [...prev, type.trim()]);
+      if (form.type.trim() && !allTypes.includes(form.type.trim())) {
+        setAllTypes((prev) => [...prev, form.type.trim()]);
       }
 
       onTaskCreated();
@@ -161,8 +176,8 @@ export function AddTaskDialog({
             <Label className="text-base font-medium">Título</Label>
             <Input
               placeholder="Título do Item"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={form.title}
+              onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
               className="h-12 text-base"
             />
             {formErrors.title && (
@@ -177,9 +192,9 @@ export function AddTaskDialog({
             <div className="flex flex-col space-y-2">
               <Label className="text-base font-medium">Preço</Label>
               <NumericFormat
-                value={price}
+                value={form.price}
                 onValueChange={(values) => {
-                  setPrice(values.floatValue ?? '');
+                  setForm((prev) => ({ ...prev, price: values.floatValue ?? '' }));
                 }}
                 thousandSeparator="."
                 decimalSeparator=","
@@ -239,8 +254,8 @@ export function AddTaskDialog({
             <div className="flex w-full flex-col space-y-2">
               <Label className="text-base font-medium">Status</Label>
               <Select
-                value={done}
-                onValueChange={(value) => setDone(value as TaskStatus)}
+                value={form.done}
+                onValueChange={(value) => setForm((prev) => ({ ...prev, done: value as TaskStatus }))}
               >
                 <SelectTrigger className="!h-12 !w-full text-base">
                   <SelectValue placeholder="Selecione o status" />
@@ -265,8 +280,8 @@ export function AddTaskDialog({
               <Label className="text-base font-medium">Tipo de Gasto</Label>
               <div className="bg-background flex min-h-[6rem] flex-col items-start gap-2 rounded-md border p-4">
                 <TypeSelector
-                  value={type}
-                  onChange={setType}
+                  value={form.type}
+                  onChange={(value) => setForm((prev) => ({ ...prev, type: value }))}
                   allTypes={allTypes}
                 />
 

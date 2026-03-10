@@ -21,6 +21,7 @@ import { formatToBRL } from '@/utils/format';
 
 // services
 import { getTasks } from '@/service/task/getTasks';
+import { getTasksCountByMonth } from '@/service/task/getTasksCountByMonth';
 import { totalPrice, totalItems } from '@/service/total';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
@@ -61,17 +62,29 @@ function List() {
     queryFn: () => getTasks({ month: parseInt(mesAtivo), year: form.ano }),
   });
 
+  // 🔄 Busca contagem de tasks por mês para mostrar ícone
+  const { data: tasksCountByMonth = {} } = useQuery({
+    queryKey: queryKeys.tasks.countByMonth(form.ano),
+    queryFn: () => getTasksCountByMonth(form.ano),
+    staleTime: 1000 * 60 * 5, // 5 minutos
+  });
+
   // 🔄 Função para invalidar cache e recarregar dados
   const handleTasksChange = useCallback(async () => {
     console.log('🔄 Invalidando cache e recarregando dados...');
 
-    // Invalida o cache do mês atual
-    await queryClient.invalidateQueries({
-      queryKey: queryKeys.tasks.list({
-        month: parseInt(mesAtivo),
-        year: form.ano,
+    // Invalida o cache do mês atual e da contagem por mês
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.tasks.list({
+          month: parseInt(mesAtivo),
+          year: form.ano,
+        }),
       }),
-    });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.tasks.countByMonth(form.ano),
+      }),
+    ]);
 
     // Força o refetch dos dados
     await refetch();
@@ -127,7 +140,7 @@ function List() {
 
   return (
     <div className="space-y-6">
-      <TituloPage titulo="Lista" />
+      <TituloPage titulo="Despesas" />
 
       {/* Valor total pago + botão adicionar */}
       <div className="flex flex-row items-center justify-between">
@@ -160,17 +173,24 @@ function List() {
           )}
         </div>
 
-        <AddTaskDialog onTaskCreated={handleTasksChange} />
+        <AddTaskDialog
+          onTaskCreated={handleTasksChange}
+          mesSelecionado={parseInt(mesAtivo)}
+        />
       </div>
 
       <Tabs value={mesAtivo} onValueChange={setMesAtivo}>
         <TabsList className="gap-1">
           {MESES_LISTA.map((mes) => {
-            const temTarefas =
-              mes.value === mesAtivo && tasksCurrentMonth.length > 0;
+            const mesNumero = parseInt(mes.value);
+            const temTarefas = (tasksCountByMonth[mesNumero] || 0) > 0;
 
             return (
-              <TabsTrigger key={mes.value} value={mes.value} className="gap-2">
+              <TabsTrigger
+                key={mes.value}
+                value={mes.value}
+                className="data-[state=active]:bg-primary gap-2"
+              >
                 {temTarefas && <FaCheckCircle />}
                 {mes.label}
               </TabsTrigger>

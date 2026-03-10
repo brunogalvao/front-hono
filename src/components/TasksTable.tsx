@@ -96,13 +96,13 @@ export const TasksTable = memo(function TasksTable({
   isLoading = false,
 }: TaskTable) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [title, setTitle] = useState('');
-  const [price, setPrice] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [done, setDone] = useState<TaskStatus>(TASK_STATUS.Pendente);
-  const [type, setType] = useState('');
   const [allTypes, setAllTypes] = useState<string[]>([]);
-  const [form, setForm] = useState({
+  const [editForm, setEditForm] = useState({
+    title: '',
+    price: '',
+    done: TASK_STATUS.Pendente as TaskStatus,
+    type: '',
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
   });
@@ -113,29 +113,14 @@ export const TasksTable = memo(function TasksTable({
 
   const handleEditClick = useCallback((task: Task) => {
     setEditingTask(task);
-
-    // Atualiza o título da tarefa
-    setTitle(task.title ?? '');
-
-    // Converte o preço para string de forma segura
-    setPrice(
-      task.price !== null && task.price !== undefined
-        ? task.price.toString()
-        : ''
-    );
-
-    // Garante um tipo mesmo se estiver undefined
-    setType(task.type ?? '');
-
-    // Define o status da tarefa
-    setDone(task.done);
-
-    setForm({
+    setEditForm({
+      title: task.title ?? '',
+      price: task.price !== null && task.price !== undefined ? task.price.toString() : '',
+      type: task.type ?? '',
+      done: task.done,
       mes: task.mes,
       ano: task.ano,
     });
-
-    // Abre o modal de edição
     setDialogOpen(true);
   }, []);
 
@@ -145,12 +130,12 @@ export const TasksTable = memo(function TasksTable({
         await editTaskMutation.mutateAsync({
           id: editingTask.id,
           data: {
-            title,
-            done,
-            price: price ? Number(price) : null,
-            type,
-            mes: form.mes,
-            ano: form.ano,
+            title: editForm.title,
+            done: editForm.done,
+            price: editForm.price ? Number(editForm.price) : null,
+            type: editForm.type,
+            mes: editForm.mes,
+            ano: editForm.ano,
           },
         });
         console.log('🟢 Editado com sucesso');
@@ -165,11 +150,7 @@ export const TasksTable = memo(function TasksTable({
     }
   }, [
     editingTask,
-    title,
-    done,
-    price,
-    type,
-    form,
+    editForm,
     onTasksChange,
     editTaskMutation,
   ]);
@@ -210,12 +191,12 @@ export const TasksTable = memo(function TasksTable({
   const formErrors = useMemo(() => {
     try {
       taskSchema.parse({
-        title,
-        price: price ? Number(price) : null,
-        type,
-        done,
-        mes: form.mes,
-        ano: form.ano,
+        title: editForm.title,
+        price: editForm.price ? Number(editForm.price) : null,
+        type: editForm.type,
+        done: editForm.done,
+        mes: editForm.mes,
+        ano: editForm.ano,
       });
       return {};
     } catch (error) {
@@ -230,7 +211,7 @@ export const TasksTable = memo(function TasksTable({
       }
       return {};
     }
-  }, [title, price, type, done, form]);
+  }, [editForm]);
 
   const isFormValid = Object.keys(formErrors).length === 0;
 
@@ -335,8 +316,8 @@ export const TasksTable = memo(function TasksTable({
             <div className="flex flex-col space-y-2">
               <Label className="text-base font-medium">Título</Label>
               <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={editForm.title}
+                onChange={(e) => setEditForm((prev) => ({ ...prev, title: e.target.value }))}
                 className="h-12 text-base"
               />
             </div>
@@ -348,8 +329,8 @@ export const TasksTable = memo(function TasksTable({
                 <Input
                   type="number"
                   step="0.01"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  value={editForm.price}
+                  onChange={(e) => setEditForm((prev) => ({ ...prev, price: e.target.value }))}
                   className="h-12 text-base"
                 />
               </div>
@@ -357,8 +338,8 @@ export const TasksTable = memo(function TasksTable({
               <div className="flex flex-col space-y-2">
                 <Label className="text-base font-medium">Status</Label>
                 <Select
-                  value={done}
-                  onValueChange={(value) => setDone(value as TaskStatus)}
+                  value={editForm.done}
+                  onValueChange={(value) => setEditForm((prev) => ({ ...prev, done: value as TaskStatus }))}
                 >
                   <SelectTrigger className="border-input bg-background !h-12 w-full border px-3 py-2 text-base">
                     <SelectValue placeholder="Selecione o status" />
@@ -378,8 +359,8 @@ export const TasksTable = memo(function TasksTable({
               <Label className="text-base font-medium">Tipo de Gasto</Label>
               <div className="bg-background flex min-h-[3rem] flex-col items-center gap-2 rounded-md border p-4">
                 <TypeSelector
-                  value={type}
-                  onChange={setType}
+                  value={editForm.type}
+                  onChange={(value) => setEditForm((prev) => ({ ...prev, type: value }))}
                   allTypes={allTypes}
                 />
               </div>
