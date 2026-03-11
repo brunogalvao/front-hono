@@ -1,125 +1,58 @@
-import { useIA } from '@/hooks/use-ia';
+import type { IASimplificada } from '@/service/ia/getIA';
 import { formatToBRL, formatToUSD } from '@/utils/format';
 import {
   TrendingUp,
   TrendingDown,
   AlertTriangle,
   CheckCircle,
+  Wallet,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  Clock,
+  Activity,
 } from 'lucide-react';
 import { FaChartArea, FaMoneyBill } from 'react-icons/fa6';
 import { MdTipsAndUpdates } from 'react-icons/md';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 
-// Componente Skeleton para o status financeiro
-const StatusSkeleton = () => (
-  <Card>
-    <CardContent className="pt-6">
-      <div className="mb-4 flex items-center gap-3">
-        <Skeleton className="h-6 w-6" />
-        <div className="flex-1">
-          <Skeleton className="mb-2 h-6 w-48" />
-          <Skeleton className="h-4 w-64" />
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
-        {[1, 2, 3, 4].map((index) => (
-          <div key={index}>
-            <Skeleton className="mb-1 h-4 w-16" />
-            <Skeleton className="h-5 w-20" />
-          </div>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-);
+type Props = {
+  data: IASimplificada;
+};
 
-// Componente Skeleton para o resumo financeiro
-const SummarySkeleton = () => (
-  <Card>
-    <CardHeader className="pb-2">
-      <div className="flex items-center gap-2">
-        <Skeleton className="h-5 w-5" />
-        <Skeleton className="h-6 w-32" />
-      </div>
-    </CardHeader>
-    <CardContent>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {[1, 2, 3].map((index) => (
-          <div key={index} className="bg-muted rounded-lg p-4 text-center">
-            <Skeleton className="mx-auto mb-2 h-8 w-24" />
-            <Skeleton className="mx-auto h-4 w-20" />
-          </div>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-);
-
-// Componente Skeleton para conversão de dólar
-const DollarConversionSkeleton = () => (
-  <Card>
-    <CardHeader className="pb-2">
-      <div className="flex items-center gap-2">
-        <Skeleton className="h-5 w-5" />
-        <Skeleton className="h-6 w-40" />
-      </div>
-    </CardHeader>
-    <CardContent>
-      <div className="flex items-center justify-between">
-        <div>
-          <Skeleton className="mb-1 h-4 w-32" />
-          <Skeleton className="h-6 w-24" />
-        </div>
-        <div className="text-right">
-          <Skeleton className="mb-1 h-4 w-36" />
-          <Skeleton className="h-6 w-28" />
-        </div>
-      </div>
-      <div className="bg-muted mt-4 rounded-lg p-3">
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-4 w-4" />
-          <Skeleton className="h-4 flex-1" />
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
-
-const IARecommendations = () => {
-  const { data: iaData, isLoading, error } = useIA();
-
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <StatusSkeleton />
-        <div className="grid grid-cols-1 gap-4">
-          <SummarySkeleton />
-          <DollarConversionSkeleton />
-        </div>
-      </div>
-    );
+const getStatusFinanceiro = (percentualGasto: number) => {
+  if (percentualGasto < 50) {
+    return {
+      status: 'Excelente',
+      color: 'text-emerald-500',
+      icon: CheckCircle,
+      message: 'Seu controle financeiro está excelente! Continue assim.',
+    };
+  } else if (percentualGasto < 70) {
+    return {
+      status: 'Bom',
+      color: 'text-blue-500',
+      icon: TrendingUp,
+      message: 'Bom controle financeiro, mas há espaço para melhorar.',
+    };
+  } else if (percentualGasto < 90) {
+    return {
+      status: 'Atenção',
+      color: 'text-amber-500',
+      icon: AlertTriangle,
+      message: 'Atenção: você está gastando muito da sua renda.',
+    };
+  } else {
+    return {
+      status: 'Crítico',
+      color: 'text-red-500',
+      icon: TrendingDown,
+      message: 'ALERTA: Situação financeira crítica!',
+    };
   }
+};
 
-  if (error) {
-    return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-6">
-        <div className="mb-2 flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-red-600" />
-          <span className="text-lg font-semibold text-red-800">
-            Erro na Análise
-          </span>
-        </div>
-        <p className="text-red-700">{error.message}</p>
-      </div>
-    );
-  }
-
-  // Verificação de segurança para iaData
-  if (!iaData?.data) {
-    return null; // Deixa o Dashboard controlar o skeleton
-  }
-
+const IARecommendations = ({ data }: Props) => {
   const {
     percentualGasto,
     percentualDisponivel,
@@ -127,55 +60,29 @@ const IARecommendations = () => {
     cotacaoDolar,
     quantidadeDolar,
     rendimentoMes,
-    tarefasPagas,
-  } = iaData.data;
+    despesasPagas,
+    despesasPendentes,
+  } = data;
 
-  // Determinar status financeiro baseado no percentual gasto
-  const getStatusFinanceiro = () => {
-    if (percentualGasto < 50) {
-      return {
-        status: 'Excelente',
-        color: 'text-emerald-500',
-        icon: CheckCircle,
-        message: 'Seu controle financeiro está excelente! Continue assim.',
-      };
-    } else if (percentualGasto < 70) {
-      return {
-        status: 'Bom',
-        color: 'text-blue-500',
-        icon: TrendingUp,
-        message: 'Bom controle financeiro, mas há espaço para melhorar.',
-      };
-    } else if (percentualGasto < 90) {
-      return {
-        status: 'Atenção',
-        color: 'text-amber-500',
-        icon: AlertTriangle,
-        message: 'Atenção: você está gastando muito da sua renda.',
-      };
-    } else {
-      return {
-        status: 'Crítico',
-        color: 'text-red-500',
-        icon: TrendingDown,
-        message: 'ALERTA: Situação financeira crítica!',
-      };
-    }
-  };
-
-  const statusInfo = getStatusFinanceiro();
+  const statusInfo = getStatusFinanceiro(percentualGasto);
   const IconComponent = statusInfo.icon;
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-[30%_40%_30%]">
       {/* Status Financeiro */}
       <Card>
-        <CardContent className="pt-6">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-primary flex flex-row items-center gap-2 text-lg">
+            <Activity />
+            Status Financeiro
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
           <div className="mb-4 flex items-center gap-3">
-            <IconComponent className={`h-6 w-6 ${statusInfo.color}`} />
+            <IconComponent className={`h-6 w-6 shrink-0 ${statusInfo.color}`} />
             <div>
               <h3 className={`text-lg font-semibold ${statusInfo.color}`}>
-                Status: {statusInfo.status}
+                {statusInfo.status}
               </h3>
               <p className="text-muted-foreground text-sm">
                 {statusInfo.message}
@@ -183,27 +90,24 @@ const IARecommendations = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
-            <div>
-              <span className="text-muted-foreground">Gasto:</span>
-              <div className={`font-semibold ${statusInfo.color}`}>
-                {percentualGasto}%
-              </div>
+          {/* Barra de progresso */}
+          <div className="mb-4 space-y-1">
+            <div className="flex justify-between text-xs">
+              <span className="text-muted-foreground">Gasto: {percentualGasto}%</span>
+              <span className="text-muted-foreground">Disponível: {percentualDisponivel}%</span>
             </div>
+            <Progress value={percentualGasto} className="h-2" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <span className="text-muted-foreground">Disponível:</span>
-              <div className="font-semibold text-emerald-500">
-                {percentualDisponivel}%
-              </div>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Resultado:</span>
+              <span className="text-muted-foreground text-xs">Resultado</span>
               <div className="font-semibold text-blue-600">
                 {formatToBRL(resultadoLiquido)}
               </div>
             </div>
             <div>
-              <span className="text-muted-foreground">Em USD:</span>
+              <span className="text-muted-foreground text-xs">Equivalente em dólar (USD)</span>
               <div className="font-semibold text-purple-600">
                 {formatToUSD(quantidadeDolar)}
               </div>
@@ -220,25 +124,49 @@ const IARecommendations = () => {
             Resumo do Mês
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="bg-muted rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">
+        <CardContent className="space-y-3">
+          {/* Rendimento */}
+          <div className="flex items-center gap-3 rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-500/10">
+              <ArrowUpCircle className="h-5 w-5 text-blue-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-muted-foreground text-xs">Rendimento Total</div>
+              <div className="text-lg font-bold text-blue-600 leading-tight">
                 {formatToBRL(rendimentoMes)}
               </div>
-              <div className="text-muted-foreground text-sm">Rendimento Total</div>
             </div>
-            <div className="bg-muted rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-red-600">
-                {formatToBRL(tarefasPagas)}
+          </div>
+
+          {/* Gastos */}
+          <div className="flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/5 p-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-500/10">
+              <ArrowDownCircle className="h-5 w-5 text-red-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-muted-foreground text-xs">Gastos Realizados</div>
+              <div className="text-lg font-bold text-red-600 leading-tight">
+                {formatToBRL(despesasPagas)}
               </div>
-              <div className="text-muted-foreground text-sm">Gastos Realizados</div>
             </div>
-            <div className="bg-muted rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-emerald-600">
+            {despesasPendentes > 0 && (
+              <div className="flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-1 text-xs text-amber-600 shrink-0">
+                <Clock className="h-3 w-3" />
+                <span>+{formatToBRL(despesasPendentes)} pendente</span>
+              </div>
+            )}
+          </div>
+
+          {/* Saldo */}
+          <div className="flex items-center gap-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
+              <Wallet className="h-5 w-5 text-emerald-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-muted-foreground text-xs">Sobrou no Mês</div>
+              <div className="text-lg font-bold text-emerald-600 leading-tight">
                 {formatToBRL(resultadoLiquido)}
               </div>
-              <div className="text-muted-foreground text-sm">Sobrou no Mês</div>
             </div>
           </div>
         </CardContent>
@@ -269,7 +197,7 @@ const IARecommendations = () => {
           </div>
           <div className="bg-muted mt-4 rounded-lg p-3">
             <p className="text-muted-foreground flex flex-row items-center gap-2 text-sm">
-              <MdTipsAndUpdates className="text-amber-500 shrink-0" />
+              <MdTipsAndUpdates className="shrink-0 text-amber-500" />
               <span>
                 Com {formatToBRL(resultadoLiquido)} você pode comprar $
                 {quantidadeDolar.toFixed(2)} dólares na cotação de{' '}

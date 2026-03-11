@@ -51,7 +51,7 @@ interface TaskTable {
   isLoading?: boolean;
 }
 
-// Componente Skeleton para a tabela de tarefas
+// Componente Skeleton para a tabela de despesas
 const TasksTableSkeleton = () => (
   <div className="space-y-4">
     <div className="rounded-md border">
@@ -227,8 +227,8 @@ export const TasksTable = memo(function TasksTable({
   // const totalMesAtual =
   //   iaData?.data?.rendimentoMes || salariosPorMes[mesAtual] || 0;
 
-  const totalTarefasMesAtual =
-    iaData?.data?.totalTarefas || salariosPorMes[mesAtual] || 0;
+  const totalDespesasMesAtual =
+    iaData?.data?.totalDespesas || salariosPorMes[mesAtual] || 0;
 
   if (isLoading) {
     return <TasksTableSkeleton />;
@@ -239,9 +239,9 @@ export const TasksTable = memo(function TasksTable({
       <Table>
         <TableCaption>
           <div className="flex justify-between">
-            <div>{tasks.length} Tarefas</div>
+            <div>{tasks.length} Despesas</div>
             <div className="font-bold">
-              Total {formatToBRL(totalTarefasMesAtual)}
+              Total {formatToBRL(totalDespesasMesAtual)}
             </div>
           </div>
         </TableCaption>
@@ -309,7 +309,7 @@ export const TasksTable = memo(function TasksTable({
             <DialogTitle>Editar Item</DialogTitle>
           </DialogHeader>
           <DialogDescription className="pb-4" id="edit-task-description">
-            Edite os detalhes da tarefa selecionada.
+            Edite os detalhes da despesa selecionada.
           </DialogDescription>
           <div className="flex flex-col space-y-6">
             {/* Título - Largura total */}

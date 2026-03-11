@@ -18,8 +18,8 @@ export async function createTask(task: NewTask): Promise<NewTask> {
   });
 
   if (!res.ok) {
-    console.error('Erro ao criar tarefa', await res.text());
-    throw new Error('Erro ao criar tarefa');
+    console.error('Erro ao criar despesa', await res.text());
+    throw new Error('Erro ao criar despesa');
   }
 
   return res.json();

@@ -52,7 +52,7 @@ function StatusDropdown({
       console.error('Erro ao atualizar status:', err);
       // Reverte o estado local em caso de erro
       setLocalStatus(task.done);
-      toast.error('Erro ao atualizar status da tarefa');
+      toast.error('Erro ao atualizar status da despesa');
     }
   };
 

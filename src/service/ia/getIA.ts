@@ -2,9 +2,9 @@ import { supabase } from '@/lib/supabase';
 import { API_BASE_URL } from '@/config/api';
 
 export interface IASimplificada {
-  tarefasPagas: number;
-  tarefasPendentes: number;
-  totalTarefas: number;
+  despesasPagas: number;
+  despesasPendentes: number;
+  totalDespesas: number;
   rendimentoMes: number;
   percentualDisponivel: number;
   percentualGasto: number;
@@ -42,13 +42,13 @@ export async function getIA(
 
     console.log('📅 Data atual:', { mesAtual, anoAtual, rendimentoMes });
 
-    // Buscar dados de tarefas reais
-    let tarefasPagas = 0;
-    let tarefasPendentes = 0;
+    // Buscar dados de despesas reais
+    let despesasPagas = 0;
+    let despesasPendentes = 0;
 
     try {
       const tasksUrl = `${API_BASE_URL}/api/tasks?month=${mesAtual}&year=${anoAtual}`;
-      console.log('📋 Buscando tarefas:', tasksUrl);
+      console.log('📋 Buscando despesas:', tasksUrl);
 
       const tasksResponse = await fetch(tasksUrl, {
         headers: {
@@ -56,57 +56,57 @@ export async function getIA(
         },
       });
 
-      console.log('📋 Status da resposta das tarefas:', tasksResponse.status);
+      console.log('📋 Status da resposta das despesas:', tasksResponse.status);
 
       if (tasksResponse.ok) {
         const tasks = (await tasksResponse.json()) as Array<{
           done: string; // "Pago" | "Pendente"
           price?: number;
         }>;
-        console.log('📋 Tarefas recebidas:', tasks.length);
+        console.log('📋 Despesas recebidas:', tasks.length);
 
-        const tarefasPagasArray = tasks.filter((task) => {
+        const despesasPagasArray = tasks.filter((task) => {
           const isPago = task.done === 'Pago';
           const hasPrice =
             task.price !== null && task.price !== undefined && task.price > 0;
           return isPago && hasPrice;
         });
 
-        const tarefasPendentesArray = tasks.filter((task) => {
+        const despesasPendentesArray = tasks.filter((task) => {
           const isPendente = task.done === 'Pendente';
           const hasPrice =
             task.price !== null && task.price !== undefined && task.price > 0;
           return isPendente && hasPrice;
         });
 
-        tarefasPagas = tarefasPagasArray.reduce((sum: number, task) => {
+        despesasPagas = despesasPagasArray.reduce((sum: number, task) => {
           return sum + (Number(task.price) || 0);
         }, 0);
 
-        tarefasPendentes = tarefasPendentesArray.reduce((sum: number, task) => {
+        despesasPendentes = despesasPendentesArray.reduce((sum: number, task) => {
           return sum + (Number(task.price) || 0);
         }, 0);
 
-        console.log('📋 Tarefas calculadas:', {
-          pagas: tarefasPagasArray.length,
-          pendentes: tarefasPendentesArray.length,
-          valorPago: tarefasPagas,
-          valorPendente: tarefasPendentes,
+        console.log('📋 Despesas calculadas:', {
+          pagas: despesasPagasArray.length,
+          pendentes: despesasPendentesArray.length,
+          valorPago: despesasPagas,
+          valorPendente: despesasPendentes,
         });
       } else {
         const errorText = await tasksResponse.text();
         console.warn(
-          '⚠️ Erro ao buscar tarefas:',
+          '⚠️ Erro ao buscar despesas:',
           tasksResponse.status,
           errorText
         );
         throw new Error(
-          `Falha ao buscar dados de tarefas: ${tasksResponse.status} - ${errorText}`
+          `Falha ao buscar dados de despesas: ${tasksResponse.status} - ${errorText}`
         );
       }
     } catch (tasksError) {
-      console.error('❌ Erro ao buscar tarefas:', tasksError);
-      throw new Error('Não foi possível buscar dados de tarefas');
+      console.error('❌ Erro ao buscar despesas:', tasksError);
+      throw new Error('Não foi possível buscar dados de despesas');
     }
 
     // Buscar cotação do dólar em tempo real
@@ -125,10 +125,10 @@ export async function getIA(
     }
 
     // Calcular dados simplificados
-    const totalTarefas = tarefasPagas + tarefasPendentes;
-    const resultadoLiquido = Math.max(0, rendimentoMes - tarefasPagas);
+    const totalDespesas = despesasPagas + despesasPendentes;
+    const resultadoLiquido = Math.max(0, rendimentoMes - despesasPagas);
     const percentualGasto =
-      rendimentoMes > 0 ? (tarefasPagas / rendimentoMes) * 100 : 0;
+      rendimentoMes > 0 ? (despesasPagas / rendimentoMes) * 100 : 0;
     const percentualDisponivel = 100 - percentualGasto;
     const quantidadeDolar = resultadoLiquido / cotacaoDolar;
 
@@ -136,9 +136,9 @@ export async function getIA(
     const dicasEconomia = gerarDicasEconomia(percentualGasto);
 
     const dadosSimplificados: IASimplificada = {
-      tarefasPagas,
-      tarefasPendentes,
-      totalTarefas,
+      despesasPagas,
+      despesasPendentes,
+      totalDespesas,
       rendimentoMes,
       percentualDisponivel: Math.round(percentualDisponivel),
       percentualGasto: Math.round(percentualGasto),
@@ -206,11 +206,11 @@ function generateMockResponse(
 ): IAResponse {
   const mesAtual = new Date().getMonth() + 1;
   const rendimentoMes = incomesData?.[mesAtual] || 5000;
-  const tarefasPagas = 3000;
-  const tarefasPendentes = 1000;
-  const totalTarefas = tarefasPagas + tarefasPendentes;
-  const resultadoLiquido = Math.max(0, rendimentoMes - tarefasPagas);
-  const percentualGasto = (tarefasPagas / rendimentoMes) * 100;
+  const despesasPagas = 3000;
+  const despesasPendentes = 1000;
+  const totalDespesas = despesasPagas + despesasPendentes;
+  const resultadoLiquido = Math.max(0, rendimentoMes - despesasPagas);
+  const percentualGasto = (despesasPagas / rendimentoMes) * 100;
   const percentualDisponivel = 100 - percentualGasto;
   const cotacaoDolar = 5.25;
   const quantidadeDolar = resultadoLiquido / cotacaoDolar;
@@ -218,9 +218,9 @@ function generateMockResponse(
   return {
     success: true,
     data: {
-      tarefasPagas,
-      tarefasPendentes,
-      totalTarefas,
+      despesasPagas,
+      despesasPendentes,
+      totalDespesas,
       rendimentoMes,
       percentualDisponivel: Math.round(percentualDisponivel),
       percentualGasto: Math.round(percentualGasto),

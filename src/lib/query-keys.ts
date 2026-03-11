@@ -59,6 +59,13 @@ export const queryKeys = {
   ia: {
     all: ['ia'] as const,
   },
+
+  // Notifications
+  notifications: {
+    all: ['notifications'] as const,
+    pending: (month: number, year: number) =>
+      [...queryKeys.notifications.all, 'pending', month, year] as const,
+  },
 } as const;
 
 // Tipos para type safety

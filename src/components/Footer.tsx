@@ -11,8 +11,8 @@ const Footer = () => {
   const currentDate = new Date().getFullYear();
 
   return (
-    <footer className="h-52 text-white">
-      <div className="relative container mx-auto flex h-full items-center justify-center px-4">
+    <footer className="py-10 text-white">
+      <div className="relative container mx-auto flex flex-col items-center justify-center gap-6 px-4">
         <ul className="flex flex-row gap-12">
           {mediaSocial.map((item, index) => (
             <TooltipProvider key={index}>
@@ -33,7 +33,7 @@ const Footer = () => {
             </TooltipProvider>
           ))}
         </ul>
-        <small className="absolute bottom-0 flex flex-row items-center gap-3 text-center text-zinc-700">
+        <small className="flex flex-row items-center gap-2 text-center text-zinc-700">
           <FaRegCopyright /> {currentDate} AiVision. All rights reserved.
         </small>
       </div>

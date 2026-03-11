@@ -12,6 +12,7 @@ import { LogOut } from '@/components/animate-ui/icons/log-out';
 import { Loader } from '@/components/animate-ui/icons/loader';
 import { AnimateIcon } from '@/components/animate-ui/icons/icon';
 import { RippleButton } from '@/components/animate-ui/buttons/ripple';
+import { NotificationBell } from '@/components/NotificationBell';
 
 function Admin() {
   const navigate = useNavigate();
@@ -86,7 +87,8 @@ function Admin() {
 
           <Separator orientation="vertical" className="mr-2 h-4" />
           {/* sair */}
-          <div className="flex w-full justify-end">
+          <div className="flex w-full items-center justify-end gap-2">
+            <NotificationBell />
             <AnimateIcon animateOnHover>
               <RippleButton
                 onClick={handleLogout}

@@ -6,7 +6,7 @@ import { deleteTask } from '@/service/task/deleteTask';
 import { queryKeys } from '@/lib/query-keys';
 import type { Task } from '@/model/tasks.model';
 
-// Hook para buscar tarefas
+// Hook para buscar despesas
 export function useTasks(month: number, year: number) {
   return useQuery({
     queryKey: queryKeys.tasks.list({ month, year }),
@@ -15,14 +15,14 @@ export function useTasks(month: number, year: number) {
   });
 }
 
-// Hook para criar tarefa
+// Hook para criar despesa
 export function useCreateTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createTask,
     onSuccess: (newTask, variables) => {
-      // Invalida todas as queries de tarefas
+      // Invalida todas as queries de despesas
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.lists() });
 
       // Invalida também queries específicas de totais
@@ -45,7 +45,7 @@ export function useCreateTask() {
   });
 }
 
-// Hook para editar tarefa
+// Hook para editar despesa
 export function useEditTask() {
   const queryClient = useQueryClient();
 
@@ -53,7 +53,7 @@ export function useEditTask() {
     mutationFn: ({ id, data }: { id: string; data: Partial<Task> }) =>
       editTask(id, data),
     onSuccess: (updatedTask, variables) => {
-      // Invalida todas as queries de tarefas
+      // Invalida todas as queries de despesas
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.lists() });
 
       // Invalida também queries específicas de totais
@@ -81,14 +81,14 @@ export function useEditTask() {
   });
 }
 
-// Hook para deletar tarefa
+// Hook para deletar despesa
 export function useDeleteTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: deleteTask,
     onSuccess: () => {
-      // Invalida todas as queries de tarefas
+      // Invalida todas as queries de despesas
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.lists() });
 
       // Invalida também queries específicas de totais

@@ -1,7 +1,7 @@
 import { API_BASE_URL } from '@/config/api';
 import { supabase } from '@/lib/supabase';
 
-// Soma total de tarefas do usuário logado
+// Soma total de despesas do usuário logado
 export const totalItems = async (): Promise<number> => {
   const session = await supabase.auth.getSession();
   const token = session.data.session?.access_token;
@@ -16,14 +16,14 @@ export const totalItems = async (): Promise<number> => {
 
   if (!res.ok) {
     console.error(`Erro: ${res.status}`);
-    throw new Error('Erro ao buscar total de tarefas');
+    throw new Error('Erro ao buscar total de despesas');
   }
 
   const data = await res.json();
   return data.total;
 };
 
-// Soma total de preço das tarefas do usuário logado
+// Soma total de preço das despesas do usuário logado
 export const totalPrice = async (): Promise<number> => {
   const session = await supabase.auth.getSession();
   const token = session.data.session?.access_token;
@@ -45,7 +45,7 @@ export const totalPrice = async (): Promise<number> => {
   return data.totalPrice;
 };
 
-// Soma total de valores pagos (tarefas com done = true) do usuário logado
+// Soma total de valores pagos (despesas com done = true) do usuário logado
 export const totalPaid = async (): Promise<number> => {
   const session = await supabase.auth.getSession();
   const token = session.data.session?.access_token;

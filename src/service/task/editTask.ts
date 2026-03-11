@@ -31,8 +31,8 @@ export const editTask = async (id: string, updated: Partial<Task>) => {
 
   if (!res.ok) {
     const errorText = await res.text();
-    console.error('❌ Erro ao editar tarefa:', errorText);
-    throw new Error(`Erro ao editar tarefa: ${errorText}`);
+    console.error('❌ Erro ao editar despesa:', errorText);
+    throw new Error(`Erro ao editar despesa: ${errorText}`);
   }
 
   const result = await res.json();

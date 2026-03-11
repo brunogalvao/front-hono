@@ -8,21 +8,21 @@ export const CARDS: { title: string; description: string; icons: IconName }[] =
       icons: 'Clock7',
     },
     {
-      title: 'Aqui para te lembras',
+      title: 'Nunca perca um prazo',
       description:
-        'Mantenha suas tarefas financeiras organizadas e nunca perca um compromisso.',
+        'Organize tarefas financeiras por mês e mantenha tudo em dia.',
       icons: 'Bell',
     },
     {
-      title: 'Controle de tudo',
+      title: 'Histórico completo',
       description:
-        'Gerencie suas finanças com ferramentas intuitivas e completas.',
+        'Visualize entradas, saídas e saldo mês a mês com clareza.',
       icons: 'Cog',
     },
     {
-      title: 'Você vai adorar',
+      title: 'Insights inteligentes',
       description:
-        'Experimente uma plataforma feita para facilitar sua vida financeira.',
+        'Receba recomendações automáticas baseadas no seu perfil financeiro.',
       icons: 'Heart',
     },
   ];

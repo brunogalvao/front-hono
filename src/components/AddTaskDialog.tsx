@@ -54,7 +54,7 @@ export function AddTaskDialog({
     ano: new Date().getFullYear(),
   });
 
-  // Hook para criar tarefa com invalidação automática do cache
+  // Hook para criar despesa com invalidação automática do cache
   const createTaskMutation = useCreateTask();
 
   // Atualiza o mês quando o mês selecionado na aba mudar
@@ -132,7 +132,7 @@ export function AddTaskDialog({
       onTaskCreated();
       resetForm();
     } catch (err) {
-      console.error('Erro ao criar tarefa:', err);
+      console.error('Erro ao criar despesa:', err);
     }
   };
 

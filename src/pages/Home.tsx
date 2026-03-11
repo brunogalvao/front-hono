@@ -8,8 +8,11 @@ import { AnimateIcon } from '@/components/animate-ui/icons/icon';
 import { LogIn } from '@/components/animate-ui/icons/log-in';
 import { GradientText } from '@/components/animate-ui/text/gradient';
 import { HighlightText } from '@/components/animate-ui/text/highlight';
+import CtaFinal from '@/components/CtaFinal';
 import DescriptionHome from '@/components/DescriptionHome';
 import Footer from '@/components/Footer';
+import HowItWorks from '@/components/HowItWorks';
+import StatsSection from '@/components/StatsSection';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -21,62 +24,55 @@ import { Separator } from '@/components/ui/separator';
 import { CARDS } from '@/data/cardsIntro';
 import { textoChamada } from '@/data/textoTitulo';
 import { motion } from 'framer-motion';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
+
+const ICONS = {
+  Clock7,
+  Bell,
+  Heart,
+  Cog,
+} as const;
 
 function Home() {
-  // icon
-  const ICONS = {
-    Clock7,
-    Bell,
-    Heart,
-    Cog,
-  } as const;
-
-  const navigate = useNavigate();
-
-  const goLogin = () => {
-    navigate({ to: '/login' });
-  };
-
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto flex flex-col gap-y-3 px-4 pb-8">
+      <div className="container mx-auto flex flex-col gap-y-8 px-4 pb-8">
+
+        {/* Navbar */}
         <div className="flex justify-end py-2">
-          <Button variant="link">
-            <AnimateIcon animateOnHover animation="default-loop">
-              <Link
-                to="/login"
-                onClick={(e) => {
-                  e.preventDefault();
-                  goLogin();
-                }}
-                className="flex items-center gap-3 rounded px-4 py-2 font-semibold text-white transition duration-300"
-              >
-                Login
+          <Button variant="link" asChild>
+            <Link to="/login" className="flex items-center gap-3 font-semibold">
+              Login
+              <AnimateIcon animateOnHover animation="default-loop">
                 <LogIn className="size-6" />
-              </Link>
-            </AnimateIcon>
+              </AnimateIcon>
+            </Link>
           </Button>
         </div>
 
         <Separator orientation="horizontal" />
 
+        {/* Hero */}
         <div className="flex min-h-[70vh] flex-col items-center gap-3 py-20 md:flex-row">
           <div className="flex w-full flex-col md:w-[60%]">
             <GradientText
-              className="mb-3 w-full text-8xl font-bold capitalize"
+              className="mb-3 w-full text-8xl font-bold"
               text={textoChamada[0].title}
             />
-            <p className="text-base text-gray-600">
+            <p className="text-muted-foreground text-base">
               {textoChamada[0].tituloHeader}
             </p>
           </div>
 
-          <p className="mt-8 w-full text-center text-base text-gray-600 md:w-[40%] md:ps-8 md:text-end">
+          <p className="mt-8 w-full text-center text-base text-muted-foreground md:w-[40%] md:ps-8 md:text-end">
             {textoChamada[0].textoHeader}
           </p>
         </div>
 
+        {/* Como funciona */}
+        <HowItWorks />
+
+        {/* Feature Cards */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <MotionHighlight hover className="rounded-2xl">
             {CARDS.map((card, idx) => {
@@ -88,7 +84,7 @@ function Home() {
                   key={card.title}
                   initial={{ x: isLeft ? '-50%' : '50%', opacity: 0 }}
                   whileInView={{ x: '0%', opacity: 1 }}
-                  viewport={{ once: false }}
+                  viewport={{ once: true }}
                   transition={{ duration: 1.5, ease: 'easeInOut' }}
                 >
                   <Card data-value={card.title} className="bg-transparent">
@@ -111,27 +107,28 @@ function Home() {
           </MotionHighlight>
         </div>
 
-        {/* Target */}
-        <div className="relative flex h-80 flex-col items-center justify-center gap-8 text-xl">
-          <StarsBackground className="absolute inset-0 z-0 flex items-center justify-center rounded-xl" />
+        {/* Stats */}
+        <StatsSection />
 
+        {/* CTA antigo — link simples no meio da página */}
+        <div className="relative flex h-48 flex-col items-center justify-center gap-8 text-xl">
+          <StarsBackground className="absolute inset-0 z-0 flex items-center justify-center rounded-xl" />
           <span className="z-10 font-bold">Conheça agora mesmo</span>
-          <span
-            className="z-10 flex cursor-pointer gap-3"
-            onClick={goLogin}
-            style={{ cursor: 'pointer' }}
-          >
+          <Link to="/login" className="z-10">
             <HighlightText
               text="Faça o login"
               transition={{ duration: 4, ease: 'easeInOut' }}
               inViewOnce
               className="cursor-pointer rounded-full px-16 py-2 font-bold duration-200 hover:underline"
             />
-          </span>
+          </Link>
         </div>
 
         {/* Description */}
         <DescriptionHome />
+
+        {/* CTA Final */}
+        <CtaFinal />
 
         <Footer />
       </div>

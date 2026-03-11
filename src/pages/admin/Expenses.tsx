@@ -53,7 +53,7 @@ function List() {
     ano: new Date().getFullYear(),
   });
 
-  // 🔄 Busca tarefas do mês ativo usando TanStack Query
+  // 🔄 Busca despesas do mês ativo usando TanStack Query
   const { data: tasksCurrentMonth = [], refetch } = useQuery({
     queryKey: queryKeys.tasks.list({
       month: parseInt(mesAtivo),
@@ -166,7 +166,7 @@ function List() {
                 <TooltipContent>
                   {tasksCurrentMonth.length > 0
                     ? 'Mude o status na tabela para somar os valores pagos.'
-                    : 'Nenhuma tarefa encontrada.'}
+                    : 'Nenhuma despesa encontrada.'}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -183,7 +183,7 @@ function List() {
         <TabsList className="gap-1">
           {MESES_LISTA.map((mes) => {
             const mesNumero = parseInt(mes.value);
-            const temTarefas = (tasksCountByMonth[mesNumero] || 0) > 0;
+            const temDespesas = (tasksCountByMonth[mesNumero] || 0) > 0;
 
             return (
               <TabsTrigger
@@ -191,7 +191,7 @@ function List() {
                 value={mes.value}
                 className="data-[state=active]:bg-primary gap-2"
               >
-                {temTarefas && <FaCheckCircle />}
+                {temDespesas && <FaCheckCircle />}
                 {mes.label}
               </TabsTrigger>
             );
@@ -222,7 +222,7 @@ function List() {
                 <Card>
                   <CardContent>
                     <p className="text-center text-sm text-zinc-500">
-                      Nenhum item encontrada para {mes.label}.
+                      Nenhuma despesa encontrada para {mes.label}.
                     </p>
                   </CardContent>
                 </Card>

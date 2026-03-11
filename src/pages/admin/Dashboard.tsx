@@ -1,10 +1,10 @@
 import TituloPage from '@/components/TituloPage';
 import { useIA } from '@/hooks/use-ia';
 import IARecommendations from '@/components/IARecommendations';
-import { GoDotFill } from 'react-icons/go';
+import FinancialChart from '@/components/FinancialChart';
+import { CheckCircle2 } from 'lucide-react';
 import { MdTipsAndUpdates } from 'react-icons/md';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
 import {
   DollarConversionSkeleton,
   StatusSkeleton,
@@ -12,16 +12,24 @@ import {
   TipsSkeleton,
 } from '@/components/SkeletonDashboard';
 
-const Dashboard = () => {
-  // Hook para buscar dados da IA simplificados
-  const { data: iaData, isLoading } = useIA();
+const MESES = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+];
 
-  // Mostrar skeleton quando está carregando OU quando não há dados
+const Dashboard = () => {
+  const { data: iaData, isLoading } = useIA();
   const shouldShowSkeleton = isLoading || !iaData?.data;
+
+  const now = new Date();
+  const subtitulo = `${MESES[now.getMonth()]} de ${now.getFullYear()}`;
 
   return (
     <div className="space-y-6">
-      <TituloPage titulo="Home" />
+      <TituloPage titulo="Visão Geral" subtitulo={subtitulo} />
+
+      {/* Gráfico de Visão Geral */}
+      <FinancialChart />
 
       {/* Dicas de Economia */}
       {shouldShowSkeleton ? (
@@ -37,12 +45,10 @@ const Dashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="grid grid-cols-2 gap-3">
+              <ul className="grid grid-cols-1 gap-2 md:grid-cols-2">
                 {iaData.data.dicasEconomia.map((dica, index) => (
-                  <li key={index} className="flex items-center gap-2">
-                    <span className="text-emerald-600">
-                      <GoDotFill />
-                    </span>
+                  <li key={index} className="flex items-start gap-2">
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-500" />
                     <span className="text-sm">{dica}</span>
                   </li>
                 ))}
@@ -60,7 +66,7 @@ const Dashboard = () => {
           <DollarConversionSkeleton />
         </div>
       ) : (
-        <IARecommendations />
+        <IARecommendations data={iaData!.data!} />
       )}
     </div>
   );

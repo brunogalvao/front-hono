@@ -1,10 +1,15 @@
 import { motion } from 'framer-motion';
 
-function TituloPage({ titulo }: { titulo: string }) {
+function TituloPage({ titulo, subtitulo }: { titulo: string; subtitulo?: string }) {
   return (
     <>
       <div className="flex flex-row justify-between">
-        <h1 className="text-2xl font-bold">{titulo}</h1>
+        <div>
+          <h1 className="text-2xl font-bold">{titulo}</h1>
+          {subtitulo && (
+            <p className="text-muted-foreground mt-0.5 text-sm">{subtitulo}</p>
+          )}
+        </div>
       </div>
       <motion.div
         style={{

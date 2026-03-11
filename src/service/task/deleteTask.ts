@@ -15,8 +15,8 @@ export const deleteTask = async (id: string) => {
   });
 
   if (!res.ok) {
-    console.error('Erro ao deletar tarefa', await res.text());
-    throw new Error('Erro ao deletar tarefa');
+    console.error('Erro ao deletar despesa', await res.text());
+    throw new Error('Erro ao deletar despesa');
   }
 
   return res.json();

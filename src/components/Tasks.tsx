@@ -13,7 +13,7 @@ import {
 } from './ui/table';
 import { Skeleton } from './ui/skeleton';
 
-// Componente Skeleton para a tabela de tarefas
+// Componente Skeleton para a tabela de despesas
 const TasksSkeleton = () => (
   <div className="space-y-4">
     <div className="flex justify-end">
@@ -57,7 +57,7 @@ function Tasks() {
       })
       .catch((err) => {
         console.error('Erro ao buscar tarefas:', err);
-        setError('Erro ao buscar tarefas.');
+        setError('Erro ao buscar despesas.');
       })
       .finally(() => setLoading(false));
   }, []);
@@ -67,7 +67,7 @@ function Tasks() {
 
   return (
     <Table>
-      <TableCaption className="text-end">{tasks.length} Tarefas</TableCaption>
+      <TableCaption className="text-end">{tasks.length} Despesas</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead className="w-[200px]" scope="col">

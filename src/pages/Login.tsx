@@ -8,6 +8,7 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -239,10 +240,9 @@ function Login() {
                     </div>
                     <div className="flex flex-col space-y-2">
                       <Label htmlFor="password">Senha</Label>
-                      <Input
+                      <PasswordInput
                         id="password"
                         name="password"
-                        type="password"
                         autoComplete="current-password"
                         required
                         placeholder="********"

@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 // import { Link } from "react-router-dom";
@@ -118,10 +119,9 @@ const RegisterUserForm = () => {
 
           <div className="flex flex-col space-y-2">
             <Label htmlFor="password">Senha</Label>
-            <Input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               placeholder="********"
               value={form.password}
               onChange={handleChange}
@@ -130,10 +130,9 @@ const RegisterUserForm = () => {
 
           <div className="flex flex-col space-y-2">
             <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-            <Input
+            <PasswordInput
               id="confirmPassword"
               name="confirmPassword"
-              type="password"
               placeholder="********"
               value={form.confirmPassword}
               onChange={handleChange}

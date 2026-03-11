@@ -1,13 +1,12 @@
 import { Separator } from './ui/separator';
-
 import img01 from '@/assets/tela-inicial.png';
 
 const DescriptionHome = () => {
   return (
-    <div className="my-8 grid items-center gap-3 md:grid-cols-[1fr_auto_1fr]">
-      <div className="flex w-full flex-col space-y-3 p-3 text-end">
+    <div className="my-8 grid items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
+      <div className="flex w-full flex-col space-y-3 p-3 text-start md:text-end">
         <h1 className="text-3xl font-bold">Bem-Vindo ao FinanceTask</h1>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Gerencie suas finanças de forma simples, rápida e inteligente. Aqui,
           você pode registrar receitas e despesas em poucos cliques, acompanhar
           seu saldo em tempo real e nunca mais esquecer um compromisso
@@ -20,7 +19,9 @@ const DescriptionHome = () => {
           financeira!
         </span>
       </div>
-      <Separator orientation="vertical" className="mx-4 h-12" />
+
+      <Separator orientation="vertical" className="mx-4 hidden h-32 md:block" />
+
       <div className="relative inline-block w-fit">
         <img className="rounded-2xl" src={img01} alt="FinanceTask" />
         <div
