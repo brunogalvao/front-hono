@@ -27,6 +27,8 @@ export default defineConfig({
     },
   },
   server: {
+    port: 5173,
+    strictPort: true, // falha em vez de mudar para outra porta
     open: true,
     proxy: {
       '/api': {
