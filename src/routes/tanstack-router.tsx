@@ -7,6 +7,7 @@ import {
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
 import Admin from '@/pages/Admin';
+import AuthCallback from '@/pages/AuthCallback';
 import Expenses from '@/pages/admin/Expenses';
 import Income from '@/pages/admin/Income';
 import EditUser from '@/pages/admin/EditUser';
@@ -73,6 +74,13 @@ const historyRoute = createRoute({
   component: History,
 });
 
+// Auth Callback Route
+const authCallbackRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/auth/callback',
+  component: AuthCallback,
+});
+
 // Catch-all route
 const catchAllRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -84,6 +92,7 @@ const catchAllRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   homeRoute,
   loginRoute,
+  authCallbackRoute,
   adminRoute.addChildren([
     editUserRoute,
     expensesRoute,
