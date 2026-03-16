@@ -25,4 +25,16 @@ export const CARDS: { title: string; description: string; icons: IconName }[] =
         'Receba recomendações automáticas baseadas no seu perfil financeiro.',
       icons: 'Heart',
     },
+    {
+      title: 'Alertas automáticos',
+      description:
+        'Seja avisado quando seus gastos ultrapassarem o planejado para o mês.',
+      icons: 'BellOff',
+    },
+    {
+      title: 'Sincronização em tempo real',
+      description:
+        'Seus dados sempre atualizados em qualquer dispositivo, sem precisar recarregar.',
+      icons: 'RefreshCcw',
+    },
   ];

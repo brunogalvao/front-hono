@@ -2,15 +2,35 @@ import { motion } from 'framer-motion';
 import { SlidingNumber } from '@/components/animate-ui/text/sliding-number';
 
 const stats = [
-  { value: 100, suffix: '%', label: 'Gratuito', description: 'Sem custos ocultos' },
-  { value: 12, suffix: '', label: 'Meses de histórico', description: 'Visão anual completa' },
-  { value: 3, suffix: 's', label: 'Para registrar', description: 'Receitas e despesas' },
-  { value: 1, suffix: '', label: 'Lugar só', description: 'Para tudo que é seu' },
+  {
+    value: 100,
+    suffix: '%',
+    label: 'Gratuito',
+    description: 'Sem custos ocultos',
+  },
+  {
+    value: 12,
+    suffix: '',
+    label: 'Meses de histórico',
+    description: 'Visão anual completa',
+  },
+  {
+    value: 3,
+    suffix: 's',
+    label: 'Para registrar',
+    description: 'Receitas e despesas',
+  },
+  {
+    value: 1,
+    suffix: '',
+    label: 'Lugar só',
+    description: 'Para tudo que é seu',
+  },
 ];
 
 const StatsSection = () => {
   return (
-    <section className="border-border rounded-2xl border py-12">
+    <section className="border-border w-full rounded-2xl border py-12">
       <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
         {stats.map((stat, idx) => (
           <motion.div

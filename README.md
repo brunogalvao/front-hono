@@ -55,6 +55,50 @@ Veja a documentação completa em [VERSION_SYSTEM.md](./VERSION_SYSTEM.md).
 
 ---
 
+## 🧪 Testes
+
+O projeto utiliza **Vitest** com **happy-dom** para testes unitários de utilitários e lógica da aplicação.
+
+### Stack de testes
+
+| Lib | Papel |
+|---|---|
+| `vitest` | Runner de testes, compatível com Vite |
+| `happy-dom` | Ambiente DOM rápido (substituto do jsdom) |
+| `@testing-library/react` | Renderização de componentes React |
+| `@testing-library/jest-dom` | Matchers extras (`toBeInTheDocument`, etc.) |
+
+### Comandos
+
+```bash
+# Modo watch (desenvolvimento)
+pnpm test
+
+# Execução única (CI / pré-deploy)
+pnpm test:run
+```
+
+### Estrutura
+
+```
+src/test/
+├── setup.ts              # Configuração global (@testing-library/jest-dom)
+└── utils/
+    ├── format.test.ts    # Testes de formatação de moeda (BRL / USD)
+    └── getInitials.test.ts # Testes de geração de iniciais do usuário
+```
+
+### Deploy na Vercel
+
+Os testes são executados automaticamente **antes do build**. Se algum teste falhar, o deploy é cancelado.
+
+```json
+// vercel.json
+"buildCommand": "pnpm run test:run && pnpm run build"
+```
+
+---
+
 # Comandos Docker do Supabase
 
 - **Start**: `supabase start`
