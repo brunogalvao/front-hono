@@ -66,3 +66,6 @@ OPTIMIZATION_SUMMARY.md
 CLEANUP_ANALYSIS.md
 CLEANUP_COMPLETE.md
 .env*.local
+
+*storybook.log
+storybook-static

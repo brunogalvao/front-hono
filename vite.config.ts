@@ -3,6 +3,13 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { copyFileSync, existsSync } from 'fs';
+import { fileURLToPath } from 'node:url';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import { playwright } from '@vitest/browser-playwright';
+const dirname =
+  typeof __dirname !== 'undefined'
+    ? __dirname
+    : path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   test: {
@@ -12,6 +19,30 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    projects: [
+      {
+        extends: true,
+        plugins: [
+          storybookTest({
+            configDir: path.join(dirname, '.storybook'),
+          }),
+        ],
+        test: {
+          name: 'storybook',
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({}),
+            instances: [
+              {
+                browser: 'chromium',
+              },
+            ],
+          },
+          setupFiles: ['.storybook/vitest.setup.ts'],
+        },
+      },
+    ],
   },
   plugins: [
     react(),
@@ -36,7 +67,8 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    strictPort: true, // falha em vez de mudar para outra porta
+    strictPort: true,
+    // falha em vez de mudar para outra porta
     open: true,
     proxy: {
       '/api': {
@@ -116,7 +148,6 @@ export default defineConfig({
           if (id.includes('/components/animate-ui/')) {
             return 'animate-ui';
           }
-
           return null;
         },
       },
