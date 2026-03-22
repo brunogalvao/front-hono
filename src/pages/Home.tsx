@@ -6,7 +6,7 @@ import { Cog } from '@/components/animate-ui/icons/cog';
 import { Heart } from '@/components/animate-ui/icons/heart';
 import { AnimateIcon } from '@/components/animate-ui/icons/icon';
 import { RefreshCcw } from '@/components/animate-ui/icons/refresh-ccw';
-import { GradientText } from '@/components/animate-ui/text/gradient';
+import { GsapHeroTitle } from '@/components/GsapHeroTitle';
 import { HighlightText } from '@/components/animate-ui/text/highlight';
 import CtaFinal from '@/components/CtaFinal';
 import DescriptionHome from '@/components/DescriptionHome';
@@ -88,7 +88,7 @@ function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden">
       <LandingNavbar />
 
       <div className="container mx-auto flex flex-col px-4 pb-8">
@@ -98,7 +98,7 @@ function Home() {
           className="flex min-h-[calc(100vh-56px)] flex-col justify-center gap-12 md:flex-row md:items-center"
         >
           <div className="flex w-full flex-col gap-4 md:w-[60%]">
-            <GradientText
+            <GsapHeroTitle
               className="w-full text-7xl font-bold md:text-8xl"
               text={textoChamada[0].title}
             />

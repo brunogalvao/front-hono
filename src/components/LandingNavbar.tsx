@@ -52,7 +52,7 @@ export function LandingNavbar() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 w-full transition-all duration-300',
+        'fixed top-0 z-50 w-full transition-all duration-300',
         scrolled
           ? 'bg-background/80 shadow-sm backdrop-blur-md'
           : 'bg-transparent'

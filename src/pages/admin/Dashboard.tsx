@@ -19,7 +19,7 @@ const MESES = [
 
 const Dashboard = () => {
   const { data: iaData, isLoading } = useIA();
-  const shouldShowSkeleton = isLoading || !iaData?.data;
+  const shouldShowSkeleton = isLoading;
 
   const now = new Date();
   const subtitulo = `${MESES[now.getMonth()]} de ${now.getFullYear()}`;
@@ -65,9 +65,9 @@ const Dashboard = () => {
           <SummarySkeleton />
           <DollarConversionSkeleton />
         </div>
-      ) : (
-        <IARecommendations data={iaData!.data!} />
-      )}
+      ) : iaData?.data ? (
+        <IARecommendations data={iaData.data} />
+      ) : null}
     </div>
   );
 };

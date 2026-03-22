@@ -50,7 +50,7 @@ function Income() {
   const deleteIncomeMutation = useDeleteIncome();
 
   // React Query gerencia os dados — sem useEffect manual
-  const { data: incomes = [], isLoading } = useQuery({
+  const { data: incomes = [], isLoading, isError } = useQuery({
     queryKey: queryKeys.incomes.list(),
     queryFn: getIncomes,
   });
@@ -204,6 +204,10 @@ function Income() {
         <CardContent>
           {isLoading ? (
             <IncomeListSkeleton />
+          ) : isError ? (
+            <p className="text-center text-sm text-red-500">
+              Erro ao carregar rendimentos. Verifique sua conexão e tente novamente.
+            </p>
           ) : incomes.length <= 0 ? (
             <TooltipProvider>
               <Tooltip>

@@ -38,7 +38,7 @@ import {
 import { FaCheckCircle } from 'react-icons/fa';
 import { useIA } from '@/hooks/use-ia';
 
-function List() {
+function Expenses() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -54,7 +54,12 @@ function List() {
   });
 
   // 🔄 Busca despesas do mês ativo usando TanStack Query
-  const { data: tasksCurrentMonth = [], refetch } = useQuery({
+  const {
+    data: tasksCurrentMonth = [],
+    refetch,
+    isFetching: isFetchingTasks,
+    isError: isErrorTasks,
+  } = useQuery({
     queryKey: queryKeys.tasks.list({
       month: parseInt(mesAtivo),
       year: form.ano,
@@ -140,7 +145,7 @@ function List() {
 
   return (
     <div className="space-y-6">
-      <TituloPage titulo="Despesas" />
+      <TituloPage titulo="Despesas" subtitulo="Gerencie suas despesas mensais" />
 
       {/* Valor total pago + botão adicionar */}
       <div className="flex flex-row items-center justify-between">
@@ -200,10 +205,18 @@ function List() {
         <TabsContents>
           {MESES_LISTA.map((mes) => (
             <TabsContent key={mes.value} value={mes.value}>
-              {isLoading && mes.value === mesAtivo ? (
+              {(isLoading || isFetchingTasks) && mes.value === mesAtivo ? (
                 <Card>
                   <CardContent>
                     <Loading />
+                  </CardContent>
+                </Card>
+              ) : isErrorTasks && mes.value === mesAtivo ? (
+                <Card>
+                  <CardContent>
+                    <p className="text-center text-sm text-red-500">
+                      Erro ao carregar despesas. Verifique sua conexão e tente novamente.
+                    </p>
                   </CardContent>
                 </Card>
               ) : mes.value === mesAtivo && tasksCurrentMonth.length > 0 ? (
@@ -235,4 +248,4 @@ function List() {
   );
 }
 
-export default List;
+export default Expenses;

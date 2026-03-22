@@ -105,8 +105,8 @@ export async function getIA(
         );
       }
     } catch (tasksError) {
-      console.error('❌ Erro ao buscar despesas:', tasksError);
-      throw new Error('Não foi possível buscar dados de despesas');
+      console.warn('⚠️ Erro ao buscar despesas, usando valores zerados:', tasksError);
+      // continua com despesasPagas = 0 e despesasPendentes = 0
     }
 
     // Buscar cotação do dólar em tempo real
@@ -156,17 +156,8 @@ export async function getIA(
     };
   } catch (error) {
     console.error('❌ Erro ao processar dados IA:', error);
-
-    // Retornar dados mock em caso de erro
-    if (
-      error instanceof TypeError &&
-      error.message.includes('Failed to fetch')
-    ) {
-      console.warn('⚠️ Erro de rede detectado, usando dados mock temporários');
-      return generateMockResponse(incomesData);
-    }
-
-    throw error;
+    console.warn('⚠️ Usando dados calculados com fallback');
+    return generateMockResponse(incomesData);
   }
 }
 

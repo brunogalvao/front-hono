@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/query-keys';
 import TituloPage from '@/components/TituloPage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getNomeMes } from '@/model/mes.enum';
@@ -200,37 +202,52 @@ function DespesasModal({ tasks, mes, ano, open, onClose }: DespesasModalProps) {
 function History() {
   const currentYear = new Date().getFullYear();
   const [ano, setAno] = useState(currentYear);
-  const [loading, setLoading] = useState(true);
-  const [summaries, setSummaries] = useState<MonthSummary[]>([]);
-  const [tasksByYear, setTasksByYear] = useState<Record<number, Task[]>>({});
   const [selectedMes, setSelectedMes] = useState<number | null>(null);
 
   const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const [incomes, tasks] = await Promise.all([
-          getIncomes(),
-          getTasksByYear(ano),
-        ]);
-        setTasksByYear(tasks);
-        setSummaries(buildSummaries(incomes, tasks, ano));
-      } catch (err) {
-        console.error('Erro ao carregar histórico:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const {
+    data: incomes = [],
+    isLoading: isLoadingIncomes,
+    isError: isErrorIncomes,
+  } = useQuery({
+    queryKey: queryKeys.incomes.list(),
+    queryFn: getIncomes,
+  });
 
-    load();
-  }, [ano]);
+  const {
+    data: tasksByYear = {},
+    isLoading: isLoadingTasks,
+    isError: isErrorTasks,
+  } = useQuery({
+    queryKey: queryKeys.tasks.byYear(ano),
+    queryFn: () => getTasksByYear(ano),
+  });
 
-  const totalRendimento = summaries.reduce((s, m) => s + m.rendimento, 0);
-  const totalDespesas = summaries.reduce((s, m) => s + m.totalDespesas, 0);
-  const totalPago = summaries.reduce((s, m) => s + m.pago, 0);
-  const totalPendente = summaries.reduce((s, m) => s + m.pendente, 0);
+  const loading = isLoadingIncomes || isLoadingTasks;
+  const isError = isErrorIncomes || isErrorTasks;
+
+  const summaries = useMemo(
+    () => buildSummaries(incomes, tasksByYear, ano),
+    [incomes, tasksByYear, ano],
+  );
+
+  const totalRendimento = useMemo(
+    () => summaries.reduce((s, m) => s + m.rendimento, 0),
+    [summaries],
+  );
+  const totalDespesas = useMemo(
+    () => summaries.reduce((s, m) => s + m.totalDespesas, 0),
+    [summaries],
+  );
+  const totalPago = useMemo(
+    () => summaries.reduce((s, m) => s + m.pago, 0),
+    [summaries],
+  );
+  const totalPendente = useMemo(
+    () => summaries.reduce((s, m) => s + m.pendente, 0),
+    [summaries],
+  );
   const totalSaldo = totalRendimento - totalDespesas;
 
   return (
@@ -253,6 +270,12 @@ function History() {
           </SelectContent>
         </Select>
       </div>
+
+      {isError && (
+        <p className="text-sm text-red-500">
+          Erro ao carregar dados. Verifique sua conexão e tente novamente.
+        </p>
+      )}
 
       {/* Cards de Resumo Anual */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">

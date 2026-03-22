@@ -6,12 +6,12 @@ import { useTasks } from './use-tasks';
 
 export function useIA() {
   // Buscar dados de rendimentos para incluir na query key
-  const { data: incomesData } = useIncomesByMonth();
+  const { data: incomesData, isLoading: isLoadingIncomes } = useIncomesByMonth();
 
   // Buscar dados de tarefas do mês atual
   const mesAtual = new Date().getMonth() + 1;
   const anoAtual = new Date().getFullYear();
-  const { data: tasksData } = useTasks(mesAtual, anoAtual);
+  const { data: tasksData, isLoading: isLoadingTasks } = useTasks(mesAtual, anoAtual);
 
   const queryClient = useQueryClient();
 
@@ -20,7 +20,7 @@ export function useIA() {
     queryFn: () => getIA(incomesData), // Passar dados de rendimentos
     staleTime: 1000 * 5, // 5 segundos para resposta mais rápida
     gcTime: 1000 * 60 * 1, // 1 minuto
-    enabled: !!incomesData && !!tasksData, // Só executa se tiver dados de rendimentos E tarefas
+    enabled: true,
     refetchOnWindowFocus: true, // Rebusca quando a janela ganha foco
     refetchOnMount: true, // Rebusca quando o componente monta
     refetchOnReconnect: true, // Rebusca quando reconecta à internet
@@ -42,6 +42,7 @@ export function useIA() {
 
   return {
     ...query,
+    isLoading: query.isLoading || isLoadingIncomes || isLoadingTasks,
     refetchIA,
   };
 }

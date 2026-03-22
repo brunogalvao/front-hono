@@ -10,6 +10,8 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.tasks.details(), id] as const,
     countByMonth: (year: number) =>
       [...queryKeys.tasks.all, 'count-by-month', year] as const,
+    byYear: (year: number) =>
+      [...queryKeys.tasks.all, 'by-year', year] as const,
   },
 
   // Incomes
