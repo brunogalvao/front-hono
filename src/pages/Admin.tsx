@@ -87,13 +87,13 @@ function Admin() {
 
           <Separator orientation="vertical" className="mr-2 h-4" />
           {/* sair */}
-          <div className="flex w-full items-center justify-end gap-2">
+          <div className="flex w-full items-center justify-end gap-4">
             <NotificationBell />
             <AnimateIcon animateOnHover>
               <RippleButton
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="w-40"
+                className="w-40 rounded-full px-6!"
               >
                 {isLoggingOut ? (
                   <>

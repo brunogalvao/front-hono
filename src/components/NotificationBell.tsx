@@ -6,6 +6,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -34,14 +39,23 @@ export function NotificationBell() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-accent">
-          <Bell className={cn('size-5', count > 0 ? 'text-amber-500' : 'text-muted-foreground')} />
-          {count > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-              {count > 9 ? '9+' : count}
-            </span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-accent">
+              <Bell className={cn('size-5', count > 0 ? 'text-amber-500' : 'text-muted-foreground')} />
+              {count > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {count > 9 ? '9+' : count}
+                </span>
+              )}
+            </button>
+          </TooltipTrigger>
+          {count === 0 && (
+            <TooltipContent side="bottom">
+              Nenhuma despesa pendente
+            </TooltipContent>
           )}
-        </button>
+        </Tooltip>
       </PopoverTrigger>
 
       <PopoverContent className="w-80 p-0" align="end">

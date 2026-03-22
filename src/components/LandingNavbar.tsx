@@ -88,7 +88,7 @@ export function LandingNavbar() {
             to="/login"
             className={cn(
               buttonVariants({ variant: 'default', size: 'sm' }),
-              'gap-2 rounded-full'
+              'gap-2 rounded-full px-6!'
             )}
           >
             Entrar
