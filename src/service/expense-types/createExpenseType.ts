@@ -1,10 +1,7 @@
-import { supabase } from '@/lib/supabase';
+import { getAuthToken } from '@/lib/supabase';
 
 export const createExpenseType = async (nome: string) => {
-  const session = (await supabase.auth.getSession()).data.session;
-  const token = session?.access_token;
-
-  if (!token) throw new Error('Usuário não autenticado.');
+  const token = await getAuthToken();
 
   const response = await fetch('/api/expense-types', {
     method: 'POST',

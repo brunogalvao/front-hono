@@ -2,10 +2,9 @@
 import { supabase } from '@/lib/supabase';
 
 export const getExpenseTypes = async (): Promise<{ name: string }[]> => {
-  const session = await supabase.auth.getSession();
-  const user_id = session.data.session?.user?.id;
-
-  if (!user_id) throw new Error('Usuário não autenticado.');
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError || !userData.user) throw new Error('Usuário não autenticado.');
+  const user_id = userData.user.id;
 
   const { data, error } = await supabase
     .from('tasks')

@@ -1,12 +1,9 @@
 import { API_BASE_URL } from '@/config/api';
-import { supabase } from '@/lib/supabase';
+import { getAuthToken } from '@/lib/supabase';
 
 // Soma total de despesas do usuário logado
 export const totalItems = async (): Promise<number> => {
-  const session = await supabase.auth.getSession();
-  const token = session.data.session?.access_token;
-
-  if (!token) throw new Error('Usuário não autenticado.');
+  const token = await getAuthToken();
 
   const res = await fetch(`${API_BASE_URL}/api/tasks/total`, {
     headers: {
@@ -25,10 +22,7 @@ export const totalItems = async (): Promise<number> => {
 
 // Soma total de preço das despesas do usuário logado
 export const totalPrice = async (): Promise<number> => {
-  const session = await supabase.auth.getSession();
-  const token = session.data.session?.access_token;
-
-  if (!token) throw new Error('Usuário não autenticado.');
+  const token = await getAuthToken();
 
   const res = await fetch(`${API_BASE_URL}/api/tasks/total-price`, {
     headers: {
@@ -47,10 +41,7 @@ export const totalPrice = async (): Promise<number> => {
 
 // Soma total de valores pagos (despesas com done = true) do usuário logado
 export const totalPaid = async (): Promise<number> => {
-  const session = await supabase.auth.getSession();
-  const token = session.data.session?.access_token;
-
-  if (!token) throw new Error('Usuário não autenticado.');
+  const token = await getAuthToken();
 
   const res = await fetch(`${API_BASE_URL}/api/tasks/total-paid`, {
     headers: {

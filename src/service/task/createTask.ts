@@ -1,12 +1,9 @@
 import { API_BASE_URL } from '@/config/api';
 import type { NewTask } from '@/model/tasks.model';
-import { supabase } from '@/lib/supabase';
+import { getAuthToken } from '@/lib/supabase';
 
 export async function createTask(task: NewTask): Promise<NewTask> {
-  const session = await supabase.auth.getSession();
-  const accessToken = session.data.session?.access_token;
-
-  if (!accessToken) throw new Error('Usuário não autenticado.');
+  const accessToken = await getAuthToken();
 
   const res = await fetch(`${API_BASE_URL}/api/tasks`, {
     method: 'POST',

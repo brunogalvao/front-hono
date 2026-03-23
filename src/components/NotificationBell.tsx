@@ -18,8 +18,18 @@ import { formatToBRL } from '@/utils/format';
 import { cn } from '@/lib/utils';
 
 const MESES = [
-  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
 ];
 
 export function NotificationBell() {
@@ -41,10 +51,15 @@ export function NotificationBell() {
       <PopoverTrigger asChild>
         <Tooltip>
           <TooltipTrigger asChild>
-            <button className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-accent">
-              <Bell className={cn('size-5', count > 0 ? 'text-amber-500' : 'text-muted-foreground')} />
+            <button className="hover:bg-accent relative flex h-9 w-9 items-center justify-center rounded-full transition-colors">
+              <Bell
+                className={cn(
+                  'size-5',
+                  count > 0 ? 'text-amber-500' : 'text-muted-foreground'
+                )}
+              />
               {count > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
                   {count > 9 ? '9+' : count}
                 </span>
               )}
@@ -86,11 +101,16 @@ export function NotificationBell() {
           <>
             <ul className="max-h-64 divide-y overflow-y-auto">
               {pendentes.map((task) => (
-                <li key={task.id} className="flex items-center justify-between px-4 py-3">
+                <li
+                  key={task.id}
+                  className="flex items-center justify-between px-4 py-3"
+                >
                   <div className="flex flex-col">
                     <span className="text-sm font-medium">{task.title}</span>
                     {task.type && (
-                      <span className="text-muted-foreground text-xs">{task.type}</span>
+                      <span className="text-muted-foreground text-xs">
+                        {task.type}
+                      </span>
                     )}
                   </div>
                   <span className="text-sm font-semibold text-amber-500">
@@ -103,7 +123,9 @@ export function NotificationBell() {
             <Separator />
 
             <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-muted-foreground text-xs">Total pendente</span>
+              <span className="text-muted-foreground text-xs">
+                Total pendente
+              </span>
               <span className="text-sm font-bold text-red-500">
                 {formatToBRL(totalPendente)}
               </span>

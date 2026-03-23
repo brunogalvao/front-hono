@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase, getAuthToken } from '@/lib/supabase';
 import { API_BASE_URL } from '@/config/api';
 import type { UserProfile } from '@/model/user.model';
 
@@ -22,14 +22,7 @@ export const getUser = async (): Promise<UserProfile> => {
 export const updateUser = async (
   data: UserProfile
 ): Promise<{ success: boolean; user: UserProfile }> => {
-  const { data: sessionData, error: sessionError } =
-    await supabase.auth.getSession();
-
-  const token = sessionData?.session?.access_token;
-
-  if (sessionError || !token) {
-    throw new Error('Token de autenticação não encontrado.');
-  }
+  const token = await getAuthToken();
 
   const res = await fetch(`${API_BASE_URL}/api/user`, {
     method: 'PATCH',

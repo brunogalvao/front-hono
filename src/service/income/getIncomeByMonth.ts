@@ -7,11 +7,6 @@ export interface IncomeByMonth {
 }
 
 export async function getIncomesByMonth(): Promise<Record<number, number>> {
-  const session = (await supabase.auth.getSession()).data.session;
-  const token = session?.access_token;
-
-  if (!token) throw new Error('Usuário não autenticado');
-
   try {
     // Tenta usar a API primeiro - busca todos os incomes e agrupa no frontend
     const incomes = await getIncomes();

@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { getAuthToken } from '@/lib/supabase';
 import { API_BASE_URL } from '@/config/api';
 
 export interface IASimplificada {
@@ -22,10 +22,7 @@ export interface IAResponse {
 export async function getIA(
   incomesData?: Record<number, number>
 ): Promise<IAResponse> {
-  const session = await supabase.auth.getSession();
-  const token = session.data.session?.access_token;
-
-  if (!token) throw new Error('Usuário não autenticado.');
+  const token = await getAuthToken();
 
   try {
     console.log('🔄 Fazendo requisição para análise de investimento...');

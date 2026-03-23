@@ -17,6 +17,7 @@ import { NotificationBell } from '@/components/NotificationBell';
 function Admin() {
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [sessionReady, setSessionReady] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -35,45 +36,39 @@ function Admin() {
   };
 
   useEffect(() => {
-    // const logToken = async () => {
-    //   const { data, error } = await supabase.auth.getSession();
-    //   if (error) {
-    //     console.error("❌ Erro ao obter sessão:", error);
-    //     return;
-    //   }
+    // onAuthStateChange dispara INITIAL_SESSION assim que a sessão é resolvida
+    // (inclusive após o code exchange do OAuth do GitHub via PKCE).
+    // Só então marcamos sessionReady=true e renderizamos o conteúdo protegido,
+    // evitando queries disparadas com token nulo.
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      const expiresAt = session?.expires_at ?? 0;
+      const secondsLeft = expiresAt - Math.floor(Date.now() / 1000);
+      console.log('[Admin] onAuthStateChange', event, { hasSession: !!session, secondsLeft });
 
-    //   const token = data.session?.access_token;
-    //   console.log("🔑 Access Token:");
-    //   console.log(token); // isso evita corte
-    // };
-
-    // logToken();
-
-    const checkUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
       if (!session) {
-        navigate({ to: '/login' });
-      } else {
-        console.log('Usuário autenticado:', session.user.email);
-      }
-    };
-
-    const setupAuthListener = () => {
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
-        if (!session) {
+        // Sem sessão: redireciona para login (exceto durante carregamento inicial)
+        if (event !== 'INITIAL_SESSION') {
           navigate({ to: '/login' });
         }
-      });
-      return subscription;
-    };
+        return;
+      }
 
-    checkUser();
-
-    const subscription = setupAuthListener();
+      if (
+        event === 'SIGNED_IN' ||
+        event === 'TOKEN_REFRESHED' ||
+        event === 'USER_UPDATED'
+      ) {
+        console.log('[Admin] sessionReady = true via', event);
+        setSessionReady(true);
+      } else if (event === 'INITIAL_SESSION') {
+        // Mostra o layout imediatamente, mas as queries aguardam no módulo supabase.ts
+        // até que TOKEN_REFRESHED confirme que o token foi validado pelo servidor.
+        console.log('[Admin] sessionReady = true via INITIAL_SESSION (layout visível, queries aguardam TOKEN_REFRESHED)');
+        setSessionReady(true);
+      }
+    });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
@@ -86,9 +81,8 @@ function Admin() {
           <SidebarTrigger className="-ml-1" />
 
           <Separator orientation="vertical" className="mr-2 h-4" />
-          {/* sair */}
           <div className="flex w-full items-center justify-end gap-4">
-            <NotificationBell />
+            {sessionReady && <NotificationBell />}
             <AnimateIcon animateOnHover>
               <RippleButton
                 onClick={handleLogout}
@@ -113,7 +107,7 @@ function Admin() {
         <div className="flex flex-1 flex-col gap-4 p-4">
           <div className="bg-muted/50 min-h-0 flex-1 overflow-auto rounded-xl px-8 py-6 md:min-h-min">
             <div className="h-full w-full">
-              <Outlet />
+              {sessionReady ? <Outlet /> : null}
             </div>
           </div>
         </div>
