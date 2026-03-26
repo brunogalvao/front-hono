@@ -1,35 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import { queryKeys } from '@/lib/query-keys';
 import { getTasksPendentes } from '@/service/task/getTasksPendentes';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Bell } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { formatToBRL } from '@/utils/format';
 import { cn } from '@/lib/utils';
 
 const MESES = [
-  'Janeiro',
-  'Fevereiro',
-  'Março',
-  'Abril',
-  'Maio',
-  'Junho',
-  'Julho',
-  'Agosto',
-  'Setembro',
-  'Outubro',
-  'Novembro',
-  'Dezembro',
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
 ];
 
 export function NotificationBell() {
@@ -40,99 +25,73 @@ export function NotificationBell() {
   const { data: pendentes = [] } = useQuery({
     queryKey: queryKeys.notifications.pending(month, year),
     queryFn: () => getTasksPendentes({ month, year }),
-    staleTime: 1000 * 60 * 5, // 5 min
+    staleTime: 1000 * 60 * 5,
   });
 
   const count = pendentes.length;
   const totalPendente = pendentes.reduce((acc, t) => acc + (t.price ?? 0), 0);
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button className="hover:bg-accent relative flex h-9 w-9 items-center justify-center rounded-full transition-colors">
-              <Bell
-                className={cn(
-                  'size-5',
-                  count > 0 ? 'text-amber-500' : 'text-muted-foreground'
-                )}
-              />
-              {count > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                  {count > 9 ? '9+' : count}
-                </span>
-              )}
-            </button>
-          </TooltipTrigger>
-          {count === 0 && (
-            <TooltipContent side="bottom">
-              Nenhuma despesa pendente
-            </TooltipContent>
-          )}
-        </Tooltip>
-      </PopoverTrigger>
-
-      <PopoverContent className="w-80 p-0" align="end">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div>
-            <p className="text-sm font-semibold">Despesas pendentes</p>
-            <p className="text-muted-foreground text-xs">
-              {MESES[month - 1]} {year}
-            </p>
-          </div>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Link
+          to="/admin/list"
+          className="hover:bg-accent relative flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+        >
+          <Bell
+            className={cn(
+              'size-5',
+              count > 0 ? 'text-amber-500' : 'text-muted-foreground'
+            )}
+          />
           {count > 0 && (
-            <Badge variant="destructive" className="text-xs">
-              {count} pendente{count > 1 ? 's' : ''}
-            </Badge>
+            <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+              {count > 9 ? '9+' : count}
+            </span>
           )}
-        </div>
+        </Link>
+      </TooltipTrigger>
 
-        <Separator />
-
+      <TooltipContent side="bottom" align="end" className="max-w-72 p-3">
         {count === 0 ? (
-          <div className="flex flex-col items-center gap-2 py-8 text-center">
-            <Bell className="text-muted-foreground size-8" />
-            <p className="text-muted-foreground text-sm">
-              Nenhuma despesa pendente este mês.
-            </p>
-          </div>
+          <p className="text-xs">Nenhuma despesa pendente</p>
         ) : (
-          <>
-            <ul className="max-h-64 divide-y overflow-y-auto">
+          <div className="min-w-56">
+            <div className="mb-2">
+              <p className="text-sm font-semibold">Despesas pendentes</p>
+              <p className="text-muted-foreground text-xs">
+                {MESES[month - 1]} {year}
+              </p>
+            </div>
+            <Separator className="mb-2" />
+            <ul className="space-y-2">
               {pendentes.map((task) => (
-                <li
-                  key={task.id}
-                  className="flex items-center justify-between px-4 py-3"
-                >
+                <li key={task.id} className="flex items-start justify-between gap-4">
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium">{task.title}</span>
+                    <span className="text-xs font-medium">{task.title}</span>
                     {task.type && (
-                      <span className="text-muted-foreground text-xs">
-                        {task.type}
-                      </span>
+                      <span className="text-muted-foreground text-[11px]">{task.type}</span>
                     )}
                   </div>
-                  <span className="text-sm font-semibold text-amber-500">
+                  <span className="shrink-0 text-xs font-semibold text-amber-400">
                     {task.price != null ? formatToBRL(task.price) : '—'}
                   </span>
                 </li>
               ))}
             </ul>
-
-            <Separator />
-
-            <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-muted-foreground text-xs">
-                Total pendente
-              </span>
-              <span className="text-sm font-bold text-red-500">
+            <Separator className="my-2" />
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground text-xs">Total pendente</span>
+              <span className="text-xs font-bold text-red-400">
                 {formatToBRL(totalPendente)}
               </span>
             </div>
-          </>
+            <p className="text-muted-foreground mt-2 text-center text-[11px]">
+              Clique para ver as despesas
+            </p>
+          </div>
         )}
-      </PopoverContent>
-    </Popover>
+      </TooltipContent>
+    </Tooltip>
   );
 }
