@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { queryKeys } from '@/lib/query-keys';
 import { getTasksPendentes } from '@/service/task/getTasksPendentes';
 import {
@@ -11,13 +11,11 @@ import { Bell } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { formatToBRL } from '@/utils/format';
 import { cn } from '@/lib/utils';
-
-const MESES = [
-  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
-];
+import type { Task } from '@/model/tasks.model';
+import { getNomeMes } from '@/model/mes.enum';
 
 export function NotificationBell() {
+  const navigate = useNavigate();
   const now = new Date();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
@@ -30,6 +28,11 @@ export function NotificationBell() {
 
   const count = pendentes.length;
   const totalPendente = pendentes.reduce((acc, t) => acc + (t.price ?? 0), 0);
+
+  const handleTaskClick = (task: Task) => {
+    sessionStorage.setItem('highlightTaskId', task.id);
+    navigate({ to: '/admin/list' });
+  };
 
   return (
     <Tooltip>
@@ -60,13 +63,17 @@ export function NotificationBell() {
             <div className="mb-2">
               <p className="text-sm font-semibold">Despesas pendentes</p>
               <p className="text-muted-foreground text-xs">
-                {MESES[month - 1]} {year}
+                {getNomeMes(month)} {year}
               </p>
             </div>
             <Separator className="mb-2" />
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {pendentes.map((task) => (
-                <li key={task.id} className="flex items-start justify-between gap-4">
+                <li
+                  key={task.id}
+                  onClick={() => handleTaskClick(task)}
+                  className="hover:bg-accent/20 flex cursor-pointer items-start justify-between gap-4 rounded px-1 py-1.5 transition-colors"
+                >
                   <div className="flex flex-col">
                     <span className="text-xs font-medium">{task.title}</span>
                     {task.type && (
@@ -87,7 +94,7 @@ export function NotificationBell() {
               </span>
             </div>
             <p className="text-muted-foreground mt-2 text-center text-[11px]">
-              Clique para ver as despesas
+              Clique em uma despesa para destacá-la
             </p>
           </div>
         )}

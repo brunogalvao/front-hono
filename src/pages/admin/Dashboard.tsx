@@ -11,18 +11,14 @@ import {
   SummarySkeleton,
   TipsSkeleton,
 } from '@/components/SkeletonDashboard';
-
-const MESES = [
-  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
-];
+import { getNomeMes } from '@/model/mes.enum';
+import { getCurrentMonth, getCurrentYear } from '@/utils/date';
 
 const Dashboard = () => {
   const { data: iaData, isLoading } = useIA();
   const shouldShowSkeleton = isLoading;
 
-  const now = new Date();
-  const subtitulo = `${MESES[now.getMonth()]} de ${now.getFullYear()}`;
+  const subtitulo = `${getNomeMes(getCurrentMonth())} de ${getCurrentYear()}`;
 
   return (
     <div className="space-y-6">

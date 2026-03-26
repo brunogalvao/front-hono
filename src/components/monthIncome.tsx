@@ -1,4 +1,5 @@
 import { MESES } from '@/model/mes.enum';
+import { formatToBRL } from '@/utils/format';
 import {
   Tooltip,
   TooltipContent,
@@ -19,12 +20,6 @@ export default function MonthIncome({
   total,
 }: MonthIncomeProps) {
   const { data: salariosPorMes = {}, error } = useIncomesByMonth(reloadTrigger);
-
-  const formatToBRL = (valor: number) =>
-    new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(valor);
 
   if (error) {
     console.error('Erro ao carregar salários por mês:', error);

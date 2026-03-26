@@ -22,16 +22,11 @@ export function useCreateTask() {
   return useMutation({
     mutationFn: createTask,
     onSuccess: (newTask, variables) => {
-      // Invalida todas as queries de despesas
-      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.lists() });
-
-      // Invalida também queries específicas de totais
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.totals.all });
-
-      // Invalida queries da IA para recalcular análises
       queryClient.invalidateQueries({ queryKey: queryKeys.ia.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
 
-      // Atualiza cache otimisticamente para o mês específico
       const month = variables.mes;
       const year = variables.ano;
       queryClient.setQueryData(
@@ -53,16 +48,11 @@ export function useEditTask() {
     mutationFn: ({ id, data }: { id: string; data: Partial<Task> }) =>
       editTask(id, data),
     onSuccess: (updatedTask, variables) => {
-      // Invalida todas as queries de despesas
-      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.lists() });
-
-      // Invalida também queries específicas de totais
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.totals.all });
-
-      // Invalida queries da IA para recalcular análises
       queryClient.invalidateQueries({ queryKey: queryKeys.ia.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
 
-      // Atualiza cache otimisticamente para o mês específico
       const month = variables.data.mes || updatedTask.mes;
       const year = variables.data.ano || updatedTask.ano;
 
@@ -88,14 +78,10 @@ export function useDeleteTask() {
   return useMutation({
     mutationFn: deleteTask,
     onSuccess: () => {
-      // Invalida todas as queries de despesas
-      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.lists() });
-
-      // Invalida também queries específicas de totais
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.totals.all });
-
-      // Invalida queries da IA para recalcular análises
       queryClient.invalidateQueries({ queryKey: queryKeys.ia.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
     },
   });
 }

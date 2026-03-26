@@ -13,6 +13,11 @@ export const MESES = {
   12: 'Dezembro',
 } as const;
 
+export const MESES_ABREV = [
+  'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+  'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez',
+] as const;
+
 export type MesNumero = keyof typeof MESES;
 
 export const MESES_LISTA = Object.entries(MESES).map(([value, label]) => ({

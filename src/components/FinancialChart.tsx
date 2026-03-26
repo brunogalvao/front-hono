@@ -14,8 +14,8 @@ import { formatToBRL } from '@/utils/format';
 import { TrendingUp } from 'lucide-react';
 import { useIncomesByMonth } from '@/hooks/use-incomes-by-month';
 import { useTasksByYear } from '@/hooks/use-tasks-by-year';
-
-const MESES_ABREV = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+import { MESES_ABREV } from '@/model/mes.enum';
+import { TASK_STATUS } from '@/model/tasks.model';
 
 const CustomTooltip = ({
   active,
@@ -69,10 +69,10 @@ const FinancialChart = () => {
 
     const tasks = tasksByYear?.[mes] ?? [];
     const pagas = tasks
-      .filter((t) => t.done === 'Pago' && t.price)
+      .filter((t) => t.done === TASK_STATUS.Pago && t.price)
       .reduce((sum, t) => sum + (Number(t.price) || 0), 0);
     const pendentes = tasks
-      .filter((t) => t.done === 'Pendente' && t.price)
+      .filter((t) => t.done === TASK_STATUS.Pendente && t.price)
       .reduce((sum, t) => sum + (Number(t.price) || 0), 0);
 
     const totalDespesas = pagas + pendentes;

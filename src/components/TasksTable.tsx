@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo, useMemo } from 'react';
+import { useState, useEffect, useCallback, memo, useMemo, useRef } from 'react';
 import type { Task, TaskStatus } from '@/model/tasks.model';
 import { TASK_STATUS } from '@/model/tasks.model';
 import { getExpenseTypes } from '@/service/expense-types/getExpenseTypes';
@@ -42,6 +42,7 @@ import StatusDropdown from './StatusDropdown';
 // icons
 import { Pencil, Trash, Loader } from 'lucide-react';
 import { formatToBRL } from '@/utils/format';
+import { cn } from '@/lib/utils';
 
 interface TaskTable {
   tasks: Task[];
@@ -106,6 +107,19 @@ export const TasksTable = memo(function TasksTable({
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
   });
+
+  const [highlightedTaskId] = useState<string | null>(() => {
+    const id = sessionStorage.getItem('highlightTaskId');
+    if (id) sessionStorage.removeItem('highlightTaskId');
+    return id;
+  });
+  const highlightRef = useRef<HTMLTableRowElement | null>(null);
+
+  useEffect(() => {
+    if (highlightRef.current) {
+      highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, []);
 
   // Hooks para edição e deleção com invalidação automática do cache
   const editTaskMutation = useEditTask();
@@ -257,12 +271,29 @@ export const TasksTable = memo(function TasksTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tasks.map((task) => (
-            <TableRow key={task.id}>
-              <TableCell className="font-medium">{task.title}</TableCell>
+          {tasks.map((task) => {
+            const isPendente = task.done === TASK_STATUS.Pendente;
+            const isHighlighted = task.id === highlightedTaskId;
+            return (
+            <TableRow
+              key={task.id}
+              ref={isHighlighted ? highlightRef : undefined}
+              className={cn(
+                isPendente && 'border-l-2 border-l-amber-500 bg-amber-500/5',
+                isHighlighted && 'ring-2 ring-amber-400 ring-inset bg-amber-500/15',
+              )}
+            >
+              <TableCell className="font-medium">
+                <div className="flex items-center gap-2">
+                  {isPendente && (
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-amber-500" />
+                  )}
+                  {task.title}
+                </div>
+              </TableCell>
               <TableCell>{task.type || 'Sem tipo'}</TableCell>
               <TableCell>
-                {task.price ? `R$ ${task.price.toFixed(2)}` : 'Sem preço'}
+                {task.price ? formatToBRL(task.price) : 'Sem preço'}
               </TableCell>
               <TableCell>
                 <StatusDropdown
@@ -295,7 +326,8 @@ export const TasksTable = memo(function TasksTable({
                 </div>
               </TableCell>
             </TableRow>
-          ))}
+            );
+          })}
         </TableBody>
       </Table>
 
