@@ -52,8 +52,6 @@ const RegisterUserForm = () => {
 
     setLoading(true);
 
-    localStorage.setItem('signup_name', form.name);
-
     const { data, error } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
