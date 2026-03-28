@@ -48,10 +48,7 @@ function Admin() {
       console.log('[Admin] onAuthStateChange', event, { hasSession: !!session, secondsLeft });
 
       if (!session) {
-        // Sem sessão: redireciona para login (exceto durante carregamento inicial)
-        if (event !== 'INITIAL_SESSION') {
-          navigate({ to: '/login' });
-        }
+        navigate({ to: '/login' });
         return;
       }
 

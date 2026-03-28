@@ -25,10 +25,10 @@ import {
   TabsTrigger,
 } from '@/components/animate-ui/radix/tabs';
 import RegisterUserForm from '@/components/RegisterUserForm';
+import { ForgotPassword } from '@/components/ForgotPassword';
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface FormData {
-  name: string;
   email: string;
   password: string;
 }
@@ -37,7 +37,6 @@ function Login() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>({
-    name: '',
     email: '',
     password: '',
   });
@@ -56,24 +55,12 @@ function Login() {
   const handleEmailLogin = async () => {
     try {
       setLoading(true);
-      const {
-        error,
-        data: { user },
-      } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
 
       if (error) throw error;
-
-      // ⚠️ Atualiza o displayName se estiver vazio
-      if (user && !user.user_metadata?.displayName) {
-        await supabase.auth.updateUser({
-          data: {
-            displayName: formData.name,
-          },
-        });
-      }
 
       navigate({ to: '/admin/dashboard' });
     } catch (err) {
@@ -239,7 +226,10 @@ function Login() {
                       />
                     </div>
                     <div className="flex flex-col space-y-2">
-                      <Label htmlFor="password">Senha</Label>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="password">Senha</Label>
+                        <ForgotPassword />
+                      </div>
                       <PasswordInput
                         id="password"
                         name="password"
