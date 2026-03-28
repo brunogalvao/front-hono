@@ -29,7 +29,6 @@ let _cachedSession: Session | null = null;
 // (SIGNED_IN ou TOKEN_REFRESHED) ou que não há sessão (SIGNED_OUT / INITIAL_SESSION sem sessão).
 // Isso evita usar um token expirado do localStorage enquanto o refresh ainda não completou.
 let _resolveReady!: () => void;
-let _readyResolvedBy = 'pending';
 const _sessionReady = new Promise<void>((resolve) => {
   _resolveReady = resolve;
 });
@@ -43,11 +42,9 @@ supabase.auth.onAuthStateChange((event, session) => {
     event === 'SIGNED_OUT' ||
     event === 'USER_UPDATED'
   ) {
-    _readyResolvedBy = event;
     _resolveReady();
   } else if (event === 'INITIAL_SESSION') {
     if (!session) {
-      _readyResolvedBy = 'INITIAL_SESSION(no session)';
       _resolveReady();
     } else {
       // Force a token refresh so the Supabase project is awake and the token
@@ -55,7 +52,6 @@ supabase.auth.onAuthStateChange((event, session) => {
       // TOKEN_REFRESHED (or SIGNED_OUT) will resolve _sessionReady.
       supabase.auth.refreshSession().catch(() => {
         // Network error or refresh token invalid — fall back to stored token.
-        _readyResolvedBy = 'INITIAL_SESSION(refresh-failed-fallback)';
         _resolveReady();
       });
     }
