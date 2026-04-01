@@ -18,6 +18,7 @@ import { Plus } from './animate-ui/icons/plus';
 import { getExpenseTypes } from '@/service/expense-types/getExpenseTypes';
 import { TypeSelector } from './TypeSelector';
 import { TASK_STATUS, type TaskStatus } from '@/model/tasks.model';
+import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -33,11 +34,13 @@ import { Loader } from 'lucide-react';
 interface AddTaskDialogProps {
   onTaskCreated: () => void;
   mesSelecionado?: number;
+  anoSelecionado?: number;
 }
 
 export function AddTaskDialog({
   onTaskCreated,
   mesSelecionado,
+  anoSelecionado,
 }: AddTaskDialogProps) {
   const [msg, setMsg] = useState('');
   const [allTypes, setAllTypes] = useState<string[]>([]);
@@ -51,18 +54,21 @@ export function AddTaskDialog({
     type: '',
     done: TASK_STATUS.Pendente as TaskStatus,
     mes: mesSelecionado ?? new Date().getMonth() + 1,
-    ano: new Date().getFullYear(),
+    ano: anoSelecionado ?? new Date().getFullYear(),
+    recorrente: false,
   });
 
   // Hook para criar despesa com invalidação automática do cache
   const createTaskMutation = useCreateTask();
 
-  // Atualiza o mês quando o mês selecionado na aba mudar
+  // Atualiza mês/ano quando as props mudarem
   useEffect(() => {
-    if (mesSelecionado) {
-      setForm((f) => ({ ...f, mes: mesSelecionado }));
-    }
-  }, [mesSelecionado]);
+    setForm((f) => ({
+      ...f,
+      mes: mesSelecionado ?? new Date().getMonth() + 1,
+      ano: anoSelecionado ?? new Date().getFullYear(),
+    }));
+  }, [mesSelecionado, anoSelecionado]);
 
   useEffect(() => {
     const fetchTypes = async () => {
@@ -85,7 +91,8 @@ export function AddTaskDialog({
       type: '',
       done: TASK_STATUS.Pendente,
       mes: mesSelecionado ?? new Date().getMonth() + 1,
-      ano: new Date().getFullYear(),
+      ano: anoSelecionado ?? new Date().getFullYear(),
+      recorrente: false,
     });
     setFormErrors({});
     setMsg('');
@@ -100,6 +107,7 @@ export function AddTaskDialog({
       type: form.type,
       mes: form.mes,
       ano: form.ano,
+      recorrente: form.recorrente,
     });
 
     if (!result.success) {
@@ -249,31 +257,55 @@ export function AddTaskDialog({
             </div>
           </div>
 
-          {/* Status e Tipo de Gasto - Em linha */}
+          {/* Status, Recorrência e Tipo de Gasto */}
           <div className="grid grid-cols-1 gap-4">
-            <div className="flex w-full flex-col space-y-2">
-              <Label className="text-base font-medium">Status</Label>
-              <Select
-                value={form.done}
-                onValueChange={(value) => setForm((prev) => ({ ...prev, done: value as TaskStatus }))}
-              >
-                <SelectTrigger className="!h-12 !w-full text-base">
-                  <SelectValue placeholder="Selecione o status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(TASK_STATUS).map(([key, label]) => (
-                    <SelectItem key={key} value={label}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex w-full flex-col space-y-2">
+                <Label className="text-base font-medium">Status</Label>
+                <Select
+                  value={form.done}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      done: value as TaskStatus,
+                      ...(value === TASK_STATUS.Fixo && { recorrente: true }),
+                    }))
+                  }
+                >
+                  <SelectTrigger className="!h-12 !w-full text-base">
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(TASK_STATUS).map(([key, label]) => (
+                      <SelectItem key={key} value={label}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-              {formErrors.done && (
-                <span className="text-destructive text-sm">
-                  {formErrors.done}
-                </span>
-              )}
+                {formErrors.done && (
+                  <span className="text-destructive text-sm">
+                    {formErrors.done}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex w-full flex-col space-y-2">
+                <Label className="text-base font-medium">Recorrência</Label>
+                <div className="border-input bg-background flex h-12 items-center gap-3 rounded-md border px-3">
+                  <Switch
+                    id="recorrente"
+                    checked={form.recorrente}
+                    onCheckedChange={(checked) =>
+                      setForm((prev) => ({ ...prev, recorrente: checked }))
+                    }
+                  />
+                  <Label htmlFor="recorrente" className="cursor-pointer text-sm font-normal">
+                    {form.recorrente ? 'Recorrente (todos os meses)' : 'Apenas este mês'}
+                  </Label>
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-col space-y-2">

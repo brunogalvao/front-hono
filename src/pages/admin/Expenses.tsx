@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 // components
 import { TasksTable } from '@/components/TasksTable';
 import { AddTaskDialog } from '@/components/AddTaskDialog';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import Loading from '@/components/Loading';
 import TituloPage from '@/components/TituloPage';
 import {
@@ -17,17 +17,16 @@ import {
 
 // model & utils
 import { MESES_LISTA } from '@/model/mes.enum';
+import { TASK_STATUS } from '@/model/tasks.model';
 import { formatToBRL } from '@/utils/format';
 
 // services
 import { getTasks } from '@/service/task/getTasks';
 import { getTasksCountByMonth } from '@/service/task/getTasksCountByMonth';
-import { totalPrice, totalItems } from '@/service/total';
-import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
 
 // icons
-import { BanknoteArrowUp, Loader } from 'lucide-react';
+import { BanknoteArrowUp, ChevronLeft, ChevronRight, RefreshCw, CircleCheck } from 'lucide-react';
 import {
   Tabs,
   TabsContent,
@@ -35,136 +34,77 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/animate-ui/radix/tabs';
-import { FaCheckCircle } from 'react-icons/fa';
-import { useIA } from '@/hooks/use-ia';
 
 function Expenses() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [total, setTotal] = useState(0);
-  const [price, setPrice] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const [mesAtivo, setMesAtivo] = useState(String(new Date().getMonth() + 1));
-  const { data: iaData, isLoading: isLoadingIA } = useIA();
+  const [anoAtivo, setAnoAtivo] = useState(new Date().getFullYear());
 
-  const [form] = useState({
-    mes: new Date().getMonth() + 1,
-    ano: new Date().getFullYear(),
-  });
-
-  // 🔄 Busca despesas do mês ativo usando TanStack Query
+  // 🔄 Busca despesas do mês ativo
   const {
     data: tasksCurrentMonth = [],
-    refetch,
     isFetching: isFetchingTasks,
     isError: isErrorTasks,
   } = useQuery({
     queryKey: queryKeys.tasks.list({
       month: parseInt(mesAtivo),
-      year: form.ano,
+      year: anoAtivo,
     }),
-    queryFn: () => getTasks({ month: parseInt(mesAtivo), year: form.ano }),
+    queryFn: () => getTasks({ month: parseInt(mesAtivo), year: anoAtivo }),
   });
 
-  // 🔄 Busca contagem de tasks por mês para mostrar ícone
-  const { data: tasksCountByMonth = {} } = useQuery({
-    queryKey: queryKeys.tasks.countByMonth(form.ano),
-    queryFn: () => getTasksCountByMonth(form.ano),
-    staleTime: 1000 * 60 * 5, // 5 minutos
+  // 🔄 Busca meta por mês (contagem + recorrente) para ícones nos tabs
+  const { data: monthsMeta } = useQuery({
+    queryKey: queryKeys.tasks.countByMonth(anoAtivo),
+    queryFn: () => getTasksCountByMonth(anoAtivo),
+    staleTime: 1000 * 60 * 5,
   });
 
-  // 🔄 Função para invalidar cache e recarregar dados
+  // 💰 Calcula total pago do mês ativo diretamente das tasks
+  const totalPago = tasksCurrentMonth
+    .filter((t) => t.done === TASK_STATUS.Pago && t.price)
+    .reduce((sum, t) => sum + Number(t.price), 0);
+
+  // 🔄 Invalida cache e recarrega após alteração
   const handleTasksChange = useCallback(async () => {
-    console.log('🔄 Invalidando cache e recarregando dados...');
-
-    // Invalida o cache do mês atual e da contagem por mês
     await Promise.all([
       queryClient.invalidateQueries({
         queryKey: queryKeys.tasks.list({
           month: parseInt(mesAtivo),
-          year: form.ano,
+          year: anoAtivo,
         }),
       }),
       queryClient.invalidateQueries({
-        queryKey: queryKeys.tasks.countByMonth(form.ano),
+        queryKey: queryKeys.tasks.countByMonth(anoAtivo),
       }),
     ]);
+  }, [queryClient, mesAtivo, anoAtivo]);
 
-    // Força o refetch dos dados
-    await refetch();
-
-    // Atualiza os totais
-    try {
-      const [totalResult, priceResult] = await Promise.all([
-        totalItems(),
-        totalPrice(),
-      ]);
-      setTotal(totalResult);
-      setPrice(priceResult);
-    } catch (err) {
-      console.error('Erro ao atualizar totais:', err);
-    }
-
-    console.log('✅ Cache invalidado e dados recarregados');
-  }, [queryClient, mesAtivo, form.ano, refetch]);
-
-  // 🔐 Verifica usuário e escuta logout
-  useEffect(() => {
-    const checkUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) navigate({ to: '/login' });
-    };
-
-    const subscription = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) navigate({ to: '/login' });
-    }).data.subscription;
-
-    checkUser();
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  // 📊 Busca totais uma vez
-  useEffect(() => {
-    const fetchTotals = async () => {
-      setIsLoading(true);
-      try {
-        const total = await totalPrice();
-        setPrice(total);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTotals();
-  }, []);
+  const prevYear = () => setAnoAtivo((y) => y - 1);
+  const nextYear = () =>
+    setAnoAtivo((y) => Math.min(y + 1, new Date().getFullYear() + 1));
 
   return (
     <div className="space-y-6">
       <TituloPage titulo="Despesas" subtitulo="Gerencie suas despesas mensais" />
 
-      {/* Valor total pago + botão adicionar */}
+      {/* Total pago + seletor de ano + botão adicionar */}
       <div className="flex flex-row items-center justify-between">
+        {/* Total pago do mês ativo */}
         <div className="flex items-center gap-3">
-          {isLoadingIA || iaData?.data?.rendimentoMes === undefined ? (
+          {isFetchingTasks ? (
+            <span className="text-muted-foreground text-sm">Carregando...</span>
+          ) : totalPago > 0 ? (
             <span className="flex items-center gap-2">
-              <Loader className="h-4 w-4 animate-spin" />
-              Carregando...
-            </span>
-          ) : iaData.data.rendimentoMes > 0 ? (
-            <span className="flex gap-2">
-              {formatToBRL(iaData.data.rendimentoMes)}
-              <BanknoteArrowUp />
+              {formatToBRL(totalPago)}
+              <BanknoteArrowUp className="h-4 w-4" />
             </span>
           ) : (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <p className="cursor-pointer text-sm text-zinc-500">
+                  <p className="text-muted-foreground cursor-pointer text-sm">
                     Sem Pagamento Efetuado
                   </p>
                 </TooltipTrigger>
@@ -178,34 +118,80 @@ function Expenses() {
           )}
         </div>
 
-        <AddTaskDialog
-          onTaskCreated={handleTasksChange}
-          mesSelecionado={parseInt(mesAtivo)}
-        />
+        <div className="flex items-center gap-3">
+          {/* Seletor de ano */}
+          <div className="border-border flex items-center gap-1 rounded-md border px-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={prevYear}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="w-12 text-center text-sm font-medium">{anoAtivo}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={nextYear}
+              disabled={anoAtivo >= new Date().getFullYear() + 1}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <AddTaskDialog
+            onTaskCreated={handleTasksChange}
+            mesSelecionado={parseInt(mesAtivo)}
+            anoSelecionado={anoAtivo}
+          />
+        </div>
       </div>
 
       <Tabs value={mesAtivo} onValueChange={setMesAtivo}>
         <TabsList className="gap-1">
           {MESES_LISTA.map((mes) => {
             const mesNumero = parseInt(mes.value);
-            const temDespesas = (tasksCountByMonth[mesNumero] || 0) > 0;
+            const temDespesas = (monthsMeta?.count?.[mesNumero] ?? 0) > 0;
+            const temRecorrente = monthsMeta?.hasRecorrente?.[mesNumero] ?? false;
+            const names = monthsMeta?.recorrenteNames?.[mesNumero] ?? [];
+
+            const icon = temRecorrente ? (
+              <RefreshCw className="h-3 w-3 shrink-0 text-blue-400" />
+            ) : temDespesas ? (
+              <CircleCheck className="h-3 w-3 shrink-0" />
+            ) : null;
 
             return (
-              <TabsTrigger
-                key={mes.value}
-                value={mes.value}
-                className="data-[state=active]:bg-primary gap-2"
-              >
-                {temDespesas && <FaCheckCircle />}
-                {mes.label}
-              </TabsTrigger>
+              <TooltipProvider key={mes.value}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger
+                      value={mes.value}
+                      className="data-[state=active]:bg-primary gap-1.5"
+                    >
+                      {icon}
+                      {mes.label}
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  {temRecorrente && names.length > 0 && (
+                    <TooltipContent>
+                      <p className="mb-1 text-xs font-semibold">Recorrentes:</p>
+                      {names.map((name) => (
+                        <p key={name} className="text-xs">• {name}</p>
+                      ))}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
             );
           })}
         </TabsList>
         <TabsContents>
           {MESES_LISTA.map((mes) => (
             <TabsContent key={mes.value} value={mes.value}>
-              {(isLoading || isFetchingTasks) && mes.value === mesAtivo ? (
+              {isFetchingTasks && mes.value === mesAtivo ? (
                 <Card>
                   <CardContent>
                     <Loading />
@@ -215,7 +201,8 @@ function Expenses() {
                 <Card>
                   <CardContent>
                     <p className="text-center text-sm text-red-500">
-                      Erro ao carregar despesas. Verifique sua conexão e tente novamente.
+                      Erro ao carregar despesas. Verifique sua conexão e tente
+                      novamente.
                     </p>
                   </CardContent>
                 </Card>
@@ -224,17 +211,16 @@ function Expenses() {
                   <CardContent>
                     <TasksTable
                       tasks={tasksCurrentMonth}
-                      total={total}
-                      totalPrice={price}
+                      total={tasksCurrentMonth.length}
+                      totalPrice={totalPago}
                       onTasksChange={handleTasksChange}
-                      isLoading={isLoading}
                     />
                   </CardContent>
                 </Card>
               ) : (
                 <Card>
                   <CardContent>
-                    <p className="text-center text-sm text-zinc-500">
+                    <p className="text-muted-foreground text-center text-sm">
                       Nenhuma despesa encontrada para {mes.label}.
                     </p>
                   </CardContent>

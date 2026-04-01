@@ -1,7 +1,7 @@
-// Status como objeto
 export const TASK_STATUS = {
   Pago: 'Pago',
   Pendente: 'Pendente',
+  Fixo: 'Fixo',
 } as const;
 
 export type TaskStatus = (typeof TASK_STATUS)[keyof typeof TASK_STATUS];
@@ -19,6 +19,8 @@ export type Task = {
   type?: string;
   mes: number;
   ano: number;
+  fixo_source_id?: string | null;
+  recorrente?: boolean;
 };
 
 export type TaskTable = {

@@ -74,6 +74,9 @@ const FinancialChart = () => {
     const pendentes = tasks
       .filter((t) => t.done === TASK_STATUS.Pendente && t.price)
       .reduce((sum, t) => sum + (Number(t.price) || 0), 0);
+    const recorrentes = tasks
+      .filter((t) => (t.recorrente || t.fixo_source_id) && t.price)
+      .reduce((sum, t) => sum + (Number(t.price) || 0), 0);
 
     const totalDespesas = pagas + pendentes;
     const disponivel = Math.max(0, rendimento - totalDespesas);
@@ -83,6 +86,7 @@ const FinancialChart = () => {
       Rendimento: rendimento,
       Despesas: pagas,
       Pendentes: pendentes,
+      Recorrente: recorrentes,
       Disponível: disponivel,
     };
   });
@@ -90,13 +94,13 @@ const FinancialChart = () => {
   // Exibe até o último mês que tem algum dado (income, despesa paga ou pendente)
   const lastMonthWithData = allMonthsData.reduce(
     (last, d, i) =>
-      d.Rendimento > 0 || d.Despesas > 0 || d.Pendentes > 0 ? i : last,
+      d.Rendimento > 0 || d.Despesas > 0 || d.Pendentes > 0 || d.Recorrente > 0 ? i : last,
     mesAtual - 1
   );
   const chartData = allMonthsData.slice(0, lastMonthWithData + 1);
 
   const hasData = chartData.some(
-    (d) => d.Rendimento > 0 || d.Despesas > 0 || d.Pendentes > 0
+    (d) => d.Rendimento > 0 || d.Despesas > 0 || d.Pendentes > 0 || d.Recorrente > 0
   );
   if (!hasData) return null;
 
@@ -128,6 +132,10 @@ const FinancialChart = () => {
                 <linearGradient id="gradDisponivel" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="gradRecorrente" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -182,6 +190,16 @@ const FinancialChart = () => {
                 strokeWidth={2}
                 strokeDasharray="5 3"
                 fill="url(#gradPendentes)"
+                dot={false}
+                activeDot={{ r: 4, strokeWidth: 0 }}
+              />
+              <Area
+                type="monotone"
+                dataKey="Recorrente"
+                stroke="#8b5cf6"
+                strokeWidth={2}
+                strokeDasharray="4 2"
+                fill="url(#gradRecorrente)"
                 dot={false}
                 activeDot={{ r: 4, strokeWidth: 0 }}
               />

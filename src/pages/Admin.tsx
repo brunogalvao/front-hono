@@ -36,33 +36,22 @@ function Admin() {
   };
 
   useEffect(() => {
-    // onAuthStateChange dispara INITIAL_SESSION assim que a sessão é resolvida
-    // (inclusive após o code exchange do OAuth do GitHub via PKCE).
-    // Só então marcamos sessionReady=true e renderizamos o conteúdo protegido,
-    // evitando queries disparadas com token nulo.
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      const expiresAt = session?.expires_at ?? 0;
-      const secondsLeft = expiresAt - Math.floor(Date.now() / 1000);
-      console.log('[Admin] onAuthStateChange', event, { hasSession: !!session, secondsLeft });
-
       if (!session) {
-        navigate({ to: '/login' });
+        if (event !== 'INITIAL_SESSION') {
+          navigate({ to: '/login' });
+        }
         return;
       }
 
       if (
         event === 'SIGNED_IN' ||
         event === 'TOKEN_REFRESHED' ||
-        event === 'USER_UPDATED'
+        event === 'USER_UPDATED' ||
+        event === 'INITIAL_SESSION'
       ) {
-        console.log('[Admin] sessionReady = true via', event);
-        setSessionReady(true);
-      } else if (event === 'INITIAL_SESSION') {
-        // Mostra o layout imediatamente, mas as queries aguardam no módulo supabase.ts
-        // até que TOKEN_REFRESHED confirme que o token foi validado pelo servidor.
-        console.log('[Admin] sessionReady = true via INITIAL_SESSION (layout visível, queries aguardam TOKEN_REFRESHED)');
         setSessionReady(true);
       }
     });

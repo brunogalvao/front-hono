@@ -5,10 +5,10 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import {
+  TASK_STATUS,
   TASK_STATUS_LIST,
   type TaskStatus,
   type Task,
-  TASK_STATUS,
 } from '@/model/tasks.model';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
@@ -65,7 +65,13 @@ function StatusDropdown({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Badge
-          variant={localStatus === TASK_STATUS.Pago ? 'outline' : 'default'}
+          variant={
+            localStatus === TASK_STATUS.Pago
+              ? 'outline'
+              : localStatus === TASK_STATUS.Fixo
+                ? 'secondary'
+                : 'default'
+          }
           className="flex cursor-pointer items-center gap-1"
         >
           {editTaskMutation.isPending ? (

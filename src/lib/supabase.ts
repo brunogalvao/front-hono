@@ -4,10 +4,6 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Supabase Configuration:', {
-    url: supabaseUrl ? 'Defined' : 'Missing',
-    anonKey: supabaseAnonKey ? 'Defined' : 'Missing',
-  });
   throw new Error(`Missing Supabase configuration. Please check your .env file and ensure it contains:
   VITE_SUPABASE_URL=your-project-url
   VITE_SUPABASE_ANON_KEY=your-anon-key`);
@@ -27,7 +23,6 @@ let _cachedSession: Session | null = null;
 
 // Promise que resolve SOMENTE quando temos certeza que a sessão é válida
 // (SIGNED_IN ou TOKEN_REFRESHED) ou que não há sessão (SIGNED_OUT / INITIAL_SESSION sem sessão).
-// Isso evita usar um token expirado do localStorage enquanto o refresh ainda não completou.
 let _resolveReady!: () => void;
 const _sessionReady = new Promise<void>((resolve) => {
   _resolveReady = resolve;

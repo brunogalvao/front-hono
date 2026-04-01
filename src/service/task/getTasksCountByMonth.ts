@@ -1,14 +1,20 @@
 import { API_BASE_URL } from '@/config/api';
 import { getAuthToken } from '@/lib/supabase';
+import type { Task } from '@/model/tasks.model';
 
 export type TasksCountByMonth = Record<number, number>;
 
+export type TasksMonthMeta = {
+  count: TasksCountByMonth;
+  hasRecorrente: Record<number, boolean>;
+  recorrenteNames: Record<number, string[]>;
+};
+
 export const getTasksCountByMonth = async (
   year: number
-): Promise<TasksCountByMonth> => {
+): Promise<TasksMonthMeta> => {
   const accessToken = await getAuthToken();
 
-  // Busca tasks de todos os meses do ano em paralelo
   const promises = Array.from({ length: 12 }, (_, i) => {
     const month = i + 1;
     const url = new URL(`${API_BASE_URL}/api/tasks`);
@@ -16,20 +22,29 @@ export const getTasksCountByMonth = async (
     url.searchParams.append('year', String(year));
 
     return fetch(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      headers: { Authorization: `Bearer ${accessToken}` },
     }).then((res) => (res.ok ? res.json() : []));
   });
 
   const results = await Promise.all(promises);
 
-  // Retorna objeto com contagem por mês
-  const countByMonth: TasksCountByMonth = {};
-  results.forEach((tasks, index) => {
+  const count: TasksCountByMonth = {};
+  const hasRecorrente: Record<number, boolean> = {};
+  const recorrenteNames: Record<number, string[]> = {};
+
+  results.forEach((tasks: Task[], index) => {
     const month = index + 1;
-    countByMonth[month] = Array.isArray(tasks) ? tasks.length : 0;
+    count[month] = Array.isArray(tasks) ? tasks.length : 0;
+
+    const recorrentes = Array.isArray(tasks)
+      ? tasks.filter((t) => t.recorrente === true || !!t.fixo_source_id)
+      : [];
+
+    hasRecorrente[month] = recorrentes.length > 0;
+    recorrenteNames[month] = [
+      ...new Set(recorrentes.map((t) => t.title)),
+    ];
   });
 
-  return countByMonth;
+  return { count, hasRecorrente, recorrenteNames };
 };

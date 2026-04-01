@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, memo, useMemo, useRef } from 'react';
 import type { Task, TaskStatus } from '@/model/tasks.model';
 import { TASK_STATUS } from '@/model/tasks.model';
+import { Switch } from '@/components/ui/switch';
 import { getExpenseTypes } from '@/service/expense-types/getExpenseTypes';
 import { z } from 'zod';
 import { taskSchema } from '@/schema/taskSchema';
@@ -40,7 +41,7 @@ import { TypeSelector } from './TypeSelector';
 import StatusDropdown from './StatusDropdown';
 
 // icons
-import { Pencil, Trash, Loader } from 'lucide-react';
+import { Pencil, Trash, Loader, RefreshCw } from 'lucide-react';
 import { formatToBRL } from '@/utils/format';
 import { cn } from '@/lib/utils';
 
@@ -106,6 +107,7 @@ export const TasksTable = memo(function TasksTable({
     type: '',
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
+    recorrente: false,
   });
 
   const [highlightedTaskId] = useState<string | null>(() => {
@@ -134,6 +136,7 @@ export const TasksTable = memo(function TasksTable({
       done: task.done,
       mes: task.mes,
       ano: task.ano,
+      recorrente: task.recorrente ?? false,
     });
     setDialogOpen(true);
   }, []);
@@ -150,6 +153,7 @@ export const TasksTable = memo(function TasksTable({
             type: editForm.type,
             mes: editForm.mes,
             ano: editForm.ano,
+            recorrente: editForm.recorrente,
           },
         });
         console.log('🟢 Editado com sucesso');
@@ -273,20 +277,26 @@ export const TasksTable = memo(function TasksTable({
         <TableBody>
           {tasks.map((task) => {
             const isPendente = task.done === TASK_STATUS.Pendente;
+            const isRecorrente = task.recorrente === true;
+            const isRecurringCopy = !!task.fixo_source_id;
             const isHighlighted = task.id === highlightedTaskId;
             return (
             <TableRow
               key={task.id}
               ref={isHighlighted ? highlightRef : undefined}
               className={cn(
-                isPendente && 'border-l-2 border-l-amber-500 bg-amber-500/5',
+                isPendente && !isRecorrente && !isRecurringCopy && 'border-l-2 border-l-amber-500 bg-amber-500/5',
+                (isRecorrente || isRecurringCopy) && 'border-l-2 border-l-blue-400 bg-blue-500/5',
                 isHighlighted && 'ring-2 ring-amber-400 ring-inset bg-amber-500/15',
               )}
             >
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
-                  {isPendente && (
+                  {isPendente && !isRecorrente && !isRecurringCopy && (
                     <span className="h-2 w-2 shrink-0 rounded-full bg-amber-500" />
+                  )}
+                  {(isRecorrente || isRecurringCopy) && (
+                    <RefreshCw className="h-3 w-3 shrink-0 text-blue-400" />
                   )}
                   {task.title}
                 </div>
@@ -342,6 +352,12 @@ export const TasksTable = memo(function TasksTable({
           </DialogHeader>
           <DialogDescription className="pb-4" id="edit-task-description">
             Edite os detalhes da despesa selecionada.
+            {editingTask?.fixo_source_id && (
+              <span className="mt-1 flex items-center gap-1.5 text-blue-400">
+                <RefreshCw className="h-3 w-3" />
+                Despesa recorrente — alterações se aplicam apenas a este mês.
+              </span>
+            )}
           </DialogDescription>
           <div className="flex flex-col space-y-6">
             {/* Título - Largura total */}
@@ -377,14 +393,31 @@ export const TasksTable = memo(function TasksTable({
                     <SelectValue placeholder="Selecione o status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={TASK_STATUS.Pendente}>
-                      Pendente
-                    </SelectItem>
+                    <SelectItem value={TASK_STATUS.Pendente}>Pendente</SelectItem>
                     <SelectItem value={TASK_STATUS.Pago}>Pago</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
+
+            {/* Recorrência */}
+            {!editingTask?.fixo_source_id && (
+              <div className="flex flex-col space-y-2">
+                <Label className="text-base font-medium">Recorrência</Label>
+                <div className="border-input bg-background flex h-12 items-center gap-3 rounded-md border px-3">
+                  <Switch
+                    id="edit-recorrente"
+                    checked={editForm.recorrente}
+                    onCheckedChange={(checked) =>
+                      setEditForm((prev) => ({ ...prev, recorrente: checked }))
+                    }
+                  />
+                  <Label htmlFor="edit-recorrente" className="cursor-pointer text-sm font-normal">
+                    {editForm.recorrente ? 'Recorrente (todos os meses)' : 'Apenas este mês'}
+                  </Label>
+                </div>
+              </div>
+            )}
 
             {/* Tipo de Gasto - Largura total */}
             <div className="flex flex-col space-y-2">
