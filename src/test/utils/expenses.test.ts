@@ -169,6 +169,7 @@ describe('acesso seguro a TasksMonthMeta (?.[])', () => {
     const meta: TasksMonthMeta = {
       count: { 3: 5 },
       hasRecorrente: { 3: true },
+      recorrenteNames: { 3: ['Aluguel'] },
     };
     expect(getCountSafe(meta, 3)).toBe(5);
     expect(getRecorrenteSafe(meta, 3)).toBe(true);
@@ -178,6 +179,7 @@ describe('acesso seguro a TasksMonthMeta (?.[])', () => {
     const meta: TasksMonthMeta = {
       count: {},
       hasRecorrente: {},
+      recorrenteNames: {},
     };
     expect(getCountSafe(meta, 7)).toBe(0);
     expect(getRecorrenteSafe(meta, 7)).toBe(false);

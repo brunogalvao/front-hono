@@ -166,7 +166,7 @@ function Expenses() {
             return (
               <TooltipProvider key={mes.value}>
                 <Tooltip>
-                  <TooltipTrigger asChild>
+                  <TooltipTrigger>
                     <TabsTrigger
                       value={mes.value}
                       className="data-[state=active]:bg-primary gap-1.5"
