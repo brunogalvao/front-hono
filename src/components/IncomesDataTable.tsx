@@ -38,7 +38,7 @@ import { getNomeMes } from '@/model/mes.enum';
 import { Pencil, Trash } from 'lucide-react';
 import { DialogConfirmDelete } from './DialogConfirmDelete';
 
-export type Income = IncomeItem & {
+type Income = IncomeItem & {
   onEdit?: (income: IncomeItem) => void;
   onDelete?: (id: string) => void;
 };
@@ -99,7 +99,7 @@ const IncomesDataTableSkeleton = () => (
   </div>
 );
 
-export const columns: ColumnDef<Income>[] = [
+const columns: ColumnDef<Income>[] = [
   {
     accessorKey: 'descricao',
     header: ({ column }) => {

@@ -6,7 +6,8 @@ import {
 } from '@/components/ui/sidebar';
 import { Link, useLocation } from '@tanstack/react-router';
 import { FaListAlt, FaUserCog, FaHome, FaHistory } from 'react-icons/fa';
-import { MdPaid } from 'react-icons/md';
+import { MdPaid, MdCreditCard } from 'react-icons/md';
+import { Sparkles } from 'lucide-react';
 
 // Define os ícones disponíveis e o tipo aceito
 const iconMap: Record<string, React.ElementType> = {
@@ -15,6 +16,8 @@ const iconMap: Record<string, React.ElementType> = {
   user: FaUserCog,
   dashboard: FaHome,
   history: FaHistory,
+  parcelas: MdCreditCard,
+  advisor: Sparkles,
 };
 
 type IconKey = keyof typeof iconMap;

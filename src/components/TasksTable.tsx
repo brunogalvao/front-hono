@@ -26,6 +26,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from './ui/dialog';
@@ -99,6 +100,7 @@ export const TasksTable = memo(function TasksTable({
 }: TaskTable) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteConfirmTask, setDeleteConfirmTask] = useState<Task | null>(null);
   const [allTypes, setAllTypes] = useState<string[]>([]);
   const [editForm, setEditForm] = useState({
     title: '',
@@ -108,6 +110,7 @@ export const TasksTable = memo(function TasksTable({
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
     recorrente: false,
+    fixo_source_id: null as string | null | undefined,
   });
 
   const [highlightedTaskId] = useState<string | null>(() => {
@@ -119,7 +122,10 @@ export const TasksTable = memo(function TasksTable({
 
   useEffect(() => {
     if (highlightRef.current) {
-      highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      highlightRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
     }
   }, []);
 
@@ -131,12 +137,16 @@ export const TasksTable = memo(function TasksTable({
     setEditingTask(task);
     setEditForm({
       title: task.title ?? '',
-      price: task.price !== null && task.price !== undefined ? task.price.toString() : '',
+      price:
+        task.price !== null && task.price !== undefined
+          ? task.price.toString()
+          : '',
       type: task.type ?? '',
       done: task.done,
       mes: task.mes,
       ano: task.ano,
       recorrente: task.recorrente ?? false,
+      fixo_source_id: task.fixo_source_id,
     });
     setDialogOpen(true);
   }, []);
@@ -154,6 +164,9 @@ export const TasksTable = memo(function TasksTable({
             mes: editForm.mes,
             ano: editForm.ano,
             recorrente: editForm.recorrente,
+            ...(editForm.fixo_source_id !== editingTask.fixo_source_id && {
+              fixo_source_id: editForm.fixo_source_id,
+            }),
           },
         });
         console.log('🟢 Editado com sucesso');
@@ -166,22 +179,14 @@ export const TasksTable = memo(function TasksTable({
         console.error('❌ Erro ao editar:', err);
       }
     }
-  }, [
-    editingTask,
-    editForm,
-    onTasksChange,
-    editTaskMutation,
-  ]);
+  }, [editingTask, editForm, onTasksChange, editTaskMutation]);
 
   const handleDelete = useCallback(
-    async (id: string) => {
+    async (id: string, cancelAll: boolean) => {
       try {
-        await deleteTaskMutation.mutateAsync(id);
-
-        // Atualiza a tabela
+        await deleteTaskMutation.mutateAsync({ id, cancelAll });
+        setDeleteConfirmTask(null);
         onTasksChange();
-
-        // Atualiza a lista de tipos
         const types = await getExpenseTypes();
         setAllTypes(types.map((t) => t.name));
       } catch (err) {
@@ -189,6 +194,17 @@ export const TasksTable = memo(function TasksTable({
       }
     },
     [onTasksChange, deleteTaskMutation]
+  );
+
+  const handleDeleteClick = useCallback(
+    (task: Task) => {
+      if (task.parcela_group_id) {
+        setDeleteConfirmTask(task);
+      } else {
+        handleDelete(task.id, false);
+      }
+    },
+    [handleDelete]
   );
 
   useEffect(() => {
@@ -265,7 +281,7 @@ export const TasksTable = memo(function TasksTable({
         </TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[200px]" scope="col">
+            <TableHead className="w-50" scope="col">
               Título
             </TableHead>
             <TableHead scope="col">Tipo</TableHead>
@@ -281,61 +297,73 @@ export const TasksTable = memo(function TasksTable({
             const isRecurringCopy = !!task.fixo_source_id;
             const isHighlighted = task.id === highlightedTaskId;
             return (
-            <TableRow
-              key={task.id}
-              ref={isHighlighted ? highlightRef : undefined}
-              className={cn(
-                isPendente && !isRecorrente && !isRecurringCopy && 'border-l-2 border-l-amber-500 bg-amber-500/5',
-                (isRecorrente || isRecurringCopy) && 'border-l-2 border-l-blue-400 bg-blue-500/5',
-                isHighlighted && 'ring-2 ring-amber-400 ring-inset bg-amber-500/15',
-              )}
-            >
-              <TableCell className="font-medium">
-                <div className="flex items-center gap-2">
-                  {isPendente && !isRecorrente && !isRecurringCopy && (
-                    <span className="h-2 w-2 shrink-0 rounded-full bg-amber-500" />
-                  )}
-                  {(isRecorrente || isRecurringCopy) && (
-                    <RefreshCw className="h-3 w-3 shrink-0 text-blue-400" />
-                  )}
-                  {task.title}
-                </div>
-              </TableCell>
-              <TableCell>{task.type || 'Sem tipo'}</TableCell>
-              <TableCell>
-                {task.price ? formatToBRL(task.price) : 'Sem preço'}
-              </TableCell>
-              <TableCell>
-                <StatusDropdown
-                  task={{ ...task, done: task.done }}
-                  onStatusChanged={onTasksChange}
-                />
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEditClick(task)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(task.id)}
-                    disabled={deleteTaskMutation.isPending}
-                  >
-                    {deleteTaskMutation.isPending ? (
-                      <Loader className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Trash className="h-4 w-4" />
+              <TableRow
+                key={task.id}
+                ref={isHighlighted ? highlightRef : undefined}
+                className={cn(
+                  isPendente &&
+                    !isRecorrente &&
+                    !isRecurringCopy &&
+                    'border-l-2 border-l-amber-500 bg-amber-500/5',
+                  (isRecorrente || isRecurringCopy) &&
+                    'border-l-2 border-l-blue-400 bg-blue-500/5',
+                  isHighlighted &&
+                    'bg-amber-500/15 ring-2 ring-amber-400 ring-inset'
+                )}
+              >
+                <TableCell className="font-medium">
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-2">
+                      {isPendente && !isRecorrente && !isRecurringCopy && (
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-amber-500" />
+                      )}
+                      {(isRecorrente || isRecurringCopy) && (
+                        <RefreshCw className="h-3 w-3 shrink-0 text-blue-400" />
+                      )}
+                      {task.title}
+                    </div>
+                    {task.parcela_total && task.parcela_numero && (
+                      <span className="text-muted-foreground text-xs font-normal">
+                        Parcela {task.parcela_numero}/{task.parcela_total}
+                      </span>
                     )}
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
+                  </div>
+                </TableCell>
+                <TableCell>{task.type || 'Sem tipo'}</TableCell>
+                <TableCell>
+                  {task.price ? formatToBRL(task.price) : 'Sem preço'}
+                </TableCell>
+                <TableCell>
+                  <StatusDropdown
+                    task={{ ...task, done: task.done }}
+                    onStatusChanged={onTasksChange}
+                  />
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditClick(task)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteClick(task)}
+                      disabled={deleteTaskMutation.isPending}
+                    >
+                      {deleteTaskMutation.isPending ? (
+                        <Loader className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
             );
           })}
         </TableBody>
@@ -352,7 +380,16 @@ export const TasksTable = memo(function TasksTable({
           </DialogHeader>
           <DialogDescription className="pb-4" id="edit-task-description">
             Edite os detalhes da despesa selecionada.
-            {editingTask?.fixo_source_id && (
+            {editingTask?.parcela_numero && editingTask?.parcela_total && (
+              <span className="mt-1 flex items-center gap-1.5 text-violet-400">
+                <span className="inline-flex h-5 items-center rounded-full bg-violet-500/15 px-2 text-[11px] font-semibold text-violet-400">
+                  Parcela {editingTask.parcela_numero}/
+                  {editingTask.parcela_total}
+                </span>
+                Alterações se aplicam apenas a esta parcela.
+              </span>
+            )}
+            {editingTask?.fixo_source_id && !editingTask?.parcela_group_id && (
               <span className="mt-1 flex items-center gap-1.5 text-blue-400">
                 <RefreshCw className="h-3 w-3" />
                 Despesa recorrente — alterações se aplicam apenas a este mês.
@@ -365,7 +402,9 @@ export const TasksTable = memo(function TasksTable({
               <Label className="text-base font-medium">Título</Label>
               <Input
                 value={editForm.title}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, title: e.target.value }))}
+                onChange={(e) =>
+                  setEditForm((prev) => ({ ...prev, title: e.target.value }))
+                }
                 className="h-12 text-base"
               />
             </div>
@@ -378,7 +417,9 @@ export const TasksTable = memo(function TasksTable({
                   type="number"
                   step="0.01"
                   value={editForm.price}
-                  onChange={(e) => setEditForm((prev) => ({ ...prev, price: e.target.value }))}
+                  onChange={(e) =>
+                    setEditForm((prev) => ({ ...prev, price: e.target.value }))
+                  }
                   className="h-12 text-base"
                 />
               </div>
@@ -387,13 +428,20 @@ export const TasksTable = memo(function TasksTable({
                 <Label className="text-base font-medium">Status</Label>
                 <Select
                   value={editForm.done}
-                  onValueChange={(value) => setEditForm((prev) => ({ ...prev, done: value as TaskStatus }))}
+                  onValueChange={(value) =>
+                    setEditForm((prev) => ({
+                      ...prev,
+                      done: value as TaskStatus,
+                    }))
+                  }
                 >
-                  <SelectTrigger className="border-input bg-background !h-12 w-full border px-3 py-2 text-base">
+                  <SelectTrigger className="border-input bg-background h-12! w-full border px-3 py-2 text-base">
                     <SelectValue placeholder="Selecione o status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={TASK_STATUS.Pendente}>Pendente</SelectItem>
+                    <SelectItem value={TASK_STATUS.Pendente}>
+                      Pendente
+                    </SelectItem>
                     <SelectItem value={TASK_STATUS.Pago}>Pago</SelectItem>
                   </SelectContent>
                 </Select>
@@ -401,31 +449,66 @@ export const TasksTable = memo(function TasksTable({
             </div>
 
             {/* Recorrência */}
-            {!editingTask?.fixo_source_id && (
-              <div className="flex flex-col space-y-2">
-                <Label className="text-base font-medium">Recorrência</Label>
-                <div className="border-input bg-background flex h-12 items-center gap-3 rounded-md border px-3">
-                  <Switch
-                    id="edit-recorrente"
-                    checked={editForm.recorrente}
-                    onCheckedChange={(checked) =>
-                      setEditForm((prev) => ({ ...prev, recorrente: checked }))
-                    }
-                  />
-                  <Label htmlFor="edit-recorrente" className="cursor-pointer text-sm font-normal">
-                    {editForm.recorrente ? 'Recorrente (todos os meses)' : 'Apenas este mês'}
-                  </Label>
-                </div>
+            <div className="flex flex-col space-y-2">
+              <Label className="text-base font-medium">Recorrência</Label>
+              <div className="border-input bg-background flex h-12 items-center gap-3 rounded-md border px-3">
+                {editingTask?.fixo_source_id ? (
+                  <>
+                    <Switch
+                      id="edit-desvincular"
+                      checked={editForm.fixo_source_id !== null}
+                      onCheckedChange={(checked) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          fixo_source_id: checked
+                            ? editingTask.fixo_source_id
+                            : null,
+                        }))
+                      }
+                    />
+                    <Label
+                      htmlFor="edit-desvincular"
+                      className="cursor-pointer text-sm font-normal"
+                    >
+                      {editForm.fixo_source_id !== null
+                        ? 'Vinculada à série (este mês)'
+                        : 'Desvinculada da série'}
+                    </Label>
+                  </>
+                ) : (
+                  <>
+                    <Switch
+                      id="edit-recorrente"
+                      checked={editForm.recorrente}
+                      onCheckedChange={(checked) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          recorrente: checked,
+                        }))
+                      }
+                    />
+                    <Label
+                      htmlFor="edit-recorrente"
+                      className="cursor-pointer text-sm font-normal"
+                    >
+                      {editForm.recorrente
+                        ? 'Recorrente (todos os meses)'
+                        : 'Apenas este mês'}
+                    </Label>
+                  </>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Tipo de Gasto - Largura total */}
             <div className="flex flex-col space-y-2">
               <Label className="text-base font-medium">Tipo de Gasto</Label>
-              <div className="bg-background flex min-h-[3rem] flex-col items-center gap-2 rounded-md border p-4">
+              <div className="bg-background flex min-h-12 flex-col items-center gap-2 rounded-md border p-4">
                 <TypeSelector
                   value={editForm.type}
-                  onChange={(value) => setEditForm((prev) => ({ ...prev, type: value }))}
+                  onChange={(value) =>
+                    setEditForm((prev) => ({ ...prev, type: value }))
+                  }
                   allTypes={allTypes}
                 />
               </div>
@@ -454,6 +537,48 @@ export const TasksTable = memo(function TasksTable({
               )}
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de confirmação de deleção de parcela */}
+      <Dialog
+        open={!!deleteConfirmTask}
+        onOpenChange={(open) => !open && setDeleteConfirmTask(null)}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Deletar parcela</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            <strong>{deleteConfirmTask?.title}</strong> — Parcela{' '}
+            {deleteConfirmTask?.parcela_numero}/
+            {deleteConfirmTask?.parcela_total}
+            <br />O que deseja deletar?
+          </DialogDescription>
+          <DialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button
+              variant="outline"
+              disabled={deleteTaskMutation.isPending}
+              onClick={() =>
+                deleteConfirmTask && handleDelete(deleteConfirmTask.id, false)
+              }
+            >
+              Apenas esta parcela
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleteTaskMutation.isPending}
+              onClick={() =>
+                deleteConfirmTask && handleDelete(deleteConfirmTask.id, true)
+              }
+            >
+              {deleteTaskMutation.isPending ? (
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              Cancelar compra inteira ({deleteConfirmTask?.parcela_total}{' '}
+              parcelas)
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -25,7 +25,9 @@ const data = {
     { title: 'Dashboard', url: '/admin/dashboard', icon: 'dashboard' as const },
     { title: 'Despesas', url: '/admin/list', icon: 'list' as const },
     { title: 'Rendimento', url: '/admin/income', icon: 'income' as const },
+    { title: 'Compras a Prazo', url: '/admin/parcelas', icon: 'parcelas' as const },
     { title: 'Histórico', url: '/admin/history', icon: 'history' as const },
+    { title: 'Consultor IA', url: '/admin/advisor', icon: 'advisor' as const },
     { title: 'Usuário', url: '/admin/editUser', icon: 'user' as const },
   ],
 };

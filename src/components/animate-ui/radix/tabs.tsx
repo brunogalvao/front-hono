@@ -55,9 +55,12 @@ function TabsList({
     setActiveValue(activeTab.getAttribute('data-value') ?? undefined);
   }, []);
 
-  React.useEffect(() => {
+  // Sincroniza o highlight ANTES do browser pintar (elimina flash inicial)
+  React.useLayoutEffect(() => {
     getActiveValue();
+  }, [getActiveValue]);
 
+  React.useEffect(() => {
     const observer = new MutationObserver(getActiveValue);
 
     if (localRef.current) {

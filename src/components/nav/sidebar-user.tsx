@@ -3,7 +3,7 @@ import { getUser } from '@/service/userService';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { getInitials } from '@/utils/getInitials';
 import type { UserProfile } from '@/model/user.model';
-import { useUser } from '@/context/UserContext';
+import { useUser } from '@/hooks/useUser';
 
 export function SidebarUser() {
   const [fetchedProfile, setFetchedProfile] = useState<UserProfile | null>(

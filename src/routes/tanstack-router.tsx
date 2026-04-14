@@ -13,6 +13,8 @@ import Income from '@/pages/admin/Income';
 import EditUser from '@/pages/admin/EditUser';
 import Dashboard from '@/pages/admin/Dashboard';
 import History from '@/pages/admin/History';
+import Parcelas from '@/pages/admin/Parcelas';
+import Advisor from '@/pages/admin/Advisor';
 
 // Root Route
 const rootRoute = createRootRoute({
@@ -74,6 +76,18 @@ const historyRoute = createRoute({
   component: History,
 });
 
+const parcelasRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: '/parcelas',
+  component: Parcelas,
+});
+
+const advisorRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: '/advisor',
+  component: Advisor,
+});
+
 // Auth Callback Route
 const authCallbackRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -99,6 +113,8 @@ const routeTree = rootRoute.addChildren([
     dashboardRoute,
     incomeRoute,
     historyRoute,
+    parcelasRoute,
+    advisorRoute,
   ]),
   catchAllRoute,
 ]);

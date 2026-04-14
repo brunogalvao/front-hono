@@ -55,6 +55,46 @@ Veja a documentação completa em [VERSION_SYSTEM.md](./VERSION_SYSTEM.md).
 
 ---
 
+## 🤖 Consultor IA (AI Financial Advisor)
+
+O módulo **Consultor IA** oferece análise financeira personalizada gerada pelo modelo Claude da Anthropic, com streaming em tempo real.
+
+### Funcionalidades
+
+- Diagnóstico do período com resumo de receitas x despesas
+- Alertas de comportamentos problemáticos e sugestões de corte
+- Recomendações de investimento contextualizadas para o mercado brasileiro (Tesouro Direto, CDB, FIIs, etc.)
+
+### Configuração da ANTHROPIC_API_KEY
+
+A chave da API Anthropic é utilizada **exclusivamente** na Supabase Edge Function. Ela nunca é exposta ao frontend.
+
+**1. Para desenvolvimento local com Supabase CLI:**
+
+Crie ou edite o arquivo `supabase/.env` (nunca commite este arquivo):
+
+```
+ANTHROPIC_API_KEY=sk-ant-...sua-chave-aqui...
+```
+
+**2. Para produção (Supabase Dashboard):**
+
+Acesse **Project Settings → Edge Functions → Secrets** e adicione:
+
+```
+ANTHROPIC_API_KEY = sk-ant-...sua-chave-aqui...
+```
+
+**3. Deploy da Edge Function:**
+
+```bash
+supabase functions deploy financial-advisor
+```
+
+> A chave pode ser obtida em https://console.anthropic.com/
+
+---
+
 ## 🧪 Testes
 
 O projeto utiliza **Vitest** com **happy-dom** para testes unitários de utilitários e lógica da aplicação.

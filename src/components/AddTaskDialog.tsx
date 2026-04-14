@@ -56,6 +56,8 @@ export function AddTaskDialog({
     mes: mesSelecionado ?? new Date().getMonth() + 1,
     ano: anoSelecionado ?? new Date().getFullYear(),
     recorrente: false,
+    parcelado: false,
+    parcela_total: 2,
   });
 
   // Hook para criar despesa com invalidação automática do cache
@@ -93,6 +95,8 @@ export function AddTaskDialog({
       mes: mesSelecionado ?? new Date().getMonth() + 1,
       ano: anoSelecionado ?? new Date().getFullYear(),
       recorrente: false,
+      parcelado: false,
+      parcela_total: 2,
     });
     setFormErrors({});
     setMsg('');
@@ -108,6 +112,7 @@ export function AddTaskDialog({
       mes: form.mes,
       ano: form.ano,
       recorrente: form.recorrente,
+      ...(form.parcelado && { parcela_total: form.parcela_total }),
     });
 
     if (!result.success) {
@@ -131,6 +136,7 @@ export function AddTaskDialog({
         done: result.data.done,
         mes: form.mes,
         ano: form.ano,
+        ...(form.parcelado && { parcela_total: form.parcela_total }),
       });
 
       if (form.type.trim() && !allTypes.includes(form.type.trim())) {
@@ -292,19 +298,68 @@ export function AddTaskDialog({
               </div>
 
               <div className="flex w-full flex-col space-y-2">
-                <Label className="text-base font-medium">Recorrência</Label>
-                <div className="border-input bg-background flex h-12 items-center gap-3 rounded-md border px-3">
-                  <Switch
-                    id="recorrente"
-                    checked={form.recorrente}
-                    onCheckedChange={(checked) =>
-                      setForm((prev) => ({ ...prev, recorrente: checked }))
-                    }
-                  />
-                  <Label htmlFor="recorrente" className="cursor-pointer text-sm font-normal">
-                    {form.recorrente ? 'Recorrente (todos os meses)' : 'Apenas este mês'}
-                  </Label>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Col 1: Recorrência */}
+                  <div className="flex flex-col space-y-2">
+                    <Label className="text-base font-medium">Recorrência</Label>
+                    <div className="border-input bg-background flex h-12 items-center gap-3 rounded-md border px-3">
+                      <Switch
+                        id="recorrente"
+                        checked={form.recorrente}
+                        disabled={form.parcelado}
+                        onCheckedChange={(checked) =>
+                          setForm((prev) => ({ ...prev, recorrente: checked }))
+                        }
+                      />
+                      <Label htmlFor="recorrente" className="cursor-pointer text-sm font-normal">
+                        {form.recorrente ? 'Recorrente' : 'Este mês'}
+                      </Label>
+                    </div>
+                  </div>
+
+                  {/* Col 2: Parcelado */}
+                  <div className="flex flex-col space-y-2">
+                    <Label className="text-base font-medium">Parcelado</Label>
+                    <div className="border-input bg-background flex h-12 items-center gap-3 rounded-md border px-3">
+                      <Switch
+                        id="parcelado"
+                        checked={form.parcelado}
+                        disabled={form.recorrente}
+                        onCheckedChange={(checked) =>
+                          setForm((prev) => ({ ...prev, parcelado: checked }))
+                        }
+                      />
+                      <Label htmlFor="parcelado" className="cursor-pointer text-sm font-normal">
+                        {form.parcelado ? 'Sim' : 'Não'}
+                      </Label>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Campo nº parcelas (visível quando parcelado ativo) */}
+                {form.parcelado && (
+                  <div className="flex flex-col space-y-1">
+                    <Label className="text-sm font-medium">Nº de parcelas</Label>
+                    <Input
+                      type="number"
+                      min={2}
+                      max={360}
+                      value={form.parcela_total}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          parcela_total: parseInt(e.target.value) || 2,
+                        }))
+                      }
+                      className="h-10 text-base"
+                    />
+                    {typeof form.price === 'number' && form.price > 0 && (
+                      <span className="text-muted-foreground text-xs">
+                        R$ {(form.price / form.parcela_total).toFixed(2)} / parcela
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

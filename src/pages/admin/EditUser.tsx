@@ -36,7 +36,7 @@ import { AnimateIcon } from '@/components/animate-ui/icons/icon';
 import { LiquidButton } from '@/components/animate-ui/buttons/liquid';
 import { RefreshCcw } from '@/components/animate-ui/icons/refresh-ccw';
 import { toast } from 'sonner';
-import { useUser } from '@/context/UserContext';
+import { useUser } from '@/hooks/useUser';
 import { ResetPassword } from '@/components/ResetPassword';
 
 const EditUser = () => {

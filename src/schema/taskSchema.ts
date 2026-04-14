@@ -15,4 +15,5 @@ export const taskSchema = z.object({
   mes: z.number().int().min(1).max(12),
   ano: z.number().int().min(2000),
   recorrente: z.boolean().default(false),
+  parcela_total: z.number().int().min(2).max(360).optional(),
 });

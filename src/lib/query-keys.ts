@@ -68,6 +68,12 @@ export const queryKeys = {
     pending: (month: number, year: number) =>
       [...queryKeys.notifications.all, 'pending', month, year] as const,
   },
+
+  // Parcelas
+  parcelas: {
+    all: ['parcelas'] as const,
+    list: () => [...queryKeys.parcelas.all, 'list'] as const,
+  },
 } as const;
 
 // Tipos para type safety

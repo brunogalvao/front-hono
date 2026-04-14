@@ -37,7 +37,7 @@ const HowItWorks = () => {
 
       <div className="relative grid grid-cols-1 gap-8 md:grid-cols-3">
         {/* linha conectando os passos — apenas desktop */}
-        <div className="absolute top-10 hidden h-px w-full bg-gradient-to-r from-transparent via-border to-transparent md:block" />
+        <div className="absolute top-10 hidden h-px w-full bg-linear-to-r from-transparent via-border to-transparent md:block" />
 
         {steps.map((item, idx) => (
           <motion.div
@@ -50,7 +50,7 @@ const HowItWorks = () => {
           >
             <div className="bg-background border-border relative z-10 flex h-20 w-20 items-center justify-center rounded-full border-2">
               <item.icon className="text-primary size-8" />
-              <span className="text-primary absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+              <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
                 {item.step}
               </span>
             </div>

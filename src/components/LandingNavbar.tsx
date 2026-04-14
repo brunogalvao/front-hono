@@ -72,7 +72,7 @@ export function LandingNavbar() {
                 key={link.href}
                 onClick={() => scrollToSection(link.href)}
                 className={cn(
-                  'rounded-full px-6 py-1.5 text-sm font-medium transition-colors',
+                  'cursor-pointer rounded-full px-6 py-1.5 text-sm font-medium transition-colors',
                   activeSection === link.href.replace('#', '')
                     ? 'bg-primary text-primary-foreground'
                     : 'text-muted-foreground hover:text-foreground hover:bg-accent'

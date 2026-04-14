@@ -76,7 +76,8 @@ export function useDeleteTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteTask,
+    mutationFn: ({ id, cancelAll }: { id: string; cancelAll?: boolean }) =>
+      deleteTask({ id, cancelAll }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.totals.all });
