@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
   Sparkles,
@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   PiggyBank,
   Bot,
+  Clock,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,60 @@ import TituloPage from '@/components/TituloPage';
 import { useFinancialAdvisor } from '@/hooks/useFinancialAdvisor';
 import { getCurrentMonth, getCurrentYear } from '@/utils/date';
 import { getNomeMes } from '@/model/mes.enum';
+
+const KEYWORDS_POSITIVE = [
+  'superávit',
+  'positivo',
+  'positiva',
+  'excelente',
+  'ótimo',
+  'ótima',
+  'reserva de emergência',
+  'Tesouro Direto',
+  'CDB',
+  'LCI',
+  'LCA',
+  'FIIs',
+  'patrimônio',
+  'investimento',
+  'rentabilidade',
+];
+
+const KEYWORDS_WARNING = [
+  'déficit',
+  'negativo',
+  'negativa',
+  'atenção',
+  'alerta',
+  'cuidado',
+  'reduzir',
+  'eliminar',
+  'cortar',
+  'dívida',
+  'dívidas',
+  'endividamento',
+  'comprometido',
+  'comprometida',
+  'excesso',
+  'excessivo',
+];
+
+function highlightKeywords(text: string): string {
+  let result = text;
+  for (const word of KEYWORDS_POSITIVE) {
+    result = result.replace(
+      new RegExp(`(?<![*\`])(${word})(?![*\`])`, 'gi'),
+      '**$1**'
+    );
+  }
+  for (const word of KEYWORDS_WARNING) {
+    result = result.replace(
+      new RegExp(`(?<![*\`])(${word})(?![*\`])`, 'gi'),
+      '*$1*'
+    );
+  }
+  return result;
+}
 
 function AnalysisSkeleton() {
   return (
@@ -74,11 +129,71 @@ function SectionCard({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed [&>h3]:mb-1 [&>h3]:font-semibold [&>ol]:mt-2 [&>ol]:space-y-1 [&>p]:mb-2 [&>strong]:font-semibold [&>ul]:mt-2 [&>ul]:space-y-1">
-          <ReactMarkdown>{content}</ReactMarkdown>
+        <div className="prose prose-sm dark:prose-invert advisor-content max-w-none text-sm leading-relaxed">
+          <ReactMarkdown
+            components={{
+              strong: ({ children }) => (
+                <strong className="rounded px-0.5 font-semibold text-emerald-600 dark:text-emerald-400">
+                  {children}
+                </strong>
+              ),
+              em: ({ children }) => (
+                <em className="rounded px-0.5 font-medium text-rose-600 not-italic dark:text-rose-400">
+                  {children}
+                </em>
+              ),
+            }}
+          >
+            {highlightKeywords(content)}
+          </ReactMarkdown>
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function QuotaExceededAlert({ retrySeconds }: { retrySeconds: number | null }) {
+  const initialSeconds = retrySeconds ?? 60;
+  const [countdown, setCountdown] = useState(initialSeconds);
+  const availableAt = new Date(
+    Date.now() + initialSeconds * 1000
+  ).toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = setInterval(() => setCountdown((s) => s - 1), 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
+
+  const minutes = Math.floor(countdown / 60);
+  const seconds = countdown % 60;
+  const countdownStr =
+    minutes > 0
+      ? `${minutes}min ${seconds.toString().padStart(2, '0')}s`
+      : `${countdown}s`;
+
+  return (
+    <Alert className="border-amber-500/50 bg-amber-500/10">
+      <Clock className="-mt-1 size-4 text-amber-500" />
+      <AlertDescription className="text-sm">
+        <span className="font-semibold text-amber-600 dark:text-amber-400">
+          Limite de requisições atingido.
+        </span>{' '}
+        {countdown > 0 ? (
+          <>
+            Disponível às{' '}
+            <span className="font-semibold tabular-nums">{availableAt}</span> —
+            faltam <span className="tabular-nums">{countdownStr}</span>.
+          </>
+        ) : (
+          'Você já pode tentar novamente.'
+        )}
+      </AlertDescription>
+    </Alert>
   );
 }
 
@@ -107,7 +222,7 @@ function parseAnalysisSections(analysis: string): {
 export function FinancialAdvisor() {
   const [month, setMonth] = useState(getCurrentMonth());
   const [year, setYear] = useState(getCurrentYear());
-  const { analysis, isLoading, error, analyzeFinances, reset } =
+  const { analysis, isLoading, error, retrySeconds, analyzeFinances, reset } =
     useFinancialAdvisor();
 
   const hasAnalysis = analysis.length > 0;
@@ -153,7 +268,7 @@ export function FinancialAdvisor() {
                 disabled={isLoading}
                 className="gap-2"
               >
-                <Sparkles className="size-4" />
+                <Sparkles className="size-1" />
                 {isLoading ? 'Analisando...' : 'Analisar'}
               </Button>
             ) : (
@@ -171,7 +286,12 @@ export function FinancialAdvisor() {
         </CardContent>
       </Card>
 
-      {/* Erro */}
+      {/* Quota esgotada */}
+      {retrySeconds !== null && (
+        <QuotaExceededAlert retrySeconds={retrySeconds} />
+      )}
+
+      {/* Erro genérico */}
       {error && (
         <Alert variant="destructive">
           <AlertTriangle className="size-4" />

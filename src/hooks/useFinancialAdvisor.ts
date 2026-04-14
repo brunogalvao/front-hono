@@ -11,6 +11,7 @@ interface FinancialAdvisorState {
   analysis: string;
   isLoading: boolean;
   error: string | null;
+  retrySeconds: number | null;
   analyzeFinances: (period: FinancialAdvisorPeriod) => void;
   reset: () => void;
 }
@@ -18,11 +19,13 @@ interface FinancialAdvisorState {
 export function useFinancialAdvisor(): FinancialAdvisorState {
   const [analysis, setAnalysis] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [retrySeconds, setRetrySeconds] = useState<number | null>(null);
 
   const mutation = useMutation({
     mutationFn: async (period: FinancialAdvisorPeriod) => {
       setAnalysis('');
       setError(null);
+      setRetrySeconds(null);
 
       const { data: userData, error: userError } =
         await supabase.auth.getUser();
@@ -39,16 +42,6 @@ export function useFinancialAdvisor(): FinancialAdvisorState {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-      console.log('[FinancialAdvisor] token prefix:', token?.slice(0, 20));
-      console.log(
-        '[FinancialAdvisor] anonKey prefix:',
-        supabaseAnonKey?.slice(0, 20)
-      );
-      console.log(
-        '[FinancialAdvisor] url:',
-        `${supabaseUrl}/functions/v1/financial-advisor`
-      );
-
       const response = await fetch(
         `${supabaseUrl}/functions/v1/financial-advisor`,
         {
@@ -64,14 +57,19 @@ export function useFinancialAdvisor(): FinancialAdvisorState {
 
       if (!response.ok) {
         const body = await response.text();
-        let msg = `Erro ${response.status}`;
-        try {
-          const parsed = JSON.parse(body);
-          msg = parsed.error ?? msg;
-        } catch {
-          // body não é JSON
+        let parsed: Record<string, unknown> = {};
+        try { parsed = JSON.parse(body); } catch { /* ignora */ }
+
+        if (response.status === 429 || parsed.error === 'QUOTA_EXCEEDED') {
+          setRetrySeconds((parsed.retrySeconds as number) ?? null);
+          throw new Error('QUOTA_EXCEEDED');
         }
-        throw new Error(msg);
+
+        if (parsed.error === 'GEMINI_ERROR') {
+          throw new Error((parsed.message as string) ?? 'Erro ao conectar com o serviço de IA.');
+        }
+
+        throw new Error((parsed.error as string) ?? (parsed.message as string) ?? `Erro ${response.status}`);
       }
 
       const reader = response.body?.getReader();
@@ -91,7 +89,9 @@ export function useFinancialAdvisor(): FinancialAdvisorState {
       return accumulated;
     },
     onError: (err: Error) => {
-      setError(err.message);
+      if (err.message !== 'QUOTA_EXCEEDED') {
+        setError(err.message);
+      }
     },
   });
 
@@ -106,12 +106,14 @@ export function useFinancialAdvisor(): FinancialAdvisorState {
     mutation.reset();
     setAnalysis('');
     setError(null);
+    setRetrySeconds(null);
   }, [mutation]);
 
   return {
     analysis,
     isLoading: mutation.isPending,
     error,
+    retrySeconds,
     analyzeFinances,
     reset,
   };

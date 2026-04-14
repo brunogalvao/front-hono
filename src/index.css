@@ -138,3 +138,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .advisor-content p {
+    @apply mb-3 font-light last:mb-0;
+  }
+  .advisor-content h3 {
+    @apply mb-1 font-light;
+  }
+  .advisor-content ul,
+  .advisor-content ol {
+    @apply mt-2 space-y-1;
+  }
+}
