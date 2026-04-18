@@ -18,6 +18,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { LogoIcon } from '@/components/LogoIcon';
 
 const data = {
   navMain: [
@@ -39,7 +40,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
-                <img src="/logo.svg" alt="FinanceTask" className="size-10 shrink-0" />
+                <LogoIcon className="size-10 shrink-0" />
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">Task's Finance</span>
                   <Tooltip>
