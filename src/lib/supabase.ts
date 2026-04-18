@@ -30,27 +30,7 @@ const _sessionReady = new Promise<void>((resolve) => {
 
 supabase.auth.onAuthStateChange((event, session) => {
   _cachedSession = session;
-
-  if (
-    event === 'SIGNED_IN' ||
-    event === 'TOKEN_REFRESHED' ||
-    event === 'SIGNED_OUT' ||
-    event === 'USER_UPDATED'
-  ) {
-    _resolveReady();
-  } else if (event === 'INITIAL_SESSION') {
-    if (!session) {
-      _resolveReady();
-    } else {
-      // Force a token refresh so the Supabase project is awake and the token
-      // is server-validated before any API request is made.
-      // TOKEN_REFRESHED (or SIGNED_OUT) will resolve _sessionReady.
-      supabase.auth.refreshSession().catch(() => {
-        // Network error or refresh token invalid — fall back to stored token.
-        _resolveReady();
-      });
-    }
-  }
+  _resolveReady();
 });
 
 // Retorna um access_token garantidamente válido

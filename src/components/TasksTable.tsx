@@ -169,7 +169,6 @@ export const TasksTable = memo(function TasksTable({
             }),
           },
         });
-        console.log('🟢 Editado com sucesso');
         setEditingTask(null);
         // Fecha o dialog
         setDialogOpen(false);
@@ -211,7 +210,6 @@ export const TasksTable = memo(function TasksTable({
     const fetchTypes = async () => {
       try {
         const types = await getExpenseTypes();
-        console.log('✅ Tipos carregados:', types);
         setAllTypes(types.map((t) => t.name)); // ou t.nome se não fez o mapeamento na API
       } catch (err) {
         console.error('Erro ao carregar tipos de gasto:', err);

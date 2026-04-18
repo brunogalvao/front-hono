@@ -13,9 +13,11 @@ import { Loader } from '@/components/animate-ui/icons/loader';
 import { AnimateIcon } from '@/components/animate-ui/icons/icon';
 import { RippleButton } from '@/components/animate-ui/buttons/ripple';
 import { NotificationBell } from '@/components/NotificationBell';
+import { useSessionGuard } from '@/hooks/useSessionGuard';
 
 function Admin() {
   const navigate = useNavigate();
+  useSessionGuard();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
 
@@ -36,22 +38,20 @@ function Admin() {
   };
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setSessionReady(true);
+      } else {
+        navigate({ to: '/login' });
+      }
+    });
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        if (event !== 'INITIAL_SESSION') {
-          navigate({ to: '/login' });
-        }
-        return;
-      }
-
-      if (
-        event === 'SIGNED_IN' ||
-        event === 'TOKEN_REFRESHED' ||
-        event === 'USER_UPDATED' ||
-        event === 'INITIAL_SESSION'
-      ) {
+      if (event === 'SIGNED_OUT') {
+        navigate({ to: '/login' });
+      } else if (session) {
         setSessionReady(true);
       }
     });

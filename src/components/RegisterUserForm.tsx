@@ -41,7 +41,6 @@ const RegisterUserForm = () => {
 
     if (!result.success) {
       const errorMessages = result.error.flatten().fieldErrors;
-      console.log(errorMessages); // 👈 teste se esse log aparece
 
       // Pega a primeira mensagem de erro e exibe no toast
       const firstError = Object.values(errorMessages)[0]?.[0];

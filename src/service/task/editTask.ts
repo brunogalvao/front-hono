@@ -5,12 +5,6 @@ import { getAuthToken } from '@/lib/supabase';
 export const editTask = async (id: string, updated: Partial<Task>) => {
   const accessToken = await getAuthToken();
 
-  console.log('🌐 Enviando requisição para API:', {
-    url: `${API_BASE_URL}/api/tasks/${id}`,
-    method: 'PUT',
-    data: updated,
-  });
-
   const res = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {
     method: 'PUT',
     headers: {
@@ -20,12 +14,6 @@ export const editTask = async (id: string, updated: Partial<Task>) => {
     body: JSON.stringify(updated),
   });
 
-  console.log('📡 Resposta da API:', {
-    status: res.status,
-    ok: res.ok,
-    statusText: res.statusText,
-  });
-
   if (!res.ok) {
     const errorText = await res.text();
     console.error('❌ Erro ao editar despesa:', errorText);
@@ -33,6 +21,5 @@ export const editTask = async (id: string, updated: Partial<Task>) => {
   }
 
   const result = await res.json();
-  console.log('✅ Resposta da API (dados):', result);
   return result;
 };

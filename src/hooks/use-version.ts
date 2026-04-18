@@ -53,7 +53,6 @@ export function useVersion() {
           }
         }
       } catch (err) {
-        console.warn('Failed to load version info:', err);
         // Fallback to default version info
         setVersionInfo({
           version: 'beta - v1.0.0',

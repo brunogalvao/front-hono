@@ -23,12 +23,14 @@ import {
 } from '@/components/ui/card';
 import { CARDS } from '@/data/cardsIntro';
 import { textoChamada } from '@/data/textoTitulo';
+import { HERO_BADGES, TESTIMONIALS, CTA_BENEFITS } from '@/data/home';
 import { cn } from '@/lib/utils';
 import { Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2, Quote, ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
+// import { text } from 'node:stream/consumers';
 
 const ICONS = {
   Clock7,
@@ -38,37 +40,6 @@ const ICONS = {
   BellOff,
   RefreshCcw,
 } as const;
-
-const HERO_BADGES = [
-  '100% Gratuito',
-  'Insights com IA',
-  'Sem cartão de crédito',
-];
-
-const TESTIMONIALS = [
-  {
-    name: 'Ana Lima',
-    role: 'Freelancer',
-    text: 'Finalmente consigo ver pra onde meu dinheiro vai todo mês. Simples e muito rápido de usar.',
-  },
-  {
-    name: 'Carlos Mendes',
-    role: 'Empreendedor',
-    text: 'Os insights automáticos me ajudaram a cortar gastos que eu nem sabia que tinha. Recomendo muito.',
-  },
-  {
-    name: 'Juliana Costa',
-    role: 'Professora',
-    text: 'Uso todo mês para fechar as contas. A interface é limpa e nunca trava. Perfeito.',
-  },
-];
-
-const CTA_BENEFITS = [
-  'Registre receitas e despesas em segundos',
-  'Histórico completo mês a mês',
-  'Recomendações inteligentes baseadas no seu perfil',
-  'Acesso imediato, sem burocracia',
-];
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -114,7 +85,7 @@ function Home() {
                   'w-fit gap-2 rounded-full px-8'
                 )}
               >
-                Começar agora
+                {textoChamada[0].ctaHeader}
                 <ArrowRight className="size-4" />
               </Link>
 

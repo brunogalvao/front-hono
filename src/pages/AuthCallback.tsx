@@ -6,6 +6,14 @@ const AuthCallback = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // With PKCE flow, the code may have been exchanged before this component mounted.
+    // Check for an existing session first to avoid missing the SIGNED_IN event.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate({ to: '/admin/dashboard' });
+      }
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         navigate({ to: '/admin/dashboard' });

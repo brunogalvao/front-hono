@@ -26,7 +26,13 @@ import { getTasksCountByMonth } from '@/service/task/getTasksCountByMonth';
 import { queryKeys } from '@/lib/query-keys';
 
 // icons
-import { BanknoteArrowUp, ChevronLeft, ChevronRight, RefreshCw, CircleCheck } from 'lucide-react';
+import {
+  BanknoteArrowUp,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+  CircleCheck,
+} from 'lucide-react';
 import {
   Tabs,
   TabsContent,
@@ -87,7 +93,10 @@ function Expenses() {
 
   return (
     <div className="space-y-6">
-      <TituloPage titulo="Despesas" subtitulo="Gerencie suas despesas mensais" />
+      <TituloPage
+        titulo="Despesas"
+        subtitulo="Gerencie suas despesas mensais"
+      />
 
       {/* Total pago + seletor de ano + botão adicionar */}
       <div className="flex flex-row items-center justify-between">
@@ -129,7 +138,9 @@ function Expenses() {
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="w-12 text-center text-sm font-medium">{anoAtivo}</span>
+            <span className="w-12 text-center text-sm font-medium">
+              {anoAtivo}
+            </span>
             <Button
               variant="ghost"
               size="icon"
@@ -154,7 +165,8 @@ function Expenses() {
           {MESES_LISTA.map((mes) => {
             const mesNumero = parseInt(mes.value);
             const temDespesas = (monthsMeta?.count?.[mesNumero] ?? 0) > 0;
-            const temRecorrente = monthsMeta?.hasRecorrente?.[mesNumero] ?? false;
+            const temRecorrente =
+              monthsMeta?.hasRecorrente?.[mesNumero] ?? false;
             const names = monthsMeta?.recorrenteNames?.[mesNumero] ?? [];
 
             const icon = temRecorrente ? (
@@ -167,19 +179,23 @@ function Expenses() {
               <TooltipProvider key={mes.value}>
                 <Tooltip>
                   <TooltipTrigger>
-                    <TabsTrigger
-                      value={mes.value}
-                      className="data-[state=active]:bg-primary gap-1.5"
-                    >
-                      {icon}
-                      {mes.label}
-                    </TabsTrigger>
+                    <span>
+                      <TabsTrigger
+                        value={mes.value}
+                        className="data-[state=active]:bg-primary gap-1.5"
+                      >
+                        {icon}
+                        {mes.label}
+                      </TabsTrigger>
+                    </span>
                   </TooltipTrigger>
                   {temRecorrente && names.length > 0 && (
                     <TooltipContent>
                       <p className="mb-1 text-xs font-semibold">Recorrentes:</p>
                       {names.map((name) => (
-                        <p key={name} className="text-xs">• {name}</p>
+                        <p key={name} className="text-xs">
+                          • {name}
+                        </p>
                       ))}
                     </TooltipContent>
                   )}
