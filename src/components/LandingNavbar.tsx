@@ -5,6 +5,7 @@ import { AnimateIcon } from '@/components/animate-ui/icons/icon';
 import { LogIn } from '@/components/animate-ui/icons/log-in';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { Logo } from '@/components/Logo';
 
 const NAV_LINKS = [
   { label: 'Home', href: '#home' },
@@ -61,9 +62,7 @@ export function LandingNavbar() {
       <div className="container mx-auto flex flex-col items-center">
         <div className="flex w-full flex-row justify-between px-6 py-7">
           {/* Logo */}
-          <span className="text-lg font-bold tracking-tight">
-            Task's Finance
-          </span>
+          <Logo size={36} />
 
           {/* Links de seção */}
           <nav className="hidden items-center gap-3 md:flex">

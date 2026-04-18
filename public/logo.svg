@@ -1,0 +1,39 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Task's Finance logo">
+  <defs>
+    <linearGradient id="logo-bg" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="oklch(0.68 0.25 292.717)" />
+      <stop offset="100%" stop-color="oklch(0.50 0.25 292.717)" />
+    </linearGradient>
+    <linearGradient id="logo-line" x1="6" y1="28" x2="34" y2="8" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="white" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="white" stop-opacity="1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="40" height="40" rx="10" fill="url(#logo-bg)" />
+
+  <!-- Trending chart line -->
+  <polyline
+    points="7,29 15,19 22,23 33,10"
+    stroke="url(#logo-line)"
+    stroke-width="2.8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Arrow head -->
+  <polyline
+    points="27,9 33,10 32,16"
+    stroke="white"
+    stroke-width="2.8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Task line -->
+  <line x1="7" y1="34" x2="16" y2="34" stroke="white" stroke-width="2" stroke-linecap="round" stroke-opacity="0.55" />
+
+  <!-- Checkmark dot -->
+  <circle cx="33" cy="10" r="2.5" fill="white" />
+</svg>

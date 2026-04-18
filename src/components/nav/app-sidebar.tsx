@@ -1,5 +1,5 @@
 // import * as React from "react";
-import { GalleryVerticalEnd } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 import {
   Sidebar,
@@ -42,9 +42,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-12 items-center justify-center rounded-full">
-                  <GalleryVerticalEnd className="size-4" />
-                </div>
+                <Logo size={32} showWordmark={false} />
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">Task's Finance</span>
                   <Tooltip>
