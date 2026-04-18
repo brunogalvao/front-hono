@@ -28,7 +28,7 @@ const _sessionReady = new Promise<void>((resolve) => {
   _resolveReady = resolve;
 });
 
-supabase.auth.onAuthStateChange((event, session) => {
+supabase.auth.onAuthStateChange((_event, session) => {
   _cachedSession = session;
   _resolveReady();
 });
