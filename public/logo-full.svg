@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 56" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A855F7"/>
+      <stop offset="1" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="white" stop-opacity="1"/>
+      <stop offset="1" stop-color="white" stop-opacity="0.7"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0" y1="0" x2="200" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A855F7"/>
+      <stop offset="1" stop-color="#6D28D9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon background -->
+  <rect width="56" height="56" rx="14" fill="url(#bgGrad)"/>
+
+  <!-- Inner highlight -->
+  <rect width="56" height="28" rx="14" fill="white" fill-opacity="0.05"/>
+
+  <!-- Bar 1 -->
+  <rect x="8" y="33" width="10" height="15" rx="2.5" fill="white" fill-opacity="0.45"/>
+
+  <!-- Bar 2 -->
+  <rect x="23" y="24" width="10" height="24" rx="2.5" fill="white" fill-opacity="0.7"/>
+
+  <!-- Bar 3 -->
+  <rect x="38" y="13" width="10" height="35" rx="2.5" fill="url(#barGrad)"/>
+
+  <!-- Trend line -->
+  <polyline
+    points="13,29 28,20 43,10"
+    stroke="white"
+    stroke-width="2.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+    opacity="0.75"
+  />
+
+  <!-- Arrow head -->
+  <polyline
+    points="36.5,8 43,10 41,17"
+    stroke="white"
+    stroke-width="2.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+    opacity="0.75"
+  />
+
+  <!-- Text: Finance -->
+  <text
+    x="68"
+    y="24"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif"
+    font-size="15"
+    font-weight="700"
+    letter-spacing="-0.3"
+    fill="url(#textGrad)"
+  >Finance</text>
+
+  <!-- Text: Task -->
+  <text
+    x="68"
+    y="42"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif"
+    font-size="15"
+    font-weight="400"
+    letter-spacing="0.5"
+    fill="#6B7280"
+  >Task</text>
+</svg>
