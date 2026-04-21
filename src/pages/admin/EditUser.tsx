@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import type { User } from '@supabase/supabase-js';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getInitials } from '@/utils/getInitials';
-import { uploadAvatarImage } from '@/service/uploadAvatarImage';
 import { Camera, Loader2 } from 'lucide-react';
 import Cropper from 'react-easy-crop';
 import type { Area } from 'react-easy-crop';
@@ -38,9 +35,11 @@ import { RefreshCcw } from '@/components/animate-ui/icons/refresh-ccw';
 import { toast } from 'sonner';
 import { useUser } from '@/hooks/useUser';
 import { ResetPassword } from '@/components/ResetPassword';
+import { useCurrentUser, useUpdateUserProfile } from '@/hooks/use-user-profile';
 
 const EditUser = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const { data: user } = useCurrentUser();
+  const updateProfile = useUpdateUserProfile();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -48,7 +47,6 @@ const EditUser = () => {
   });
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [provider, setProvider] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,84 +57,58 @@ const EditUser = () => {
   });
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const result = await supabase.auth.getUser();
+    if (user) {
+      setFormData({
+        name: user.user_metadata?.displayName ?? user.user_metadata?.full_name ?? user.user_metadata?.name ?? '',
+        avatarUrl: user.user_metadata?.avatar_url ?? '',
+        phone: user.user_metadata?.phone ?? '',
+      });
+      setProvider(user.app_metadata.provider || 'desconhecido');
+    }
+  }, [user]);
 
-      const user = result.data?.user;
-      const prov = result.data.user?.app_metadata.provider;
-
-      if (user) {
-        setUser(user);
-        setFormData({
-          name: user.user_metadata?.displayName ?? user.user_metadata?.full_name ?? user.user_metadata?.name ?? '',
-          avatarUrl: user.user_metadata?.avatar_url ?? '',
-          phone: user.user_metadata?.phone ?? '',
-        });
-        setProvider(prov || 'desconhecido');
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  const handleUpdate = async () => {
+  const handleUpdate = () => {
     const result = schema.safeParse({ phone: formData.phone });
     if (!result.success) {
-      const errorMessage =
-        result.error.format().phone?._errors?.[0] || 'Telefone inválido.';
-      toast.error(errorMessage);
+      toast.error(result.error.format().phone?._errors?.[0] || 'Telefone inválido.');
       return;
     }
-
-    const formattedPhone = result.data.phone;
-
     if (!user) {
       toast.error('Usuário não autenticado.');
       return;
     }
 
-    let newAvatarUrl = formData.avatarUrl;
+    const formattedPhone = result.data.phone;
 
-    try {
-      setUploading(true);
-      if (file) {
-        newAvatarUrl = await uploadAvatarImage(file, user.id);
-      }
-
-      const { error } = await supabase.auth.updateUser({
-        data: {
-          displayName: formData.name,
-          phone: formattedPhone,
-          avatar_url: newAvatarUrl,
+    updateProfile.mutate(
+      {
+        userId: user.id,
+        file,
+        displayName: formData.name,
+        phone: formattedPhone,
+        currentAvatarUrl: formData.avatarUrl,
+      },
+      {
+        onSuccess: ({ avatarUrl }) => {
+          setFormData((prev) => ({ ...prev, avatarUrl }));
+          setPreview(null);
+          setFile(null);
+          toast.success('Perfil atualizado com sucesso!', { duration: 5000 });
+          if (provider === 'email') {
+            setProfile({
+              name: formData.name,
+              email: user.email ?? '',
+              avatar_url: avatarUrl,
+              phone: formattedPhone,
+              displayName: formData.name,
+            });
+          }
         },
-      });
-
-      if (error) {
-        console.error('Erro ao atualizar perfil:', error);
-        toast.error('Erro ao atualizar perfil.');
-        return;
-      }
-
-      setFormData((prev) => ({ ...prev, avatarUrl: newAvatarUrl }));
-      setPreview(null);
-      setFile(null);
-      toast.success('Perfil atualizado com sucesso!', { duration: 5000 });
-
-      if (provider === 'email') {
-        setProfile({
-          name: formData.name,
-          email: user.email ?? '',
-          avatar_url: newAvatarUrl,
-          phone: formattedPhone,
-          displayName: formData.name,
-        });
-      }
-    } catch (err) {
-      console.error('Erro no processo de atualização:', err);
-      toast.error('Erro ao fazer upload da foto.', { duration: 5000 });
-    } finally {
-      setUploading(false);
-    }
+        onError: () => {
+          toast.error('Erro ao atualizar perfil.', { duration: 5000 });
+        },
+      },
+    );
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -222,11 +194,11 @@ const EditUser = () => {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
+              disabled={updateProfile.isPending}
               className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity hover:opacity-100 disabled:cursor-not-allowed"
               title="Alterar foto"
             >
-              {uploading ? (
+              {updateProfile.isPending ? (
                 <Loader2 className="h-6 w-6 animate-spin text-white" />
               ) : (
                 <Camera className="h-6 w-6 text-white" />
@@ -369,9 +341,9 @@ const EditUser = () => {
 
         <CardFooter className="flex justify-end">
           <AnimateIcon animateOnHover>
-            <LiquidButton className="text-white" onClick={handleUpdate} disabled={uploading}>
+            <LiquidButton className="text-white" onClick={handleUpdate} disabled={updateProfile.isPending}>
               <div className="flex flex-row items-center gap-3 px-12">
-                {uploading ? (
+                {updateProfile.isPending ? (
                   <>
                     Salvando
                     <Loader2 className="size-5 animate-spin" />
