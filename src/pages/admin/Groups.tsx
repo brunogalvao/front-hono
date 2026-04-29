@@ -1,23 +1,23 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Users, UserPlus, Trash2, Mail } from 'lucide-react';
+import { Users, UserPlus, Trash2, Mail, Loader2 } from 'lucide-react';
+import { PatternFormat } from 'react-number-format';
+import { z } from 'zod';
 
 import TituloPage from '@/components/TituloPage';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,18 +28,30 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { AnimateIcon } from '@/components/animate-ui/icons/icon';
+import { LiquidButton } from '@/components/animate-ui/buttons/liquid';
+import { SendIcon } from '@/components/animate-ui/icons/send';
 
 import { useGroups, useGroupMembers, useInviteMember, useRemoveMember } from '@/hooks/use-groups';
 import { useCurrentUser } from '@/hooks/use-user-profile';
 import { getInitials } from '@/utils/getInitials';
+import { phoneSchema } from '@/model/phone.model';
 import type { GroupMember } from '@/service/groups/getGroupMembers';
 
 const SECTION_CHIPS = [
-  { label: 'Despesas', icon: '💸' },
-  { label: 'Rendimentos', icon: '💰' },
+  { label: 'Despesas',       icon: '💸' },
+  { label: 'Rendimentos',    icon: '💰' },
   { label: 'Compras a Prazo', icon: '🛒' },
-  { label: 'Consultor IA', icon: '🤖' },
+  { label: 'Consultor IA',   icon: '🤖' },
 ];
+
+const inviteSchema = z.object({
+  name:  z.string().min(1, 'Nome é obrigatório'),
+  email: z.string().email('E-mail inválido'),
+  phone: phoneSchema.optional().or(z.literal('')),
+});
+
+// ─── Skeletons ────────────────────────────────────────────────────────────────
 
 function MemberSkeleton() {
   return (
@@ -60,6 +72,8 @@ function MemberSkeleton() {
   );
 }
 
+// ─── MemberCard ───────────────────────────────────────────────────────────────
+
 interface MemberCardProps {
   member: GroupMember;
   isCurrentUser: boolean;
@@ -69,7 +83,7 @@ interface MemberCardProps {
 }
 
 function MemberCard({ member, isCurrentUser, isOwner, currentUserIsOwner, onRemove }: MemberCardProps) {
-  const name = member.display_name || member.email?.split('@')[0] || 'Usuário';
+  const name     = member.display_name || member.email?.split('@')[0] || 'Usuário';
   const initials = getInitials(name);
 
   return (
@@ -136,34 +150,125 @@ function MemberCard({ member, isCurrentUser, isOwner, currentUserIsOwner, onRemo
   );
 }
 
+// ─── InviteForm ───────────────────────────────────────────────────────────────
+
+interface InviteFormProps {
+  groupId: string;
+  onSuccess: () => void;
+}
+
+function InviteForm({ groupId, onSuccess }: InviteFormProps) {
+  const inviteMutation = useInviteMember(groupId);
+  const [form, setForm] = useState({ name: '', email: '', phone: '' });
+
+  function handleSubmit() {
+    const result = inviteSchema.safeParse(form);
+    if (!result.success) {
+      toast.error(result.error.errors[0].message);
+      return;
+    }
+    inviteMutation.mutate(
+      { name: form.name, email: form.email, phone: form.phone || undefined },
+      {
+        onSuccess: () => {
+          toast.success('Convite enviado com sucesso!');
+          setForm({ name: '', email: '', phone: '' });
+          onSuccess();
+        },
+        onError: (err: Error) => toast.error(err.message),
+      },
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Convidar novo membro</CardTitle>
+      </CardHeader>
+
+      <CardContent className="flex flex-col space-y-6">
+        {/* Linha 1: Nome + Telefone */}
+        <div className="flex flex-row gap-6">
+          <div className="flex w-full flex-col gap-2">
+            <Label htmlFor="invite-name">Nome</Label>
+            <Input
+              id="invite-name"
+              value={form.name}
+              onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+              placeholder="Nome completo"
+            />
+          </div>
+
+          <div className="flex w-full flex-col gap-2">
+            <Label htmlFor="invite-phone">Telefone</Label>
+            <PatternFormat
+              id="invite-phone"
+              value={form.phone}
+              onValueChange={(v) => setForm((p) => ({ ...p, phone: v.formattedValue }))}
+              format="(##) #####-####"
+              mask="_"
+              customInput={Input}
+              placeholder="(00) 00000-0000"
+            />
+          </div>
+        </div>
+
+        {/* Linha 2: E-mail */}
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="invite-email">E-mail</Label>
+          <Input
+            id="invite-email"
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+            placeholder="nome@exemplo.com"
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+          />
+        </div>
+      </CardContent>
+
+      <CardFooter className="flex justify-end">
+        <AnimateIcon animateOnHover>
+          <LiquidButton
+            className="text-white"
+            onClick={handleSubmit}
+            disabled={inviteMutation.isPending}
+          >
+            <div className="flex items-center gap-3 px-8">
+              {inviteMutation.isPending ? (
+                <>
+                  Enviando
+                  <Loader2 className="size-4 animate-spin" />
+                </>
+              ) : (
+                <>
+                  Enviar convite
+                  <SendIcon className="size-4" />
+                </>
+              )}
+            </div>
+          </LiquidButton>
+        </AnimateIcon>
+      </CardFooter>
+    </Card>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function Groups() {
   const { data: groups, isLoading: loadingGroups } = useGroups();
   const { data: currentUser } = useCurrentUser();
 
-  const activeGroup = groups?.[0];
-  const activeGroupId = activeGroup?.id ?? '';
+  const activeGroup        = groups?.[0];
+  const activeGroupId      = activeGroup?.id ?? '';
   const currentUserIsOwner = activeGroup?.role === 'owner';
 
   const { data: members, isLoading: loadingMembers } = useGroupMembers(activeGroupId);
-  const inviteMutation = useInviteMember(activeGroupId);
   const removeMutation = useRemoveMember(activeGroupId);
 
-  const [inviteOpen, setInviteOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
-
-  const [removeTarget, setRemoveTarget] = useState<{ id: string; name: string } | null>(null);
-
-  function handleInvite() {
-    if (!inviteEmail.trim()) return;
-    inviteMutation.mutate(inviteEmail.trim(), {
-      onSuccess: () => {
-        toast.success('Convite enviado com sucesso!');
-        setInviteEmail('');
-        setInviteOpen(false);
-      },
-      onError: (err: Error) => toast.error(err.message),
-    });
-  }
+  const [showInviteForm, setShowInviteForm]   = useState(false);
+  const [removeTarget, setRemoveTarget]       = useState<{ id: string; name: string } | null>(null);
 
   function handleRemoveConfirm() {
     if (!removeTarget) return;
@@ -187,21 +292,34 @@ export default function Groups() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="mx-auto w-full space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <TituloPage titulo={activeGroup?.name ?? 'Grupo'} />
-        {currentUserIsOwner && (
-          <Button onClick={() => setInviteOpen(true)} className="gap-2" size="sm">
+        {currentUserIsOwner && !showInviteForm && (
+          <Button onClick={() => setShowInviteForm(true)} className="gap-2" size="sm">
             <UserPlus className="size-4" />
             Convidar membro
           </Button>
         )}
       </div>
 
+      {/* Formulário de convite — visível apenas quando o owner clica em "Convidar membro" */}
+      {currentUserIsOwner && showInviteForm && (
+        <InviteForm
+          groupId={activeGroupId}
+          onSuccess={() => setShowInviteForm(false)}
+        />
+      )}
+
+      {/* Lista de membros */}
       <section className="space-y-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Users className="size-4" />
-          <span>{members?.length ?? 0} {members?.length === 1 ? 'membro' : 'membros'}</span>
+          <span>
+            {members?.length ?? 0}{' '}
+            {members?.length === 1 ? 'membro' : 'membros'}
+          </span>
         </div>
 
         {loadingMembers ? (
@@ -222,42 +340,6 @@ export default function Groups() {
           ))
         )}
       </section>
-
-      {/* Dialog de convite */}
-      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Convidar membro</DialogTitle>
-            <DialogDescription>
-              Envie um convite por e-mail. O link expira em 48 horas.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-2">
-            <Label htmlFor="invite-email">E-mail</Label>
-            <Input
-              id="invite-email"
-              type="email"
-              placeholder="nome@exemplo.com"
-              value={inviteEmail}
-              onChange={(e) => setInviteEmail(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
-              autoFocus
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setInviteOpen(false)}>
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleInvite}
-              disabled={!inviteEmail.trim() || inviteMutation.isPending}
-              className="gap-2"
-            >
-              {inviteMutation.isPending ? 'Enviando...' : 'Enviar convite'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Confirmação de remoção */}
       <AlertDialog open={!!removeTarget} onOpenChange={(open) => !open && setRemoveTarget(null)}>

@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
 import { getGroups } from '@/service/groups/getGroups';
 import { getGroupMembers } from '@/service/groups/getGroupMembers';
-import { inviteMember } from '@/service/groups/inviteMember';
+import { inviteMember, type InvitePayload } from '@/service/groups/inviteMember';
 import { removeMember } from '@/service/groups/removeMember';
 
 export function useGroups() {
@@ -25,7 +25,7 @@ export function useGroupMembers(groupId: string | undefined) {
 export function useInviteMember(groupId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (email: string) => inviteMember(groupId, email),
+    mutationFn: (payload: InvitePayload) => inviteMember(groupId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.groups.members(groupId) });
     },
