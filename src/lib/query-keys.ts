@@ -74,6 +74,17 @@ export const queryKeys = {
     all: ['parcelas'] as const,
     list: () => [...queryKeys.parcelas.all, 'list'] as const,
   },
+
+  // Groups
+  groups: {
+    all: ['groups'] as const,
+    members: (groupId: string) => ['groups', 'members', groupId] as const,
+  },
+
+  // Invites
+  invites: {
+    byToken: (token: string) => ['invites', token] as const,
+  },
 } as const;
 
 // Tipos para type safety

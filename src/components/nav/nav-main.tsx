@@ -7,7 +7,7 @@ import {
 import { Link, useLocation } from '@tanstack/react-router';
 import { FaListAlt, FaUserCog, FaHome, FaHistory } from 'react-icons/fa';
 import { MdPaid, MdCreditCard } from 'react-icons/md';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Users } from 'lucide-react';
 
 // Define os ícones disponíveis e o tipo aceito
 const iconMap: Record<string, React.ElementType> = {
@@ -18,6 +18,7 @@ const iconMap: Record<string, React.ElementType> = {
   history: FaHistory,
   parcelas: MdCreditCard,
   advisor: Sparkles,
+  groups: Users,
 };
 
 type IconKey = keyof typeof iconMap;

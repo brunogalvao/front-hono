@@ -28,6 +28,7 @@ const data = {
     { title: 'Compras a Prazo', url: '/admin/parcelas', icon: 'parcelas' as const },
     { title: 'Histórico', url: '/admin/history', icon: 'history' as const },
     { title: 'Consultor IA', url: '/admin/advisor', icon: 'advisor' as const },
+    { title: 'Grupo', url: '/admin/groups', icon: 'groups' as const },
     { title: 'Usuário', url: '/admin/editUser', icon: 'user' as const },
   ],
 };

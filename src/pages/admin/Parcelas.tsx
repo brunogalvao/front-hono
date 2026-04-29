@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useParcelas } from '@/hooks/use-parcelas';
+import { useParcelas, useDeleteParcela } from '@/hooks/use-parcelas';
 import { queryKeys } from '@/lib/query-keys';
 import TituloPage from '@/components/TituloPage';
 import { AddParcelaDialog } from '@/components/AddParcelaDialog';
+import { EditParcelaDialog } from '@/components/EditParcelaDialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,10 +17,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { formatToBRL } from '@/utils/format';
 import { getNomeMes } from '@/model/mes.enum';
 import type { ParcelaGroup } from '@/model/parcelas.model';
-import { CreditCard } from 'lucide-react';
+import { CreditCard, Pencil, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 type StatusFilter = 'Todos' | 'Ativo' | 'Quitada';
 
@@ -67,6 +79,9 @@ function TableSkeleton() {
 function Parcelas() {
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<StatusFilter>('Todos');
+  const [editingParcela, setEditingParcela] = useState<ParcelaGroup | null>(null);
+  const [deletingParcela, setDeletingParcela] = useState<ParcelaGroup | null>(null);
+  const deleteMutation = useDeleteParcela();
 
   const { data: parcelas = [], isLoading } = useParcelas();
 
@@ -157,6 +172,7 @@ function Parcelas() {
                   <TableHead>Valor Total</TableHead>
                   <TableHead>Início</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead className="w-10" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -189,6 +205,26 @@ function Parcelas() {
                     <TableCell>
                       <StatusBadge status={group.status} />
                     </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setEditingParcela(group)}
+                          className="h-8 w-8"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setDeletingParcela(group)}
+                          className="text-destructive hover:text-destructive h-8 w-8"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -196,6 +232,49 @@ function Parcelas() {
           )}
         </CardContent>
       </Card>
+
+      {editingParcela && (
+        <EditParcelaDialog
+          open={!!editingParcela}
+          onOpenChange={(open) => { if (!open) setEditingParcela(null); }}
+          parcela={editingParcela}
+        />
+      )}
+
+      <AlertDialog
+        open={!!deletingParcela}
+        onOpenChange={(open) => { if (!open) setDeletingParcela(null); }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Arquivar compra parcelada?</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{deletingParcela?.title}" e todas as suas{' '}
+              {deletingParcela?.parcela_total} parcelas serão arquivadas. Essa
+              ação pode ser revertida diretamente no banco de dados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90 text-white"
+              onClick={async () => {
+                if (!deletingParcela) return;
+                try {
+                  await deleteMutation.mutateAsync(deletingParcela.parcela_group_id);
+                  toast.success('Compra parcelada arquivada.');
+                } catch {
+                  toast.error('Erro ao arquivar compra parcelada.');
+                } finally {
+                  setDeletingParcela(null);
+                }
+              }}
+            >
+              Arquivar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

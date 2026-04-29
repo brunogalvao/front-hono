@@ -15,6 +15,8 @@ import Dashboard from '@/pages/admin/Dashboard';
 import History from '@/pages/admin/History';
 import Parcelas from '@/pages/admin/Parcelas';
 import Advisor from '@/pages/admin/Advisor';
+import Groups from '@/pages/admin/Groups';
+import Invite from '@/pages/Invite';
 
 // Root Route
 const rootRoute = createRootRoute({
@@ -88,6 +90,19 @@ const advisorRoute = createRoute({
   component: Advisor,
 });
 
+const groupsRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: '/groups',
+  component: Groups,
+});
+
+// Invite Route (public)
+const inviteRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/invite/$token',
+  component: Invite,
+});
+
 // Auth Callback Route
 const authCallbackRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -106,6 +121,7 @@ const catchAllRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   homeRoute,
   loginRoute,
+  inviteRoute,
   authCallbackRoute,
   adminRoute.addChildren([
     editUserRoute,
@@ -115,6 +131,7 @@ const routeTree = rootRoute.addChildren([
     historyRoute,
     parcelasRoute,
     advisorRoute,
+    groupsRoute,
   ]),
   catchAllRoute,
 ]);

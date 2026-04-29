@@ -72,6 +72,11 @@ function Expenses() {
     .filter((t) => t.done === TASK_STATUS.Pago && t.price)
     .reduce((sum, t) => sum + Number(t.price), 0);
 
+  // 💰 Total de todas as despesas do mês (independente do status)
+  const totalDespesas = tasksCurrentMonth
+    .filter((t) => t.price)
+    .reduce((sum, t) => sum + Number(t.price), 0);
+
   // 🔄 Invalida cache e recarrega após alteração
   const handleTasksChange = useCallback(async () => {
     await Promise.all([
@@ -228,7 +233,7 @@ function Expenses() {
                     <TasksTable
                       tasks={tasksCurrentMonth}
                       total={tasksCurrentMonth.length}
-                      totalPrice={totalPago}
+                      totalPrice={totalDespesas}
                       onTasksChange={handleTasksChange}
                     />
                   </CardContent>

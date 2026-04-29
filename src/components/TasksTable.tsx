@@ -6,8 +6,6 @@ import { getExpenseTypes } from '@/service/expense-types/getExpenseTypes';
 import { z } from 'zod';
 import { taskSchema } from '@/schema/taskSchema';
 import { useEditTask, useDeleteTask } from '@/hooks/use-tasks';
-import { useIA } from '@/hooks/use-ia';
-import { useIncomesByMonth } from '@/hooks/use-incomes-by-month';
 
 // ui
 import {
@@ -95,6 +93,7 @@ const TasksTableSkeleton = () => (
 
 export const TasksTable = memo(function TasksTable({
   tasks,
+  totalPrice,
   onTasksChange,
   isLoading = false,
 }: TaskTable) {
@@ -247,20 +246,7 @@ export const TasksTable = memo(function TasksTable({
 
   const isFormValid = Object.keys(formErrors).length === 0;
 
-  // Hook para buscar dados da IA simplificados
-  const { data: iaData } = useIA();
-
-  // Hook para buscar rendimentos por mês (ainda usado para exibição no header)
-  const { data: salariosPorMes = {} } = useIncomesByMonth();
-
-  const mesAtual = new Date().getMonth() + 1;
-
-  // Usar dados da IA ou fallback para valores locais
-  // const totalMesAtual =
-  //   iaData?.data?.rendimentoMes || salariosPorMes[mesAtual] || 0;
-
-  const totalDespesasMesAtual =
-    iaData?.data?.totalDespesas || salariosPorMes[mesAtual] || 0;
+  const totalDespesasMesAtual = totalPrice;
 
   if (isLoading) {
     return <TasksTableSkeleton />;
@@ -289,16 +275,21 @@ export const TasksTable = memo(function TasksTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tasks.map((task) => {
-            const isPendente = task.done === TASK_STATUS.Pendente;
-            const isRecorrente = task.recorrente === true;
-            const isRecurringCopy = !!task.fixo_source_id;
-            const isHighlighted = task.id === highlightedTaskId;
-            return (
+          {(() => {
+            const pendentes = tasks.filter((t) => t.done !== TASK_STATUS.Pago);
+            const pagas = tasks.filter((t) => t.done === TASK_STATUS.Pago);
+            const renderRow = (task: Task) => {
+              const isPendente = task.done === TASK_STATUS.Pendente;
+              const isPago = task.done === TASK_STATUS.Pago;
+              const isRecorrente = task.recorrente === true;
+              const isRecurringCopy = !!task.fixo_source_id;
+              const isHighlighted = task.id === highlightedTaskId;
+              return (
               <TableRow
                 key={task.id}
                 ref={isHighlighted ? highlightRef : undefined}
                 className={cn(
+                  isPago && 'opacity-50',
                   isPendente &&
                     !isRecorrente &&
                     !isRecurringCopy &&
@@ -363,7 +354,25 @@ export const TasksTable = memo(function TasksTable({
                 </TableCell>
               </TableRow>
             );
-          })}
+            };
+            return (
+              <>
+                {pendentes.map(renderRow)}
+                {pagas.length > 0 && (
+                  <TableRow className="hover:bg-transparent">
+                    <TableCell colSpan={5} className="py-1">
+                      <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                        <div className="bg-border h-px flex-1" />
+                        {pagas.length} paga{pagas.length > 1 ? 's' : ''}
+                        <div className="bg-border h-px flex-1" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+                {pagas.map(renderRow)}
+              </>
+            );
+          })()}
         </TableBody>
       </Table>
 

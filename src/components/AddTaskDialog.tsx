@@ -167,7 +167,7 @@ export function AddTaskDialog({
       </DialogTrigger>
 
       <DialogContent
-        className="w-full max-w-2xl"
+        className="w-full sm:max-w-3xl"
         aria-describedby="add-task-description"
       >
         <DialogHeader>
