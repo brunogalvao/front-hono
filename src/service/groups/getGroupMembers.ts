@@ -1,7 +1,8 @@
+import type { GroupAccess } from './groupAccess';
 import { getAuthToken } from '@/lib/supabase';
 import { API_BASE_URL } from '@/config/api';
 
-export interface GroupMember {
+export interface GroupMember extends GroupAccess {
   user_id: string;
   role: 'owner' | 'member';
   joined_at: string;

@@ -79,6 +79,7 @@ export const queryKeys = {
   groups: {
     all: ['groups'] as const,
     members: (groupId: string) => ['groups', 'members', groupId] as const,
+    invites: (groupId: string) => ['groups', 'invites', groupId] as const,
   },
 
   // Invites

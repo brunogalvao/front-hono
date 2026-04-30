@@ -1,23 +1,22 @@
-import type { GroupAccess } from './groupAccess';
 import { getAuthToken } from '@/lib/supabase';
 import { API_BASE_URL } from '@/config/api';
+import type { GroupAccess } from './groupAccess';
 
-export interface InvitePayload extends GroupAccess {
-  name: string;
-  email: string;
-  phone?: string;
-}
-
-export async function inviteMember(groupId: string, payload: InvitePayload): Promise<void> {
+export async function updateMemberAccess(
+  groupId: string,
+  userId: string,
+  payload: Partial<GroupAccess>
+): Promise<void> {
   const token = await getAuthToken();
-  const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}/invite`, {
-    method: 'POST',
+  const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}/members/${userId}`, {
+    method: 'PATCH',
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload),
   });
+
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     throw new Error(data?.error || `Erro HTTP ${res.status}`);
