@@ -1,0 +1,33 @@
+{
+  "title": "Installments",
+  "subtitle": "Manage your installment purchases",
+  "noInstallments": "No installment purchases found.",
+  "noInstallmentsHint": "Click \"Add\" to register a new installment purchase.",
+  "open": "Open",
+  "remaining": "remaining",
+  "filterAll": "All",
+  "filterActive": "Active",
+  "filterPaid": "Paid off",
+  "tableTitle": "Installment Purchases",
+  "col": {
+    "description": "Description",
+    "category": "Category",
+    "installment": "Installment",
+    "progress": "Progress",
+    "total": "Total Amount",
+    "start": "Start",
+    "status": "Status"
+  },
+  "perMonth": "/mo",
+  "archiveTitle": "Archive installment purchase?",
+  "archiveDescription": "\"{{title}}\" and all its {{total}} installments will be archived. This action can be reversed directly in the database.",
+  "archiveConfirm": "Archive",
+  "toast": {
+    "updated": "Installment updated!",
+    "updateError": "Error updating installment.",
+    "archived": "Installment purchase archived.",
+    "archiveError": "Error archiving installment purchase.",
+    "deleted": "Installment deleted successfully.",
+    "deleteError": "Error deleting installment."
+  }
+}

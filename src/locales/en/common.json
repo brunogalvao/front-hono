@@ -1,0 +1,55 @@
+{
+  "loading": "Loading...",
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "add": "Add",
+  "update": "Update",
+  "confirm": "Confirm",
+  "back": "Back",
+  "close": "Close",
+  "search": "Search",
+  "noData": "No data found.",
+  "error": "Error",
+  "success": "Success",
+  "currency": {
+    "brl": "R$",
+    "usd": "U$",
+    "invalidValue": "Invalid value"
+  },
+  "months": {
+    "1": "January",
+    "2": "February",
+    "3": "March",
+    "4": "April",
+    "5": "May",
+    "6": "June",
+    "7": "July",
+    "8": "August",
+    "9": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December",
+    "invalid": "Invalid month"
+  },
+  "monthsAbbr": {
+    "1": "Jan",
+    "2": "Feb",
+    "3": "Mar",
+    "4": "Apr",
+    "5": "May",
+    "6": "Jun",
+    "7": "Jul",
+    "8": "Aug",
+    "9": "Sep",
+    "10": "Oct",
+    "11": "Nov",
+    "12": "Dec"
+  },
+  "errors": {
+    "unauthenticated": "User not authenticated.",
+    "generic": "An error occurred. Please try again.",
+    "connectionError": "Connection error. Check your internet."
+  }
+}

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import {
   Clock3,
   Loader2,
@@ -564,6 +565,7 @@ function InviteForm({ groupId, onSuccess }: InviteFormProps) {
 }
 
 export default function Groups() {
+  const { t } = useTranslation('groups');
   const { data: groups, isLoading: loadingGroups } = useGroups();
   const { data: currentUser } = useCurrentUser();
   const [selectedGroupId, setSelectedGroupId] = useState('');
@@ -618,7 +620,7 @@ export default function Groups() {
 
     removeMutation.mutate(removeTarget.id, {
       onSuccess: () => {
-        toast.success('Membro removido.');
+        toast.success(t('toast.removed'));
         setRemoveTarget(null);
       },
       onError: (err: Error) => toast.error(err.message),
@@ -680,9 +682,9 @@ export default function Groups() {
       <div className="mx-auto w-full space-y-6">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="space-y-2">
-            <TituloPage titulo="Grupos" />
+            <TituloPage titulo={t('title')} />
             <p className="text-sm text-muted-foreground">
-              Crie seu primeiro grupo para começar a organizar pessoas e permissões.
+              {t('subtitle')}
             </p>
           </div>
           {isSuperAdmin && <Badge>Super Admin</Badge>}
@@ -703,11 +705,11 @@ export default function Groups() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="space-y-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <TituloPage titulo="Grupos" />
+            <TituloPage titulo={t('title')} />
             {isSuperAdmin && <Badge>Super Admin</Badge>}
           </div>
           <p className="text-sm text-muted-foreground">
-            Bruno pode criar grupos, adicionar pessoas e ajustar os acessos por grupo.
+            {t('subtitle')}
           </p>
         </div>
 

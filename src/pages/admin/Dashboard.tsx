@@ -14,16 +14,18 @@ import {
 } from '@/components/SkeletonDashboard';
 import { getNomeMes } from '@/model/mes.enum';
 import { getCurrentMonth, getCurrentYear } from '@/utils/date';
+import { useTranslation } from 'react-i18next';
 
 const Dashboard = () => {
   const { data: iaData, isLoading } = useIA();
+  const { t } = useTranslation('dashboard');
   const shouldShowSkeleton = isLoading;
 
-  const subtitulo = `${getNomeMes(getCurrentMonth())} de ${getCurrentYear()}`;
+  const subtitulo = `${getNomeMes(getCurrentMonth())} ${getCurrentYear()}`;
 
   return (
     <div className="space-y-6">
-      <TituloPage titulo="Visão Geral" subtitulo={subtitulo} />
+      <TituloPage titulo={t('title')} subtitulo={subtitulo} />
 
       {/* Gráfico de Visão Geral */}
       <FinancialChart />
@@ -39,7 +41,7 @@ const Dashboard = () => {
               <CardTitle className="flex items-center justify-between gap-2 text-lg">
                 <div className="flex flex-row items-center gap-2 text-amber-500">
                   <MdTipsAndUpdates />
-                  Dicas de Economia
+                  {t('savingTips')}
                 </div>
               </CardTitle>
             </CardHeader>
@@ -56,11 +58,10 @@ const Dashboard = () => {
                 <div className="border-primary hover:bg-primary group flex w-full cursor-pointer flex-col items-center justify-center gap-2 gap-y-1 rounded-full border bg-amber-50/5 py-3 text-center text-white transition-all hover:text-white">
                   <div className="flex flex-row items-center gap-2">
                     <Sparkles />
-                    Consultor IA
+                    {t('advisorCta')}
                   </div>
                   <div className="text-sm font-light text-gray-500 group-hover:text-white">
-                    Acesse o Consultor de IA para receber dicas personalizadas
-                    de economia.
+                    {t('advisorDescription')}
                   </div>
                 </div>
               </Link>

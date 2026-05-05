@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -38,6 +39,7 @@ import { ResetPassword } from '@/components/ResetPassword';
 import { useCurrentUser, useUpdateUserProfile } from '@/hooks/use-user-profile';
 
 const EditUser = () => {
+  const { t } = useTranslation(['profile', 'common']);
   const { data: user } = useCurrentUser();
   const updateProfile = useUpdateUserProfile();
   const [formData, setFormData] = useState({
@@ -74,7 +76,7 @@ const EditUser = () => {
       return;
     }
     if (!user) {
-      toast.error('Usuário não autenticado.');
+      toast.error(t('common:errors.unauthenticated'));
       return;
     }
 
@@ -93,7 +95,7 @@ const EditUser = () => {
           setFormData((prev) => ({ ...prev, avatarUrl }));
           setPreview(null);
           setFile(null);
-          toast.success('Perfil atualizado com sucesso!', { duration: 5000 });
+          toast.success(t('toast.updated'), { duration: 5000 });
           if (provider === 'email') {
             setProfile({
               name: formData.name,
@@ -105,7 +107,7 @@ const EditUser = () => {
           }
         },
         onError: () => {
-          toast.error('Erro ao atualizar perfil.', { duration: 5000 });
+          toast.error(t('toast.updateError'), { duration: 5000 });
         },
       },
     );
@@ -178,7 +180,7 @@ const EditUser = () => {
 
   return (
     <div className="mx-auto w-full space-y-6">
-      <TituloPage titulo="Editar Perfil" />
+      <TituloPage titulo={t('title')} />
 
       <div className="flex flex-row items-center gap-5">
         {/* Avatar clicável */}
@@ -306,7 +308,7 @@ const EditUser = () => {
         <CardContent className="flex flex-col space-y-6">
           <div className="flex flex-row gap-6">
             <div className="flex w-full flex-col gap-2">
-              <Label htmlFor="name">Nome</Label>
+              <Label htmlFor="name">{t('name')}</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -317,7 +319,7 @@ const EditUser = () => {
             </div>
 
             <div className="flex w-full flex-col gap-2">
-              <Label htmlFor="phone">Telefone</Label>
+              <Label htmlFor="phone">{t('phone')}</Label>
               <PatternFormat
                 id="phone"
                 value={formData.phone}
@@ -345,12 +347,12 @@ const EditUser = () => {
               <div className="flex flex-row items-center gap-3 px-12">
                 {updateProfile.isPending ? (
                   <>
-                    Salvando
+                    {t('common:loading')}
                     <Loader2 className="size-5 animate-spin" />
                   </>
                 ) : (
                   <>
-                    Salvar Alterações
+                    {t('save')}
                     <RefreshCcw className="size-5" />
                   </>
                 )}

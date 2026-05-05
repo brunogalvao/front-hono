@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import {
   Sparkles,
@@ -104,6 +105,7 @@ interface SectionCardProps {
   iconClass: string;
   badge?: string;
   badgeVariant?: 'default' | 'secondary' | 'destructive' | 'outline';
+  badgeClass?: string;
   content: string;
 }
 
@@ -113,6 +115,7 @@ function SectionCard({
   iconClass,
   badge,
   badgeVariant = 'secondary',
+  badgeClass,
   content,
 }: SectionCardProps) {
   return (
@@ -122,7 +125,10 @@ function SectionCard({
           <Icon className={`size-5 shrink-0 ${iconClass}`} />
           <span>{title}</span>
           {badge && (
-            <Badge variant={badgeVariant} className="ml-auto text-xs">
+            <Badge
+              variant={badgeVariant}
+              className={`ml-auto text-xs ${badgeClass ?? ''}`}
+            >
               {badge}
             </Badge>
           )}
@@ -153,11 +159,12 @@ function SectionCard({
 }
 
 function QuotaExceededAlert({ retrySeconds }: { retrySeconds: number | null }) {
+  const { t, i18n } = useTranslation('advisor');
   const initialSeconds = retrySeconds ?? 60;
   const [countdown, setCountdown] = useState(initialSeconds);
   const availableAt = new Date(
     Date.now() + initialSeconds * 1000
-  ).toLocaleTimeString('pt-BR', {
+  ).toLocaleTimeString(i18n.language === 'en' ? 'en-US' : 'pt-BR', {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -181,16 +188,16 @@ function QuotaExceededAlert({ retrySeconds }: { retrySeconds: number | null }) {
       <Clock className="-mt-1 size-4 text-amber-500" />
       <AlertDescription className="text-sm">
         <span className="font-semibold text-amber-600 dark:text-amber-400">
-          Limite de requisições atingido.
+          {t('quota.exceeded')}
         </span>{' '}
         {countdown > 0 ? (
           <>
-            Disponível às{' '}
+            {t('quota.availableAt')}{' '}
             <span className="font-semibold tabular-nums">{availableAt}</span> —
-            faltam <span className="tabular-nums">{countdownStr}</span>.
+            {t('quota.remaining')} <span className="tabular-nums">{countdownStr}</span>.
           </>
         ) : (
-          'Você já pode tentar novamente.'
+          t('quota.tryAgain')
         )}
       </AlertDescription>
     </Alert>
@@ -220,6 +227,7 @@ function parseAnalysisSections(analysis: string): {
 }
 
 export function FinancialAdvisor() {
+  const { t } = useTranslation('advisor');
   const [month, setMonth] = useState(getCurrentMonth());
   const [year, setYear] = useState(getCurrentYear());
   const { analysis, isLoading, error, retrySeconds, analyzeFinances, reset } =
@@ -247,8 +255,8 @@ export function FinancialAdvisor() {
   return (
     <div className="space-y-6">
       <TituloPage
-        titulo="Consultor IA"
-        subtitulo="Análise financeira personalizada com inteligência artificial"
+        titulo={t('title')}
+        subtitulo={t('subtitle')}
       />
 
       {/* Controles */}
@@ -268,8 +276,10 @@ export function FinancialAdvisor() {
                 disabled={isLoading}
                 className="gap-2"
               >
-                <Sparkles className="size-1" />
-                {isLoading ? 'Analisando...' : 'Analisar'}
+                <Sparkles
+                  className={`size-4 ${isLoading ? 'animate-spin' : ''}`}
+                />
+                {isLoading ? t('analyzing') : t('analyze')}
               </Button>
             ) : (
               <Button
@@ -279,7 +289,7 @@ export function FinancialAdvisor() {
                 className="gap-2"
               >
                 <RotateCcw className="size-4" />
-                Nova análise
+                {t('newAnalysis')}
               </Button>
             )}
           </div>
@@ -308,13 +318,13 @@ export function FinancialAdvisor() {
           {isStreaming && (
             <div className="text-muted-foreground flex items-center gap-2 text-sm">
               <Bot className="size-4 animate-pulse" />
-              <span>Gerando análise...</span>
+              <span>{t('analyzing')}</span>
             </div>
           )}
 
           {sections.diagnostico && (
             <SectionCard
-              title="Diagnóstico do Período"
+              title={t('sections.diagnosis')}
               icon={TrendingUp}
               iconClass="text-blue-500"
               badge={`${getNomeMes(month)} ${year}`}
@@ -324,31 +334,31 @@ export function FinancialAdvisor() {
 
           {sections.alertas && (
             <SectionCard
-              title="Alertas e Sugestões de Corte"
+              title={t('sections.alerts')}
               icon={AlertTriangle}
               iconClass="text-amber-500"
-              badge="Atenção"
+              badge={t('sections.attentionBadge')}
               badgeVariant="outline"
+              badgeClass="border-amber-500/50 bg-amber-500/15 text-amber-600 dark:text-amber-400"
               content={sections.alertas}
             />
           )}
 
           {sections.investimento && (
             <SectionCard
-              title="Recomendação de Investimento"
+              title={t('sections.investment')}
               icon={PiggyBank}
               iconClass="text-emerald-500"
-              badge="Estratégia"
+              badge={t('sections.strategyBadge')}
+              badgeVariant="outline"
+              badgeClass="border-emerald-500/50 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
               content={sections.investimento}
             />
           )}
 
-          {/* Aviso de responsabilidade */}
           {!isStreaming && (
             <p className="text-muted-foreground text-center text-xs">
-              Esta análise é gerada por inteligência artificial e tem caráter
-              informativo. Consulte um profissional financeiro certificado para
-              decisões de investimento.
+              {t('disclaimer')}
             </p>
           )}
         </div>
@@ -362,16 +372,14 @@ export function FinancialAdvisor() {
               <Sparkles className="text-primary size-8" />
             </div>
             <div>
-              <h3 className="font-semibold">Análise financeira com IA</h3>
+              <h3 className="font-semibold">{t('emptyTitle')}</h3>
               <p className="text-muted-foreground mt-1 text-sm">
-                Selecione o período e clique em "Analisar" para receber um
-                diagnóstico personalizado com alertas e recomendações de
-                investimento.
+                {t('emptyDescription')}
               </p>
             </div>
             <Button onClick={handleAnalyze} className="gap-2">
               <Sparkles className="size-4" />
-              Analisar {getNomeMes(month)} {year}
+              {t('analyze')} {getNomeMes(month)} {year}
             </Button>
           </CardContent>
         </Card>

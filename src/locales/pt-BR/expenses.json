@@ -1,0 +1,34 @@
+{
+  "title": "Despesas",
+  "subtitle": "Gerencie suas despesas mensais",
+  "noPayment": "Sem Pagamento Efetuado",
+  "noPaymentTooltip": "Mude o status na tabela para somar os valores pagos.",
+  "noExpenses": "Nenhuma despesa encontrada.",
+  "noExpensesForMonth": "Nenhuma despesa encontrada para {{month}}.",
+  "loadError": "Erro ao carregar despesas. Verifique sua conexão e tente novamente.",
+  "recurring": "Recorrentes",
+  "table": {
+    "title": "Título",
+    "price": "Valor",
+    "status": "Status",
+    "type": "Categoria",
+    "month": "Mês",
+    "actions": "Ações",
+    "editItem": "Editar Item",
+    "deleteConfirm": "Tem certeza que deseja deletar esta despesa?",
+    "deleteSuccess": "Despesa deletada com sucesso.",
+    "deleteError": "Erro ao deletar despesa.",
+    "updateSuccess": "Despesa atualizada com sucesso.",
+    "updateError": "Erro ao atualizar despesa."
+  },
+  "add": {
+    "title": "Adicionar Despesa",
+    "titleLabel": "Título",
+    "price": "Valor",
+    "status": "Status",
+    "type": "Categoria",
+    "month": "Mês",
+    "success": "Despesa adicionada com sucesso.",
+    "error": "Erro ao adicionar despesa."
+  }
+}

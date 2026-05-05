@@ -1,0 +1,55 @@
+{
+  "loading": "Carregando...",
+  "save": "Salvar",
+  "cancel": "Cancelar",
+  "delete": "Deletar",
+  "edit": "Editar",
+  "add": "Adicionar",
+  "update": "Atualizar",
+  "confirm": "Confirmar",
+  "back": "Voltar",
+  "close": "Fechar",
+  "search": "Buscar",
+  "noData": "Nenhum dado encontrado.",
+  "error": "Erro",
+  "success": "Sucesso",
+  "currency": {
+    "brl": "R$",
+    "usd": "U$",
+    "invalidValue": "Valor inválido"
+  },
+  "months": {
+    "1": "Janeiro",
+    "2": "Fevereiro",
+    "3": "Março",
+    "4": "Abril",
+    "5": "Maio",
+    "6": "Junho",
+    "7": "Julho",
+    "8": "Agosto",
+    "9": "Setembro",
+    "10": "Outubro",
+    "11": "Novembro",
+    "12": "Dezembro",
+    "invalid": "Mês inválido"
+  },
+  "monthsAbbr": {
+    "1": "Jan",
+    "2": "Fev",
+    "3": "Mar",
+    "4": "Abr",
+    "5": "Mai",
+    "6": "Jun",
+    "7": "Jul",
+    "8": "Ago",
+    "9": "Set",
+    "10": "Out",
+    "11": "Nov",
+    "12": "Dez"
+  },
+  "errors": {
+    "unauthenticated": "Usuário não autenticado.",
+    "generic": "Ocorreu um erro. Tente novamente.",
+    "connectionError": "Erro de conexão. Verifique sua internet."
+  }
+}

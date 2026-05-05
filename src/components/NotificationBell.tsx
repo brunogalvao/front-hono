@@ -31,14 +31,14 @@ export function NotificationBell() {
 
   const handleTaskClick = (task: Task) => {
     sessionStorage.setItem('highlightTaskId', task.id);
-    navigate({ to: '/admin/list' });
+    navigate({ to: '/admin/expenses' });
   };
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Link
-          to="/admin/list"
+          to="/admin/expenses"
           className="hover:bg-accent relative flex h-9 w-9 items-center justify-center rounded-full transition-colors"
         >
           <Bell

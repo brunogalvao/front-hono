@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
@@ -16,12 +17,13 @@ import {
 import { Loader2 } from 'lucide-react';
 
 export function ForgotPassword() {
+  const { t } = useTranslation(['auth', 'common']);
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!email) return toast.error('Informe seu e-mail.');
+    if (!email) return toast.error(t('forgotPassword.errors.emailRequired'));
 
     setLoading(true);
 
@@ -32,11 +34,11 @@ export function ForgotPassword() {
     setLoading(false);
 
     if (error) {
-      toast.error('Erro ao enviar e-mail de recuperação.');
+      toast.error(t('forgotPassword.errors.generic'));
       return;
     }
 
-    toast.success('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
+    toast.success(t('forgotPassword.success'));
     setEmail('');
     setOpen(false);
   };
@@ -48,20 +50,20 @@ export function ForgotPassword() {
           type="button"
           className="text-muted-foreground hover:text-primary text-sm underline-offset-4 hover:underline"
         >
-          Esqueci minha senha
+          {t('forgotPassword.trigger')}
         </button>
       </DialogTrigger>
 
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Recuperar senha</DialogTitle>
+          <DialogTitle>{t('forgotPassword.title')}</DialogTitle>
           <DialogDescription>
-            Informe seu e-mail e enviaremos um link para você redefinir sua senha.
+            {t('forgotPassword.description')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="reset-email">E-mail</Label>
+          <Label htmlFor="reset-email">{t('forgotPassword.email')}</Label>
           <Input
             id="reset-email"
             type="email"
@@ -74,15 +76,15 @@ export function ForgotPassword() {
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
-            Cancelar
+            {t('common:cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
             {loading ? (
               <>
-                Enviando <Loader2 className="size-4 animate-spin" />
+                {t('common:loading')} <Loader2 className="size-4 animate-spin" />
               </>
             ) : (
-              'Enviar link'
+              t('forgotPassword.submit')
             )}
           </Button>
         </DialogFooter>

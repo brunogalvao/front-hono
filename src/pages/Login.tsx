@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import {
   Card,
@@ -17,7 +18,6 @@ import { GradientText } from '@/components/animate-ui/text/gradient';
 import { AnimateIcon } from '@/components/animate-ui/icons/icon';
 import { LogIn } from '@/components/animate-ui/icons/log-in';
 import { Loader } from '@/components/animate-ui/icons/loader';
-import { textoChamada } from '@/data/textoTitulo';
 import {
   Tabs,
   TabsContent,
@@ -35,6 +35,7 @@ interface FormData {
 
 function Login() {
   const navigate = useNavigate();
+  const { t } = useTranslation(['auth', 'home', 'common']);
 
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -43,9 +44,10 @@ function Login() {
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [textoAtual, setTextoAtual] = useState<string>(
-    textoChamada[0].textoHeader
-  );
+  const [textoTab, setTextoTab] = useState<'login' | 'register'>('login');
+  const textoAtual = textoTab === 'login'
+    ? t('home:hero.description')
+    : t('home:register.prompt');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -64,7 +66,7 @@ function Login() {
 
       navigate({ to: '/admin/dashboard' });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao fazer login');
+      setError(err instanceof Error ? err.message : t('auth:login.errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -82,7 +84,7 @@ function Login() {
       if (error) throw error;
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Erro ao fazer login com GitHub'
+        err instanceof Error ? err.message : t('auth:login.errors.github')
       );
       setLoading(false);
     }
@@ -100,7 +102,7 @@ function Login() {
       if (error) throw error;
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Erro ao fazer login com Google'
+        err instanceof Error ? err.message : t('auth:login.errors.google')
       );
       setLoading(false);
     }
@@ -113,11 +115,11 @@ function Login() {
   };
 
   const changeTextCadastro = () => {
-    setTextoAtual(textoChamada[0].subTituloCadastroCard);
+    setTextoTab('register');
   };
 
   const changeTextLogin = () => {
-    setTextoAtual(textoChamada[0].textoHeader);
+    setTextoTab('login');
   };
 
   useEffect(() => {
@@ -168,11 +170,11 @@ function Login() {
                   >
                     {loading ? (
                       <>
-                        <FaGithub /> Acessando a aplicação
+                        <FaGithub /> {t('auth:login.withGithubLoading')}
                       </>
                     ) : (
                       <>
-                        <FaGithub /> Entrar com GitHub
+                        <FaGithub /> {t('auth:login.withGithub')}
                       </>
                     )}
                   </Button>
@@ -192,7 +194,7 @@ function Login() {
                           src="https://www.svgrepo.com/show/475656/google-color.svg"
                           className="h-5 w-5"
                         />
-                        Acessando com Google...
+                        {t('auth:login.withGoogleLoading')}
                       </>
                     ) : (
                       <>
@@ -200,7 +202,7 @@ function Login() {
                           src="https://www.svgrepo.com/show/475656/google-color.svg"
                           className="h-5 w-5"
                         />
-                        Entrar com Google
+                        {t('auth:login.withGoogle')}
                       </>
                     )}
                   </Button>
@@ -227,7 +229,7 @@ function Login() {
                     </div>
                     <div className="flex flex-col space-y-2">
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="password">Senha</Label>
+                        <Label htmlFor="password">{t('auth:login.password')}</Label>
                         <ForgotPassword />
                       </div>
                       <PasswordInput
@@ -250,12 +252,12 @@ function Login() {
                     >
                       {loading ? (
                         <>
-                          Carregando
+                          {t('auth:login.loading')}
                           <Loader />
                         </>
                       ) : (
                         <>
-                          Entrar
+                          {t('auth:login.submit')}
                           <LogIn className="size-5" />
                         </>
                       )}
@@ -270,7 +272,7 @@ function Login() {
             <CardFooter>
               <div className="text-primary flex w-full justify-between">
                 <Link to="/" className="border-dashed text-sm hover:border-b">
-                  voltar
+                  {t('common:back')}
                 </Link>
               </div>
             </CardFooter>
@@ -291,7 +293,7 @@ function Login() {
               <div className="flex flex-col space-y-2">
                 <GradientText
                   className="mb-3 text-5xl font-bold capitalize"
-                  text={textoChamada[0].title}
+                  text={t('home:hero.title')}
                 />
                 <span className="text-zinc-400">{textoAtual}</span>
               </div>

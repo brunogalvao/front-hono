@@ -1,0 +1,12 @@
+{
+  "title": "Editar Perfil",
+  "name": "Nome",
+  "phone": "Telefone",
+  "avatar": "Avatar",
+  "save": "Salvar alterações",
+  "toast": {
+    "updated": "Perfil atualizado com sucesso!",
+    "updateError": "Erro ao atualizar perfil.",
+    "phoneInvalid": "Telefone inválido."
+  }
+}

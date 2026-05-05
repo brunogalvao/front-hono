@@ -6,7 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { MESES, getNomeMes } from '@/model/mes.enum';
+import { getMesesLista, getNomeMes } from '@/model/mes.enum';
 
 interface MonthYearPickerProps {
   mes: number;
@@ -54,7 +54,7 @@ export function MonthYearPicker({ mes, ano, onChange }: MonthYearPickerProps) {
 
         {/* Grid de meses */}
         <div className="grid grid-cols-3 gap-1">
-          {Object.entries(MESES).map(([value, label]) => {
+          {getMesesLista().map(({ value, label }) => {
             const mesNum = Number(value);
             const isSelected = mesNum === mes && yearView === ano;
             return (

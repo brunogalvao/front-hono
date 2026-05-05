@@ -50,13 +50,13 @@ const adminRoute = createRoute({
 
 const editUserRoute = createRoute({
   getParentRoute: () => adminRoute,
-  path: '/editUser',
+  path: '/profile',
   component: EditUser,
 });
 
 const expensesRoute = createRoute({
   getParentRoute: () => adminRoute,
-  path: '/list',
+  path: '/expenses',
   component: Expenses,
 });
 
@@ -80,7 +80,7 @@ const historyRoute = createRoute({
 
 const parcelasRoute = createRoute({
   getParentRoute: () => adminRoute,
-  path: '/parcelas',
+  path: '/installments',
   component: Parcelas,
 });
 

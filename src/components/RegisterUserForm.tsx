@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import {
   Card,
@@ -18,9 +19,9 @@ import { registerSchema } from '@/schema/registerSchema';
 import { AnimateIcon } from './animate-ui/icons/icon';
 import { Send } from './animate-ui/icons/send';
 import { Loader } from './animate-ui/icons/loader';
-import { textoChamada } from '@/data/textoTitulo';
 
 const RegisterUserForm = () => {
+  const { t } = useTranslation(['auth', 'common']);
   const [form, setForm] = useState({
     email: '',
     name: '',
@@ -58,17 +59,16 @@ const RegisterUserForm = () => {
         data: {
           displayName: form.name,
         },
-        emailRedirectTo: `${window.location.origin}/admin/list`,
+        emailRedirectTo: `${window.location.origin}/admin/expenses`,
       },
     });
 
     if (error) {
-      toast.error(`Erro ao cadastrar: ${error.message}`);
+      toast.error(`${t('register.errors.generic')}: ${error.message}`);
     } else if (data.user && data.user.identities?.length === 0) {
-      // Email já cadastrado — Supabase retorna 200 mas sem enviar email (repeated signup)
-      toast.error('Este e-mail já está cadastrado. Verifique sua caixa de entrada ou spam.');
+      toast.error(t('register.errors.emailInUse'));
     } else {
-      toast.success('Cadastro realizado com sucesso! Verifique seu e-mail.');
+      toast.success(t('register.success'));
       setForm({
         email: '',
         name: '',
@@ -83,39 +83,39 @@ const RegisterUserForm = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl">Faça seu Cadastro</CardTitle>
+        <CardTitle className="text-2xl">{t('register.title')}</CardTitle>
         <CardDescription>
-          {textoChamada[0].subTituloCadastroCard}
+          {t('register.subtitle')}
         </CardDescription>
       </CardHeader>
 
       <CardContent>
         <form className="space-y-4" onSubmit={handleRegister}>
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="name">Nome</Label>
+            <Label htmlFor="name">{t('register.name')}</Label>
             <Input
               id="name"
               name="name"
-              placeholder="Preencha com o seu nome"
+              placeholder={t('register.namePlaceholder')}
               value={form.name}
               onChange={handleChange}
             />
           </div>
 
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('register.email')}</Label>
             <Input
               id="email"
               name="email"
               type="email"
-              placeholder="Preencha com o seu E-mail"
+              placeholder={t('register.emailPlaceholder')}
               value={form.email}
               onChange={handleChange}
             />
           </div>
 
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password">{t('register.password')}</Label>
             <PasswordInput
               id="password"
               name="password"
@@ -126,7 +126,7 @@ const RegisterUserForm = () => {
           </div>
 
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+            <Label htmlFor="confirmPassword">{t('register.confirmPassword')}</Label>
             <PasswordInput
               id="confirmPassword"
               name="confirmPassword"
@@ -144,12 +144,11 @@ const RegisterUserForm = () => {
             >
               {loading ? (
                 <>
-                  Cadastrando <Loader />
+                  {t('common:loading')} <Loader />
                 </>
               ) : (
                 <>
-                  {' '}
-                  Cadastrar <Send />
+                  {t('register.submit')} <Send />
                 </>
               )}
             </Button>

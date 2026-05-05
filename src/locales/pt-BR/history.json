@@ -1,0 +1,32 @@
+{
+  "title": "Histórico",
+  "subtitle": "Histórico de todas as suas transações",
+  "year": "Ano",
+  "noExpenses": "Sem despesas",
+  "noExpensesForMonth": "Nenhuma despesa encontrada para {{month}}.",
+  "noExpensesThisMonth": "Nenhuma despesa registrada neste mês.",
+  "totalIncome": "Rendimento Total",
+  "totalExpenses": "Total Despesas",
+  "totalPaid": "Total Pago",
+  "pending": "Pendente",
+  "yearBalance": "Saldo do Ano",
+  "monthlyTitle": "Histórico Mensal — {{year}}",
+  "col": {
+    "month": "Mês",
+    "income": "Rendimento",
+    "expenses": "Despesas",
+    "paid": "Pago",
+    "pending": "Pendente",
+    "balance": "Saldo",
+    "status": "Status",
+    "title": "Título",
+    "type": "Tipo",
+    "amount": "Valor"
+  },
+  "modal": {
+    "title": "Despesas — {{month}} / {{year}}"
+  },
+  "paidPercent": "{{pct}}% pago",
+  "pendingPercent": "{{pct}}% pendente",
+  "loadError": "Erro ao carregar dados. Verifique sua conexão e tente novamente."
+}

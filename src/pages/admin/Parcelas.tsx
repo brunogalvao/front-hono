@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useParcelas, useDeleteParcela } from '@/hooks/use-parcelas';
 import { queryKeys } from '@/lib/query-keys';
 import TituloPage from '@/components/TituloPage';
@@ -77,6 +78,7 @@ function TableSkeleton() {
 }
 
 function Parcelas() {
+  const { t } = useTranslation(['installments', 'common']);
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<StatusFilter>('Todos');
   const [editingParcela, setEditingParcela] = useState<ParcelaGroup | null>(null);
@@ -103,8 +105,8 @@ function Parcelas() {
   return (
     <div className="space-y-6">
       <TituloPage
-        titulo="Compras a Prazo"
-        subtitulo="Acompanhe suas compras parceladas"
+        titulo={t('title')}
+        subtitulo={t('subtitle')}
       />
 
       {/* Header: total em aberto + botão */}
@@ -112,11 +114,11 @@ function Parcelas() {
         <div className="text-muted-foreground text-sm">
           {!isLoading && ativas.length > 0 && (
             <span>
-              Em aberto:{' '}
+              {t('open')}:{' '}
               <span className="text-foreground font-semibold">
                 {formatToBRL(totalEmAberto)}
               </span>{' '}
-              restantes
+              {t('remaining')}
             </span>
           )}
         </div>
@@ -127,9 +129,9 @@ function Parcelas() {
       <div className="flex gap-2">
         {(
           [
-            { key: 'Todos' as const, label: `Todos (${parcelas.length})` },
-            { key: 'Ativo' as const, label: `Ativo (${ativas.length})` },
-            { key: 'Quitada' as const, label: `Quitada (${quitadas.length})` },
+            { key: 'Todos' as const, label: `${t('filterAll')} (${parcelas.length})` },
+            { key: 'Ativo' as const, label: `${t('filterActive')} (${ativas.length})` },
+            { key: 'Quitada' as const, label: `${t('filterPaid')} (${quitadas.length})` },
           ]
         ).map(({ key, label }) => (
           <Button
@@ -146,7 +148,7 @@ function Parcelas() {
       {/* Tabela */}
       <Card>
         <CardHeader>
-          <CardTitle>Compras Parceladas</CardTitle>
+          <CardTitle>{t('tableTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -155,23 +157,23 @@ function Parcelas() {
             <div className="py-12 text-center">
               <CreditCard className="text-muted-foreground mx-auto mb-3 h-10 w-10 opacity-30" />
               <p className="text-muted-foreground text-sm">
-                Nenhuma compra parcelada encontrada.
+                {t('noInstallments')}
               </p>
               <p className="text-muted-foreground mt-1 text-xs">
-                Clique em "Adicionar" para registrar uma nova compra parcelada.
+                {t('noInstallmentsHint')}
               </p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Descrição</TableHead>
-                  <TableHead>Categoria</TableHead>
-                  <TableHead>Parcela</TableHead>
-                  <TableHead>Progresso</TableHead>
-                  <TableHead>Valor Total</TableHead>
-                  <TableHead>Início</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>{t('col.description')}</TableHead>
+                  <TableHead>{t('col.category')}</TableHead>
+                  <TableHead>{t('col.installment')}</TableHead>
+                  <TableHead>{t('col.progress')}</TableHead>
+                  <TableHead>{t('col.total')}</TableHead>
+                  <TableHead>{t('col.start')}</TableHead>
+                  <TableHead>{t('col.status')}</TableHead>
                   <TableHead className="w-10" />
                 </TableRow>
               </TableHeader>
@@ -189,7 +191,7 @@ function Parcelas() {
                     <TableCell className="font-semibold">
                       {formatToBRL(group.valor_parcela)}
                       <span className="text-muted-foreground block text-xs font-normal">
-                        /mês
+                        {t('perMonth')}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -247,30 +249,31 @@ function Parcelas() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Arquivar compra parcelada?</AlertDialogTitle>
+            <AlertDialogTitle>{t('archiveTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              "{deletingParcela?.title}" e todas as suas{' '}
-              {deletingParcela?.parcela_total} parcelas serão arquivadas. Essa
-              ação pode ser revertida diretamente no banco de dados.
+              {t('archiveDescription', {
+                title: deletingParcela?.title,
+                total: deletingParcela?.parcela_total,
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive hover:bg-destructive/90 text-white"
               onClick={async () => {
                 if (!deletingParcela) return;
                 try {
                   await deleteMutation.mutateAsync(deletingParcela.parcela_group_id);
-                  toast.success('Compra parcelada arquivada.');
+                  toast.success(t('toast.archived'));
                 } catch {
-                  toast.error('Erro ao arquivar compra parcelada.');
+                  toast.error(t('toast.archiveError'));
                 } finally {
                   setDeletingParcela(null);
                 }
               }}
             >
-              Arquivar
+              {t('archiveConfirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

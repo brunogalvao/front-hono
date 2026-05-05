@@ -1,0 +1,31 @@
+{
+  "title": "Grupos",
+  "subtitle": "Gerencie seus grupos financeiros",
+  "createGroup": "Criar Grupo",
+  "groupName": "Nome do Grupo",
+  "members": "Membros",
+  "inviteMember": "Convidar Membro",
+  "pendingInvites": "Convites Pendentes",
+  "noGroups": "Nenhum grupo encontrado.",
+  "noMembers": "Nenhum membro encontrado.",
+  "access": {
+    "expenses": "Despesas",
+    "income": "Rendimentos",
+    "installments": "Compras a Prazo",
+    "advisor": "Consultor IA"
+  },
+  "roles": {
+    "owner": "Proprietário",
+    "member": "Membro"
+  },
+  "toast": {
+    "created": "Grupo criado com sucesso!",
+    "createError": "Erro ao criar grupo.",
+    "invited": "Convite enviado com sucesso!",
+    "inviteError": "Erro ao enviar convite.",
+    "joined": "Bem-vindo ao grupo!",
+    "joinError": "Erro ao entrar no grupo.",
+    "removed": "Membro removido com sucesso.",
+    "removeError": "Erro ao remover membro."
+  }
+}

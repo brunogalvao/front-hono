@@ -1,0 +1,29 @@
+{
+  "title": "Consultor IA",
+  "subtitle": "Análise financeira personalizada com inteligência artificial",
+  "analyze": "Analisar",
+  "analyzing": "Analisando...",
+  "newAnalysis": "Nova análise",
+  "disclaimer": "Esta análise é gerada por inteligência artificial e tem caráter informativo. Consulte um profissional financeiro certificado para decisões importantes.",
+  "emptyTitle": "Análise financeira com IA",
+  "emptyDescription": "Selecione o período e clique em \"Analisar\" para receber uma análise personalizada das suas finanças.",
+  "sections": {
+    "diagnosis": "Diagnóstico do Período",
+    "alerts": "Alertas e Sugestões de Corte",
+    "investment": "Recomendação de Investimento",
+    "attentionBadge": "Atenção",
+    "strategyBadge": "Estratégia"
+  },
+  "quota": {
+    "exceeded": "Limite de requisições atingido.",
+    "availableAt": "Disponível às",
+    "remaining": "faltam",
+    "tryAgain": "Você já pode tentar novamente."
+  },
+  "status": {
+    "excellent": "Excelente",
+    "good": "Bom",
+    "attention": "Atenção",
+    "critical": "Crítico"
+  }
+}

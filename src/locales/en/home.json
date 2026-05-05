@@ -1,0 +1,51 @@
+{
+  "hero": {
+    "title": "FinanceTask",
+    "headline": "Manage your finances simply and efficiently.",
+    "description": "FinanceTask organizes your income, expenses and financial tasks in one place. Track your balance in real time, view monthly history and receive smart suggestions to improve your financial health.",
+    "cta": "Get started",
+    "badges": {
+      "free": "100% Free",
+      "ai": "AI Insights",
+      "noCard": "No credit card"
+    }
+  },
+  "features": {
+    "title": "Features",
+    "subtitle": "Everything you need",
+    "description": "Simple tools for powerful financial control.",
+    "cards": {
+      "register": { "title": "Record instantly", "description": "Add income and expenses quickly, without hassle." },
+      "deadlines": { "title": "Never miss a deadline", "description": "Organize financial tasks by month and stay on top of everything." },
+      "history": { "title": "Complete history", "description": "View income, expenses and balance month by month with clarity." },
+      "insights": { "title": "Smart insights", "description": "Receive automatic recommendations based on your financial profile." },
+      "alerts": { "title": "Automatic alerts", "description": "Get notified when your spending exceeds what was planned for the month." },
+      "sync": { "title": "Real-time sync", "description": "Your data always up to date on any device, without reloading." }
+    }
+  },
+  "stats": {
+    "title": "Numbers that speak for themselves",
+    "subtitle": "Simple, fast and free from day one."
+  },
+  "testimonials": {
+    "items": {
+      "ana": { "name": "Ana Lima", "role": "Freelancer", "text": "I can finally see where my money goes every month. Simple and very fast to use." },
+      "carlos": { "name": "Carlos Mendes", "role": "Entrepreneur", "text": "The automatic insights helped me cut expenses I didn't even know I had. Highly recommended." },
+      "juliana": { "name": "Juliana Costa", "role": "Teacher", "text": "I use it every month to close accounts. The interface is clean and never crashes. Perfect." }
+    }
+  },
+  "cta": {
+    "title": "Ready to get started?",
+    "subtitle": "Join those who already use FinanceTask to organize their finances.",
+    "login": "Sign in",
+    "benefits": {
+      "1": "Record income and expenses in seconds",
+      "2": "Complete history month by month",
+      "3": "Smart recommendations based on your profile",
+      "4": "Immediate access, no bureaucracy"
+    }
+  },
+  "register": {
+    "prompt": "Record your finances easily and quickly."
+  }
+}

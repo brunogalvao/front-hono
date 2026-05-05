@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { queryKeys } from '@/lib/query-keys';
 import TituloPage from '@/components/TituloPage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -73,9 +74,10 @@ function buildSummaries(
 }
 
 function StatusBar({ pago, pendente }: { pago: number; pendente: number }) {
+  const { t } = useTranslation('history');
   const total = pago + pendente;
   if (total === 0) {
-    return <span className="text-muted-foreground text-xs">Sem despesas</span>;
+    return <span className="text-muted-foreground text-xs">{t('noExpenses')}</span>;
   }
   const pagoPercent = Math.round((pago / total) * 100);
 
@@ -88,8 +90,8 @@ function StatusBar({ pago, pendente }: { pago: number; pendente: number }) {
         />
       </div>
       <div className="text-muted-foreground flex justify-between text-xs">
-        <span className="text-emerald-500">{pagoPercent}% pago</span>
-        <span className="text-amber-500">{100 - pagoPercent}% pendente</span>
+        <span className="text-emerald-500">{t('paidPercent', { pct: pagoPercent })}</span>
+        <span className="text-amber-500">{t('pendingPercent', { pct: 100 - pagoPercent })}</span>
       </div>
     </div>
   );
@@ -132,6 +134,7 @@ interface DespesasModalProps {
 }
 
 function DespesasModal({ tasks, mes, ano, open, onClose }: DespesasModalProps) {
+  const { t } = useTranslation('history');
   const total = tasks.reduce((sum, t) => sum + Number(t.price ?? 0), 0);
 
   return (
@@ -139,22 +142,22 @@ function DespesasModal({ tasks, mes, ano, open, onClose }: DespesasModalProps) {
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            Despesas — {getNomeMes(mes)} / {ano}
+            {t('modal.title', { month: getNomeMes(mes), year: ano })}
           </DialogTitle>
         </DialogHeader>
 
         {tasks.length === 0 ? (
           <p className="text-muted-foreground py-6 text-center text-sm">
-            Nenhuma despesa registrada neste mês.
+            {t('noExpensesThisMonth')}
           </p>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Título</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Valor</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{t('col.title')}</TableHead>
+                <TableHead>{t('col.type')}</TableHead>
+                <TableHead>{t('col.amount')}</TableHead>
+                <TableHead>{t('col.status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -200,6 +203,7 @@ function DespesasModal({ tasks, mes, ano, open, onClose }: DespesasModalProps) {
 }
 
 function History() {
+  const { t } = useTranslation('history');
   const currentYear = new Date().getFullYear();
   const [ano, setAno] = useState(currentYear);
   const [selectedMes, setSelectedMes] = useState<number | null>(null);
@@ -252,11 +256,11 @@ function History() {
 
   return (
     <div className="space-y-6">
-      <TituloPage titulo="Histórico" />
+      <TituloPage titulo={t('title')} />
 
       {/* Filtro de Ano */}
       <div className="flex items-center gap-3">
-        <span className="text-muted-foreground text-sm font-medium">Ano:</span>
+        <span className="text-muted-foreground text-sm font-medium">{t('year')}:</span>
         <Select value={String(ano)} onValueChange={(v) => setAno(Number(v))}>
           <SelectTrigger className="w-32">
             <SelectValue />
@@ -273,7 +277,7 @@ function History() {
 
       {isError && (
         <p className="text-sm text-red-500">
-          Erro ao carregar dados. Verifique sua conexão e tente novamente.
+          {t('loadError')}
         </p>
       )}
 
@@ -282,7 +286,7 @@ function History() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-muted-foreground text-sm font-medium">
-              Rendimento Total
+              {t('totalIncome')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -295,7 +299,7 @@ function History() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-muted-foreground text-sm font-medium">
-              Total Despesas
+              {t('totalExpenses')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -308,7 +312,7 @@ function History() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-muted-foreground text-sm font-medium">
-              Total Pago
+              {t('totalPaid')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -316,7 +320,7 @@ function History() {
               {loading ? <Skeleton className="h-6 w-24" /> : formatToBRL(totalPago)}
             </p>
             <p className="text-muted-foreground text-xs">
-              Pendente: {loading ? '...' : formatToBRL(totalPendente)}
+              {t('pending')}: {loading ? '...' : formatToBRL(totalPendente)}
             </p>
           </CardContent>
         </Card>
@@ -324,7 +328,7 @@ function History() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-muted-foreground text-sm font-medium">
-              Saldo do Ano
+              {t('yearBalance')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -346,7 +350,7 @@ function History() {
       {/* Tabela Mensal */}
       <Card>
         <CardHeader>
-          <CardTitle>Histórico Mensal — {ano}</CardTitle>
+          <CardTitle>{t('monthlyTitle', { year: ano })}</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -355,13 +359,13 @@ function History() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[110px]">Mês</TableHead>
-                  <TableHead>Rendimento</TableHead>
-                  <TableHead>Despesas</TableHead>
-                  <TableHead>Pago</TableHead>
-                  <TableHead>Pendente</TableHead>
-                  <TableHead>Saldo</TableHead>
-                  <TableHead className="min-w-[160px]">Status</TableHead>
+                  <TableHead className="w-[110px]">{t('col.month')}</TableHead>
+                  <TableHead>{t('col.income')}</TableHead>
+                  <TableHead>{t('col.expenses')}</TableHead>
+                  <TableHead>{t('col.paid')}</TableHead>
+                  <TableHead>{t('col.pending')}</TableHead>
+                  <TableHead>{t('col.balance')}</TableHead>
+                  <TableHead className="min-w-[160px]">{t('col.status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -1,0 +1,31 @@
+{
+  "title": "Groups",
+  "subtitle": "Manage your financial groups",
+  "createGroup": "Create Group",
+  "groupName": "Group Name",
+  "members": "Members",
+  "inviteMember": "Invite Member",
+  "pendingInvites": "Pending Invites",
+  "noGroups": "No groups found.",
+  "noMembers": "No members found.",
+  "access": {
+    "expenses": "Expenses",
+    "income": "Income",
+    "installments": "Installments",
+    "advisor": "AI Advisor"
+  },
+  "roles": {
+    "owner": "Owner",
+    "member": "Member"
+  },
+  "toast": {
+    "created": "Group created successfully!",
+    "createError": "Error creating group.",
+    "invited": "Invite sent successfully!",
+    "inviteError": "Error sending invite.",
+    "joined": "Welcome to the group!",
+    "joinError": "Error joining group.",
+    "removed": "Member removed successfully.",
+    "removeError": "Error removing member."
+  }
+}

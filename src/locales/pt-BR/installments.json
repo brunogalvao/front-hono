@@ -1,0 +1,33 @@
+{
+  "title": "Compras a Prazo",
+  "subtitle": "Gerencie suas compras parceladas",
+  "noInstallments": "Nenhuma compra parcelada encontrada.",
+  "noInstallmentsHint": "Clique em \"Adicionar\" para registrar uma nova compra parcelada.",
+  "open": "Em aberto",
+  "remaining": "restantes",
+  "filterAll": "Todos",
+  "filterActive": "Ativo",
+  "filterPaid": "Quitada",
+  "tableTitle": "Compras Parceladas",
+  "col": {
+    "description": "Descrição",
+    "category": "Categoria",
+    "installment": "Parcela",
+    "progress": "Progresso",
+    "total": "Valor Total",
+    "start": "Início",
+    "status": "Status"
+  },
+  "perMonth": "/mês",
+  "archiveTitle": "Arquivar compra parcelada?",
+  "archiveDescription": "\"{{title}}\" e todas as suas {{total}} parcelas serão arquivadas. Essa ação pode ser revertida diretamente no banco de dados.",
+  "archiveConfirm": "Arquivar",
+  "toast": {
+    "updated": "Compra parcelada atualizada!",
+    "updateError": "Erro ao atualizar compra parcelada.",
+    "archived": "Compra parcelada arquivada.",
+    "archiveError": "Erro ao arquivar compra parcelada.",
+    "deleted": "Compra parcelada deletada com sucesso.",
+    "deleteError": "Erro ao deletar compra parcelada."
+  }
+}

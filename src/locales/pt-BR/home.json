@@ -1,0 +1,51 @@
+{
+  "hero": {
+    "title": "FinanceTask",
+    "headline": "Gerencie suas finanças de forma simples e eficiente.",
+    "description": "FinanceTask organiza suas receitas, despesas e tarefas financeiras em um só lugar. Acompanhe seu saldo em tempo real, visualize o histórico mensal e receba sugestões inteligentes para melhorar sua saúde financeira.",
+    "cta": "Começar agora",
+    "badges": {
+      "free": "100% Gratuito",
+      "ai": "Insights com IA",
+      "noCard": "Sem cartão de crédito"
+    }
+  },
+  "features": {
+    "title": "Funcionalidades",
+    "subtitle": "Tudo que você precisa",
+    "description": "Ferramentas simples para um controle financeiro poderoso.",
+    "cards": {
+      "register": { "title": "Registre na hora", "description": "Adicione receitas e despesas rapidamente, sem complicação." },
+      "deadlines": { "title": "Nunca perca um prazo", "description": "Organize tarefas financeiras por mês e mantenha tudo em dia." },
+      "history": { "title": "Histórico completo", "description": "Visualize entradas, saídas e saldo mês a mês com clareza." },
+      "insights": { "title": "Insights inteligentes", "description": "Receba recomendações automáticas baseadas no seu perfil financeiro." },
+      "alerts": { "title": "Alertas automáticos", "description": "Seja avisado quando seus gastos ultrapassarem o planejado para o mês." },
+      "sync": { "title": "Sincronização em tempo real", "description": "Seus dados sempre atualizados em qualquer dispositivo, sem precisar recarregar." }
+    }
+  },
+  "stats": {
+    "title": "Números que falam por si",
+    "subtitle": "Simples, rápido e gratuito desde o primeiro dia."
+  },
+  "testimonials": {
+    "items": {
+      "ana": { "name": "Ana Lima", "role": "Freelancer", "text": "Finalmente consigo ver pra onde meu dinheiro vai todo mês. Simples e muito rápido de usar." },
+      "carlos": { "name": "Carlos Mendes", "role": "Empreendedor", "text": "Os insights automáticos me ajudaram a cortar gastos que eu nem sabia que tinha. Recomendo muito." },
+      "juliana": { "name": "Juliana Costa", "role": "Professora", "text": "Uso todo mês para fechar as contas. A interface é limpa e nunca trava. Perfeito." }
+    }
+  },
+  "cta": {
+    "title": "Pronto para começar?",
+    "subtitle": "Junte-se a quem já usa o FinanceTask para organizar as finanças.",
+    "login": "Faça o login",
+    "benefits": {
+      "1": "Registre receitas e despesas em segundos",
+      "2": "Histórico completo mês a mês",
+      "3": "Recomendações inteligentes baseadas no seu perfil",
+      "4": "Acesso imediato, sem burocracia"
+    }
+  },
+  "register": {
+    "prompt": "Registre suas finanças de forma fácil e rápida."
+  }
+}

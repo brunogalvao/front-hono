@@ -1,5 +1,6 @@
 // import * as React from "react";
 import { Logo } from '@/components/Logo';
+import { useTranslation } from 'react-i18next';
 
 import {
   Sidebar,
@@ -13,6 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import { NavMain } from '@/components/nav/nav-main';
 import { SidebarUser } from '@/components/nav/sidebar-user';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useVersion } from '@/hooks/use-version';
 import {
   Tooltip,
@@ -20,21 +22,20 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-const data = {
-  navMain: [
-    { title: 'Dashboard', url: '/admin/dashboard', icon: 'dashboard' as const },
-    { title: 'Despesas', url: '/admin/list', icon: 'list' as const },
-    { title: 'Rendimento', url: '/admin/income', icon: 'income' as const },
-    { title: 'Compras a Prazo', url: '/admin/parcelas', icon: 'parcelas' as const },
-    { title: 'Histórico', url: '/admin/history', icon: 'history' as const },
-    { title: 'Consultor IA', url: '/admin/advisor', icon: 'advisor' as const },
-    { title: 'Grupo', url: '/admin/groups', icon: 'groups' as const },
-    { title: 'Usuário', url: '/admin/editUser', icon: 'user' as const },
-  ],
-};
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { getVersionString, loading } = useVersion();
+  const { t } = useTranslation(['nav', 'common']);
+
+  const navItems = [
+    { title: t('dashboard'), url: '/admin/dashboard', icon: 'dashboard' as const },
+    { title: t('expenses'), url: '/admin/expenses', icon: 'list' as const },
+    { title: t('income'), url: '/admin/income', icon: 'income' as const },
+    { title: t('installments'), url: '/admin/installments', icon: 'parcelas' as const },
+    { title: t('history'), url: '/admin/history', icon: 'history' as const },
+    { title: t('advisor'), url: '/admin/advisor', icon: 'advisor' as const },
+    { title: t('groups'), url: '/admin/groups', icon: 'groups' as const },
+    { title: t('profile'), url: '/admin/profile', icon: 'user' as const },
+  ];
 
   return (
     <Sidebar {...props} collapsible="offcanvas">
@@ -51,7 +52,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <small>version</small>
                     </TooltipTrigger>
                     <TooltipContent>
-                      {loading ? 'Carregando...' : getVersionString()}
+                      {loading ? t('common:loading') : getVersionString()}
                     </TooltipContent>
                   </Tooltip>
 
@@ -66,9 +67,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
+        <div className="flex items-center justify-end px-2 pb-1">
+          <LanguageSwitcher />
+        </div>
         <SidebarUser />
       </SidebarFooter>
       <SidebarRail />

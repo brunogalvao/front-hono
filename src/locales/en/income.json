@@ -1,0 +1,19 @@
+{
+  "title": "Income",
+  "subtitle": "Manage your income sources",
+  "description": "Description",
+  "amount": "Salary",
+  "monthYear": "Month / Year",
+  "listTitle": "Income List",
+  "noIncome": "No Income",
+  "noIncomeTooltip": "Add your income in the fields above.",
+  "annualTotal": "Annual Total",
+  "loadError": "Error loading income. Check your connection and try again.",
+  "toast": {
+    "updated": "Record Updated",
+    "created": "New record saved",
+    "deleted": "Income deleted successfully.",
+    "deleteError": "Error deleting income.",
+    "createError": "Error saving income."
+  }
+}

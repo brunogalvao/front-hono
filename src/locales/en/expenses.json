@@ -1,0 +1,34 @@
+{
+  "title": "Expenses",
+  "subtitle": "Manage your monthly expenses",
+  "noPayment": "No Payment Made",
+  "noPaymentTooltip": "Change the status in the table to sum paid values.",
+  "noExpenses": "No expenses found.",
+  "noExpensesForMonth": "No expenses found for {{month}}.",
+  "loadError": "Error loading expenses. Check your connection and try again.",
+  "recurring": "Recurring",
+  "table": {
+    "title": "Title",
+    "price": "Amount",
+    "status": "Status",
+    "type": "Category",
+    "month": "Month",
+    "actions": "Actions",
+    "editItem": "Edit Item",
+    "deleteConfirm": "Are you sure you want to delete this expense?",
+    "deleteSuccess": "Expense deleted successfully.",
+    "deleteError": "Error deleting expense.",
+    "updateSuccess": "Expense updated successfully.",
+    "updateError": "Error updating expense."
+  },
+  "add": {
+    "title": "Add Expense",
+    "titleLabel": "Title",
+    "price": "Amount",
+    "status": "Status",
+    "type": "Category",
+    "month": "Month",
+    "success": "Expense added successfully.",
+    "error": "Error adding expense."
+  }
+}

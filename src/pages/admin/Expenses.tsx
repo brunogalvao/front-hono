@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 // components
 import { TasksTable } from '@/components/TasksTable';
@@ -16,7 +17,7 @@ import {
 } from '@/components/animate-ui/components/tooltip';
 
 // model & utils
-import { MESES_LISTA } from '@/model/mes.enum';
+import { getMesesLista } from '@/model/mes.enum';
 import { TASK_STATUS } from '@/model/tasks.model';
 import { formatToBRL } from '@/utils/format';
 
@@ -26,23 +27,12 @@ import { getTasksCountByMonth } from '@/service/task/getTasksCountByMonth';
 import { queryKeys } from '@/lib/query-keys';
 
 // icons
-import {
-  BanknoteArrowUp,
-  ChevronLeft,
-  ChevronRight,
-  RefreshCw,
-  CircleCheck,
-} from 'lucide-react';
-import {
-  Tabs,
-  TabsContent,
-  TabsContents,
-  TabsList,
-  TabsTrigger,
-} from '@/components/animate-ui/radix/tabs';
+import { BanknoteArrowUp, ChevronLeft, ChevronRight } from 'lucide-react';
 
 function Expenses() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation(['expenses', 'common']);
+  const mesesLista = getMesesLista();
 
   const [mesAtivo, setMesAtivo] = useState(String(new Date().getMonth() + 1));
   const [anoAtivo, setAnoAtivo] = useState(new Date().getFullYear());
@@ -99,8 +89,8 @@ function Expenses() {
   return (
     <div className="space-y-6">
       <TituloPage
-        titulo="Despesas"
-        subtitulo="Gerencie suas despesas mensais"
+        titulo={t('title')}
+        subtitulo={t('subtitle')}
       />
 
       {/* Total pago + seletor de ano + botão adicionar */}
@@ -108,7 +98,7 @@ function Expenses() {
         {/* Total pago do mês ativo */}
         <div className="flex items-center gap-3">
           {isFetchingTasks ? (
-            <span className="text-muted-foreground text-sm">Carregando...</span>
+            <span className="text-muted-foreground text-sm">{t('common:loading')}</span>
           ) : totalPago > 0 ? (
             <span className="flex items-center gap-2">
               {formatToBRL(totalPago)}
@@ -119,13 +109,13 @@ function Expenses() {
               <Tooltip>
                 <TooltipTrigger>
                   <p className="text-muted-foreground cursor-pointer text-sm">
-                    Sem Pagamento Efetuado
+                    {t('noPayment')}
                   </p>
                 </TooltipTrigger>
                 <TooltipContent>
                   {tasksCurrentMonth.length > 0
-                    ? 'Mude o status na tabela para somar os valores pagos.'
-                    : 'Nenhuma despesa encontrada.'}
+                    ? t('noPaymentTooltip')
+                    : t('noExpenses')}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -134,7 +124,7 @@ function Expenses() {
 
         <div className="flex items-center gap-3">
           {/* Seletor de ano */}
-          <div className="border-border flex items-center gap-1 rounded-md border px-1">
+          <div className="border-border flex h-10 items-center gap-1 rounded-md border px-1">
             <Button
               variant="ghost"
               size="icon"
@@ -165,92 +155,87 @@ function Expenses() {
         </div>
       </div>
 
-      <Tabs value={mesAtivo} onValueChange={setMesAtivo}>
-        <TabsList className="gap-1">
-          {MESES_LISTA.map((mes) => {
+      {/* Seletor de meses — pills estilo MonthIncome */}
+      <TooltipProvider>
+        <div className="flex flex-wrap gap-2">
+          {mesesLista.map((mes) => {
             const mesNumero = parseInt(mes.value);
+            const ativo = mesAtivo === mes.value;
             const temDespesas = (monthsMeta?.count?.[mesNumero] ?? 0) > 0;
             const temRecorrente =
               monthsMeta?.hasRecorrente?.[mesNumero] ?? false;
             const names = monthsMeta?.recorrenteNames?.[mesNumero] ?? [];
 
-            const icon = temRecorrente ? (
-              <RefreshCw className="h-3 w-3 shrink-0 text-blue-400" />
-            ) : temDespesas ? (
-              <CircleCheck className="h-3 w-3 shrink-0" />
-            ) : null;
-
             return (
-              <TooltipProvider key={mes.value}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <span>
-                      <TabsTrigger
-                        value={mes.value}
-                        className="data-[state=active]:bg-primary gap-1.5"
-                      >
-                        {icon}
-                        {mes.label}
-                      </TabsTrigger>
-                    </span>
-                  </TooltipTrigger>
-                  {temRecorrente && names.length > 0 && (
-                    <TooltipContent>
-                      <p className="mb-1 text-xs font-semibold">Recorrentes:</p>
-                      {names.map((name) => (
-                        <p key={name} className="text-xs">
-                          • {name}
-                        </p>
-                      ))}
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              </TooltipProvider>
+              <Tooltip key={mes.value}>
+                <TooltipTrigger>
+                  <div
+                    onClick={() => setMesAtivo(mes.value)}
+                    className={`cursor-pointer rounded-full border px-3 py-1 text-[.75rem] uppercase ${
+                      ativo || temDespesas
+                        ? 'bg-primary border-primary'
+                        : 'hover:bg-primary border-zinc-400 text-zinc-400 duration-200 hover:text-white'
+                    }`}
+                  >
+                    {mes.label}
+                    {temRecorrente && !ativo && (
+                      <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-blue-400 align-middle" />
+                    )}
+                  </div>
+                </TooltipTrigger>
+                {temRecorrente && names.length > 0 && (
+                  <TooltipContent>
+                    <p className="mb-1 text-xs font-semibold">{t('recurring')}:</p>
+                    {names.map((name) => (
+                      <p key={name} className="text-xs">
+                        • {name}
+                      </p>
+                    ))}
+                  </TooltipContent>
+                )}
+              </Tooltip>
             );
           })}
-        </TabsList>
-        <TabsContents>
-          {MESES_LISTA.map((mes) => (
-            <TabsContent key={mes.value} value={mes.value}>
-              {isFetchingTasks && mes.value === mesAtivo ? (
-                <Card>
-                  <CardContent>
-                    <Loading />
-                  </CardContent>
-                </Card>
-              ) : isErrorTasks && mes.value === mesAtivo ? (
-                <Card>
-                  <CardContent>
-                    <p className="text-center text-sm text-red-500">
-                      Erro ao carregar despesas. Verifique sua conexão e tente
-                      novamente.
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : mes.value === mesAtivo && tasksCurrentMonth.length > 0 ? (
-                <Card>
-                  <CardContent>
-                    <TasksTable
-                      tasks={tasksCurrentMonth}
-                      total={tasksCurrentMonth.length}
-                      totalPrice={totalDespesas}
-                      onTasksChange={handleTasksChange}
-                    />
-                  </CardContent>
-                </Card>
-              ) : (
-                <Card>
-                  <CardContent>
-                    <p className="text-muted-foreground text-center text-sm">
-                      Nenhuma despesa encontrada para {mes.label}.
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-            </TabsContent>
-          ))}
-        </TabsContents>
-      </Tabs>
+        </div>
+      </TooltipProvider>
+
+      {/* Conteúdo do mês ativo */}
+      {isFetchingTasks ? (
+        <Card>
+          <CardContent>
+            <Loading />
+          </CardContent>
+        </Card>
+      ) : isErrorTasks ? (
+        <Card>
+          <CardContent>
+            <p className="text-center text-sm text-red-500">
+              {t('loadError')}
+            </p>
+          </CardContent>
+        </Card>
+      ) : tasksCurrentMonth.length > 0 ? (
+        <Card>
+          <CardContent>
+            <TasksTable
+              tasks={tasksCurrentMonth}
+              total={tasksCurrentMonth.length}
+              totalPrice={totalDespesas}
+              onTasksChange={handleTasksChange}
+            />
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent>
+            <p className="text-muted-foreground text-center text-sm">
+              {t('noExpensesForMonth', {
+                month: mesesLista.find((m) => m.value === mesAtivo)?.label ?? mesAtivo,
+              })}
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

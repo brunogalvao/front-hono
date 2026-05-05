@@ -1,0 +1,32 @@
+{
+  "title": "History",
+  "subtitle": "History of all your transactions",
+  "year": "Year",
+  "noExpenses": "No expenses",
+  "noExpensesForMonth": "No expenses found for {{month}}.",
+  "noExpensesThisMonth": "No expenses recorded for this month.",
+  "totalIncome": "Total Income",
+  "totalExpenses": "Total Expenses",
+  "totalPaid": "Total Paid",
+  "pending": "Pending",
+  "yearBalance": "Year Balance",
+  "monthlyTitle": "Monthly History — {{year}}",
+  "col": {
+    "month": "Month",
+    "income": "Income",
+    "expenses": "Expenses",
+    "paid": "Paid",
+    "pending": "Pending",
+    "balance": "Balance",
+    "status": "Status",
+    "title": "Title",
+    "type": "Type",
+    "amount": "Amount"
+  },
+  "modal": {
+    "title": "Expenses — {{month}} / {{year}}"
+  },
+  "paidPercent": "{{pct}}% paid",
+  "pendingPercent": "{{pct}}% pending",
+  "loadError": "Error loading data. Check your connection and try again."
+}

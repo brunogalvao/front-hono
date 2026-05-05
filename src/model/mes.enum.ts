@@ -1,30 +1,37 @@
-export const MESES = {
-  1: 'Janeiro',
-  2: 'Fevereiro',
-  3: 'Março',
-  4: 'Abril',
-  5: 'Maio',
-  6: 'Junho',
-  7: 'Julho',
-  8: 'Agosto',
-  9: 'Setembro',
-  10: 'Outubro',
-  11: 'Novembro',
-  12: 'Dezembro',
-} as const;
+import i18n from '@/lib/i18n';
 
+export type MesNumero = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+// Mantido para compatibilidade com componentes que precisam de referência estática
+export const MESES_KEYS: Record<MesNumero, string> = {
+  1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6',
+  7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12',
+};
+
+export function getNomeMes(numero: number): string {
+  return i18n.t(`common:months.${numero}`, { defaultValue: i18n.t('common:months.invalid') });
+}
+
+export function getAbrevMes(numero: number): string {
+  return i18n.t(`common:monthsAbbr.${numero}`, { defaultValue: '???' });
+}
+
+// Lista para seletores — gerada dinamicamente para reagir ao idioma ativo
+export function getMesesLista() {
+  return Array.from({ length: 12 }, (_, i) => ({
+    value: String(i + 1),
+    label: getNomeMes(i + 1),
+  }));
+}
+
+// Compatibilidade retroativa — array estático (usado em charts, não precisa ser reativo)
 export const MESES_ABREV = [
   'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
   'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez',
 ] as const;
 
-export type MesNumero = keyof typeof MESES;
-
-export const MESES_LISTA = Object.entries(MESES).map(([value, label]) => ({
-  label,
-  value,
+// MESES_LISTA estático mantido para compatibilidade — componentes reativos devem usar getMesesLista()
+export const MESES_LISTA = Array.from({ length: 12 }, (_, i) => ({
+  value: String(i + 1),
+  label: getNomeMes(i + 1),
 }));
-
-export function getNomeMes(numero: number): string {
-  return MESES[numero as MesNumero] ?? 'Mês inválido';
-}

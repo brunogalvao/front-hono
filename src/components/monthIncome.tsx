@@ -1,5 +1,6 @@
-import { MESES } from '@/model/mes.enum';
+import { getMesesLista } from '@/model/mes.enum';
 import { formatToBRL } from '@/utils/format';
+import { useTranslation } from 'react-i18next';
 import {
   Tooltip,
   TooltipContent,
@@ -19,7 +20,9 @@ export default function MonthIncome({
   onSelectMes,
   total,
 }: MonthIncomeProps) {
+  const { t } = useTranslation('income');
   const { data: salariosPorMes = {}, error } = useIncomesByMonth(reloadTrigger);
+  const mesesLista = getMesesLista();
 
   if (error) {
     console.error('Erro ao carregar salários por mês:', error);
@@ -30,12 +33,12 @@ export default function MonthIncome({
       <div className="flex flex-row gap-3">
         <TooltipProvider>
           <div className="flex flex-wrap gap-2">
-            {Object.entries(MESES).map(([id, nome]) => {
-              const mesNumero = parseInt(id);
+            {mesesLista.map(({ value, label }) => {
+              const mesNumero = parseInt(value);
               const salarioMes = salariosPorMes[mesNumero];
 
               return (
-                <Tooltip key={id}>
+                <Tooltip key={value}>
                   <TooltipTrigger>
                     <div
                       className={`cursor-pointer rounded-full border px-3 py-1 text-[.75rem] uppercase ${
@@ -45,14 +48,14 @@ export default function MonthIncome({
                       }`}
                     >
                       <span onClick={() => onSelectMes?.(mesNumero)}>
-                        {nome}
+                        {label}
                       </span>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
                     {salarioMes
-                      ? `Salário: ${formatToBRL(salarioMes)}`
-                      : 'Sem salário'}
+                      ? `${t('amount')}: ${formatToBRL(salarioMes)}`
+                      : t('noIncome')}
                   </TooltipContent>
                 </Tooltip>
               );
@@ -60,7 +63,7 @@ export default function MonthIncome({
           </div>
         </TooltipProvider>
       </div>
-      Total Anual {formatToBRL(total)}
+      {t('annualTotal')} {formatToBRL(total)}
     </div>
   );
 }

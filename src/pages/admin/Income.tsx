@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 // ui
 import TituloPage from '@/components/TituloPage';
@@ -36,6 +37,7 @@ import {
 import { queryKeys } from '@/lib/query-keys';
 
 function Income() {
+  const { t } = useTranslation(['income', 'common']);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     descricao: '',
@@ -64,10 +66,10 @@ function Income() {
     try {
       if (editingId) {
         await editIncomeMutation.mutateAsync({ ...form, id: editingId });
-        toast.success('Cadastro Editado');
+        toast.success(t('toast.updated'));
       } else {
         await createIncomeMutation.mutateAsync(form);
-        toast.success('Salvo novo cadastro');
+        toast.success(t('toast.created'));
       }
 
       setForm({
@@ -93,7 +95,7 @@ function Income() {
   const handleDelete = async (id: string) => {
     try {
       await deleteIncomeMutation.mutateAsync(id);
-      toast.success('Rendimento deletado com sucesso');
+      toast.success(t('toast.deleted'));
     } catch (err) {
       console.error('Erro ao deletar:', err);
 
@@ -102,7 +104,7 @@ function Income() {
           ? err.message
           : typeof err === 'string'
             ? err
-            : 'Erro ao deletar rendimento';
+            : t('toast.deleteError');
 
       toast.error(errorMessage);
     }
@@ -120,7 +122,7 @@ function Income() {
 
   return (
     <div className="space-y-6">
-      <TituloPage titulo="Rendimentos" />
+      <TituloPage titulo={t('title')} />
 
       {isLoading ? (
         <IncomeFormSkeleton />
@@ -134,10 +136,10 @@ function Income() {
           <div className="flex flex-col space-y-6">
             <div className="flex flex-row gap-3">
               <div className="flex w-full flex-col space-y-3">
-                <Label>Descrição</Label>
+                <Label>{t('description')}</Label>
                 <Input
                   className="w-full"
-                  placeholder="Descrição"
+                  placeholder={t('description')}
                   value={form.descricao}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, descricao: e.target.value }))
@@ -146,7 +148,7 @@ function Income() {
               </div>
 
               <div className="flex w-full flex-col space-y-3">
-                <Label>Salário</Label>
+                <Label>{t('amount')}</Label>
                 <NumericFormat
                   value={form.valor}
                   onValueChange={({ floatValue }) => {
@@ -163,7 +165,7 @@ function Income() {
               </div>
 
               <div className="flex w-full flex-col space-y-3">
-                <Label>Mês / Ano</Label>
+                <Label>{t('monthYear')}</Label>
                 <MonthYearPicker
                   mes={form.mes}
                   ano={form.ano}
@@ -179,12 +181,12 @@ function Income() {
                     <div className="flex flex-row items-center gap-3 px-12">
                       {editingId ? (
                         <>
-                          Atualizar
+                          {t('common:update')}
                           <RefreshCcw />
                         </>
                       ) : (
                         <>
-                          Adicionar
+                          {t('common:add')}
                           <Plus className="size-5" />
                         </>
                       )}
@@ -199,25 +201,25 @@ function Income() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Lista de Rendimentos</CardTitle>
+          <CardTitle>{t('listTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <IncomeListSkeleton />
           ) : isError ? (
             <p className="text-center text-sm text-red-500">
-              Erro ao carregar rendimentos. Verifique sua conexão e tente novamente.
+              {t('loadError')}
             </p>
           ) : incomes.length <= 0 ? (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
                   <p className="cursor-pointer p-0 text-center text-sm text-zinc-500">
-                    Sem Rendimento
+                    {t('noIncome')}
                   </p>
                 </TooltipTrigger>
                 <TooltipContent>
-                  Adicione seus rendimento nos campos acima.
+                  {t('noIncomeTooltip')}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

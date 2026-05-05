@@ -1,0 +1,19 @@
+{
+  "title": "Rendimentos",
+  "subtitle": "Gerencie suas fontes de renda",
+  "description": "Descrição",
+  "amount": "Salário",
+  "monthYear": "Mês / Ano",
+  "listTitle": "Lista de Rendimentos",
+  "noIncome": "Sem Rendimento",
+  "noIncomeTooltip": "Adicione seus rendimentos nos campos acima.",
+  "annualTotal": "Total Anual",
+  "loadError": "Erro ao carregar rendimentos. Verifique sua conexão e tente novamente.",
+  "toast": {
+    "updated": "Cadastro Editado",
+    "created": "Salvo novo cadastro",
+    "deleted": "Rendimento deletado com sucesso.",
+    "deleteError": "Erro ao deletar rendimento.",
+    "createError": "Erro ao salvar rendimento."
+  }
+}
