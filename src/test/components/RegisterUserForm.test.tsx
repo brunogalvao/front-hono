@@ -40,7 +40,7 @@ describe('RegisterUserForm', () => {
   it('renderiza todos os campos do formulário', () => {
     render(<RegisterUserForm />);
     expect(screen.getByLabelText('Nome')).toBeInTheDocument();
-    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.getByLabelText('E-mail')).toBeInTheDocument();
     expect(screen.getByLabelText('Senha')).toBeInTheDocument();
     expect(screen.getByLabelText('Confirmar Senha')).toBeInTheDocument();
   });
@@ -56,7 +56,7 @@ describe('RegisterUserForm', () => {
   it('exibe erro quando e-mail é inválido', async () => {
     render(<RegisterUserForm />);
     await userEvent.type(screen.getByLabelText('Nome'), 'Bruno');
-    await userEvent.type(screen.getByLabelText('Email'), 'emailinvalido');
+    await userEvent.type(screen.getByLabelText('E-mail'), 'emailinvalido');
     await userEvent.type(screen.getByLabelText('Senha'), 'senha123');
     await userEvent.type(screen.getByLabelText('Confirmar Senha'), 'senha123');
     // fireEvent.submit bypasses HTML5 native email validation,
@@ -73,7 +73,7 @@ describe('RegisterUserForm', () => {
   it('exibe erro quando senhas não coincidem', async () => {
     render(<RegisterUserForm />);
     await userEvent.type(screen.getByLabelText('Nome'), 'Bruno');
-    await userEvent.type(screen.getByLabelText('Email'), 'bruno@email.com');
+    await userEvent.type(screen.getByLabelText('E-mail'), 'bruno@email.com');
     await userEvent.type(screen.getByLabelText('Senha'), 'senha123');
     await userEvent.type(screen.getByLabelText('Confirmar Senha'), 'diferente');
     await userEvent.click(screen.getByRole('button', { name: /cadastrar/i }));
@@ -89,7 +89,7 @@ describe('RegisterUserForm', () => {
     });
     render(<RegisterUserForm />);
     await userEvent.type(screen.getByLabelText('Nome'), 'Bruno');
-    await userEvent.type(screen.getByLabelText('Email'), 'bruno@email.com');
+    await userEvent.type(screen.getByLabelText('E-mail'), 'bruno@email.com');
     await userEvent.type(screen.getByLabelText('Senha'), 'senha123');
     await userEvent.type(screen.getByLabelText('Confirmar Senha'), 'senha123');
     await userEvent.click(screen.getByRole('button', { name: /cadastrar/i }));
@@ -107,7 +107,7 @@ describe('RegisterUserForm', () => {
     });
     render(<RegisterUserForm />);
     await userEvent.type(screen.getByLabelText('Nome'), 'Bruno');
-    await userEvent.type(screen.getByLabelText('Email'), 'existente@email.com');
+    await userEvent.type(screen.getByLabelText('E-mail'), 'existente@email.com');
     await userEvent.type(screen.getByLabelText('Senha'), 'senha123');
     await userEvent.type(screen.getByLabelText('Confirmar Senha'), 'senha123');
     await userEvent.click(screen.getByRole('button', { name: /cadastrar/i }));
@@ -125,7 +125,7 @@ describe('RegisterUserForm', () => {
     });
     render(<RegisterUserForm />);
     await userEvent.type(screen.getByLabelText('Nome'), 'Bruno');
-    await userEvent.type(screen.getByLabelText('Email'), 'bruno@email.com');
+    await userEvent.type(screen.getByLabelText('E-mail'), 'bruno@email.com');
     await userEvent.type(screen.getByLabelText('Senha'), 'senha123');
     await userEvent.type(screen.getByLabelText('Confirmar Senha'), 'senha123');
     await userEvent.click(screen.getByRole('button', { name: /cadastrar/i }));

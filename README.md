@@ -42,10 +42,10 @@ O projeto inclui um sistema de versão automático que mostra informações do c
 
 ```bash
 # Desenvolvimento local
-npm run dev:with-version
+pnpm dev:with-version
 
 # Build com versão
-npm run build:with-version
+pnpm build:with-version
 
 # Produção (automático via GitHub Actions)
 git push origin main
