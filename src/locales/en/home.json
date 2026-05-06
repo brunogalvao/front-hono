@@ -1,4 +1,11 @@
 {
+  "nav": {
+    "home": "Home",
+    "howItWorks": "How it works",
+    "features": "Features",
+    "stats": "Stats",
+    "enter": "Sign in"
+  },
   "hero": {
     "title": "FinanceTask",
     "headline": "Manage your finances simply and efficiently.",
@@ -10,9 +17,18 @@
       "noCard": "No credit card"
     }
   },
+  "howItWorks": {
+    "title": "How it works",
+    "subtitle": "In three simple steps you're already in control.",
+    "steps": {
+      "1": { "title": "Create your account", "description": "Sign up for free in seconds. No credit card, no hassle." },
+      "2": { "title": "Record your finances", "description": "Add income, expenses and financial tasks with a few clicks. Organize everything by month." },
+      "3": { "title": "Track your results", "description": "View your balance, monthly history and receive smart insights to improve your financial health." }
+    }
+  },
   "features": {
-    "title": "Features",
-    "subtitle": "Everything you need",
+    "label": "Features",
+    "title": "Everything you need",
     "description": "Simple tools for powerful financial control.",
     "cards": {
       "register": { "title": "Record instantly", "description": "Add income and expenses quickly, without hassle." },
@@ -24,8 +40,15 @@
     }
   },
   "stats": {
+    "label": "Numbers",
     "title": "Numbers that speak for themselves",
-    "subtitle": "Simple, fast and free from day one."
+    "subtitle": "Simple, fast and free from day one.",
+    "items": {
+      "free": { "label": "Free", "description": "No hidden costs" },
+      "months": { "label": "Months of history", "description": "Complete annual view" },
+      "record": { "label": "To record", "description": "Income and expenses" },
+      "place": { "label": "One place", "description": "For everything that's yours" }
+    }
   },
   "testimonials": {
     "items": {
@@ -36,13 +59,32 @@
   },
   "cta": {
     "title": "Ready to get started?",
-    "subtitle": "Join those who already use FinanceTask to organize their finances.",
+    "subtitle": "Join those who already use FinanceTask to organize their finances with convenience and intelligence.",
     "login": "Sign in",
     "benefits": {
       "1": "Record income and expenses in seconds",
       "2": "Complete history month by month",
       "3": "Smart recommendations based on your profile",
       "4": "Immediate access, no bureaucracy"
+    }
+  },
+  "ctaFinal": {
+    "title": "Ready to organize your finances?",
+    "subtitle": "Create your free account and start recording income, expenses and goals today.",
+    "start": "Get started",
+    "hasAccount": "I already have an account"
+  },
+  "description": {
+    "label": "The app in action",
+    "title": "Simple to use,",
+    "titleHighlight": "powerful",
+    "titleSuffix": "results",
+    "subtitle": "See how easy it is to record, track and understand your finances in one place — no spreadsheets, no hassle.",
+    "features": {
+      "1": "Record income and expenses in seconds",
+      "2": "Monthly financial evolution chart",
+      "3": "Automatic AI insights",
+      "4": "Complete and organized history"
     }
   },
   "register": {

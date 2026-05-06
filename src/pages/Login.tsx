@@ -27,6 +27,8 @@ import {
 import RegisterUserForm from '@/components/RegisterUserForm';
 import { ForgotPassword } from '@/components/ForgotPassword';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ModeToggle } from '@/components/mode-toggle';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 interface FormData {
   email: string;
@@ -137,6 +139,10 @@ function Login() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2">
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-1">
+        <ModeToggle />
+        <LanguageSwitcher />
+      </div>
       <div className="order-last flex h-auto items-center justify-center py-8 md:order-1 md:min-h-screen md:p-0">
         <Tabs defaultValue="login" className="w-[90%] md:w-[72%]">
           <Card className="border-none bg-transparent">

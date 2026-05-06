@@ -1,4 +1,11 @@
 {
+  "nav": {
+    "home": "Home",
+    "howItWorks": "Como funciona",
+    "features": "Recursos",
+    "stats": "Estatísticas",
+    "enter": "Entrar"
+  },
   "hero": {
     "title": "FinanceTask",
     "headline": "Gerencie suas finanças de forma simples e eficiente.",
@@ -10,9 +17,18 @@
       "noCard": "Sem cartão de crédito"
     }
   },
+  "howItWorks": {
+    "title": "Como funciona",
+    "subtitle": "Em três passos simples você já está no controle.",
+    "steps": {
+      "1": { "title": "Crie sua conta", "description": "Cadastre-se gratuitamente em segundos. Sem cartão de crédito, sem burocracia." },
+      "2": { "title": "Registre suas finanças", "description": "Adicione receitas, despesas e tarefas financeiras com poucos cliques. Organize tudo por mês." },
+      "3": { "title": "Acompanhe seus resultados", "description": "Visualize seu saldo, histórico mensal e receba insights inteligentes para melhorar sua saúde financeira." }
+    }
+  },
   "features": {
-    "title": "Funcionalidades",
-    "subtitle": "Tudo que você precisa",
+    "label": "Funcionalidades",
+    "title": "Tudo que você precisa",
     "description": "Ferramentas simples para um controle financeiro poderoso.",
     "cards": {
       "register": { "title": "Registre na hora", "description": "Adicione receitas e despesas rapidamente, sem complicação." },
@@ -24,8 +40,15 @@
     }
   },
   "stats": {
+    "label": "Números",
     "title": "Números que falam por si",
-    "subtitle": "Simples, rápido e gratuito desde o primeiro dia."
+    "subtitle": "Simples, rápido e gratuito desde o primeiro dia.",
+    "items": {
+      "free": { "label": "Gratuito", "description": "Sem custos ocultos" },
+      "months": { "label": "Meses de histórico", "description": "Visão anual completa" },
+      "record": { "label": "Para registrar", "description": "Receitas e despesas" },
+      "place": { "label": "Lugar só", "description": "Para tudo que é seu" }
+    }
   },
   "testimonials": {
     "items": {
@@ -36,13 +59,32 @@
   },
   "cta": {
     "title": "Pronto para começar?",
-    "subtitle": "Junte-se a quem já usa o FinanceTask para organizar as finanças.",
+    "subtitle": "Junte-se a quem já usa o FinanceTask para organizar as finanças com praticidade e inteligência.",
     "login": "Faça o login",
     "benefits": {
       "1": "Registre receitas e despesas em segundos",
       "2": "Histórico completo mês a mês",
       "3": "Recomendações inteligentes baseadas no seu perfil",
       "4": "Acesso imediato, sem burocracia"
+    }
+  },
+  "ctaFinal": {
+    "title": "Pronto para organizar suas finanças?",
+    "subtitle": "Crie sua conta gratuitamente e comece a registrar receitas, despesas e metas ainda hoje.",
+    "start": "Começar agora",
+    "hasAccount": "Já tenho conta"
+  },
+  "description": {
+    "label": "O app em ação",
+    "title": "Simples de usar,",
+    "titleHighlight": "poderoso",
+    "titleSuffix": "no resultado",
+    "subtitle": "Veja como é fácil registrar, acompanhar e entender suas finanças em um só lugar — sem planilhas, sem complicação.",
+    "features": {
+      "1": "Registre receitas e despesas em segundos",
+      "2": "Gráfico de evolução financeira mensal",
+      "3": "Insights automáticos com IA",
+      "4": "Histórico completo e organizado"
     }
   },
   "register": {

@@ -15,6 +15,7 @@ import {
 import { NavMain } from '@/components/nav/nav-main';
 import { SidebarUser } from '@/components/nav/sidebar-user';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ModeToggle } from '@/components/mode-toggle';
 import { useVersion } from '@/hooks/use-version';
 import {
   Tooltip,
@@ -70,7 +71,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex items-center justify-end px-2 pb-1">
+        <div className="flex items-center justify-between px-2 pb-1">
+          <ModeToggle />
           <LanguageSwitcher />
         </div>
         <SidebarUser />

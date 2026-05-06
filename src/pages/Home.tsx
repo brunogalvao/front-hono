@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { MotionHighlight } from '@/components/animate-ui/effects/motion-highlight';
 import { Bell } from '@/components/animate-ui/icons/bell';
 import { BellOff } from '@/components/animate-ui/icons/bell-off';
@@ -21,25 +22,28 @@ import {
   CardDescription,
   CardTitle,
 } from '@/components/ui/card';
-import { CARDS } from '@/data/cardsIntro';
-import { textoChamada } from '@/data/textoTitulo';
-import { HERO_BADGES, TESTIMONIALS, CTA_BENEFITS } from '@/data/home';
 import { cn } from '@/lib/utils';
 import { Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2, Quote, ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-// import { text } from 'node:stream/consumers';
 
-const ICONS = {
-  Clock7,
-  Bell,
-  Heart,
-  Cog,
-  BellOff,
-  RefreshCcw,
-} as const;
+const ICONS = { Clock7, Bell, Heart, Cog, BellOff, RefreshCcw } as const;
+
+type CardKey = 'register' | 'deadlines' | 'history' | 'insights' | 'alerts' | 'sync';
+
+const CARD_ICONS: { key: CardKey; icon: keyof typeof ICONS }[] = [
+  { key: 'register', icon: 'Clock7' },
+  { key: 'deadlines', icon: 'Bell' },
+  { key: 'history', icon: 'Cog' },
+  { key: 'insights', icon: 'Heart' },
+  { key: 'alerts', icon: 'BellOff' },
+  { key: 'sync', icon: 'RefreshCcw' },
+];
+
+const TESTIMONIAL_KEYS = ['ana', 'carlos', 'juliana'] as const;
+const BENEFIT_KEYS = ['1', '2', '3', '4'] as const;
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -50,6 +54,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 function Home() {
+  const { t } = useTranslation('home');
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
@@ -71,11 +76,9 @@ function Home() {
           <div className="flex w-full flex-col gap-4 md:w-[60%]">
             <GsapHeroTitle
               className="w-full text-7xl font-bold md:text-8xl"
-              text={textoChamada[0].title}
+              text={t('hero.title')}
             />
-            <p className="text-muted-foreground text-lg">
-              {textoChamada[0].tituloHeader}
-            </p>
+            <p className="text-muted-foreground text-lg">{t('hero.headline')}</p>
 
             <div className="mt-2 flex flex-col gap-4">
               <Link
@@ -85,18 +88,18 @@ function Home() {
                   'w-fit gap-2 rounded-full px-8'
                 )}
               >
-                {textoChamada[0].ctaHeader}
+                {t('hero.cta')}
                 <ArrowRight className="size-4" />
               </Link>
 
               <div className="flex flex-wrap gap-3">
-                {HERO_BADGES.map((badge) => (
+                {(['free', 'ai', 'noCard'] as const).map((key) => (
                   <span
-                    key={badge}
+                    key={key}
                     className="text-muted-foreground flex items-center gap-1.5 text-sm"
                   >
                     <CheckCircle2 className="text-primary size-4" />
-                    {badge}
+                    {t(`hero.badges.${key}`)}
                   </span>
                 ))}
               </div>
@@ -104,7 +107,7 @@ function Home() {
           </div>
 
           <p className="text-muted-foreground w-full text-base md:w-[40%] md:ps-8 md:text-end">
-            {textoChamada[0].textoHeader}
+            {t('hero.description')}
           </p>
         </section>
 
@@ -122,43 +125,33 @@ function Home() {
           className="flex h-svh scroll-mt-16 flex-col justify-center gap-10"
         >
           <div className="text-center">
-            <SectionLabel>Funcionalidades</SectionLabel>
-            <h2 className="text-3xl font-bold">Tudo que você precisa</h2>
-            <p className="text-muted-foreground mt-2 text-base">
-              Ferramentas simples para um controle financeiro poderoso.
-            </p>
+            <SectionLabel>{t('features.label')}</SectionLabel>
+            <h2 className="text-3xl font-bold">{t('features.title')}</h2>
+            <p className="text-muted-foreground mt-2 text-base">{t('features.description')}</p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <MotionHighlight hover className="rounded-2xl">
-              {CARDS.map((card, idx) => {
-                const IconComponent = ICONS[card.icons];
+              {CARD_ICONS.map(({ key, icon }, idx) => {
+                const IconComponent = ICONS[icon];
                 const isLeft = idx % 2 === 0;
-
                 return (
                   <motion.div
-                    key={card.title}
+                    key={key}
                     initial={{ x: isLeft ? '-30%' : '30%', opacity: 0 }}
                     whileInView={{ x: '0%', opacity: 1 }}
                     viewport={{ once: true }}
-                    transition={{
-                      duration: 1.2,
-                      ease: 'easeInOut',
-                      delay: idx * 0.05,
-                    }}
+                    transition={{ duration: 1.2, ease: 'easeInOut', delay: idx * 0.05 }}
                   >
-                    <Card data-value={card.title} className="bg-transparent">
+                    <Card data-value={key} className="bg-transparent">
                       <CardContent>
                         <AnimateIcon animateOnHover>
                           <CardTitle className="mb-4 flex flex-row items-center gap-3">
-                            <IconComponent
-                              className="text-primary size-8"
-                              animate="default"
-                            />
-                            {card.title}
+                            <IconComponent className="text-primary size-8" animate="default" />
+                            {t(`features.cards.${key}.title`)}
                           </CardTitle>
                         </AnimateIcon>
-                        <CardDescription>{card.description}</CardDescription>
+                        <CardDescription>{t(`features.cards.${key}.description`)}</CardDescription>
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -174,19 +167,17 @@ function Home() {
           className="flex h-svh scroll-mt-16 flex-col items-center justify-center gap-12"
         >
           <div className="text-center">
-            <SectionLabel>Números</SectionLabel>
-            <h2 className="text-3xl font-bold">Números que falam por si</h2>
-            <p className="text-muted-foreground mt-2 text-base">
-              Simples, rápido e gratuito desde o primeiro dia.
-            </p>
+            <SectionLabel>{t('stats.label')}</SectionLabel>
+            <h2 className="text-3xl font-bold">{t('stats.title')}</h2>
+            <p className="text-muted-foreground mt-2 text-base">{t('stats.subtitle')}</p>
           </div>
 
           <StatsSection />
 
           <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-3">
-            {TESTIMONIALS.map((t, idx) => (
+            {TESTIMONIAL_KEYS.map((key, idx) => (
               <motion.div
-                key={t.name}
+                key={key}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -196,11 +187,11 @@ function Home() {
                   <CardContent className="flex flex-col gap-4 pt-6">
                     <Quote className="text-primary size-5 opacity-60" />
                     <p className="text-muted-foreground text-sm leading-relaxed">
-                      {t.text}
+                      {t(`testimonials.items.${key}.text`)}
                     </p>
                     <div className="mt-auto">
-                      <p className="text-sm font-semibold">{t.name}</p>
-                      <p className="text-muted-foreground text-xs">{t.role}</p>
+                      <p className="text-sm font-semibold">{t(`testimonials.items.${key}.name`)}</p>
+                      <p className="text-muted-foreground text-xs">{t(`testimonials.items.${key}.role`)}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -211,7 +202,6 @@ function Home() {
 
         {/* CTA intermediário */}
         <div className="border-border relative flex h-svh flex-col items-center justify-center gap-8 overflow-hidden rounded-2xl border">
-          {/* dot grid */}
           <div
             className="absolute inset-0 rounded-2xl"
             style={{
@@ -220,33 +210,24 @@ function Home() {
               backgroundSize: '28px 28px',
             }}
           />
-          {/* radial fade overlay */}
           <div className="from-background via-background/50 absolute inset-0 rounded-2xl bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,transparent_30%,var(--tw-gradient-stops))]" />
 
           <div className="relative z-10 flex flex-col items-center gap-6 text-center">
-            <span className="text-foreground text-3xl font-bold">
-              Pronto para começar?
-            </span>
-            <p className="text-muted-foreground max-w-md text-sm">
-              Junte-se a quem já usa o FinanceTask para organizar as finanças
-              com praticidade e inteligência.
-            </p>
+            <span className="text-foreground text-3xl font-bold">{t('cta.title')}</span>
+            <p className="text-muted-foreground max-w-md text-sm">{t('cta.subtitle')}</p>
 
             <ul className="flex flex-col gap-2">
-              {CTA_BENEFITS.map((b) => (
-                <li
-                  key={b}
-                  className="text-muted-foreground flex items-center gap-2 text-sm"
-                >
+              {BENEFIT_KEYS.map((key) => (
+                <li key={key} className="text-muted-foreground flex items-center gap-2 text-sm">
                   <CheckCircle2 className="text-primary size-4 shrink-0" />
-                  {b}
+                  {t(`cta.benefits.${key}`)}
                 </li>
               ))}
             </ul>
 
             <Link to="/login">
               <HighlightText
-                text="Faça o login"
+                text={t('cta.login')}
                 transition={{ duration: 4, ease: 'easeInOut' }}
                 inViewOnce
                 className="cursor-pointer rounded-full px-16 py-2 font-bold duration-200 hover:underline"

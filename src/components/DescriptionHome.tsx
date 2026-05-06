@@ -1,18 +1,15 @@
 import { motion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { DemoPreview } from './DemoPreview';
 
-const FEATURES = [
-  'Registre receitas e despesas em segundos',
-  'Gráfico de evolução financeira mensal',
-  'Insights automáticos com IA',
-  'Histórico completo e organizado',
-];
+const FEATURE_KEYS = ['1', '2', '3', '4'] as const;
 
 const DescriptionHome = () => {
+  const { t } = useTranslation('home');
+
   return (
     <div className="flex w-full flex-col items-center gap-12">
-      {/* Heading centrado */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -21,19 +18,18 @@ const DescriptionHome = () => {
         className="flex flex-col items-center gap-3 text-center"
       >
         <span className="bg-primary/10 text-primary rounded-full px-4 py-1 text-sm font-medium">
-          O app em ação
+          {t('description.label')}
         </span>
         <h2 className="max-w-xl text-4xl font-bold leading-tight">
-          Simples de usar,{' '}
-          <span className="text-primary">poderoso</span> no resultado
+          {t('description.title')}{' '}
+          <span className="text-primary">{t('description.titleHighlight')}</span>{' '}
+          {t('description.titleSuffix')}
         </h2>
         <p className="text-muted-foreground max-w-lg text-base">
-          Veja como é fácil registrar, acompanhar e entender suas finanças em
-          um só lugar — sem planilhas, sem complicação.
+          {t('description.subtitle')}
         </p>
       </motion.div>
 
-      {/* Demo em destaque */}
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -47,7 +43,6 @@ const DescriptionHome = () => {
         <DemoPreview />
       </motion.div>
 
-      {/* Feature pills abaixo */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -55,13 +50,13 @@ const DescriptionHome = () => {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="flex flex-wrap justify-center gap-3"
       >
-        {FEATURES.map((f) => (
+        {FEATURE_KEYS.map((key) => (
           <span
-            key={f}
+            key={key}
             className="border-border text-muted-foreground flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm"
           >
             <CheckCircle2 className="text-primary size-3.5 shrink-0" />
-            {f}
+            {t(`description.features.${key}`)}
           </span>
         ))}
       </motion.div>

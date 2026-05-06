@@ -47,6 +47,12 @@
     "11": "Nov",
     "12": "Dec"
   },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "toggle": "Toggle theme"
+  },
   "errors": {
     "unauthenticated": "User not authenticated.",
     "generic": "An error occurred. Please try again.",
