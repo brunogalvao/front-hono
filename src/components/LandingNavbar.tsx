@@ -10,7 +10,12 @@ import { ModeToggle } from '@/components/mode-toggle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 
-const NAV_HREFS = ['#home', '#como-funciona', '#recursos', '#estatisticas'] as const;
+const NAV_HREFS = [
+  '#home',
+  '#como-funciona',
+  '#recursos',
+  '#estatisticas',
+] as const;
 
 function scrollToSection(href: string) {
   const id = href.replace('#', '');
@@ -54,7 +59,9 @@ export function LandingNavbar() {
     <header
       className={cn(
         'fixed top-0 z-50 w-full transition-all duration-300',
-        scrolled ? 'bg-background/80 shadow-sm backdrop-blur-md' : 'bg-transparent'
+        scrolled
+          ? 'bg-background/80 shadow-sm backdrop-blur-md'
+          : 'bg-transparent'
       )}
     >
       <div className="container mx-auto flex flex-col items-center">

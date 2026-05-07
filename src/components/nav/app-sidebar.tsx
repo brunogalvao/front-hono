@@ -28,10 +28,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { t } = useTranslation(['nav', 'common']);
 
   const navItems = [
-    { title: t('dashboard'), url: '/admin/dashboard', icon: 'dashboard' as const },
+    {
+      title: t('dashboard'),
+      url: '/admin/dashboard',
+      icon: 'dashboard' as const,
+    },
     { title: t('expenses'), url: '/admin/expenses', icon: 'list' as const },
     { title: t('income'), url: '/admin/income', icon: 'income' as const },
-    { title: t('installments'), url: '/admin/installments', icon: 'parcelas' as const },
+    {
+      title: t('installments'),
+      url: '/admin/installments',
+      icon: 'parcelas' as const,
+    },
     { title: t('history'), url: '/admin/history', icon: 'history' as const },
     { title: t('advisor'), url: '/admin/advisor', icon: 'advisor' as const },
     { title: t('groups'), url: '/admin/groups', icon: 'groups' as const },
@@ -44,8 +52,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <Logo size={32} showWordmark={false} />
+              <a href="#" className="flex gap-x-4">
+                <Logo size={28} showWordmark={false} />
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">Task's Finance</span>
                   <Tooltip>
@@ -56,11 +64,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       {loading ? t('common:loading') : getVersionString()}
                     </TooltipContent>
                   </Tooltip>
-
-                  {/* <span className="font-semibold">Task's Finance</span>
-                  <span className="text-xs">
-                    {loading ? 'Carregando...' : getVersionString()}
-                  </span> */}
                 </div>
               </a>
             </SidebarMenuButton>
