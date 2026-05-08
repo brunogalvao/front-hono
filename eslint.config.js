@@ -24,5 +24,6 @@ export default tseslint.config({ ignores: ['dist'] }, {
       'warn',
       { allowConstantExport: true },
     ],
+    'quotes': ['error', 'single', { avoidEscape: true }],
   },
 }, storybook.configs["flat/recommended"]);
