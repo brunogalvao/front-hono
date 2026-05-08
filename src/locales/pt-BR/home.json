@@ -7,9 +7,9 @@
     "enter": "Entrar"
   },
   "hero": {
-    "title": "FinanceTask",
+    "title": "Task's Finance",
     "headline": "Gerencie suas finanças de forma simples e eficiente.",
-    "description": "FinanceTask organiza suas receitas, despesas e tarefas financeiras em um só lugar. Acompanhe seu saldo em tempo real, visualize o histórico mensal e receba sugestões inteligentes para melhorar sua saúde financeira.",
+    "description": "Task's Finance organiza suas receitas, despesas e tarefas financeiras em um só lugar. Acompanhe seu saldo em tempo real, visualize o histórico mensal e receba sugestões inteligentes para melhorar sua saúde financeira.",
     "cta": "Começar agora",
     "badges": {
       "free": "100% Gratuito",
@@ -59,7 +59,7 @@
   },
   "cta": {
     "title": "Pronto para começar?",
-    "subtitle": "Junte-se a quem já usa o FinanceTask para organizar as finanças com praticidade e inteligência.",
+    "subtitle": "Junte-se a quem já usa o Task's Finance para organizar as finanças com praticidade e inteligência.",
     "login": "Faça o login",
     "benefits": {
       "1": "Registre receitas e despesas em segundos",

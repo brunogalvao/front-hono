@@ -7,9 +7,9 @@
     "enter": "Sign in"
   },
   "hero": {
-    "title": "FinanceTask",
+    "title": "Task's Finance",
     "headline": "Manage your finances simply and efficiently.",
-    "description": "FinanceTask organizes your income, expenses and financial tasks in one place. Track your balance in real time, view monthly history and receive smart suggestions to improve your financial health.",
+    "description": "Task's Finance organizes your income, expenses and financial tasks in one place. Track your balance in real time, view monthly history and receive smart suggestions to improve your financial health.",
     "cta": "Get started",
     "badges": {
       "free": "100% Free",
@@ -59,7 +59,7 @@
   },
   "cta": {
     "title": "Ready to get started?",
-    "subtitle": "Join those who already use FinanceTask to organize their finances with convenience and intelligence.",
+    "subtitle": "Join those who already use Task's Finance to organize their finances with convenience and intelligence.",
     "login": "Sign in",
     "benefits": {
       "1": "Record income and expenses in seconds",
