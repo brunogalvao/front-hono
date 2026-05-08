@@ -14,8 +14,6 @@ import {
 } from '@/components/ui/sidebar';
 import { NavMain } from '@/components/nav/nav-main';
 import { SidebarUser } from '@/components/nav/sidebar-user';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { ModeToggle } from '@/components/mode-toggle';
 import { useVersion } from '@/hooks/use-version';
 import {
   Tooltip,
@@ -47,14 +45,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   ];
 
   return (
-    <Sidebar {...props} collapsible="offcanvas">
+    <Sidebar {...props} collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#" className="flex gap-x-4">
+            <SidebarMenuButton size="lg" asChild tooltip="Task's Finance">
+              <a href="#">
                 <Logo size={28} showWordmark={false} />
-                <div className="flex flex-col gap-0.5 leading-none">
+                <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
                   <span className="font-semibold">Task's Finance</span>
                   <Tooltip>
                     <TooltipTrigger className="cursor-pointer">
@@ -74,10 +72,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex items-center justify-between px-2 pb-1">
-          <ModeToggle />
-          <LanguageSwitcher />
-        </div>
         <SidebarUser />
       </SidebarFooter>
       <SidebarRail />

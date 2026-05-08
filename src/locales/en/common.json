@@ -53,6 +53,11 @@
     "system": "System",
     "toggle": "Toggle theme"
   },
+  "language": {
+    "toggle": "Language",
+    "pt-BR": "Português",
+    "en": "English"
+  },
   "errors": {
     "unauthenticated": "User not authenticated.",
     "generic": "An error occurred. Please try again.",
