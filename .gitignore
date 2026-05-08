@@ -69,3 +69,8 @@ CLEANUP_COMPLETE.md
 
 *storybook.log
 storybook-static
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
