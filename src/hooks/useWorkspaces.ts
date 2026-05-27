@@ -13,7 +13,7 @@ async function fetchWorkspaces(): Promise<WorkspaceInfo[]> {
   if (error) throw error;
 
   return (data ?? []).flatMap((row) => {
-    const ws = row.workspaces as { id: string; name: string; superuser_id: string } | null;
+    const ws = row.workspaces as unknown as { id: string; name: string; superuser_id: string } | null;
     if (!ws) return [];
     return [{ id: ws.id, name: ws.name, role: row.role as WorkspaceInfo['role'], superuser_id: ws.superuser_id }];
   });

@@ -42,7 +42,7 @@ async function buildSummary(
   const catMap = new Map<string, { category_name: string; total: number; type: string }>();
   for (const r of rows) {
     const key = r.category_id ?? '__none__';
-    const cat = r.categories as { id: string; name: string; type: string } | null;
+    const cat = r.categories as unknown as { id: string; name: string; type: string } | null;
     const name = cat?.name ?? 'Sem categoria';
     const existing = catMap.get(key);
     catMap.set(key, {

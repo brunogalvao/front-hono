@@ -20,7 +20,7 @@ const FREQ_LABELS = { monthly: 'Mensal', weekly: 'Semanal', yearly: 'Anual' };
 
 export function RecurringList() {
   const { activeWorkspaceId, activeRole } = useWorkspace();
-  const { data: items = [], isLoading, create, update, toggleActive, remove } = useRecurring(activeWorkspaceId);
+  const { data: items = [], isLoading, update, toggleActive, remove } = useRecurring(activeWorkspaceId);
   const [editTarget, setEditTarget] = useState<RecurringExpense | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
