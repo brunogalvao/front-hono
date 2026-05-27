@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import TituloPage from '@/components/TituloPage';
 import { Link } from '@tanstack/react-router';
 import { useIA } from '@/hooks/use-ia';
@@ -15,17 +16,46 @@ import {
 import { getNomeMes } from '@/model/mes.enum';
 import { getCurrentMonth, getCurrentYear } from '@/utils/date';
 import { useTranslation } from 'react-i18next';
+import { MonthNavigator } from '@/components/dashboard/MonthNavigator';
+import { SummaryCard } from '@/components/dashboard/SummaryCard';
+import { useDashboard } from '@/hooks/useDashboard';
+import { useWorkspace } from '@/context/WorkspaceContext';
 
 const Dashboard = () => {
   const { data: iaData, isLoading } = useIA();
   const { t } = useTranslation('dashboard');
   const shouldShowSkeleton = isLoading;
+  const { activeWorkspaceId } = useWorkspace();
+
+  const now = new Date();
+  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(now.getFullYear());
+  const { workspaceSummary, individualSummary } = useDashboard(activeWorkspaceId, month, year);
 
   const subtitulo = `${getNomeMes(getCurrentMonth())} ${getCurrentYear()}`;
 
   return (
     <div className="space-y-6">
-      <TituloPage titulo={t('title')} subtitulo={subtitulo} />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <TituloPage titulo={t('title')} subtitulo={subtitulo} />
+        <MonthNavigator month={month} year={year} onChange={(m, y) => { setMonth(m); setYear(y); }} />
+      </div>
+
+      {/* Resumo do Workspace e Individual */}
+      {activeWorkspaceId && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <SummaryCard
+            title="Workspace"
+            summary={workspaceSummary.data}
+            isLoading={workspaceSummary.isLoading}
+          />
+          <SummaryCard
+            title="Meus gastos"
+            summary={individualSummary.data}
+            isLoading={individualSummary.isLoading}
+          />
+        </div>
+      )}
 
       {/* Gráfico de Visão Geral */}
       <FinancialChart />

@@ -17,6 +17,15 @@ import Parcelas from '@/pages/admin/Parcelas';
 import Advisor from '@/pages/admin/Advisor';
 import Groups from '@/pages/admin/Groups';
 import Invite from '@/pages/Invite';
+// New pages
+import RegisterPage from '@/pages/auth/RegisterPage';
+import AcceptInvitePage from '@/pages/auth/AcceptInvitePage';
+import TransactionsPage from '@/pages/admin/TransactionsPage';
+import RecurringPage from '@/pages/admin/RecurringPage';
+import InsightsPage from '@/pages/admin/InsightsPage';
+import InstallmentsPage from '@/pages/admin/InstallmentsPage';
+import WorkspaceSettingsPage from '@/pages/admin/workspace/WorkspaceSettingsPage';
+import AccountSettingsPage from '@/pages/admin/AccountSettingsPage';
 
 // Root Route
 const rootRoute = createRootRoute({
@@ -27,18 +36,23 @@ const rootRoute = createRootRoute({
   ),
 });
 
-// Home Route
+// Public Routes
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   component: Home,
 });
 
-// Login Route
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
   component: Login,
+});
+
+const registerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/register',
+  component: RegisterPage,
 });
 
 // Admin Routes
@@ -96,18 +110,60 @@ const groupsRoute = createRoute({
   component: Groups,
 });
 
-// Invite Route (public)
+// New workspace-aware routes
+const transactionsRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: '/transactions',
+  component: TransactionsPage,
+});
+
+const recurringRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: '/recurring',
+  component: RecurringPage,
+});
+
+const installmentsNewRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: '/installments-new',
+  component: InstallmentsPage,
+});
+
+const insightsRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: '/insights',
+  component: InsightsPage,
+});
+
+const workspaceSettingsRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: '/settings',
+  component: WorkspaceSettingsPage,
+});
+
+const accountSettingsRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: '/account',
+  component: AccountSettingsPage,
+});
+
+// Invite & Auth Routes
 const inviteRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/invite/$token',
   component: Invite,
 });
 
-// Auth Callback Route
 const authCallbackRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth/callback',
   component: AuthCallback,
+});
+
+const acceptInviteRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/auth/accept-invite',
+  component: AcceptInvitePage,
 });
 
 // Catch-all route
@@ -121,8 +177,10 @@ const catchAllRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   homeRoute,
   loginRoute,
+  registerRoute,
   inviteRoute,
   authCallbackRoute,
+  acceptInviteRoute,
   adminRoute.addChildren([
     editUserRoute,
     expensesRoute,
@@ -132,6 +190,12 @@ const routeTree = rootRoute.addChildren([
     parcelasRoute,
     advisorRoute,
     groupsRoute,
+    transactionsRoute,
+    recurringRoute,
+    installmentsNewRoute,
+    insightsRoute,
+    workspaceSettingsRoute,
+    accountSettingsRoute,
   ]),
   catchAllRoute,
 ]);

@@ -86,6 +86,59 @@ export const queryKeys = {
   invites: {
     byToken: (token: string) => ['invites', token] as const,
   },
+
+  // Workspaces
+  workspaces: {
+    all: ['workspaces'] as const,
+    list: () => [...queryKeys.workspaces.all, 'list'] as const,
+    members: (workspaceId: string) => ['workspaces', workspaceId, 'members'] as const,
+    pendingInvites: (workspaceId: string) => ['workspaces', workspaceId, 'pending-invites'] as const,
+  },
+
+  // Transactions
+  transactions: {
+    all: ['transactions'] as const,
+    list: (workspaceId: string, month: number, year: number) =>
+      [...queryKeys.transactions.all, workspaceId, month, year] as const,
+    byCategory: (workspaceId: string, month: number, year: number) =>
+      [...queryKeys.transactions.all, workspaceId, month, year, 'by-category'] as const,
+  },
+
+  // Recurring expenses
+  recurring: {
+    all: ['recurring'] as const,
+    list: (workspaceId: string) => [...queryKeys.recurring.all, workspaceId] as const,
+  },
+
+  // Installments
+  installments: {
+    all: ['installments'] as const,
+    list: (workspaceId: string) => [...queryKeys.installments.all, workspaceId] as const,
+  },
+
+  // Dashboard
+  dashboard: {
+    all: ['dashboard'] as const,
+    workspace: (workspaceId: string, month: number, year: number) =>
+      [...queryKeys.dashboard.all, workspaceId, 'workspace', month, year] as const,
+    individual: (workspaceId: string, month: number, year: number) =>
+      [...queryKeys.dashboard.all, workspaceId, 'individual', month, year] as const,
+  },
+
+  // Insights
+  insights: {
+    all: ['insights'] as const,
+    workspace: (workspaceId: string, month: number, year: number) =>
+      [...queryKeys.insights.all, workspaceId, 'workspace', month, year] as const,
+    individual: (workspaceId: string, month: number, year: number) =>
+      [...queryKeys.insights.all, workspaceId, 'individual', month, year] as const,
+  },
+
+  // Categories
+  categories: {
+    all: ['categories'] as const,
+    list: (workspaceId: string) => [...queryKeys.categories.all, workspaceId] as const,
+  },
 } as const;
 
 // Tipos para type safety

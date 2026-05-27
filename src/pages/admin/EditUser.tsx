@@ -51,12 +51,32 @@ const EditUser = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [provider, setProvider] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const blobUrlsRef = useRef<string[]>([]);
 
   const { setProfile } = useUser();
 
   const schema = z.object({
     phone: phoneSchema,
   });
+
+  // Revoke all tracked blob URLs on unmount
+  useEffect(() => {
+    return () => {
+      blobUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
+
+  const createBlobUrl = (source: Blob | File | MediaSource) => {
+    const url = URL.createObjectURL(source);
+    blobUrlsRef.current.push(url);
+    return url;
+  };
+
+  const revokeBlobUrl = (url: string | null) => {
+    if (!url) return;
+    URL.revokeObjectURL(url);
+    blobUrlsRef.current = blobUrlsRef.current.filter((u) => u !== url);
+  };
 
   useEffect(() => {
     if (user) {
@@ -65,14 +85,14 @@ const EditUser = () => {
         avatarUrl: user.user_metadata?.avatar_url ?? '',
         phone: user.user_metadata?.phone ?? '',
       });
-      setProvider(user.app_metadata.provider || 'desconhecido');
+      setProvider(user.app_metadata.provider || t('providerUnknown'));
     }
-  }, [user]);
+  }, [user, t]);
 
   const handleUpdate = () => {
     const result = schema.safeParse({ phone: formData.phone });
     if (!result.success) {
-      toast.error(result.error.format().phone?._errors?.[0] || 'Telefone inválido.');
+      toast.error(result.error.format().phone?._errors?.[0] || t('toast.phoneInvalid'));
       return;
     }
     if (!user) {
@@ -93,6 +113,7 @@ const EditUser = () => {
       {
         onSuccess: ({ avatarUrl }) => {
           setFormData((prev) => ({ ...prev, avatarUrl }));
+          revokeBlobUrl(preview);
           setPreview(null);
           setFile(null);
           toast.success(t('toast.updated'), { duration: 5000 });
@@ -116,7 +137,8 @@ const EditUser = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0] || null;
     if (selected) {
-      setCropSrc(URL.createObjectURL(selected));
+      revokeBlobUrl(cropSrc);
+      setCropSrc(createBlobUrl(selected));
     }
     e.target.value = '';
   };
@@ -131,10 +153,14 @@ const EditUser = () => {
     setCroppedAreaPixels(croppedPixels);
   }, []);
 
-  const getCroppedBlob = async (
-    imageSrc: string,
-    pixelCrop: Area,
-  ): Promise<Blob> => {
+  const clearCrop = () => {
+    revokeBlobUrl(cropSrc);
+    setCropSrc(null);
+    setZoom(1);
+    setCrop({ x: 0, y: 0 });
+  };
+
+  const getCroppedBlob = async (imageSrc: string, pixelCrop: Area): Promise<Blob> => {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const image = new Image();
       image.onload = () => resolve(image);
@@ -147,17 +173,7 @@ const EditUser = () => {
     canvas.height = pixelCrop.height;
     const ctx = canvas.getContext('2d')!;
 
-    ctx.drawImage(
-      img,
-      pixelCrop.x,
-      pixelCrop.y,
-      pixelCrop.width,
-      pixelCrop.height,
-      0,
-      0,
-      pixelCrop.width,
-      pixelCrop.height,
-    );
+    ctx.drawImage(img, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, pixelCrop.width, pixelCrop.height);
 
     return new Promise((resolve, reject) => {
       canvas.toBlob((blob) => {
@@ -172,10 +188,9 @@ const EditUser = () => {
     const blob = await getCroppedBlob(cropSrc, croppedAreaPixels);
     const croppedFile = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
     setFile(croppedFile);
-    setPreview(URL.createObjectURL(blob));
-    setCropSrc(null);
-    setZoom(1);
-    setCrop({ x: 0, y: 0 });
+    revokeBlobUrl(preview);
+    setPreview(createBlobUrl(blob));
+    clearCrop();
   };
 
   return (
@@ -198,7 +213,7 @@ const EditUser = () => {
               onClick={() => fileInputRef.current?.click()}
               disabled={updateProfile.isPending}
               className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity hover:opacity-100 disabled:cursor-not-allowed"
-              title="Alterar foto"
+              title={t('changePhotoTooltip')}
             >
               {updateProfile.isPending ? (
                 <Loader2 className="h-6 w-6 animate-spin text-white" />
@@ -224,9 +239,7 @@ const EditUser = () => {
           </p>
           <p className="text-muted-foreground text-xs">{user?.email}</p>
           {preview && (
-            <p className="text-xs text-amber-500">
-              Nova foto selecionada — salve para aplicar.
-            </p>
+            <p className="text-xs text-amber-500">{t('imageSelected')}</p>
           )}
           {provider === 'email' && !preview && (
             <button
@@ -234,17 +247,17 @@ const EditUser = () => {
               onClick={() => fileInputRef.current?.click()}
               className="text-muted-foreground hover:text-primary mt-1 w-fit text-xs underline underline-offset-2 transition-colors"
             >
-              Alterar foto de perfil
+              {t('changePhotoLink')}
             </button>
           )}
         </div>
       </div>
 
       {/* Crop Dialog */}
-      <Dialog open={!!cropSrc} onOpenChange={(open) => { if (!open) { setCropSrc(null); setZoom(1); setCrop({ x: 0, y: 0 }); } }}>
+      <Dialog open={!!cropSrc} onOpenChange={(open) => { if (!open) clearCrop(); }}>
         <DialogContent className="max-w-md" aria-describedby={undefined}>
           <DialogHeader>
-            <DialogTitle>Recortar foto</DialogTitle>
+            <DialogTitle>{t('cropTitle')}</DialogTitle>
           </DialogHeader>
 
           <div className="relative h-72 w-full overflow-hidden rounded-lg bg-black">
@@ -264,7 +277,7 @@ const EditUser = () => {
           </div>
 
           <div className="flex flex-col gap-2 px-1">
-            <Label className="text-muted-foreground text-xs">Zoom</Label>
+            <Label className="text-muted-foreground text-xs">{t('zoomLabel')}</Label>
             <Slider
               min={1}
               max={3}
@@ -275,11 +288,11 @@ const EditUser = () => {
           </div>
 
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => { setCropSrc(null); setZoom(1); setCrop({ x: 0, y: 0 }); }}>
-              Cancelar
+            <Button variant="outline" onClick={clearCrop}>
+              {t('common:cancel')}
             </Button>
             <Button onClick={handleCropConfirm}>
-              Aplicar recorte
+              {t('applyCrop')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -288,9 +301,9 @@ const EditUser = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <div>Informações do Usuario</div>
+            <div>{t('userInfo')}</div>
             <div className="text-muted-foreground flex flex-row items-center gap-3 text-sm">
-              Está logado com
+              {t('loggedInWith')}
               {provider === 'github' ? (
                 <FaGithub className="size-6" />
               ) : provider === 'google' ? (
@@ -313,9 +326,12 @@ const EditUser = () => {
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                placeholder="Seu nome"
+                placeholder={t('namePlaceholder')}
                 disabled={provider !== 'email'}
               />
+              {provider !== 'email' && (
+                <p className="text-muted-foreground text-xs">{t('nameDisabledHint')}</p>
+              )}
             </div>
 
             <div className="flex w-full flex-col gap-2">
@@ -335,10 +351,14 @@ const EditUser = () => {
             <div className="flex w-full flex-col gap-2">
               <Label htmlFor="email">Email</Label>
               <Input value={user?.email || ''} disabled />
+              <p className="text-muted-foreground text-xs">{t('emailDisabledHint')}</p>
             </div>
           </div>
 
           <ResetPassword provider={provider} />
+          {provider !== 'email' && (
+            <p className="text-muted-foreground text-xs">{t('passwordOAuthHint')}</p>
+          )}
         </CardContent>
 
         <CardFooter className="flex justify-end">

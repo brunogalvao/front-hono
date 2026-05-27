@@ -1,0 +1,50 @@
+import { useState } from 'react';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { InstallmentList } from '@/components/installments/InstallmentList';
+import { InstallmentForm } from '@/components/installments/InstallmentForm';
+import { useInstallments } from '@/hooks/useInstallments';
+import { useWorkspace } from '@/context/WorkspaceContext';
+import { canWrite } from '@/lib/permissions';
+import { toast } from 'sonner';
+
+export default function InstallmentsPage() {
+  const { activeWorkspaceId, activeRole } = useWorkspace();
+  const [createOpen, setCreateOpen] = useState(false);
+  const { create } = useInstallments(activeWorkspaceId);
+
+  const handleCreate = async (input: Parameters<typeof create.mutateAsync>[0]) => {
+    try {
+      await create.mutateAsync(input);
+      toast.success('Parcelamento criado!');
+    } catch {
+      toast.error('Erro ao criar parcelamento.');
+      throw new Error('Erro ao criar parcelamento.');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Parcelamentos</h1>
+          <p className="text-muted-foreground text-sm">Acompanhe compras parceladas</p>
+        </div>
+        {canWrite(activeRole) && (
+          <Button onClick={() => setCreateOpen(true)}>
+            <Plus className="mr-1 h-4 w-4" />
+            Novo Parcelamento
+          </Button>
+        )}
+      </div>
+
+      <InstallmentList />
+
+      <InstallmentForm
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onSubmit={handleCreate}
+      />
+    </div>
+  );
+}

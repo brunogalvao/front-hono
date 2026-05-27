@@ -1,72 +1,73 @@
-// import * as React from "react";
-import { Logo } from '@/components/Logo';
-import { useTranslation } from 'react-i18next';
-
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar';
-import { NavMain } from '@/components/nav/nav-main';
+import { NavMain, type NavItem } from '@/components/nav/nav-main';
 import { SidebarUser } from '@/components/nav/sidebar-user';
-import { useVersion } from '@/hooks/use-version';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { WorkspaceSwitcher } from '@/components/nav/WorkspaceSwitcher';
+import { useWorkspace } from '@/context/WorkspaceContext';
+import { canWrite, canManageMembers } from '@/lib/permissions';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { getVersionString, loading } = useVersion();
-  const { t } = useTranslation(['nav', 'common']);
+  const { activeRole } = useWorkspace();
 
-  const navItems = [
+  const navItems: NavItem[] = [
     {
-      title: t('dashboard'),
+      title: 'Dashboard',
       url: '/admin/dashboard',
       icon: 'dashboard' as const,
     },
-    { title: t('expenses'), url: '/admin/expenses', icon: 'list' as const },
-    { title: t('income'), url: '/admin/income', icon: 'income' as const },
     {
-      title: t('installments'),
+      title: 'Transações',
+      url: '/admin/transactions',
+      icon: 'list' as const,
+    },
+    ...(canWrite(activeRole) ? [{
+      title: 'Recorrências',
+      url: '/admin/recurring',
+      icon: 'income' as const,
+    }] : []),
+    ...(canWrite(activeRole) ? [{
+      title: 'Parcelamentos',
       url: '/admin/installments',
       icon: 'parcelas' as const,
+    }] : []),
+    {
+      title: 'Insights IA',
+      url: '/admin/insights',
+      icon: 'advisor' as const,
     },
-    { title: t('history'), url: '/admin/history', icon: 'history' as const },
-    { title: t('advisor'), url: '/admin/advisor', icon: 'advisor' as const },
-    { title: t('groups'), url: '/admin/groups', icon: 'groups' as const },
-    { title: t('profile'), url: '/admin/profile', icon: 'user' as const },
+    ...(canManageMembers(activeRole) ? [{
+      title: 'Configurações',
+      url: '/admin/settings',
+      icon: 'groups' as const,
+    }] : []),
+    {
+      type: 'group' as const,
+      title: 'Meu Espaço',
+      icon: 'profile' as const,
+      children: [
+        {
+          title: 'Perfil',
+          url: '/admin/profile',
+          icon: 'profile' as const,
+        },
+        {
+          title: 'Minha Conta',
+          url: '/admin/account',
+          icon: 'account' as const,
+        },
+      ],
+    },
   ];
 
   return (
     <Sidebar {...props} collapsible="icon">
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild tooltip="Task's Finance">
-              <a href="#">
-                <Logo size={28} showWordmark={false} />
-                <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
-                  <span className="font-semibold">Task's Finance</span>
-                  <Tooltip>
-                    <TooltipTrigger className="cursor-pointer">
-                      <small>version</small>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {loading ? t('common:loading') : getVersionString()}
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <WorkspaceSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navItems} />

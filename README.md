@@ -151,3 +151,15 @@ Os testes são executados automaticamente **antes do build**. Se algum teste fal
 - **Iniciar**: `docker-compose up -d`
 - **Parar**: `docker-compose down`
 - **Logs**: `docker-compose logs -f`
+
+
+# Comnandos Speckit
+
+```
+/speckit.constitution   → princípios do projeto (qualidade, testes, padrões)
+/speckit.specify        → descreve O QUE quer construir (sem falar de tech stack)
+/speckit.clarify        → Claude faz perguntas pra eliminar ambiguidades
+/speckit.plan           → aí sim define o stack e gera o plano técnico
+/speckit.tasks          → quebra o plano em tarefas ordenadas
+/speckit.implement      → executa tudo
+```

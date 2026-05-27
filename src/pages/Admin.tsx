@@ -14,6 +14,7 @@ import { AnimateIcon } from '@/components/animate-ui/icons/icon';
 import { RippleButton } from '@/components/animate-ui/buttons/ripple';
 import { NotificationBell } from '@/components/NotificationBell';
 import { useSessionGuard } from '@/hooks/useSessionGuard';
+import { WorkspaceProvider } from '@/context/WorkspaceContext';
 
 function Admin() {
   const navigate = useNavigate();
@@ -60,6 +61,7 @@ function Admin() {
   }, [navigate]);
 
   return (
+    <WorkspaceProvider>
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
@@ -99,6 +101,7 @@ function Admin() {
         </div>
       </SidebarInset>
     </SidebarProvider>
+    </WorkspaceProvider>
   );
 }
 
