@@ -35,6 +35,7 @@ interface NavLeafItem {
   url: string;
   icon?: IconKey;
   type?: 'leaf';
+  exact?: boolean;
 }
 
 interface NavGroupItem {
@@ -50,9 +51,9 @@ export function NavMain({ items }: { items: NavItem[] }) {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const isActive = (path: string) => {
+  const isActive = (path: string, exact?: boolean) => {
     if (currentPath === path) return true;
-    if (path !== '/' && currentPath.startsWith(path)) return true;
+    if (!exact && path !== '/' && currentPath.startsWith(path + '/')) return true;
     return false;
   };
 
@@ -109,7 +110,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
             );
           }
 
-          const active = isActive(item.url);
+          const active = isActive(item.url, item.exact);
           const Icon = item.icon ? iconMap[item.icon] : null;
 
           return (

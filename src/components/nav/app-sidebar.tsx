@@ -71,6 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             title: 'Configurações',
             url: '/admin/settings',
             icon: 'groups' as const,
+            exact: true,
           },
         ]
       : []),
