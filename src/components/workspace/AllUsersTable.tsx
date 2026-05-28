@@ -74,9 +74,16 @@ export function AllUsersTable({
     },
   });
 
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.appUsers.byWorkspace(workspaceId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.workspaces.members(workspaceId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.workspaces.list() });
+  };
+
   const handleUpdateRole = async (memberId: string, role: WorkspaceRole) => {
     try {
       await updateRole.mutateAsync({ memberId, role });
+      invalidateAll();
       toast.success('Papel atualizado');
     } catch {
       toast.error('Erro ao atualizar papel');
@@ -87,6 +94,7 @@ export function AllUsersTable({
     if (!removeTarget?.memberId) return;
     try {
       await removeMember.mutateAsync(removeTarget.memberId);
+      invalidateAll();
       toast.success('Membro removido do workspace');
     } catch {
       toast.error('Erro ao remover membro');
