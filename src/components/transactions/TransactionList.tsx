@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/select';
 import { TransactionCard } from './TransactionCard';
 import { TransactionForm } from './TransactionForm';
-import { useTransactions, type Transaction } from '@/hooks/useTransactions';
+import { useTransactions, type Transaction, type TransactionStatus } from '@/hooks/useTransactions';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { toast } from 'sonner';
 
@@ -48,6 +48,15 @@ export function TransactionList({ month, year, currentUserId }: TransactionListP
       toast.success('Transação excluída.');
     } catch {
       toast.error('Erro ao excluir transação.');
+    }
+  };
+
+  const handleToggleStatus = async (id: string, status: TransactionStatus) => {
+    try {
+      await update.mutateAsync({ id, status });
+      toast.success(status === 'pago' ? 'Marcado como pago' : 'Marcado como pendente');
+    } catch {
+      toast.error('Erro ao atualizar status');
     }
   };
 
@@ -95,6 +104,7 @@ export function TransactionList({ month, year, currentUserId }: TransactionListP
               currentUserId={currentUserId}
               onEdit={setEditTarget}
               onDelete={handleDelete}
+              onToggleStatus={handleToggleStatus}
             />
           ))}
         </div>

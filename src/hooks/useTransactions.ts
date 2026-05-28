@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
 
+export type TransactionStatus = 'pago' | 'pendente';
+
 export interface Transaction {
   id: string;
   workspace_id: string;
@@ -9,6 +11,7 @@ export interface Transaction {
   created_by: string;
   type: 'receita' | 'despesa';
   origin: 'manual' | 'recurring' | 'installment';
+  status: TransactionStatus;
   amount: number;
   description: string | null;
   date: string;
@@ -23,6 +26,7 @@ export interface TransactionInput {
   workspace_id: string;
   category_id?: string | null;
   type: 'receita' | 'despesa';
+  status?: TransactionStatus;
   amount: number;
   description?: string | null;
   date: string;

@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/useCategories';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import type { Transaction, TransactionInput } from '@/hooks/useTransactions';
@@ -33,6 +34,7 @@ import { toast } from 'sonner';
 
 const schema = z.object({
   type: z.enum(['receita', 'despesa']),
+  status: z.enum(['pago', 'pendente']),
   amount: z.coerce.number().positive('Valor deve ser maior que zero'),
   date: z.string().min(1, 'Data obrigatória'),
   category_id: z.string().optional().nullable(),
@@ -64,6 +66,7 @@ export function TransactionForm({
     resolver: zodResolver(schema),
     defaultValues: {
       type: 'despesa',
+      status: 'pendente',
       amount: 0,
       date: new Date().toISOString().split('T')[0],
       category_id: null,
@@ -75,6 +78,7 @@ export function TransactionForm({
     if (transaction && open) {
       form.reset({
         type: transaction.type,
+        status: transaction.status ?? 'pendente',
         amount: transaction.amount,
         date: transaction.date,
         category_id: transaction.category_id,
@@ -83,6 +87,7 @@ export function TransactionForm({
     } else if (!transaction && open) {
       form.reset({
         type: 'despesa',
+        status: 'pendente',
         amount: 0,
         date: new Date().toISOString().split('T')[0],
         category_id: null,
@@ -101,6 +106,7 @@ export function TransactionForm({
       await onSubmit({
         workspace_id: activeWorkspaceId,
         type: values.type,
+        status: values.status,
         amount: values.amount,
         date: values.date,
         category_id: values.category_id ?? null,
@@ -140,6 +146,36 @@ export function TransactionForm({
                       <SelectItem value="receita">Receita</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <div className="flex gap-2">
+                    {(['pendente', 'pago'] as const).map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => field.onChange(s)}
+                        className={cn(
+                          'flex-1 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors',
+                          field.value === s
+                            ? s === 'pago'
+                              ? 'border-green-500 bg-green-500/10 text-green-600 dark:text-green-400'
+                              : 'border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                            : 'border-border text-muted-foreground hover:bg-muted',
+                        )}
+                      >
+                        {s === 'pago' ? 'Pago' : 'Pendente'}
+                      </button>
+                    ))}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}

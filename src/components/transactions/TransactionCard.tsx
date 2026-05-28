@@ -18,13 +18,14 @@ import { formatToBRL } from '@/utils/format';
 import { CategoryIcon } from '@/lib/category-icons';
 import { canEditTransaction } from '@/lib/permissions';
 import { useWorkspace } from '@/context/WorkspaceContext';
-import type { Transaction } from '@/hooks/useTransactions';
+import type { Transaction, TransactionStatus } from '@/hooks/useTransactions';
 
 interface TransactionCardProps {
   transaction: Transaction;
   currentUserId: string;
   onEdit: (transaction: Transaction) => void;
   onDelete: (id: string) => void;
+  onToggleStatus: (id: string, status: TransactionStatus) => void;
 }
 
 export function TransactionCard({
@@ -32,12 +33,14 @@ export function TransactionCard({
   currentUserId,
   onEdit,
   onDelete,
+  onToggleStatus,
 }: TransactionCardProps) {
   const { activeRole } = useWorkspace();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const canEdit = canEditTransaction(activeRole, transaction.created_by, currentUserId);
   const isReceita = transaction.type === 'receita';
+  const isPago = transaction.status === 'pago';
 
   const formattedDate = new Date(transaction.date + 'T00:00:00').toLocaleDateString('pt-BR');
   const formattedAmount = formatToBRL(transaction.amount);
@@ -72,6 +75,21 @@ export function TransactionCard({
                   {transaction.origin === 'recurring' ? 'Recorrente' : 'Parcela'}
                 </Badge>
               )}
+              <button
+                type="button"
+                disabled={!canEdit}
+                onClick={() => canEdit && onToggleStatus(transaction.id, isPago ? 'pendente' : 'pago')}
+                className={cn(
+                  'rounded-full px-2 py-0.5 text-xs font-medium transition-colors',
+                  isPago
+                    ? 'bg-green-500/15 text-green-600 dark:text-green-400'
+                    : 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+                  canEdit && 'cursor-pointer hover:opacity-80',
+                  !canEdit && 'cursor-default',
+                )}
+              >
+                {isPago ? 'Pago' : 'Pendente'}
+              </button>
             </div>
           </div>
 
