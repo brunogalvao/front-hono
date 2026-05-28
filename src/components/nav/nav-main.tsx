@@ -12,7 +12,7 @@ import {
 import { Link, useLocation } from '@tanstack/react-router';
 import { FaListAlt, FaUserCog, FaHome, FaHistory } from 'react-icons/fa';
 import { MdPaid, MdCreditCard } from 'react-icons/md';
-import { Sparkles, Users, ChevronRight, UserRound, Settings } from 'lucide-react';
+import { Sparkles, Users, ChevronRight, UserRound, Settings, ShieldCheck } from 'lucide-react';
 
 const iconMap: Record<string, React.ElementType> = {
   list: FaListAlt,
@@ -25,6 +25,7 @@ const iconMap: Record<string, React.ElementType> = {
   groups: Users,
   profile: UserRound,
   account: Settings,
+  shield: ShieldCheck,
 };
 
 type IconKey = keyof typeof iconMap;

@@ -1,0 +1,253 @@
+import { useState } from 'react';
+import { UserMinus, UserPlus } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { toast } from 'sonner';
+import { useWorkspaceMembers } from '@/hooks/useWorkspaceMembers';
+import type { AppUser } from '@/hooks/useAllAppUsers';
+import type { WorkspaceRole } from '@/context/WorkspaceContext';
+
+const ROLE_LABELS: Record<WorkspaceRole, string> = {
+  administrador: 'Administrador',
+  operador: 'Operador',
+  visualizador: 'Visualizador',
+};
+
+interface AllUsersTableProps {
+  users: AppUser[] | undefined;
+  isLoading: boolean;
+  currentUserId: string;
+  workspaceId: string;
+}
+
+export function AllUsersTable({
+  users,
+  isLoading,
+  currentUserId,
+  workspaceId,
+}: AllUsersTableProps) {
+  const { updateRole, removeMember, inviteMember } = useWorkspaceMembers(workspaceId);
+  const [removeTarget, setRemoveTarget] = useState<AppUser | null>(null);
+  const [addTarget, setAddTarget] = useState<AppUser | null>(null);
+  const [selectedRole, setSelectedRole] = useState<WorkspaceRole>('visualizador');
+
+  const handleUpdateRole = async (memberId: string, role: WorkspaceRole) => {
+    try {
+      await updateRole.mutateAsync({ memberId, role });
+      toast.success('Papel atualizado');
+    } catch {
+      toast.error('Erro ao atualizar papel');
+    }
+  };
+
+  const handleRemove = async () => {
+    if (!removeTarget?.memberId) return;
+    try {
+      await removeMember.mutateAsync(removeTarget.memberId);
+      toast.success('Membro removido do workspace');
+    } catch {
+      toast.error('Erro ao remover membro');
+    }
+    setRemoveTarget(null);
+  };
+
+  const handleAddToWorkspace = async () => {
+    if (!addTarget) return;
+    try {
+      await inviteMember.mutateAsync({ email: addTarget.profile.email, role: selectedRole });
+      toast.success('Usuário adicionado ao workspace');
+    } catch {
+      toast.error('Erro ao adicionar usuário');
+    }
+    setAddTarget(null);
+    setSelectedRole('visualizador');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-14 w-full rounded-lg" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <TooltipProvider>
+      <div className="space-y-2">
+        {(users ?? []).map((user) => {
+          const { profile, role, memberId } = user;
+          const name = profile.full_name ?? profile.email;
+          const isSelf = profile.id === currentUserId;
+          const isMember = role !== null;
+
+          return (
+            <div key={profile.id} className="flex items-center gap-3 rounded-lg border p-3">
+              <Avatar className="h-9 w-9 shrink-0">
+                <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
+              </Avatar>
+
+              <div className="flex-1 min-w-0">
+                <p className="truncate font-medium text-sm">{name}</p>
+                <p className="text-muted-foreground truncate text-xs">{profile.email}</p>
+              </div>
+
+              {/* Role area */}
+              {isMember ? (
+                isSelf ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>
+                        <Badge variant="secondary" className="text-xs">
+                          {ROLE_LABELS[role!]}
+                        </Badge>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Você não pode alterar seu próprio papel</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <Select
+                    value={role!}
+                    onValueChange={(v) => handleUpdateRole(memberId!, v as WorkspaceRole)}
+                  >
+                    <SelectTrigger className="w-36 h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(ROLE_LABELS).map(([k, v]) => (
+                        <SelectItem key={k} value={k} className="text-xs">
+                          {v}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )
+              ) : (
+                <Badge variant="outline" className="text-xs text-muted-foreground shrink-0">
+                  Sem acesso
+                </Badge>
+              )}
+
+              {/* Actions */}
+              {isMember && !isSelf && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-destructive hover:text-destructive h-8 w-8 shrink-0"
+                  onClick={() => setRemoveTarget(user)}
+                >
+                  <UserMinus className="h-4 w-4" />
+                </Button>
+              )}
+
+              {!isMember && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => {
+                    setAddTarget(user);
+                    setSelectedRole('visualizador');
+                  }}
+                >
+                  <UserPlus className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          );
+        })}
+
+        {(users ?? []).length === 0 && (
+          <p className="text-muted-foreground text-sm text-center py-4">
+            Nenhum usuário encontrado
+          </p>
+        )}
+      </div>
+
+      {/* Remove confirmation dialog */}
+      <AlertDialog open={!!removeTarget} onOpenChange={(open) => !open && setRemoveTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover membro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {removeTarget?.profile.full_name ?? removeTarget?.profile.email} perderá acesso ao
+              workspace. A conta permanece ativa na aplicação.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleRemove}
+            >
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Add to workspace dialog */}
+      <AlertDialog open={!!addTarget} onOpenChange={(open) => !open && setAddTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Adicionar ao workspace</AlertDialogTitle>
+            <AlertDialogDescription>
+              Selecione o papel de{' '}
+              <strong>{addTarget?.profile.full_name ?? addTarget?.profile.email}</strong> no
+              workspace.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="px-4 pb-2">
+            <Select
+              value={selectedRole}
+              onValueChange={(v) => setSelectedRole(v as WorkspaceRole)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(ROLE_LABELS).map(([k, v]) => (
+                  <SelectItem key={k} value={k}>
+                    {v}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleAddToWorkspace}>Adicionar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </TooltipProvider>
+  );
+}

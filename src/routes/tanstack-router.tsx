@@ -25,6 +25,7 @@ import RecurringPage from '@/pages/admin/RecurringPage';
 import InsightsPage from '@/pages/admin/InsightsPage';
 import InstallmentsPage from '@/pages/admin/InstallmentsPage';
 import WorkspaceSettingsPage from '@/pages/admin/workspace/WorkspaceSettingsPage';
+import PermissionsPage from '@/pages/admin/workspace/PermissionsPage';
 import AccountSettingsPage from '@/pages/admin/AccountSettingsPage';
 
 // Root Route
@@ -147,6 +148,12 @@ const accountSettingsRoute = createRoute({
   component: AccountSettingsPage,
 });
 
+const permissionsRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: '/settings/members',
+  component: PermissionsPage,
+});
+
 // Invite & Auth Routes
 const inviteRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -196,6 +203,7 @@ const routeTree = rootRoute.addChildren([
     insightsRoute,
     workspaceSettingsRoute,
     accountSettingsRoute,
+    permissionsRoute,
   ]),
   catchAllRoute,
 ]);

@@ -139,6 +139,12 @@ export const queryKeys = {
     all: ['categories'] as const,
     list: (workspaceId: string) => [...queryKeys.categories.all, workspaceId] as const,
   },
+
+  // All app users (super admin permissions page)
+  appUsers: {
+    all: ['app-users'] as const,
+    byWorkspace: (workspaceId: string) => [...queryKeys.appUsers.all, workspaceId] as const,
+  },
 } as const;
 
 // Tipos para type safety
