@@ -127,9 +127,9 @@ export default defineConfig({
     include: [
       'react',
       'react-dom',
-      'react-router-dom',
       '@supabase/supabase-js',
       'framer-motion',
     ],
+    exclude: ['storybook-static'],
   },
 });

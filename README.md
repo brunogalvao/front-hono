@@ -114,23 +114,34 @@ O projeto utiliza **Vitest** com **happy-dom** para testes unitários de utilit�
 # Modo watch (desenvolvimento)
 pnpm test
 
-# Execução única (CI / pré-deploy)
+# TypeScript check + todos os testes (CI / pré-deploy)
 pnpm test:run
 ```
+
+> `pnpm test:run` executa `tsc -b` antes do Vitest — qualquer erro TypeScript cancela a execução imediatamente, impedindo que código quebrado chegue à Vercel.
 
 ### Estrutura
 
 ```
 src/test/
-├── setup.ts              # Configuração global (@testing-library/jest-dom)
+├── setup.ts                        # Configuração global (@testing-library/jest-dom + i18n)
+├── components/
+│   ├── ForgotPassword.test.tsx     # Testes do formulário de recuperação de senha
+│   └── RegisterUserForm.test.tsx   # Testes do formulário de cadastro
+├── pages/
+│   └── Login.test.tsx              # Testes da página de login (email, GitHub, Google)
 └── utils/
-    ├── format.test.ts    # Testes de formatação de moeda (BRL / USD)
-    └── getInitials.test.ts # Testes de geração de iniciais do usuário
+    ├── expenses.test.ts            # Cálculo de despesas e detecção de recorrentes
+    ├── format.test.ts              # Formatação de moeda (BRL / USD)
+    ├── getInitials.test.ts         # Geração de iniciais do usuário
+    ├── permissions.test.ts         # Controle de acesso por papel (canWrite, canEdit…)
+    ├── phoneSchema.test.ts         # Validação de formato de telefone
+    └── taskSchema.test.ts          # Validação de schema de tarefas (Zod)
 ```
 
 ### Deploy na Vercel
 
-Os testes são executados automaticamente **antes do build**. Se algum teste falhar, o deploy é cancelado.
+Os testes (incluindo TypeScript check) são executados automaticamente **antes do build**. Se o TypeScript ou qualquer teste falhar, o deploy é cancelado.
 
 ```json
 // vercel.json
