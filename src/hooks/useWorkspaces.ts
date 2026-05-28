@@ -5,9 +5,13 @@ import { queryKeys } from '@/lib/query-keys';
 import { useWorkspace, type WorkspaceInfo } from '@/context/WorkspaceContext';
 
 async function fetchWorkspaces(): Promise<WorkspaceInfo[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
   const { data, error } = await supabase
     .from('workspace_members')
     .select('role, workspaces(id, name, superuser_id)')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: true });
 
   if (error) throw error;
