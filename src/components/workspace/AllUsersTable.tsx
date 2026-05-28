@@ -28,6 +28,9 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase';
+import { queryKeys } from '@/lib/query-keys';
 import { useWorkspaceMembers } from '@/hooks/useWorkspaceMembers';
 import type { AppUser } from '@/hooks/useAllAppUsers';
 import type { WorkspaceRole } from '@/context/WorkspaceContext';
@@ -51,10 +54,25 @@ export function AllUsersTable({
   currentUserId,
   workspaceId,
 }: AllUsersTableProps) {
-  const { updateRole, removeMember, inviteMember } = useWorkspaceMembers(workspaceId);
+  const queryClient = useQueryClient();
+  const { updateRole, removeMember } = useWorkspaceMembers(workspaceId);
   const [removeTarget, setRemoveTarget] = useState<AppUser | null>(null);
   const [addTarget, setAddTarget] = useState<AppUser | null>(null);
   const [selectedRole, setSelectedRole] = useState<WorkspaceRole>('visualizador');
+
+  // Direct insert for existing app users (no email invite needed)
+  const addMember = useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: WorkspaceRole }) => {
+      const { error } = await supabase
+        .from('workspace_members')
+        .insert({ workspace_id: workspaceId, user_id: userId, role });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.appUsers.byWorkspace(workspaceId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.workspaces.members(workspaceId) });
+    },
+  });
 
   const handleUpdateRole = async (memberId: string, role: WorkspaceRole) => {
     try {
@@ -79,7 +97,7 @@ export function AllUsersTable({
   const handleAddToWorkspace = async () => {
     if (!addTarget) return;
     try {
-      await inviteMember.mutateAsync({ email: addTarget.profile.email, role: selectedRole });
+      await addMember.mutateAsync({ userId: addTarget.profile.id, role: selectedRole });
       toast.success('Usuário adicionado ao workspace');
     } catch {
       toast.error('Erro ao adicionar usuário');
