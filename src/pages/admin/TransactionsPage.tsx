@@ -31,11 +31,17 @@ export default function TransactionsPage() {
 
   const { data: currentUserId } = useCurrentUserId();
   const { create } = useTransactions(activeWorkspaceId, month, year);
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   const handleCreate = async (input: Parameters<typeof create.mutateAsync>[0]) => {
     try {
       await create.mutateAsync(input);
-      toast.success('Transação criada!');
+      if (categoryFilter !== 'all') {
+        setCategoryFilter('all');
+        toast.success('Transação criada! Filtro removido para exibir a nova transação.');
+      } else {
+        toast.success('Transação criada!');
+      }
     } catch {
       toast.error('Erro ao criar transação.');
       throw new Error('Erro ao criar transação.');
@@ -64,6 +70,8 @@ export default function TransactionsPage() {
         month={month}
         year={year}
         currentUserId={currentUserId ?? ''}
+        categoryFilter={categoryFilter}
+        onCategoryFilterChange={setCategoryFilter}
       />
 
       <TransactionForm

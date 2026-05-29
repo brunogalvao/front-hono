@@ -30,11 +30,19 @@ interface TransactionTableProps {
   month: number;
   year: number;
   currentUserId: string;
+  categoryFilter: string;
+  onCategoryFilterChange: (value: string) => void;
 }
 
 const columns = getTransactionColumns();
 
-export function TransactionTable({ month, year, currentUserId }: TransactionTableProps) {
+export function TransactionTable({
+  month,
+  year,
+  currentUserId,
+  categoryFilter,
+  onCategoryFilterChange,
+}: TransactionTableProps) {
   const { activeWorkspaceId, activeRole } = useWorkspace();
   const { data: transactions = [], isLoading, update, remove } = useTransactions(
     activeWorkspaceId,
@@ -42,7 +50,6 @@ export function TransactionTable({ month, year, currentUserId }: TransactionTabl
     year,
   );
   const [editTarget, setEditTarget] = useState<Transaction | null>(null);
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   const categories = Array.from(
     new Map(
@@ -100,7 +107,7 @@ export function TransactionTable({ month, year, currentUserId }: TransactionTabl
     <div className="space-y-4">
       {categories.length > 0 && (
         <div className="flex items-center gap-2">
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
             <SelectTrigger className="w-48">
               <SelectValue placeholder="Filtrar por categoria" />
             </SelectTrigger>

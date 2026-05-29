@@ -53,24 +53,7 @@ async function fetchTransactions(
 
   if (error) throw error;
 
-  const transactions = (data ?? []) as Transaction[];
-
-  // Compute installment_number by grouping installment transactions by installment_id
-  // and sorting by date ascending to assign sequential 1-based position
-  const grouped = new Map<string, Transaction[]>();
-  for (const t of transactions) {
-    if (t.installment_id) {
-      const arr = grouped.get(t.installment_id) ?? [];
-      arr.push(t);
-      grouped.set(t.installment_id, arr);
-    }
-  }
-  for (const group of grouped.values()) {
-    group.sort((a, b) => a.date.localeCompare(b.date));
-    group.forEach((t, i) => { t.installment_number = i + 1; });
-  }
-
-  return transactions;
+  return (data ?? []) as Transaction[];
 }
 
 export function useTransactions(workspaceId: string | null, month: number, year: number) {

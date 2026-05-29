@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { Link } from '@tanstack/react-router';
 import type { ColumnDef, RowData } from '@tanstack/react-table';
-import { TrendingDown, TrendingUp, Pencil, Trash2 } from 'lucide-react';
+import { TrendingDown, TrendingUp, Pencil, Trash2, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -128,16 +129,23 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
           return <Badge variant="outline">Recorrente</Badge>;
         }
         if (origin === 'installment') {
-          if (installment_number && installments?.total_installments) {
-            return (
-              <Badge variant="outline">
-                Parcelado {installment_number}/{installments.total_installments}
-              </Badge>
-            );
-          }
-          return <Badge variant="outline">Parcelado</Badge>;
+          const label = installment_number && installments?.total_installments
+            ? `Parcelado ${installment_number}/${installments.total_installments}`
+            : 'Parcelado';
+          return (
+            <div className="flex items-center gap-1.5">
+              <Badge variant="outline">{label}</Badge>
+              <Link
+                to="/admin/installments"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                title="Ver parcelas"
+              >
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+            </div>
+          );
         }
-        return null;
+        return <Badge variant="secondary">Manual</Badge>;
       },
     },
     {
@@ -153,6 +161,7 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
           <button
             type="button"
             disabled={!canEdit}
+            aria-label={isPago ? 'Marcar como pendente' : 'Marcar como pago'}
             onClick={() =>
               canEdit && meta.onToggleStatus(row.original.id, isPago ? 'pendente' : 'pago')
             }
