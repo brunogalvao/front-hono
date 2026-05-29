@@ -20,6 +20,8 @@ export interface Transaction {
   created_at: string;
   categories?: { id: string; name: string; type: string } | null;
   profiles?: { id: string; full_name: string | null } | null;
+  installments?: { id: string; total_installments: number } | null;
+  installment_number?: number;
 }
 
 export interface TransactionInput {
@@ -43,14 +45,32 @@ async function fetchTransactions(
 
   const { data, error } = await supabase
     .from('transactions')
-    .select('*, categories(id, name, type), profiles(id, full_name)')
+    .select('*, categories(id, name, type), profiles(id, full_name), installments(id, total_installments)')
     .eq('workspace_id', workspaceId)
     .gte('date', start)
     .lte('date', end)
     .order('date', { ascending: false });
 
   if (error) throw error;
-  return (data ?? []) as Transaction[];
+
+  const transactions = (data ?? []) as Transaction[];
+
+  // Compute installment_number by grouping installment transactions by installment_id
+  // and sorting by date ascending to assign sequential 1-based position
+  const grouped = new Map<string, Transaction[]>();
+  for (const t of transactions) {
+    if (t.installment_id) {
+      const arr = grouped.get(t.installment_id) ?? [];
+      arr.push(t);
+      grouped.set(t.installment_id, arr);
+    }
+  }
+  for (const group of grouped.values()) {
+    group.sort((a, b) => a.date.localeCompare(b.date));
+    group.forEach((t, i) => { t.installment_number = i + 1; });
+  }
+
+  return transactions;
 }
 
 export function useTransactions(workspaceId: string | null, month: number, year: number) {

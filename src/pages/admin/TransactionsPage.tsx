@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MonthNavigator } from '@/components/dashboard/MonthNavigator';
-import { TransactionList } from '@/components/transactions/TransactionList';
+import { TransactionTable } from '@/components/transactions/TransactionTable';
 import { TransactionForm } from '@/components/transactions/TransactionForm';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useWorkspace } from '@/context/WorkspaceContext';
@@ -60,7 +60,7 @@ export default function TransactionsPage() {
         </div>
       </div>
 
-      <TransactionList
+      <TransactionTable
         month={month}
         year={year}
         currentUserId={currentUserId ?? ''}
