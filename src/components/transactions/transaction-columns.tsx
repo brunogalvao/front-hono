@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import type { ColumnDef, RowData } from '@tanstack/react-table';
-import { TrendingDown, TrendingUp, Pencil, Trash2, ExternalLink } from 'lucide-react';
+import {
+  TrendingDown,
+  TrendingUp,
+  Pencil,
+  Trash2,
+  ExternalLink,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,12 +38,31 @@ declare module '@tanstack/react-table' {
   }
 }
 
-function ActionsCell({ row, table }: { row: { original: Transaction }; table: { options: { meta?: { currentUserId: string; activeRole: WorkspaceRole | null; onEdit: (t: Transaction) => void; onDelete: (id: string) => void } } } }) {
+function ActionsCell({
+  row,
+  table,
+}: {
+  row: { original: Transaction };
+  table: {
+    options: {
+      meta?: {
+        currentUserId: string;
+        activeRole: WorkspaceRole | null;
+        onEdit: (t: Transaction) => void;
+        onDelete: (id: string) => void;
+      };
+    };
+  };
+}) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const meta = table.options.meta;
   if (!meta) return null;
 
-  const canEdit = canEditTransaction(meta.activeRole, row.original.created_by, meta.currentUserId);
+  const canEdit = canEditTransaction(
+    meta.activeRole,
+    row.original.created_by,
+    meta.currentUserId
+  );
   if (!canEdit || row.original.origin === 'installment') return null;
 
   return (
@@ -66,7 +91,8 @@ function ActionsCell({ row, table }: { row: { original: Transaction }; table: { 
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir transação?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. A transação será removida permanentemente.
+              Esta ação não pode ser desfeita. A transação será removida
+              permanentemente.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -101,10 +127,14 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
               'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
               isReceita
                 ? 'bg-green-100 text-green-600 dark:bg-green-900/20'
-                : 'bg-red-100 text-red-600 dark:bg-red-900/20',
+                : 'bg-red-100 text-red-600 dark:bg-red-900/20'
             )}
           >
-            {isReceita ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
+            {isReceita ? (
+              <TrendingUp className="h-5 w-5" />
+            ) : (
+              <TrendingDown className="h-5 w-5" />
+            )}
           </div>
         );
       },
@@ -116,7 +146,7 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
       accessorFn: (row) =>
         row.description ?? row.categories?.name ?? 'Sem descrição',
       cell: ({ getValue }) => (
-        <span className="font-medium leading-tight">{getValue<string>()}</span>
+        <span className="leading-tight font-medium">{getValue<string>()}</span>
       ),
     },
     {
@@ -129,9 +159,10 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
           return <Badge variant="outline">Recorrente</Badge>;
         }
         if (origin === 'installment') {
-          const label = installment_number && installments?.total_installments
-            ? `Parcelado ${installment_number}/${installments.total_installments}`
-            : 'Parcelado';
+          const label =
+            installment_number && installments?.total_installments
+              ? `Parcelado ${installment_number}/${installments.total_installments}`
+              : 'Parcelado';
           return (
             <div className="flex items-center gap-1.5">
               <Badge variant="outline">{label}</Badge>
@@ -155,7 +186,11 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
       cell: ({ row, table }) => {
         const meta = table.options.meta;
         if (!meta) return null;
-        const canEdit = canEditTransaction(meta.activeRole, row.original.created_by, meta.currentUserId);
+        const canEdit = canEditTransaction(
+          meta.activeRole,
+          row.original.created_by,
+          meta.currentUserId
+        );
         const isPago = row.original.status === 'pago';
         return (
           <button
@@ -163,7 +198,8 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
             disabled={!canEdit}
             aria-label={isPago ? 'Marcar como pendente' : 'Marcar como pago'}
             onClick={() =>
-              canEdit && meta.onToggleStatus(row.original.id, isPago ? 'pendente' : 'pago')
+              canEdit &&
+              meta.onToggleStatus(row.original.id, isPago ? 'pendente' : 'pago')
             }
             className={cn(
               'rounded-full px-2 py-0.5 text-xs font-medium transition-colors',
@@ -171,7 +207,7 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
                 ? 'bg-green-500/15 text-green-600 dark:text-green-400'
                 : 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
               canEdit && 'cursor-pointer hover:opacity-80',
-              !canEdit && 'cursor-default',
+              !canEdit && 'cursor-default'
             )}
           >
             {isPago ? 'Pago' : 'Pendente'}
@@ -189,7 +225,7 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
           <span
             className={cn(
               'font-semibold tabular-nums',
-              isReceita ? 'text-green-600' : 'text-red-500',
+              isReceita ? 'text-green-600' : 'text-red-500'
             )}
           >
             {isReceita ? '+' : '-'} {formatToBRL(row.original.amount)}
@@ -200,13 +236,42 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
     {
       id: 'actions',
       enableSorting: false,
-      header: () => null,
-      cell: ({ row, table }) => (
-        <ActionsCell
-          row={row}
-          table={table as Parameters<typeof ActionsCell>[0]['table']}
-        />
-      ),
+      header: 'Ações',
+      cell: ({ row, table }) => {
+        const { origin, installment_number, installments } = row.original;
+        if (origin === 'recurring') {
+          return (
+            <ActionsCell
+              row={row}
+              table={table as Parameters<typeof ActionsCell>[0]['table']}
+            />
+          );
+        }
+        if (origin === 'installment') {
+          const label =
+            installment_number && installments?.total_installments
+              ? `Parcelado ${installment_number}/${installments.total_installments}`
+              : 'Parcelado';
+          return (
+            <div className="flex items-center gap-1.5">
+              <Badge variant="outline">{label}</Badge>
+              <Link
+                to="/admin/installments"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                title="Ver parcelas"
+              >
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+            </div>
+          );
+        }
+        return (
+          <ActionsCell
+            row={row}
+            table={table as Parameters<typeof ActionsCell>[0]['table']}
+          />
+        );
+      },
     },
   ];
 }

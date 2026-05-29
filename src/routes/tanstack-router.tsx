@@ -13,7 +13,6 @@ import Income from '@/pages/admin/Income';
 import EditUser from '@/pages/admin/EditUser';
 import Dashboard from '@/pages/admin/Dashboard';
 import History from '@/pages/admin/History';
-import Parcelas from '@/pages/admin/Parcelas';
 import Advisor from '@/pages/admin/Advisor';
 import Groups from '@/pages/admin/Groups';
 import Invite from '@/pages/Invite';
@@ -96,7 +95,7 @@ const historyRoute = createRoute({
 const parcelasRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: '/installments',
-  component: Parcelas,
+  component: InstallmentsPage,
 });
 
 const advisorRoute = createRoute({
@@ -122,12 +121,6 @@ const recurringRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: '/recurring',
   component: RecurringPage,
-});
-
-const installmentsNewRoute = createRoute({
-  getParentRoute: () => adminRoute,
-  path: '/installments-new',
-  component: InstallmentsPage,
 });
 
 const insightsRoute = createRoute({
@@ -199,7 +192,6 @@ const routeTree = rootRoute.addChildren([
     groupsRoute,
     transactionsRoute,
     recurringRoute,
-    installmentsNewRoute,
     insightsRoute,
     workspaceSettingsRoute,
     accountSettingsRoute,

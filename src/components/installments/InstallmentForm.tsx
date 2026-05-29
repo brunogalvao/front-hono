@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,7 +36,6 @@ interface InstallmentFormProps {
 export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFormProps) {
   const { activeWorkspaceId } = useWorkspace();
   const { data: categories = [] } = useCategories(activeWorkspaceId);
-  const [submitting, setSubmitting] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -63,7 +61,6 @@ export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFor
 
   const handleSubmit = async (values: FormValues) => {
     if (!activeWorkspaceId) return;
-    setSubmitting(true);
     try {
       await onSubmit({
         workspace_id: activeWorkspaceId,
@@ -73,13 +70,9 @@ export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFor
         first_installment_date: values.first_installment_date,
         category_id: values.category_id ?? null,
       });
-      toast.success('Parcelamento criado!');
-      onOpenChange(false);
       form.reset();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Erro ao salvar');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -152,8 +145,8 @@ export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFor
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-              <Button type="submit" disabled={submitting}>
-                {submitting ? 'Salvando...' : 'Criar'}
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? 'Salvando...' : 'Criar'}
               </Button>
             </DialogFooter>
           </form>

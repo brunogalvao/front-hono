@@ -11,16 +11,21 @@ import { toast } from 'sonner';
 export default function InstallmentsPage() {
   const { activeWorkspaceId, activeRole } = useWorkspace();
   const [createOpen, setCreateOpen] = useState(false);
-  const { create } = useInstallments(activeWorkspaceId);
+  const { create, remove } = useInstallments(activeWorkspaceId);
 
   const handleCreate = async (input: Parameters<typeof create.mutateAsync>[0]) => {
     try {
       await create.mutateAsync(input);
       toast.success('Parcelamento criado!');
+      setCreateOpen(false);
     } catch {
       toast.error('Erro ao criar parcelamento.');
       throw new Error('Erro ao criar parcelamento.');
     }
+  };
+
+  const handleDelete = async (id: string) => {
+    await remove.mutateAsync(id);
   };
 
   return (
@@ -38,7 +43,7 @@ export default function InstallmentsPage() {
         )}
       </div>
 
-      <InstallmentList />
+      <InstallmentList onDelete={handleDelete} />
 
       <InstallmentForm
         open={createOpen}
