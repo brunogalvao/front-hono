@@ -7,11 +7,13 @@ import { useInstallments } from '@/hooks/useInstallments';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { canWrite } from '@/lib/permissions';
 import { toast } from 'sonner';
+import { useSearch } from '@tanstack/react-router';
 
 export default function InstallmentsPage() {
   const { activeWorkspaceId, activeRole } = useWorkspace();
   const [createOpen, setCreateOpen] = useState(false);
   const { create, remove } = useInstallments(activeWorkspaceId);
+  const { highlight } = useSearch({ from: '/admin/installments' });
 
   const handleCreate = async (input: Parameters<typeof create.mutateAsync>[0]) => {
     try {
@@ -43,7 +45,7 @@ export default function InstallmentsPage() {
         )}
       </div>
 
-      <InstallmentList onDelete={handleDelete} />
+      <InstallmentList onDelete={handleDelete} highlightId={highlight} />
 
       <InstallmentForm
         open={createOpen}

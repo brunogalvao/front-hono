@@ -15,7 +15,7 @@ export interface RecurringExpense {
   is_active: boolean;
   last_generated_date: string | null;
   created_at: string;
-  categories?: { id: string; name: string } | null;
+  categories?: { id: string; name: string; icon: string | null } | null;
 }
 
 export interface RecurringInput {
@@ -31,7 +31,7 @@ export interface RecurringInput {
 async function fetchRecurring(workspaceId: string): Promise<RecurringExpense[]> {
   const { data, error } = await supabase
     .from('recurring_expenses')
-    .select('*, categories(id, name)')
+    .select('*, categories(id, name, icon)')
     .eq('workspace_id', workspaceId)
     .order('created_at', { ascending: false });
 

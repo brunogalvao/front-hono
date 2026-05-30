@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CheckCircle, CreditCard, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import {
   AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 import { useInstallments, type Installment } from '@/hooks/useInstallments';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { canWrite } from '@/lib/permissions';
@@ -18,13 +19,21 @@ import { toast } from 'sonner';
 
 interface InstallmentListProps {
   onDelete: (id: string) => Promise<void>;
+  highlightId?: string;
 }
 
-export function InstallmentList({ onDelete }: InstallmentListProps) {
+export function InstallmentList({ onDelete, highlightId }: InstallmentListProps) {
   const { activeWorkspaceId, activeRole } = useWorkspace();
   const { data: items = [], isLoading, earlyPayoff } = useInstallments(activeWorkspaceId);
   const [payoffTarget, setPayoffTarget] = useState<Installment | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Installment | null>(null);
+  const highlightRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (highlightId && highlightRef.current) {
+      highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [highlightId, items]);
 
   const handlePayoff = async () => {
     if (!payoffTarget) return;
@@ -83,8 +92,16 @@ export function InstallmentList({ onDelete }: InstallmentListProps) {
           const remaining = item.total_installments - item.paid_installments;
           const canAct = item.status === 'active' && canWrite(activeRole);
 
+          const isHighlighted = item.id === highlightId;
           return (
-            <Card key={item.id} className={item.status !== 'active' ? 'opacity-70' : ''}>
+            <Card
+              key={item.id}
+              ref={isHighlighted ? highlightRef : null}
+              className={cn(
+                item.status !== 'active' && 'opacity-70',
+                isHighlighted && 'ring-2 ring-primary ring-offset-2',
+              )}
+            >
               <CardContent className="space-y-3 p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-0.5">

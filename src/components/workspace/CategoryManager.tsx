@@ -21,6 +21,7 @@ import {
   AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useCategories, type Category } from '@/hooks/useCategories';
+import { CategoryIcon, CATEGORY_ICONS } from '@/lib/category-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
@@ -30,6 +31,7 @@ import { toast } from 'sonner';
 const schema = z.object({
   name: z.string().min(1, 'Nome obrigatório').max(50),
   type: z.enum(['receita', 'despesa'] as const),
+  icon: z.string().nullable().optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -46,7 +48,7 @@ export function CategoryManager() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', type: 'despesa' },
+    defaultValues: { name: '', type: 'despesa', icon: null },
   });
 
   const createCat = useMutation({
@@ -55,6 +57,7 @@ export function CategoryManager() {
         workspace_id: activeWorkspaceId,
         name: values.name,
         type: values.type,
+        icon: values.icon ?? null,
         is_default: false,
       });
       if (error) throw error;
@@ -64,7 +67,9 @@ export function CategoryManager() {
 
   const updateCat = useMutation({
     mutationFn: async ({ id, values }: { id: string; values: FormValues }) => {
-      const { error } = await supabase.from('categories').update({ name: values.name, type: values.type }).eq('id', id);
+      const { error } = await supabase.from('categories')
+        .update({ name: values.name, type: values.type, icon: values.icon ?? null })
+        .eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qKey }),
@@ -79,13 +84,13 @@ export function CategoryManager() {
   });
 
   const openCreate = () => {
-    form.reset({ name: '', type: 'despesa' });
+    form.reset({ name: '', type: 'despesa', icon: null });
     setEditTarget(null);
     setFormOpen(true);
   };
 
   const openEdit = (cat: Category) => {
-    form.reset({ name: cat.name, type: cat.type });
+    form.reset({ name: cat.name, type: cat.type, icon: cat.icon ?? null });
     setEditTarget(cat);
     setFormOpen(true);
   };
@@ -133,6 +138,7 @@ export function CategoryManager() {
       <div className="space-y-1">
         {custom.map((cat) => (
           <div key={cat.id} className="flex items-center gap-2 rounded-lg border p-2">
+            {cat.icon && <CategoryIcon name={cat.icon} className="text-muted-foreground h-4 w-4 shrink-0" />}
             <span className="flex-1 text-sm">{cat.name}</span>
             <Badge variant={cat.type === 'receita' ? 'default' : 'secondary'} className="text-xs">
               {cat.type}
@@ -186,6 +192,25 @@ export function CategoryManager() {
                       <SelectItem value="receita">Receita</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="icon" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ícone</FormLabel>
+                  <div className="grid grid-cols-8 gap-1">
+                    {CATEGORY_ICONS.map(({ name, label, Icon }) => (
+                      <button
+                        key={name}
+                        type="button"
+                        title={label}
+                        onClick={() => field.onChange(field.value === name ? null : name)}
+                        className={`flex items-center justify-center rounded-md p-1.5 transition-colors hover:bg-muted ${field.value === name ? 'bg-primary/10 text-primary ring-1 ring-primary' : 'text-muted-foreground'}`}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </button>
+                    ))}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )} />

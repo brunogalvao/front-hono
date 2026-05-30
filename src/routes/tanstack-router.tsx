@@ -96,6 +96,9 @@ const parcelasRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: '/installments',
   component: InstallmentsPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    highlight: typeof search.highlight === 'string' ? search.highlight : undefined,
+  }),
 });
 
 const advisorRoute = createRoute({

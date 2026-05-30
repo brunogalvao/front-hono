@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { formatToBRL } from '@/utils/format';
+import { CategoryIcon } from '@/lib/category-icons';
 import { canEditTransaction } from '@/lib/permissions';
 import type { Transaction, TransactionStatus } from '@/hooks/useTransactions';
 
@@ -145,9 +146,20 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
       header: 'Nome',
       accessorFn: (row) =>
         row.description ?? row.categories?.name ?? 'Sem descrição',
-      cell: ({ getValue }) => (
-        <span className="leading-tight font-medium">{getValue<string>()}</span>
-      ),
+      cell: ({ row, getValue }) => {
+        const category = row.original.categories;
+        return (
+          <div className="flex flex-col gap-0.5">
+            <span className="leading-tight font-medium">{getValue<string>()}</span>
+            {category && (
+              <span className="text-muted-foreground flex items-center gap-1 text-xs">
+                <CategoryIcon name={category.icon} className="h-3 w-3" />
+                {category.name}
+              </span>
+            )}
+          </div>
+        );
+      },
     },
     {
       id: 'type',
@@ -166,13 +178,6 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
           return (
             <div className="flex items-center gap-1.5">
               <Badge variant="outline">{label}</Badge>
-              <Link
-                to="/admin/installments"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                title="Ver parcelas"
-              >
-                <ExternalLink className="h-3 w-3" />
-              </Link>
             </div>
           );
         }
@@ -238,7 +243,7 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
       enableSorting: false,
       header: 'Ações',
       cell: ({ row, table }) => {
-        const { origin, installment_number, installments } = row.original;
+        const { origin } = row.original;
         if (origin === 'recurring') {
           return (
             <ActionsCell
@@ -248,21 +253,17 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
           );
         }
         if (origin === 'installment') {
-          const label =
-            installment_number && installments?.total_installments
-              ? `Parcelado ${installment_number}/${installments.total_installments}`
-              : 'Parcelado';
+          const installmentId = row.original.installment_id;
           return (
-            <div className="flex items-center gap-1.5">
-              <Badge variant="outline">{label}</Badge>
-              <Link
-                to="/admin/installments"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                title="Ver parcelas"
-              >
-                <ExternalLink className="h-3 w-3" />
-              </Link>
-            </div>
+            <Link
+              to="/admin/installments"
+              search={{ highlight: installmentId ?? undefined }}
+              className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 transition-colors"
+              title="Ver parcelamento"
+            >
+              Ir para a Parcela
+              <ExternalLink className="h-4 w-4" />
+            </Link>
           );
         }
         return (

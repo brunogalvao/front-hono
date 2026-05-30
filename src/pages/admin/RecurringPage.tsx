@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { RecurringList } from '@/components/recurring/RecurringList';
+import { RecurringTable } from '@/components/recurring/RecurringTable';
 import { RecurringForm } from '@/components/recurring/RecurringForm';
 import { useRecurring } from '@/hooks/useRecurring';
 import { useWorkspace } from '@/context/WorkspaceContext';
@@ -38,7 +38,7 @@ export default function RecurringPage() {
         )}
       </div>
 
-      <RecurringList />
+      <RecurringTable />
 
       <RecurringForm
         open={createOpen}

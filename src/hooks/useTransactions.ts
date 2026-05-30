@@ -18,7 +18,7 @@ export interface Transaction {
   recurring_expense_id: string | null;
   installment_id: string | null;
   created_at: string;
-  categories?: { id: string; name: string; type: string } | null;
+  categories?: { id: string; name: string; type: string; icon: string | null } | null;
   profiles?: { id: string; full_name: string | null } | null;
   installments?: { id: string; total_installments: number } | null;
   installment_number?: number;
@@ -45,7 +45,7 @@ async function fetchTransactions(
 
   const { data, error } = await supabase
     .from('transactions')
-    .select('*, categories(id, name, type), profiles(id, full_name), installments(id, total_installments)')
+    .select('*, categories(id, name, type, icon), profiles(id, full_name), installments(id, total_installments)')
     .eq('workspace_id', workspaceId)
     .gte('date', start)
     .lte('date', end)
