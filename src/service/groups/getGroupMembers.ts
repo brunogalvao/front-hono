@@ -1,6 +1,5 @@
 import type { GroupAccess } from './groupAccess';
-import { getAuthToken } from '@/lib/supabase';
-import { API_BASE_URL } from '@/config/api';
+import { fetchWithAuth } from '@/lib/fetch-api';
 
 export interface GroupMember extends GroupAccess {
   user_id: string;
@@ -12,13 +11,5 @@ export interface GroupMember extends GroupAccess {
 }
 
 export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
-  const token = await getAuthToken();
-  const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}/members`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data?.error || `Erro HTTP ${res.status}`);
-  }
-  return res.json();
+  return fetchWithAuth<GroupMember[]>(`/api/groups/${groupId}/members`);
 }

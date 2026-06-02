@@ -6,7 +6,7 @@ import { deleteParcela } from '@/service/parcelas/deleteParcela';
 
 export function useParcelas() {
   return useQuery({
-    queryKey: queryKeys.parcelas.list(),
+    queryKey: queryKeys.parcelas.list,
     queryFn: getParcelas,
     staleTime: 1000 * 60 * 2,
   });

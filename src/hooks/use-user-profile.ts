@@ -5,7 +5,7 @@ import { uploadAvatarImage } from '@/service/uploadAvatarImage';
 
 export function useCurrentUser() {
   return useQuery({
-    queryKey: queryKeys.user.profile(),
+    queryKey: queryKeys.user.profile,
     queryFn: async () => {
       const { data, error } = await supabase.auth.getUser();
       if (error) throw error;

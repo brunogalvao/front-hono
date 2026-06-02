@@ -1,10 +1,14 @@
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AllUsersTable } from '@/components/workspace/AllUsersTable';
 import { InviteForm } from '@/components/workspace/InviteForm';
-import { useSuperAdminGuard } from '@/hooks/useSuperAdminGuard';
+import { PermissionMatrix } from '@/components/workspace/PermissionMatrix';
+import { usePermissions } from '@/hooks/usePermissions';
 import { useAllAppUsers } from '@/hooks/useAllAppUsers';
 import { useWorkspaceMembers } from '@/hooks/useWorkspaceMembers';
 import { useWorkspace } from '@/context/WorkspaceContext';
@@ -13,7 +17,7 @@ import { queryKeys } from '@/lib/query-keys';
 
 function useCurrentUserId() {
   return useQuery({
-    queryKey: queryKeys.auth.session(),
+    queryKey: queryKeys.auth.session,
     queryFn: async () => {
       const { data } = await supabase.auth.getUser();
       return data.user?.id ?? null;
@@ -22,13 +26,24 @@ function useCurrentUserId() {
 }
 
 export default function PermissionsPage() {
-  const { isAllowed, isLoading: isGuardLoading } = useSuperAdminGuard();
+  const navigate = useNavigate();
   const { activeWorkspace } = useWorkspace();
+  const { can, isSuperAdmin, isLoading: isPermLoading } = usePermissions();
   const { data: currentUserId } = useCurrentUserId();
   const { data: users, isLoading: isUsersLoading } = useAllAppUsers(activeWorkspace?.id ?? null);
   const { inviteMember } = useWorkspaceMembers(activeWorkspace?.id ?? null);
 
-  if (isGuardLoading) {
+  const canManageMembers = can('members', 'read');
+
+  useEffect(() => {
+    if (isPermLoading || !activeWorkspace) return;
+    if (!canManageMembers) {
+      toast.error('Acesso restrito');
+      navigate({ to: '/admin/dashboard' });
+    }
+  }, [isPermLoading, canManageMembers, activeWorkspace, navigate]);
+
+  if (isPermLoading || !activeWorkspace) {
     return (
       <div className="space-y-6">
         <div className="space-y-2">
@@ -40,7 +55,7 @@ export default function PermissionsPage() {
     );
   }
 
-  if (!isAllowed || !activeWorkspace) return null;
+  if (!canManageMembers) return null;
 
   const handleInvite = (
     email: string,
@@ -50,11 +65,30 @@ export default function PermissionsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Gerenciamento de Permissões</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          {isSuperAdmin ? 'Gerenciamento de Permissões' : 'Gerenciamento de Membros'}
+        </h1>
         <p className="text-muted-foreground text-sm">
-          Gerencie o acesso e os papéis dos usuários no workspace
+          {isSuperAdmin
+            ? 'Gerencie o acesso e os papéis dos usuários no workspace'
+            : 'Convide e remova membros do workspace'}
         </p>
       </div>
+
+      {isSuperAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Matriz de permissões por papel</CardTitle>
+            <CardDescription>
+              Configure quais operações (Ler, Criar, Atualizar, Excluir) cada papel pode executar em cada tela.
+              Mudanças são aplicadas imediatamente para todos os membros.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <PermissionMatrix workspaceId={activeWorkspace.id} currentUserId={currentUserId ?? ''} />
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
@@ -69,6 +103,7 @@ export default function PermissionsPage() {
             isLoading={isUsersLoading}
             currentUserId={currentUserId ?? ''}
             workspaceId={activeWorkspace.id}
+            isSuperAdmin={isSuperAdmin}
           />
 
           <Separator />

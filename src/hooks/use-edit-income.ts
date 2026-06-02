@@ -10,10 +10,10 @@ export function useEditIncome() {
     onSuccess: () => {
       // Invalidar cache de rendimentos
       queryClient.invalidateQueries({
-        queryKey: queryKeys.incomes.lists(),
+        queryKey: queryKeys.incomes.lists,
       });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.incomes.byMonth(),
+        queryKey: queryKeys.incomes.byMonth,
       });
 
       // Invalidar queries da IA para recalcular análises

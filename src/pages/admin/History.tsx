@@ -215,7 +215,7 @@ function History() {
     isLoading: isLoadingIncomes,
     isError: isErrorIncomes,
   } = useQuery({
-    queryKey: queryKeys.incomes.list(),
+    queryKey: queryKeys.incomes.list,
     queryFn: getIncomes,
   });
 

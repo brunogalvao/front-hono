@@ -9,7 +9,7 @@ import { useWorkspace } from '@/context/WorkspaceContext';
 
 function useCurrentUserId() {
   return useQuery({
-    queryKey: queryKeys.auth.session(),
+    queryKey: queryKeys.auth.session,
     queryFn: async () => {
       const { data } = await supabase.auth.getUser();
       return data.user?.id ?? null;

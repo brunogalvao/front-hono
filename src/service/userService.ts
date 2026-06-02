@@ -1,5 +1,5 @@
-import { supabase, getAuthToken } from '@/lib/supabase';
-import { API_BASE_URL } from '@/config/api';
+import { supabase } from '@/lib/supabase';
+import { fetchWithAuth } from '@/lib/fetch-api';
 import type { UserProfile } from '@/model/user.model';
 
 // ✅ GET USER com displayName corretamente
@@ -22,34 +22,21 @@ export const getUser = async (): Promise<UserProfile> => {
 export const updateUser = async (
   data: UserProfile
 ): Promise<{ success: boolean; user: UserProfile }> => {
-  const token = await getAuthToken();
+  type UpdateResult = {
+    success: boolean;
+    user: { email?: string; user_metadata?: { name?: string; displayName?: string; phone?: string; avatar_url?: string } };
+  };
 
-  const res = await fetch(`${API_BASE_URL}/api/user`, {
+  const result = await fetchWithAuth<UpdateResult>('/api/user', {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
     body: JSON.stringify(data),
   });
-
-  if (!res.ok) {
-    const { error } = await res.json().catch(() => ({
-      error: 'Erro desconhecido no servidor',
-    }));
-    throw new Error(error || 'Erro ao atualizar perfil');
-  }
-
-  const result = await res.json();
 
   return {
     success: result.success,
     user: {
       email: result.user.email || '',
-      name:
-        result.user.user_metadata?.name ||
-        result.user.user_metadata?.displayName ||
-        '',
+      name: result.user.user_metadata?.name || result.user.user_metadata?.displayName || '',
       displayName: result.user.user_metadata?.displayName || '',
       phone: result.user.user_metadata?.phone || '',
       avatar_url: result.user.user_metadata?.avatar_url || '',

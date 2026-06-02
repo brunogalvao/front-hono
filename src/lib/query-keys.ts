@@ -1,151 +1,137 @@
-// Query Keys Factory - Centraliza todas as query keys da aplicação
 export const queryKeys = {
-  // Tasks
   tasks: {
     all: ['tasks'] as const,
-    lists: () => [...queryKeys.tasks.all, 'list'] as const,
+    lists: ['tasks', 'list'] as const,
     list: (filters: { month: number; year: number }) =>
-      [...queryKeys.tasks.lists(), filters] as const,
-    details: () => [...queryKeys.tasks.all, 'detail'] as const,
-    detail: (id: string) => [...queryKeys.tasks.details(), id] as const,
-    countByMonth: (year: number) =>
-      [...queryKeys.tasks.all, 'count-by-month', year] as const,
-    byYear: (year: number) =>
-      [...queryKeys.tasks.all, 'by-year', year] as const,
+      ['tasks', 'list', filters] as const,
+    details: ['tasks', 'detail'] as const,
+    detail: (id: string) => ['tasks', 'detail', id] as const,
+    countByMonth: (year: number) => ['tasks', 'count-by-month', year] as const,
+    byYear: (year: number) => ['tasks', 'by-year', year] as const,
   },
 
-  // Incomes
   incomes: {
     all: ['incomes'] as const,
-    lists: () => [...queryKeys.incomes.all, 'list'] as const,
-    list: () => [...queryKeys.incomes.lists()] as const,
-    byMonth: () => [...queryKeys.incomes.all, 'by-month'] as const,
-    details: () => [...queryKeys.incomes.all, 'detail'] as const,
-    detail: (id: string) => [...queryKeys.incomes.details(), id] as const,
+    lists: ['incomes', 'list'] as const,
+    list: ['incomes', 'list'] as const,
+    byMonth: ['incomes', 'by-month'] as const,
+    details: ['incomes', 'detail'] as const,
+    detail: (id: string) => ['incomes', 'detail', id] as const,
   },
 
-  // Totals
   totals: {
     all: ['totals'] as const,
-    items: () => [...queryKeys.totals.all, 'items'] as const,
-    price: () => [...queryKeys.totals.all, 'price'] as const,
-    paid: () => [...queryKeys.totals.all, 'paid'] as const,
-    incomes: () => [...queryKeys.totals.all, 'incomes'] as const,
+    items: ['totals', 'items'] as const,
+    price: ['totals', 'price'] as const,
+    paid: ['totals', 'paid'] as const,
+    incomes: ['totals', 'incomes'] as const,
   },
 
-  // Dollar Rate
   dollarRate: {
     all: ['dollar-rate'] as const,
   },
 
-  // Auth
   auth: {
     all: ['auth'] as const,
-    session: () => [...queryKeys.auth.all, 'session'] as const,
-    listener: () => [...queryKeys.auth.all, 'listener'] as const,
+    session: ['auth', 'session'] as const,
+    listener: ['auth', 'listener'] as const,
   },
 
-  // Expense Types
   expenseTypes: {
     all: ['expense-types'] as const,
-    lists: () => [...queryKeys.expenseTypes.all, 'list'] as const,
+    lists: ['expense-types', 'list'] as const,
   },
 
-  // User
   user: {
     all: ['user'] as const,
-    profile: () => [...queryKeys.user.all, 'profile'] as const,
+    profile: ['user', 'profile'] as const,
   },
 
-  // IA
   ia: {
     all: ['ia'] as const,
   },
 
-  // Notifications
   notifications: {
     all: ['notifications'] as const,
     pending: (month: number, year: number) =>
-      [...queryKeys.notifications.all, 'pending', month, year] as const,
+      ['notifications', 'pending', month, year] as const,
   },
 
-  // Parcelas
   parcelas: {
     all: ['parcelas'] as const,
-    list: () => [...queryKeys.parcelas.all, 'list'] as const,
+    list: ['parcelas', 'list'] as const,
   },
 
-  // Groups
   groups: {
     all: ['groups'] as const,
     members: (groupId: string) => ['groups', 'members', groupId] as const,
     invites: (groupId: string) => ['groups', 'invites', groupId] as const,
   },
 
-  // Invites
   invites: {
     byToken: (token: string) => ['invites', token] as const,
   },
 
-  // Workspaces
   workspaces: {
     all: ['workspaces'] as const,
-    list: () => [...queryKeys.workspaces.all, 'list'] as const,
+    list: ['workspaces', 'list'] as const,
     members: (workspaceId: string) => ['workspaces', workspaceId, 'members'] as const,
     pendingInvites: (workspaceId: string) => ['workspaces', workspaceId, 'pending-invites'] as const,
   },
 
-  // Transactions
   transactions: {
     all: ['transactions'] as const,
     list: (workspaceId: string, month: number, year: number) =>
-      [...queryKeys.transactions.all, workspaceId, month, year] as const,
+      ['transactions', workspaceId, month, year] as const,
     byCategory: (workspaceId: string, month: number, year: number) =>
-      [...queryKeys.transactions.all, workspaceId, month, year, 'by-category'] as const,
+      ['transactions', workspaceId, month, year, 'by-category'] as const,
   },
 
-  // Recurring expenses
   recurring: {
     all: ['recurring'] as const,
-    list: (workspaceId: string) => [...queryKeys.recurring.all, workspaceId] as const,
+    list: (workspaceId: string) => ['recurring', workspaceId] as const,
   },
 
-  // Installments
   installments: {
     all: ['installments'] as const,
-    list: (workspaceId: string) => [...queryKeys.installments.all, workspaceId] as const,
+    list: (workspaceId: string) => ['installments', workspaceId] as const,
   },
 
-  // Dashboard
   dashboard: {
     all: ['dashboard'] as const,
     workspace: (workspaceId: string, month: number, year: number) =>
-      [...queryKeys.dashboard.all, workspaceId, 'workspace', month, year] as const,
+      ['dashboard', workspaceId, 'workspace', month, year] as const,
     individual: (workspaceId: string, month: number, year: number) =>
-      [...queryKeys.dashboard.all, workspaceId, 'individual', month, year] as const,
+      ['dashboard', workspaceId, 'individual', month, year] as const,
   },
 
-  // Insights
   insights: {
     all: ['insights'] as const,
     workspace: (workspaceId: string, month: number, year: number) =>
-      [...queryKeys.insights.all, workspaceId, 'workspace', month, year] as const,
+      ['insights', workspaceId, 'workspace', month, year] as const,
     individual: (workspaceId: string, month: number, year: number) =>
-      [...queryKeys.insights.all, workspaceId, 'individual', month, year] as const,
+      ['insights', workspaceId, 'individual', month, year] as const,
   },
 
-  // Categories
   categories: {
     all: ['categories'] as const,
-    list: (workspaceId: string) => [...queryKeys.categories.all, workspaceId] as const,
+    list: (workspaceId: string) => ['categories', workspaceId] as const,
   },
 
-  // All app users (super admin permissions page)
   appUsers: {
     all: ['app-users'] as const,
-    byWorkspace: (workspaceId: string) => [...queryKeys.appUsers.all, workspaceId] as const,
+    byWorkspace: (workspaceId: string) => ['app-users', workspaceId] as const,
+  },
+
+  permissions: {
+    all: ['permissions'] as const,
+    roleMatrix: (workspaceId: string) =>
+      ['permissions', 'role-matrix', workspaceId] as const,
+    memberOverrides: (workspaceId: string, userId: string) =>
+      ['permissions', 'member-overrides', workspaceId, userId] as const,
+    current: (workspaceId: string, userId: string) =>
+      ['permissions', 'current', workspaceId, userId] as const,
   },
 } as const;
 
-// Tipos para type safety
 export type QueryKeys = typeof queryKeys;

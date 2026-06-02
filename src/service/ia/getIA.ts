@@ -1,5 +1,4 @@
-import { getAuthToken } from '@/lib/supabase';
-import { API_BASE_URL } from '@/config/api';
+import { fetchWithAuth } from '@/lib/fetch-api';
 
 export interface IASimplificada {
   despesasPagas: number;
@@ -49,25 +48,13 @@ function gerarDicasEconomia(percentualGasto: number): string[] {
 }
 
 export async function getIA(): Promise<IAResponse> {
-  const token = await getAuthToken();
-
   const mesAtual = new Date().getMonth() + 1;
   const anoAtual = new Date().getFullYear();
 
-  const response = await fetch(`${API_BASE_URL}/api/ia/analise-investimento`, {
+  const raw = await fetchWithAuth<Record<string, number>>('/api/ia/analise-investimento', {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify({ mes: mesAtual, ano: anoAtual }),
   });
-
-  if (!response.ok) {
-    throw new Error(`Falha na análise financeira: ${response.status}`);
-  }
-
-  const raw = await response.json();
 
   return {
     success: true,

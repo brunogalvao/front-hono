@@ -1,5 +1,4 @@
-import { getAuthToken } from '@/lib/supabase';
-import { API_BASE_URL } from '@/config/api';
+import { fetchWithAuth } from '@/lib/fetch-api';
 
 export interface GroupItem {
   id: string;
@@ -12,13 +11,5 @@ export interface GroupItem {
 }
 
 export async function getGroups(): Promise<GroupItem[]> {
-  const token = await getAuthToken();
-  const res = await fetch(`${API_BASE_URL}/api/groups`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data?.error || `Erro HTTP ${res.status}`);
-  }
-  return res.json();
+  return fetchWithAuth<GroupItem[]>('/api/groups');
 }

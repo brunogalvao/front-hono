@@ -27,7 +27,7 @@ export function useWorkspaces() {
   const { setWorkspaces } = useWorkspace();
 
   const query = useQuery({
-    queryKey: queryKeys.workspaces.list(),
+    queryKey: queryKeys.workspaces.list,
     queryFn: fetchWorkspaces,
   });
 

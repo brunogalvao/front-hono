@@ -1,5 +1,8 @@
 import i18n from '@/lib/i18n';
 
+// Runtime browser — usa i18n para locale dinâmico.
+// Duplicação intencional com api-hono/api/utils/format.ts (runtimes e requisitos de i18n distintos).
+
 // Moeda BRL — locale segue o idioma ativo da interface
 export const formatToBRL = (value: number | string): string => {
   const number = typeof value === 'string' ? Number(value) : value;

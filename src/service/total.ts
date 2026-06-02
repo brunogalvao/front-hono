@@ -1,59 +1,16 @@
-import { API_BASE_URL } from '@/config/api';
-import { getAuthToken } from '@/lib/supabase';
+import { fetchWithAuth } from '@/lib/fetch-api';
 
-// Soma total de despesas do usuário logado
 export const totalItems = async (): Promise<number> => {
-  const token = await getAuthToken();
-
-  const res = await fetch(`${API_BASE_URL}/api/tasks/total`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!res.ok) {
-    console.error(`Erro: ${res.status}`);
-    throw new Error('Erro ao buscar total de despesas');
-  }
-
-  const data = await res.json();
+  const data = await fetchWithAuth<{ total: number }>('/api/tasks/total');
   return data.total;
 };
 
-// Soma total de preço das despesas do usuário logado
 export const totalPrice = async (): Promise<number> => {
-  const token = await getAuthToken();
-
-  const res = await fetch(`${API_BASE_URL}/api/tasks/total-price`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!res.ok) {
-    console.error(`Erro: ${res.status}`);
-    throw new Error('Erro ao buscar total');
-  }
-
-  const data = await res.json();
+  const data = await fetchWithAuth<{ totalPrice: number }>('/api/tasks/total-price');
   return data.totalPrice;
 };
 
-// Soma total de valores pagos (despesas com done = true) do usuário logado
 export const totalPaid = async (): Promise<number> => {
-  const token = await getAuthToken();
-
-  const res = await fetch(`${API_BASE_URL}/api/tasks/total-paid`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!res.ok) {
-    console.error(`Erro: ${res.status}`);
-    throw new Error('Erro ao buscar total pago');
-  }
-
-  const data = await res.json();
+  const data = await fetchWithAuth<{ total_paid: number }>('/api/tasks/total-paid');
   return data.total_paid;
 };

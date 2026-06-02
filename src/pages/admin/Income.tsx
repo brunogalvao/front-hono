@@ -53,12 +53,12 @@ function Income() {
 
   // React Query gerencia os dados — sem useEffect manual
   const { data: incomes = [], isLoading, isError } = useQuery({
-    queryKey: queryKeys.incomes.list(),
+    queryKey: queryKeys.incomes.list,
     queryFn: getIncomes,
   });
 
   const { data: total = 0 } = useQuery({
-    queryKey: queryKeys.totals.incomes(),
+    queryKey: queryKeys.totals.incomes,
     queryFn: totalIncomes,
   });
 
