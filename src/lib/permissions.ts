@@ -1,25 +1,33 @@
-type WorkspaceRole = 'administrador' | 'operador' | 'visualizador';
+export type WorkspaceRole = 'super_administrador' | 'administrador' | 'operador' | 'visualizador';
 
-export function canWrite(role: WorkspaceRole | null | undefined): boolean {
-  return role === 'administrador' || role === 'operador';
+export type PermissionResource =
+  | 'transactions'
+  | 'installments'
+  | 'recurring'
+  | 'categories'
+  | 'settings'
+  | 'members'
+  | 'permissions';
+
+export interface ResourcePermission {
+  can_read: boolean;
+  can_create: boolean;
+  can_update: boolean;
+  can_delete: boolean;
 }
 
-export function canEditTransaction(
-  role: WorkspaceRole | null | undefined,
-  transactionCreatedBy: string,
-  currentUserId: string,
-): boolean {
-  if (role === 'administrador') return true;
-  if (role === 'operador') return transactionCreatedBy === currentUserId;
-  return false;
+export type PermissionMatrix = Record<PermissionResource, ResourcePermission>;
+
+export function canWrite(role: WorkspaceRole | null | undefined): boolean {
+  return role === 'super_administrador' || role === 'administrador' || role === 'operador';
 }
 
 export function canManageMembers(role: WorkspaceRole | null | undefined): boolean {
-  return role === 'administrador';
+  return role === 'super_administrador' || role === 'administrador';
 }
 
 export function canManageCategories(role: WorkspaceRole | null | undefined): boolean {
-  return role === 'administrador';
+  return role === 'super_administrador' || role === 'administrador';
 }
 
 export function isSuperuser(

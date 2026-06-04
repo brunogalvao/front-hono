@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { UserMinus, UserPlus } from 'lucide-react';
+import { Shield, UserMinus, UserPlus } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { GuestPermissionEditor } from '@/components/workspace/GuestPermissionEditor';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Tooltip,
@@ -36,6 +44,7 @@ import type { AppUser } from '@/hooks/useAllAppUsers';
 import type { WorkspaceRole } from '@/context/WorkspaceContext';
 
 const ROLE_LABELS: Record<WorkspaceRole, string> = {
+  super_administrador: 'Super Admin',
   administrador: 'Administrador',
   operador: 'Operador',
   visualizador: 'Visualizador',
@@ -46,6 +55,7 @@ interface AllUsersTableProps {
   isLoading: boolean;
   currentUserId: string;
   workspaceId: string;
+  isSuperAdmin?: boolean;
 }
 
 export function AllUsersTable({
@@ -53,11 +63,13 @@ export function AllUsersTable({
   isLoading,
   currentUserId,
   workspaceId,
+  isSuperAdmin = false,
 }: AllUsersTableProps) {
   const queryClient = useQueryClient();
   const { updateRole, removeMember } = useWorkspaceMembers(workspaceId);
   const [removeTarget, setRemoveTarget] = useState<AppUser | null>(null);
   const [addTarget, setAddTarget] = useState<AppUser | null>(null);
+  const [permissionsTarget, setPermissionsTarget] = useState<AppUser | null>(null);
   const [selectedRole, setSelectedRole] = useState<WorkspaceRole>('visualizador');
 
   // Direct insert for existing app users (no email invite needed)
@@ -77,7 +89,7 @@ export function AllUsersTable({
   const invalidateAll = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.appUsers.byWorkspace(workspaceId) });
     queryClient.invalidateQueries({ queryKey: queryKeys.workspaces.members(workspaceId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.workspaces.list() });
+    queryClient.invalidateQueries({ queryKey: queryKeys.workspaces.list });
   };
 
   const handleUpdateRole = async (memberId: string, role: WorkspaceRole) => {
@@ -146,7 +158,7 @@ export function AllUsersTable({
 
               {/* Role area */}
               {isMember ? (
-                isSelf ? (
+                isSelf || !isSuperAdmin ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <span>
@@ -156,7 +168,11 @@ export function AllUsersTable({
                       </span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Você não pode alterar seu próprio papel</p>
+                      <p>
+                        {isSelf
+                          ? 'Você não pode alterar seu próprio papel'
+                          : 'Apenas o Super Admin pode alterar papéis'}
+                      </p>
                     </TooltipContent>
                   </Tooltip>
                 ) : (
@@ -168,11 +184,13 @@ export function AllUsersTable({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(ROLE_LABELS).map(([k, v]) => (
-                        <SelectItem key={k} value={k} className="text-xs">
-                          {v}
-                        </SelectItem>
-                      ))}
+                      {Object.entries(ROLE_LABELS)
+                        .filter(([k]) => k !== 'super_administrador')
+                        .map(([k, v]) => (
+                          <SelectItem key={k} value={k} className="text-xs">
+                            {v}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 )
@@ -184,14 +202,27 @@ export function AllUsersTable({
 
               {/* Actions */}
               {isMember && !isSelf && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-destructive hover:text-destructive h-8 w-8 shrink-0"
-                  onClick={() => setRemoveTarget(user)}
-                >
-                  <UserMinus className="h-4 w-4" />
-                </Button>
+                <>
+                  {isSuperAdmin && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0"
+                      title="Permissões individuais"
+                      onClick={() => setPermissionsTarget(user)}
+                    >
+                      <Shield className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive hover:text-destructive h-8 w-8 shrink-0"
+                    onClick={() => setRemoveTarget(user)}
+                  >
+                    <UserMinus className="h-4 w-4" />
+                  </Button>
+                </>
               )}
 
               {!isMember && (
@@ -260,11 +291,13 @@ export function AllUsersTable({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(ROLE_LABELS).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>
-                    {v}
-                  </SelectItem>
-                ))}
+                {Object.entries(ROLE_LABELS)
+                  .filter(([k]) => k !== 'super_administrador')
+                  .map(([k, v]) => (
+                    <SelectItem key={k} value={k}>
+                      {v}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -274,6 +307,31 @@ export function AllUsersTable({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Guest permissions dialog */}
+      <Dialog
+        open={!!permissionsTarget}
+        onOpenChange={(open) => !open && setPermissionsTarget(null)}
+      >
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>
+              Permissões individuais —{' '}
+              {permissionsTarget?.profile.full_name ?? permissionsTarget?.profile.email}
+            </DialogTitle>
+            <DialogDescription>
+              Configure permissões específicas para este usuário, sobrescrevendo as do papel padrão.
+            </DialogDescription>
+          </DialogHeader>
+          {permissionsTarget && (
+            <GuestPermissionEditor
+              workspaceId={workspaceId}
+              userId={permissionsTarget.profile.id}
+              currentUserId={currentUserId}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </TooltipProvider>
   );
 }

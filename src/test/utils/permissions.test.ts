@@ -3,7 +3,6 @@ import {
   canWrite,
   canManageMembers,
   canManageCategories,
-  canEditTransaction,
   isSuperuser,
 } from '@/lib/permissions';
 
@@ -28,32 +27,6 @@ describe('canManageCategories', () => {
   it('bloqueia operador', () => expect(canManageCategories('operador')).toBe(false));
   it('bloqueia visualizador', () => expect(canManageCategories('visualizador')).toBe(false));
   it('bloqueia null', () => expect(canManageCategories(null)).toBe(false));
-});
-
-describe('canEditTransaction', () => {
-  it('administrador edita qualquer transação', () => {
-    expect(canEditTransaction('administrador', 'user-1', 'user-2')).toBe(true);
-  });
-
-  it('operador edita suas próprias transações', () => {
-    expect(canEditTransaction('operador', 'user-1', 'user-1')).toBe(true);
-  });
-
-  it('operador não edita transações de outros', () => {
-    expect(canEditTransaction('operador', 'user-1', 'user-2')).toBe(false);
-  });
-
-  it('visualizador não edita nenhuma transação', () => {
-    expect(canEditTransaction('visualizador', 'user-1', 'user-1')).toBe(false);
-  });
-
-  it('null não edita', () => {
-    expect(canEditTransaction(null, 'user-1', 'user-1')).toBe(false);
-  });
-
-  it('undefined não edita', () => {
-    expect(canEditTransaction(undefined, 'user-1', 'user-1')).toBe(false);
-  });
 });
 
 describe('isSuperuser', () => {

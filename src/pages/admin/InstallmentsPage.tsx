@@ -5,12 +5,13 @@ import { InstallmentList } from '@/components/installments/InstallmentList';
 import { InstallmentForm } from '@/components/installments/InstallmentForm';
 import { useInstallments } from '@/hooks/useInstallments';
 import { useWorkspace } from '@/context/WorkspaceContext';
-import { canWrite } from '@/lib/permissions';
+import { usePermissions } from '@/hooks/usePermissions';
 import { toast } from 'sonner';
 import { useSearch } from '@tanstack/react-router';
 
 export default function InstallmentsPage() {
-  const { activeWorkspaceId, activeRole } = useWorkspace();
+  const { activeWorkspaceId } = useWorkspace();
+  const { can } = usePermissions();
   const [createOpen, setCreateOpen] = useState(false);
   const { create, remove } = useInstallments(activeWorkspaceId);
   const { highlight } = useSearch({ from: '/admin/installments' });
@@ -37,7 +38,7 @@ export default function InstallmentsPage() {
           <h1 className="text-2xl font-bold tracking-tight">Parcelamentos</h1>
           <p className="text-muted-foreground text-sm">Acompanhe compras parceladas</p>
         </div>
-        {canWrite(activeRole) && (
+        {can('installments', 'create') && (
           <Button onClick={() => setCreateOpen(true)}>
             <Plus className="mr-1 h-4 w-4" />
             Novo Parcelamento

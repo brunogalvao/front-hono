@@ -9,11 +9,12 @@ import { RecurringForm } from './RecurringForm';
 import { getRecurringColumns } from './recurring-columns';
 import { useRecurring, type RecurringExpense } from '@/hooks/useRecurring';
 import { useWorkspace } from '@/context/WorkspaceContext';
-import { canWrite } from '@/lib/permissions';
+import { usePermissions } from '@/hooks/usePermissions';
 import { toast } from 'sonner';
 
 export function RecurringTable() {
-  const { activeWorkspaceId, activeRole } = useWorkspace();
+  const { activeWorkspaceId } = useWorkspace();
+  const { can } = usePermissions();
   const { data: items = [], isLoading, update, toggleActive, remove } = useRecurring(activeWorkspaceId);
   const [editTarget, setEditTarget] = useState<RecurringExpense | null>(null);
 
@@ -38,13 +39,13 @@ export function RecurringTable() {
   const columns = useMemo(
     () =>
       getRecurringColumns({
-        canAct: canWrite(activeRole),
+        canAct: can('recurring', 'update') || can('recurring', 'delete'),
         onEdit: setEditTarget,
         onDelete: handleDelete,
         onToggle: handleToggle,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeRole],
+    [],
   );
 
   const table = useReactTable({

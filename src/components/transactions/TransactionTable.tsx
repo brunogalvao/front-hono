@@ -29,7 +29,6 @@ import { toast } from 'sonner';
 interface TransactionTableProps {
   month: number;
   year: number;
-  currentUserId: string;
   categoryFilter: string;
   onCategoryFilterChange: (value: string) => void;
 }
@@ -39,11 +38,10 @@ const columns = getTransactionColumns();
 export function TransactionTable({
   month,
   year,
-  currentUserId,
   categoryFilter,
   onCategoryFilterChange,
 }: TransactionTableProps) {
-  const { activeWorkspaceId, activeRole } = useWorkspace();
+  const { activeWorkspaceId } = useWorkspace();
   const { data: transactions = [], isLoading, update, remove } = useTransactions(
     activeWorkspaceId,
     month,
@@ -87,8 +85,6 @@ export function TransactionTable({
     columns,
     getCoreRowModel: getCoreRowModel(),
     meta: {
-      currentUserId,
-      activeRole,
       onEdit: setEditTarget,
       onDelete: handleDelete,
       onToggleStatus: handleToggleStatus,

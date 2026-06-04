@@ -18,6 +18,7 @@ import { canManageMembers } from '@/lib/permissions';
 import { toast } from 'sonner';
 
 const ROLE_LABELS: Record<WorkspaceRole, string> = {
+  super_administrador: 'Super Admin',
   administrador: 'Administrador',
   operador: 'Operador',
   visualizador: 'Visualizador',

@@ -5,11 +5,12 @@ import { RecurringTable } from '@/components/recurring/RecurringTable';
 import { RecurringForm } from '@/components/recurring/RecurringForm';
 import { useRecurring } from '@/hooks/useRecurring';
 import { useWorkspace } from '@/context/WorkspaceContext';
-import { canWrite } from '@/lib/permissions';
+import { usePermissions } from '@/hooks/usePermissions';
 import { toast } from 'sonner';
 
 export default function RecurringPage() {
-  const { activeWorkspaceId, activeRole } = useWorkspace();
+  const { activeWorkspaceId } = useWorkspace();
+  const { can } = usePermissions();
   const [createOpen, setCreateOpen] = useState(false);
   const { create } = useRecurring(activeWorkspaceId);
 
@@ -30,7 +31,7 @@ export default function RecurringPage() {
           <h1 className="text-2xl font-bold tracking-tight">Despesas Recorrentes</h1>
           <p className="text-muted-foreground text-sm">Gerencie seus gastos fixos mensais</p>
         </div>
-        {canWrite(activeRole) && (
+        {can('recurring', 'create') && (
           <Button onClick={() => setCreateOpen(true)}>
             <Plus className="mr-1 h-4 w-4" />
             Nova Recorrência

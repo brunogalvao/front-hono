@@ -6,30 +6,17 @@ import { TransactionTable } from '@/components/transactions/TransactionTable';
 import { TransactionForm } from '@/components/transactions/TransactionForm';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useWorkspace } from '@/context/WorkspaceContext';
-import { canWrite } from '@/lib/permissions';
-import { supabase } from '@/lib/supabase';
-import { useQuery } from '@tanstack/react-query';
-import { queryKeys } from '@/lib/query-keys';
+import { usePermissions } from '@/hooks/usePermissions';
 import { toast } from 'sonner';
 
-function useCurrentUserId() {
-  return useQuery({
-    queryKey: queryKeys.auth.session(),
-    queryFn: async () => {
-      const { data } = await supabase.auth.getUser();
-      return data.user?.id ?? null;
-    },
-  });
-}
-
 export default function TransactionsPage() {
-  const { activeWorkspaceId, activeRole } = useWorkspace();
+  const { activeWorkspaceId } = useWorkspace();
+  const { can } = usePermissions();
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
   const [createOpen, setCreateOpen] = useState(false);
 
-  const { data: currentUserId } = useCurrentUserId();
   const { create } = useTransactions(activeWorkspaceId, month, year);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
@@ -57,7 +44,7 @@ export default function TransactionsPage() {
         </div>
         <div className="flex items-center gap-3">
           <MonthNavigator month={month} year={year} onChange={(m, y) => { setMonth(m); setYear(y); }} />
-          {canWrite(activeRole) && (
+          {can('transactions', 'create') && (
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="mr-1 h-4 w-4" />
               Nova Transação
@@ -69,7 +56,6 @@ export default function TransactionsPage() {
       <TransactionTable
         month={month}
         year={year}
-        currentUserId={currentUserId ?? ''}
         categoryFilter={categoryFilter}
         onCategoryFilterChange={setCategoryFilter}
       />

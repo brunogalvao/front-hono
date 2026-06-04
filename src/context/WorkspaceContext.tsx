@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-export type WorkspaceRole = 'administrador' | 'operador' | 'visualizador';
+export type WorkspaceRole = 'super_administrador' | 'administrador' | 'operador' | 'visualizador';
 
 export interface WorkspaceInfo {
   id: string;
