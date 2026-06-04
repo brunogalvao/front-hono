@@ -10,6 +10,7 @@ import type profile from '@/locales/pt-BR/profile.json';
 import type installments from '@/locales/pt-BR/installments.json';
 import type history from '@/locales/pt-BR/history.json';
 import type home from '@/locales/pt-BR/home.json';
+import type insights from '@/locales/pt-BR/insights.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -27,6 +28,7 @@ declare module 'i18next' {
       installments: typeof installments;
       history: typeof history;
       home: typeof home;
+      insights: typeof insights;
     };
   }
 }

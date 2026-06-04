@@ -1,0 +1,8 @@
+{
+  "title": "Insights de IA",
+  "subtitle": "Análise inteligente dos seus gastos gerada por IA",
+  "workspacePanel": "Insights do Workspace",
+  "individualPanel": "Meus Insights",
+  "error": "Não foi possível gerar insights no momento. Tente novamente mais tarde.",
+  "empty": "Sem transações suficientes para gerar insights neste período."
+}

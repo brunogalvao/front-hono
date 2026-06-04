@@ -1,4 +1,5 @@
 import { AlertCircle, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { InsightCard } from './InsightCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,6 +13,7 @@ interface InsightsPanelProps {
 }
 
 export function InsightsPanel({ title, insights, isLoading, error }: InsightsPanelProps) {
+  const { t } = useTranslation('insights');
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -32,13 +34,13 @@ export function InsightsPanel({ title, insights, isLoading, error }: InsightsPan
         {error && !isLoading && (
           <div className="text-muted-foreground flex items-center gap-2 py-4 text-sm">
             <AlertCircle className="h-4 w-4 text-destructive" />
-            Não foi possível gerar insights no momento. Tente novamente mais tarde.
+            {t('error')}
           </div>
         )}
 
         {!isLoading && !error && insights && insights.length === 0 && (
           <p className="text-muted-foreground py-4 text-sm text-center">
-            Sem transações suficientes para gerar insights neste período.
+            {t('empty')}
           </p>
         )}
 
