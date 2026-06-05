@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,14 +38,14 @@ interface RecurringFormProps {
   mode?: 'create' | 'edit';
 }
 
-const FREQ_LABELS = { monthly: 'Mensal', weekly: 'Semanal', yearly: 'Anual' };
-
 export function RecurringForm({
   open, onOpenChange, recurring, onSubmit, mode = 'create',
 }: RecurringFormProps) {
+  const { t } = useTranslation(['recurring', 'common']);
   const { activeWorkspaceId } = useWorkspace();
   const { data: categories = [] } = useCategories(activeWorkspaceId);
   const [submitting, setSubmitting] = useState(false);
+  const FREQ_KEYS = ['monthly', 'weekly', 'yearly'] as const;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -92,10 +93,10 @@ export function RecurringForm({
         end_date: values.end_date ?? null,
         category_id: values.category_id ?? null,
       });
-      toast.success(mode === 'create' ? 'Recorrência criada!' : 'Recorrência atualizada!');
+      toast.success(mode === 'create' ? t('toast.created') : t('toast.updated'));
       onOpenChange(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao salvar');
+      toast.error(err instanceof Error ? err.message : t('toast.saveError'));
     } finally {
       setSubmitting(false);
     }
@@ -105,21 +106,21 @@ export function RecurringForm({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Nova Recorrência' : 'Editar Recorrência'}</DialogTitle>
+          <DialogTitle>{mode === 'create' ? t('newRecurring') : t('editRecurring')}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField control={form.control} name="description" render={({ field }) => (
               <FormItem>
-                <FormLabel>Descrição</FormLabel>
-                <FormControl><Input placeholder="Ex: Netflix" {...field} /></FormControl>
+                <FormLabel>{t('form.description')}</FormLabel>
+                <FormControl><Input placeholder={t('form.descriptionPlaceholder')} {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />
 
             <FormField control={form.control} name="amount" render={({ field }) => (
               <FormItem>
-                <FormLabel>Valor (R$)</FormLabel>
+                <FormLabel>{t('form.amount')}</FormLabel>
                 <FormControl><Input type="number" step="0.01" min="0.01" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
@@ -127,12 +128,12 @@ export function RecurringForm({
 
             <FormField control={form.control} name="frequency" render={({ field }) => (
               <FormItem>
-                <FormLabel>Periodicidade</FormLabel>
+                <FormLabel>{t('form.frequency')}</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                   <SelectContent>
-                    {Object.entries(FREQ_LABELS).map(([k, v]) => (
-                      <SelectItem key={k} value={k}>{v}</SelectItem>
+                    {FREQ_KEYS.map((k) => (
+                      <SelectItem key={k} value={k}>{t(`frequency.${k}`)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -143,7 +144,7 @@ export function RecurringForm({
             <div className="grid grid-cols-2 gap-3">
               <FormField control={form.control} name="start_date" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Início</FormLabel>
+                  <FormLabel>{t('form.startDate')}</FormLabel>
                   <FormControl><Input type="date" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
@@ -151,7 +152,7 @@ export function RecurringForm({
 
               <FormField control={form.control} name="end_date" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Fim (opcional)</FormLabel>
+                  <FormLabel>{t('form.endDate')}</FormLabel>
                   <FormControl>
                     <Input type="date" {...field} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value || null)} />
                   </FormControl>
@@ -162,9 +163,9 @@ export function RecurringForm({
 
             <FormField control={form.control} name="category_id" render={({ field }) => (
               <FormItem>
-                <FormLabel>Categoria</FormLabel>
+                <FormLabel>{t('form.category')}</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value ?? ''}>
-                  <FormControl><SelectTrigger><SelectValue placeholder="Sem categoria" /></SelectTrigger></FormControl>
+                  <FormControl><SelectTrigger><SelectValue placeholder={t('form.categoryPlaceholder')} /></SelectTrigger></FormControl>
                   <SelectContent>
                     {expenseCategories.map((cat) => (
                       <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
@@ -176,9 +177,9 @@ export function RecurringForm({
             )} />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common:cancel')}</Button>
               <Button type="submit" disabled={submitting}>
-                {submitting ? 'Salvando...' : mode === 'create' ? 'Criar' : 'Salvar'}
+                {submitting ? t('form.saving') : mode === 'create' ? t('form.create') : t('common:save')}
               </Button>
             </DialogFooter>
           </form>

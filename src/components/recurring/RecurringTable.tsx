@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { Power } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,6 +14,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { toast } from 'sonner';
 
 export function RecurringTable() {
+  const { t } = useTranslation('recurring');
   const { activeWorkspaceId } = useWorkspace();
   const { can } = usePermissions();
   const { data: items = [], isLoading, update, toggleActive, remove } = useRecurring(activeWorkspaceId);
@@ -21,31 +23,31 @@ export function RecurringTable() {
   const handleToggle = async (id: string, current: boolean) => {
     try {
       await toggleActive.mutateAsync({ id, is_active: !current });
-      toast.success(current ? 'Recorrência desativada.' : 'Recorrência ativada.');
+      toast.success(current ? t('toast.deactivated') : t('toast.activated'));
     } catch {
-      toast.error('Erro ao alterar status.');
+      toast.error(t('toast.toggleError'));
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
       await remove.mutateAsync(id);
-      toast.success('Recorrência excluída.');
+      toast.success(t('toast.deleted'));
     } catch {
-      toast.error('Erro ao excluir.');
+      toast.error(t('toast.deleteError'));
     }
   };
 
   const columns = useMemo(
     () =>
-      getRecurringColumns({
+      getRecurringColumns(t, {
         canAct: can('recurring', 'update') || can('recurring', 'delete'),
         onEdit: setEditTarget,
         onDelete: handleDelete,
         onToggle: handleToggle,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [t],
   );
 
   const table = useReactTable({
@@ -68,8 +70,8 @@ export function RecurringTable() {
     return (
       <div className="text-muted-foreground py-12 text-center">
         <Power className="mx-auto mb-3 h-10 w-10 opacity-30" />
-        <p className="font-medium">Nenhuma despesa recorrente</p>
-        <p className="text-sm">Adicione uma recorrência para começar.</p>
+        <p className="font-medium">{t('table.empty')}</p>
+        <p className="text-sm">{t('table.emptyHint')}</p>
       </div>
     );
   }

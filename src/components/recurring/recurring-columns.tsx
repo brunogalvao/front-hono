@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ColumnDef } from '@tanstack/react-table';
+import type { TFunction } from 'i18next';
 import { Pencil, RefreshCw, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,12 +15,6 @@ import { cn } from '@/lib/utils';
 import { formatToBRL } from '@/utils/format';
 import { CategoryIcon } from '@/lib/category-icons';
 import type { RecurringExpense } from '@/hooks/useRecurring';
-
-const FREQ_LABELS: Record<RecurringExpense['frequency'], string> = {
-  monthly: 'Mensal',
-  weekly: 'Semanal',
-  yearly: 'Anual',
-};
 
 interface ColumnOpts {
   canAct: boolean;
@@ -38,6 +34,7 @@ function ActionsCell({
   onDelete: (id: string) => void;
   onToggle: (id: string, current: boolean) => void;
 }) {
+  const { t } = useTranslation(['recurring', 'common']);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   return (
@@ -46,7 +43,7 @@ function ActionsCell({
         <Switch
           checked={item.is_active}
           onCheckedChange={() => onToggle(item.id, item.is_active)}
-          aria-label="Ativar/desativar recorrência"
+          aria-label={t('actions.toggleAria')}
         />
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(item)}>
           <Pencil className="h-4 w-4" />
@@ -64,13 +61,13 @@ function ActionsCell({
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir recorrência?</AlertDialogTitle>
+            <AlertDialogTitle>{t('delete.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              As transações já geradas não serão afetadas.
+              {t('delete.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
@@ -78,7 +75,7 @@ function ActionsCell({
                 setDeleteOpen(false);
               }}
             >
-              Excluir
+              {t('common:delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -87,7 +84,10 @@ function ActionsCell({
   );
 }
 
-export function getRecurringColumns(opts: ColumnOpts): ColumnDef<RecurringExpense>[] {
+export function getRecurringColumns(
+  t: TFunction<['recurring', 'common']>,
+  opts: ColumnOpts,
+): ColumnDef<RecurringExpense>[] {
   return [
     {
       id: 'icon',
@@ -102,7 +102,7 @@ export function getRecurringColumns(opts: ColumnOpts): ColumnDef<RecurringExpens
     {
       id: 'name',
       enableSorting: false,
-      header: 'Nome',
+      header: t('table.colName'),
       accessorKey: 'description',
       cell: ({ row }) => {
         const { description, categories, is_active } = row.original;
@@ -124,7 +124,7 @@ export function getRecurringColumns(opts: ColumnOpts): ColumnDef<RecurringExpens
     {
       id: 'amount',
       enableSorting: false,
-      header: 'Valor',
+      header: t('table.colAmount'),
       cell: ({ row }) => (
         <span className="font-semibold tabular-nums text-red-500">
           - {formatToBRL(row.original.amount)}
@@ -134,15 +134,15 @@ export function getRecurringColumns(opts: ColumnOpts): ColumnDef<RecurringExpens
     {
       id: 'frequency',
       enableSorting: false,
-      header: 'Frequência',
+      header: t('table.colFrequency'),
       cell: ({ row }) => (
-        <Badge variant="outline">{FREQ_LABELS[row.original.frequency]}</Badge>
+        <Badge variant="outline">{t(`frequency.${row.original.frequency}`)}</Badge>
       ),
     },
     {
       id: 'status',
       enableSorting: false,
-      header: 'Status',
+      header: t('table.colStatus'),
       cell: ({ row }) => {
         const { is_active } = row.original;
         return (
@@ -154,7 +154,7 @@ export function getRecurringColumns(opts: ColumnOpts): ColumnDef<RecurringExpens
                 : 'bg-muted text-muted-foreground',
             )}
           >
-            {is_active ? 'Ativo' : 'Inativo'}
+            {is_active ? t('status.active') : t('status.inactive')}
           </span>
         );
       },
@@ -164,7 +164,7 @@ export function getRecurringColumns(opts: ColumnOpts): ColumnDef<RecurringExpens
           {
             id: 'actions',
             enableSorting: false,
-            header: 'Ações',
+            header: t('table.colActions'),
             cell: ({ row }: { row: { original: RecurringExpense } }) => (
               <ActionsCell
                 item={row.original}

@@ -12,6 +12,7 @@ import type history from '@/locales/pt-BR/history.json';
 import type home from '@/locales/pt-BR/home.json';
 import type insights from '@/locales/pt-BR/insights.json';
 import type transactions from '@/locales/pt-BR/transactions.json';
+import type recurring from '@/locales/pt-BR/recurring.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -31,6 +32,7 @@ declare module 'i18next' {
       home: typeof home;
       insights: typeof insights;
       transactions: typeof transactions;
+      recurring: typeof recurring;
     };
   }
 }

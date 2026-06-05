@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RecurringTable } from '@/components/recurring/RecurringTable';
@@ -9,6 +10,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { toast } from 'sonner';
 
 export default function RecurringPage() {
+  const { t } = useTranslation('recurring');
   const { activeWorkspaceId } = useWorkspace();
   const { can } = usePermissions();
   const [createOpen, setCreateOpen] = useState(false);
@@ -17,10 +19,10 @@ export default function RecurringPage() {
   const handleCreate = async (input: Parameters<typeof create.mutateAsync>[0]) => {
     try {
       await create.mutateAsync(input);
-      toast.success('Recorrência criada!');
+      toast.success(t('toast.created'));
     } catch {
-      toast.error('Erro ao criar recorrência.');
-      throw new Error('Erro ao criar recorrência.');
+      toast.error(t('toast.createError'));
+      throw new Error(t('toast.createError'));
     }
   };
 
@@ -28,13 +30,13 @@ export default function RecurringPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Despesas Recorrentes</h1>
-          <p className="text-muted-foreground text-sm">Gerencie seus gastos fixos mensais</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
         {can('recurring', 'create') && (
           <Button onClick={() => setCreateOpen(true)}>
             <Plus className="mr-1 h-4 w-4" />
-            Nova Recorrência
+            {t('newRecurring')}
           </Button>
         )}
       </div>

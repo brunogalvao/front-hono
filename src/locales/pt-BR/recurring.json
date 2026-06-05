@@ -1,0 +1,54 @@
+{
+  "title": "Despesas Recorrentes",
+  "subtitle": "Gerencie seus gastos fixos mensais",
+  "newRecurring": "Nova Recorrência",
+  "editRecurring": "Editar Recorrência",
+  "frequency": {
+    "monthly": "Mensal",
+    "weekly": "Semanal",
+    "yearly": "Anual"
+  },
+  "status": {
+    "active": "Ativo",
+    "inactive": "Inativo"
+  },
+  "form": {
+    "description": "Descrição",
+    "descriptionPlaceholder": "Ex: Netflix",
+    "amount": "Valor (R$)",
+    "frequency": "Periodicidade",
+    "startDate": "Início",
+    "endDate": "Fim (opcional)",
+    "category": "Categoria",
+    "categoryPlaceholder": "Sem categoria",
+    "saving": "Salvando...",
+    "create": "Criar"
+  },
+  "table": {
+    "empty": "Nenhuma despesa recorrente",
+    "emptyHint": "Adicione uma recorrência para começar.",
+    "colName": "Nome",
+    "colAmount": "Valor",
+    "colFrequency": "Frequência",
+    "colStatus": "Status",
+    "colActions": "Ações"
+  },
+  "actions": {
+    "toggleAria": "Ativar/desativar recorrência"
+  },
+  "delete": {
+    "title": "Excluir recorrência?",
+    "description": "As transações já geradas não serão afetadas."
+  },
+  "toast": {
+    "created": "Recorrência criada!",
+    "updated": "Recorrência atualizada!",
+    "createError": "Erro ao criar recorrência.",
+    "saveError": "Erro ao salvar",
+    "activated": "Recorrência ativada.",
+    "deactivated": "Recorrência desativada.",
+    "toggleError": "Erro ao alterar status.",
+    "deleted": "Recorrência excluída.",
+    "deleteError": "Erro ao excluir."
+  }
+}

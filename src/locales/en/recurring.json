@@ -1,0 +1,54 @@
+{
+  "title": "Recurring Expenses",
+  "subtitle": "Manage your fixed monthly costs",
+  "newRecurring": "New Recurring",
+  "editRecurring": "Edit Recurring",
+  "frequency": {
+    "monthly": "Monthly",
+    "weekly": "Weekly",
+    "yearly": "Yearly"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "form": {
+    "description": "Description",
+    "descriptionPlaceholder": "E.g.: Netflix",
+    "amount": "Amount (R$)",
+    "frequency": "Frequency",
+    "startDate": "Start",
+    "endDate": "End (optional)",
+    "category": "Category",
+    "categoryPlaceholder": "No category",
+    "saving": "Saving...",
+    "create": "Create"
+  },
+  "table": {
+    "empty": "No recurring expenses",
+    "emptyHint": "Add a recurring expense to get started.",
+    "colName": "Name",
+    "colAmount": "Amount",
+    "colFrequency": "Frequency",
+    "colStatus": "Status",
+    "colActions": "Actions"
+  },
+  "actions": {
+    "toggleAria": "Enable/disable recurring"
+  },
+  "delete": {
+    "title": "Delete recurring expense?",
+    "description": "Transactions already generated will not be affected."
+  },
+  "toast": {
+    "created": "Recurring created!",
+    "updated": "Recurring updated!",
+    "createError": "Error creating recurring expense.",
+    "saveError": "Error saving",
+    "activated": "Recurring activated.",
+    "deactivated": "Recurring deactivated.",
+    "toggleError": "Error changing status.",
+    "deleted": "Recurring deleted.",
+    "deleteError": "Error deleting."
+  }
+}
