@@ -15,6 +15,7 @@ import ptBRInstallments from '@/locales/pt-BR/installments.json';
 import ptBRHistory from '@/locales/pt-BR/history.json';
 import ptBRHome from '@/locales/pt-BR/home.json';
 import ptBRInsights from '@/locales/pt-BR/insights.json';
+import ptBRTransactions from '@/locales/pt-BR/transactions.json';
 
 import enCommon from '@/locales/en/common.json';
 import enNav from '@/locales/en/nav.json';
@@ -29,6 +30,7 @@ import enInstallments from '@/locales/en/installments.json';
 import enHistory from '@/locales/en/history.json';
 import enHome from '@/locales/en/home.json';
 import enInsights from '@/locales/en/insights.json';
+import enTransactions from '@/locales/en/transactions.json';
 
 export const defaultNS = 'common';
 export const supportedLngs = ['pt-BR', 'en'] as const;
@@ -53,6 +55,7 @@ i18n
         history: ptBRHistory,
         home: ptBRHome,
         insights: ptBRInsights,
+        transactions: ptBRTransactions,
       },
       en: {
         common: enCommon,
@@ -68,6 +71,7 @@ i18n
         history: enHistory,
         home: enHome,
         insights: enInsights,
+        transactions: enTransactions,
       },
     },
     defaultNS,

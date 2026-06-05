@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   flexRender,
   getCoreRowModel,
@@ -33,14 +34,14 @@ interface TransactionTableProps {
   onCategoryFilterChange: (value: string) => void;
 }
 
-const columns = getTransactionColumns();
-
 export function TransactionTable({
   month,
   year,
   categoryFilter,
   onCategoryFilterChange,
 }: TransactionTableProps) {
+  const { t } = useTranslation('transactions');
+  const columns = getTransactionColumns(t);
   const { activeWorkspaceId } = useWorkspace();
   const { data: transactions = [], isLoading, update, remove } = useTransactions(
     activeWorkspaceId,
@@ -65,18 +66,18 @@ export function TransactionTable({
   const handleToggleStatus = async (id: string, status: TransactionStatus) => {
     try {
       await update.mutateAsync({ id, status });
-      toast.success(status === 'pago' ? 'Marcado como pago' : 'Marcado como pendente');
+      toast.success(status === 'pago' ? t('toast.markedPaid') : t('toast.markedPending'));
     } catch {
-      toast.error('Erro ao atualizar status');
+      toast.error(t('toast.statusError'));
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
       await remove.mutateAsync(id);
-      toast.success('Transação excluída.');
+      toast.success(t('toast.deleted'));
     } catch {
-      toast.error('Erro ao excluir transação.');
+      toast.error(t('toast.deleteError'));
     }
   };
 
@@ -105,10 +106,10 @@ export function TransactionTable({
         <div className="flex items-center gap-2">
           <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filtrar por categoria" />
+              <SelectValue placeholder={t('table.filterByCategory')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas as categorias</SelectItem>
+              <SelectItem value="all">{t('table.allCategories')}</SelectItem>
               {categories.map((cat) => (
                 <SelectItem key={cat.id} value={cat.id}>
                   {cat.name}
@@ -121,8 +122,8 @@ export function TransactionTable({
 
       {filtered.length === 0 ? (
         <div className="text-muted-foreground py-12 text-center">
-          <p className="text-lg font-medium">Nenhuma transação encontrada</p>
-          <p className="text-sm">Clique em "Nova Transação" para começar.</p>
+          <p className="text-lg font-medium">{t('table.empty')}</p>
+          <p className="text-sm">{t('table.emptyHint')}</p>
         </div>
       ) : (
         <div className="rounded-md border">

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MonthNavigator } from '@/components/dashboard/MonthNavigator';
@@ -10,6 +11,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { toast } from 'sonner';
 
 export default function TransactionsPage() {
+  const { t } = useTranslation('transactions');
   const { activeWorkspaceId } = useWorkspace();
   const { can } = usePermissions();
   const now = new Date();
@@ -25,13 +27,13 @@ export default function TransactionsPage() {
       await create.mutateAsync(input);
       if (categoryFilter !== 'all') {
         setCategoryFilter('all');
-        toast.success('Transação criada! Filtro removido para exibir a nova transação.');
+        toast.success(t('toast.createdFilterReset'));
       } else {
-        toast.success('Transação criada!');
+        toast.success(t('toast.created'));
       }
     } catch {
-      toast.error('Erro ao criar transação.');
-      throw new Error('Erro ao criar transação.');
+      toast.error(t('toast.createError'));
+      throw new Error(t('toast.createError'));
     }
   };
 
@@ -39,15 +41,15 @@ export default function TransactionsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Transações</h1>
-          <p className="text-muted-foreground text-sm">Registre e gerencie receitas e despesas</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <MonthNavigator month={month} year={year} onChange={(m, y) => { setMonth(m); setYear(y); }} />
           {can('transactions', 'create') && (
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="mr-1 h-4 w-4" />
-              Nova Transação
+              {t('newTransaction')}
             </Button>
           )}
         </div>

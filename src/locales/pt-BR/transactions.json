@@ -1,0 +1,64 @@
+{
+  "title": "Transações",
+  "subtitle": "Registre e gerencie receitas e despesas",
+  "newTransaction": "Nova Transação",
+  "editTransaction": "Editar Transação",
+  "type": {
+    "receita": "Receita",
+    "despesa": "Despesa"
+  },
+  "status": {
+    "pago": "Pago",
+    "pendente": "Pendente",
+    "markPaid": "Marcar como pago",
+    "markPending": "Marcar como pendente"
+  },
+  "origin": {
+    "recurring": "Recorrente",
+    "installment": "Parcelado",
+    "installmentCount": "Parcelado {{current}}/{{total}}",
+    "manual": "Manual"
+  },
+  "form": {
+    "type": "Tipo",
+    "status": "Status",
+    "amount": "Valor (R$)",
+    "date": "Data",
+    "category": "Categoria",
+    "categoryPlaceholder": "Selecionar categoria",
+    "description": "Descrição",
+    "descriptionPlaceholder": "Descrição opcional",
+    "saving": "Salvando...",
+    "create": "Criar"
+  },
+  "table": {
+    "filterByCategory": "Filtrar por categoria",
+    "allCategories": "Todas as categorias",
+    "empty": "Nenhuma transação encontrada",
+    "emptyHint": "Clique em \"Nova Transação\" para começar.",
+    "name": "Nome",
+    "noDescription": "Sem descrição",
+    "colType": "Tipo",
+    "colStatus": "Status",
+    "colAmount": "Valor",
+    "colActions": "Ações",
+    "viewInstallment": "Ver parcelamento",
+    "goToInstallment": "Ir para a Parcela"
+  },
+  "delete": {
+    "title": "Excluir transação?",
+    "description": "Esta ação não pode ser desfeita. A transação será removida permanentemente."
+  },
+  "toast": {
+    "created": "Transação criada!",
+    "createdFilterReset": "Transação criada! Filtro removido para exibir a nova transação.",
+    "updated": "Transação atualizada!",
+    "createError": "Erro ao criar transação.",
+    "saveError": "Erro ao salvar transação",
+    "markedPaid": "Marcado como pago",
+    "markedPending": "Marcado como pendente",
+    "statusError": "Erro ao atualizar status",
+    "deleted": "Transação excluída.",
+    "deleteError": "Erro ao excluir transação."
+  }
+}

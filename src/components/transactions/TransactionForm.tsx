@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -58,6 +59,7 @@ export function TransactionForm({
   onSubmit,
   mode = 'create',
 }: TransactionFormProps) {
+  const { t } = useTranslation(['transactions', 'common']);
   const { activeWorkspaceId } = useWorkspace();
   const { data: categories = [] } = useCategories(activeWorkspaceId);
   const [submitting, setSubmitting] = useState(false);
@@ -112,10 +114,10 @@ export function TransactionForm({
         category_id: values.category_id ?? null,
         description: values.description ?? null,
       });
-      toast.success(mode === 'create' ? 'Transação criada!' : 'Transação atualizada!');
+      toast.success(mode === 'create' ? t('toast.created') : t('toast.updated'));
       onOpenChange(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao salvar transação');
+      toast.error(err instanceof Error ? err.message : t('toast.saveError'));
     } finally {
       setSubmitting(false);
     }
@@ -125,7 +127,7 @@ export function TransactionForm({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Nova Transação' : 'Editar Transação'}</DialogTitle>
+          <DialogTitle>{mode === 'create' ? t('newTransaction') : t('editTransaction')}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -134,7 +136,7 @@ export function TransactionForm({
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo</FormLabel>
+                  <FormLabel>{t('form.type')}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -142,8 +144,8 @@ export function TransactionForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="despesa">Despesa</SelectItem>
-                      <SelectItem value="receita">Receita</SelectItem>
+                      <SelectItem value="despesa">{t('type.despesa')}</SelectItem>
+                      <SelectItem value="receita">{t('type.receita')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -156,7 +158,7 @@ export function TransactionForm({
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status</FormLabel>
+                  <FormLabel>{t('form.status')}</FormLabel>
                   <div className="flex gap-2">
                     {(['pendente', 'pago'] as const).map((s) => (
                       <button
@@ -172,7 +174,7 @@ export function TransactionForm({
                             : 'border-border text-muted-foreground hover:bg-muted',
                         )}
                       >
-                        {s === 'pago' ? 'Pago' : 'Pendente'}
+                        {s === 'pago' ? t('status.pago') : t('status.pendente')}
                       </button>
                     ))}
                   </div>
@@ -186,7 +188,7 @@ export function TransactionForm({
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Valor (R$)</FormLabel>
+                  <FormLabel>{t('form.amount')}</FormLabel>
                   <FormControl>
                     <Input type="number" step="0.01" min="0.01" {...field} />
                   </FormControl>
@@ -201,7 +203,7 @@ export function TransactionForm({
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Data</FormLabel>
+                    <FormLabel>{t('form.date')}</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -215,7 +217,7 @@ export function TransactionForm({
                 name="category_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Categoria</FormLabel>
+                    <FormLabel>{t('form.category')}</FormLabel>
                     <Select
                       key={transaction?.id ?? 'new'}
                       onValueChange={field.onChange}
@@ -223,7 +225,7 @@ export function TransactionForm({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecionar categoria" />
+                          <SelectValue placeholder={t('form.categoryPlaceholder')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -245,10 +247,10 @@ export function TransactionForm({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descrição</FormLabel>
+                  <FormLabel>{t('form.description')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Descrição opcional"
+                      placeholder={t('form.descriptionPlaceholder')}
                       {...field}
                       value={field.value ?? ''}
                     />
@@ -260,10 +262,10 @@ export function TransactionForm({
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancelar
+                {t('common:cancel')}
               </Button>
               <Button type="submit" disabled={submitting}>
-                {submitting ? 'Salvando...' : mode === 'create' ? 'Criar' : 'Salvar'}
+                {submitting ? t('form.saving') : mode === 'create' ? t('form.create') : t('common:save')}
               </Button>
             </DialogFooter>
           </form>

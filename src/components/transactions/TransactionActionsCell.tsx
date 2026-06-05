@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +18,7 @@ interface TransactionActionsCellProps {
 
 export function TransactionActionsCell({ transaction, onEdit, onDelete }: TransactionActionsCellProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const { t } = useTranslation(['transactions', 'common']);
   const { can } = usePermissions();
 
   const canUpdate = can('transactions', 'update');
@@ -52,13 +54,13 @@ export function TransactionActionsCell({ transaction, onEdit, onDelete }: Transa
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir transação?</AlertDialogTitle>
+            <AlertDialogTitle>{t('delete.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. A transação será removida permanentemente.
+              {t('delete.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
@@ -66,7 +68,7 @@ export function TransactionActionsCell({ transaction, onEdit, onDelete }: Transa
                 setDeleteOpen(false);
               }}
             >
-              Excluir
+              {t('common:delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

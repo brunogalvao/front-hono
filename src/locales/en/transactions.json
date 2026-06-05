@@ -1,0 +1,64 @@
+{
+  "title": "Transactions",
+  "subtitle": "Record and manage income and expenses",
+  "newTransaction": "New Transaction",
+  "editTransaction": "Edit Transaction",
+  "type": {
+    "receita": "Income",
+    "despesa": "Expense"
+  },
+  "status": {
+    "pago": "Paid",
+    "pendente": "Pending",
+    "markPaid": "Mark as paid",
+    "markPending": "Mark as pending"
+  },
+  "origin": {
+    "recurring": "Recurring",
+    "installment": "Installment",
+    "installmentCount": "Installment {{current}}/{{total}}",
+    "manual": "Manual"
+  },
+  "form": {
+    "type": "Type",
+    "status": "Status",
+    "amount": "Amount (R$)",
+    "date": "Date",
+    "category": "Category",
+    "categoryPlaceholder": "Select category",
+    "description": "Description",
+    "descriptionPlaceholder": "Optional description",
+    "saving": "Saving...",
+    "create": "Create"
+  },
+  "table": {
+    "filterByCategory": "Filter by category",
+    "allCategories": "All categories",
+    "empty": "No transactions found",
+    "emptyHint": "Click \"New Transaction\" to get started.",
+    "name": "Name",
+    "noDescription": "No description",
+    "colType": "Type",
+    "colStatus": "Status",
+    "colAmount": "Amount",
+    "colActions": "Actions",
+    "viewInstallment": "View installment",
+    "goToInstallment": "Go to Installment"
+  },
+  "delete": {
+    "title": "Delete transaction?",
+    "description": "This action cannot be undone. The transaction will be permanently removed."
+  },
+  "toast": {
+    "created": "Transaction created!",
+    "createdFilterReset": "Transaction created! Filter cleared to show the new transaction.",
+    "updated": "Transaction updated!",
+    "createError": "Error creating transaction.",
+    "saveError": "Error saving transaction",
+    "markedPaid": "Marked as paid",
+    "markedPending": "Marked as pending",
+    "statusError": "Error updating status",
+    "deleted": "Transaction deleted.",
+    "deleteError": "Error deleting transaction."
+  }
+}

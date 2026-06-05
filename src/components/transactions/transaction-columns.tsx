@@ -1,5 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import type { ColumnDef, RowData } from '@tanstack/react-table';
+import type { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { TrendingDown, TrendingUp, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -25,6 +27,7 @@ function StatusCell({
   row: { original: Transaction };
   table: { options: { meta?: { onToggleStatus: (id: string, status: TransactionStatus) => void } } };
 }) {
+  const { t } = useTranslation('transactions');
   const { can } = usePermissions();
   const canUpdate = can('transactions', 'update');
   const isPago = row.original.status === 'pago';
@@ -34,7 +37,7 @@ function StatusCell({
     <button
       type="button"
       disabled={!canUpdate}
-      aria-label={isPago ? 'Marcar como pendente' : 'Marcar como pago'}
+      aria-label={isPago ? t('status.markPending') : t('status.markPaid')}
       onClick={() => canUpdate && meta?.onToggleStatus(row.original.id, isPago ? 'pendente' : 'pago')}
       className={cn(
         'rounded-full px-2 py-0.5 text-xs font-medium transition-colors',
@@ -45,12 +48,12 @@ function StatusCell({
         !canUpdate && 'cursor-default',
       )}
     >
-      {isPago ? 'Pago' : 'Pendente'}
+      {isPago ? t('status.pago') : t('status.pendente')}
     </button>
   );
 }
 
-export function getTransactionColumns(): ColumnDef<Transaction>[] {
+export function getTransactionColumns(t: TFunction<'transactions'>): ColumnDef<Transaction>[] {
   return [
     {
       id: 'icon',
@@ -75,8 +78,8 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
     {
       id: 'name',
       enableSorting: false,
-      header: 'Nome',
-      accessorFn: (row) => row.description ?? row.categories?.name ?? 'Sem descrição',
+      header: t('table.name'),
+      accessorFn: (row) => row.description ?? row.categories?.name ?? t('table.noDescription'),
       cell: ({ row, getValue }) => {
         const category = row.original.categories;
         return (
@@ -95,30 +98,30 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
     {
       id: 'type',
       enableSorting: false,
-      header: 'Tipo',
+      header: t('table.colType'),
       cell: ({ row }) => {
         const { origin, installment_number, installments } = row.original;
-        if (origin === 'recurring') return <Badge variant="outline">Recorrente</Badge>;
+        if (origin === 'recurring') return <Badge variant="outline">{t('origin.recurring')}</Badge>;
         if (origin === 'installment') {
           const label =
             installment_number && installments?.total_installments
-              ? `Parcelado ${installment_number}/${installments.total_installments}`
-              : 'Parcelado';
+              ? t('origin.installmentCount', { current: installment_number, total: installments.total_installments })
+              : t('origin.installment');
           return <Badge variant="outline">{label}</Badge>;
         }
-        return <Badge variant="secondary">Manual</Badge>;
+        return <Badge variant="secondary">{t('origin.manual')}</Badge>;
       },
     },
     {
       id: 'status',
       enableSorting: false,
-      header: 'Status',
+      header: t('table.colStatus'),
       cell: ({ row, table }) => <StatusCell row={row} table={table} />,
     },
     {
       id: 'amount',
       enableSorting: false,
-      header: 'Valor',
+      header: t('table.colAmount'),
       cell: ({ row }) => {
         const isReceita = row.original.type === 'receita';
         return (
@@ -131,7 +134,7 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
     {
       id: 'actions',
       enableSorting: false,
-      header: 'Ações',
+      header: t('table.colActions'),
       cell: ({ row, table }) => {
         const meta = table.options.meta;
         if (!meta) return null;
@@ -143,9 +146,9 @@ export function getTransactionColumns(): ColumnDef<Transaction>[] {
               to="/admin/installments"
               search={{ highlight: row.original.installment_id ?? undefined }}
               className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 transition-colors"
-              title="Ver parcelamento"
+              title={t('table.viewInstallment')}
             >
-              Ir para a Parcela
+              {t('table.goToInstallment')}
               <ExternalLink className="h-4 w-4" />
             </Link>
           );
