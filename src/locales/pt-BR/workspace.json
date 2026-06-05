@@ -1,0 +1,39 @@
+{
+  "settings": {
+    "title": "Configurações",
+    "subtitle": "Configurações do workspace",
+    "activeWorkspace": "Workspace ativo",
+    "categoriesCard": "Categorias",
+    "categoriesCardDesc": "Gerencie categorias personalizadas do workspace"
+  },
+  "category": {
+    "customTitle": "Categorias personalizadas",
+    "new": "Nova",
+    "empty": "Nenhuma categoria personalizada.",
+    "defaultTitle": "Categorias padrão (somente leitura)",
+    "newTitle": "Nova Categoria",
+    "editTitle": "Editar Categoria",
+    "type": {
+      "receita": "Receita",
+      "despesa": "Despesa"
+    },
+    "form": {
+      "name": "Nome",
+      "namePlaceholder": "Ex: Academia",
+      "type": "Tipo",
+      "icon": "Ícone",
+      "create": "Criar"
+    },
+    "delete": {
+      "title": "Excluir categoria?",
+      "description": "Transações com esta categoria ficarão sem categoria."
+    },
+    "toast": {
+      "created": "Categoria criada.",
+      "updated": "Categoria atualizada.",
+      "saveError": "Erro ao salvar categoria.",
+      "deleted": "Categoria excluída.",
+      "deleteError": "Erro ao excluir categoria."
+    }
+  }
+}

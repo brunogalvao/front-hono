@@ -1,0 +1,39 @@
+{
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Workspace settings",
+    "activeWorkspace": "Active workspace",
+    "categoriesCard": "Categories",
+    "categoriesCardDesc": "Manage custom workspace categories"
+  },
+  "category": {
+    "customTitle": "Custom categories",
+    "new": "New",
+    "empty": "No custom categories.",
+    "defaultTitle": "Default categories (read-only)",
+    "newTitle": "New Category",
+    "editTitle": "Edit Category",
+    "type": {
+      "receita": "Income",
+      "despesa": "Expense"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "E.g.: Gym",
+      "type": "Type",
+      "icon": "Icon",
+      "create": "Create"
+    },
+    "delete": {
+      "title": "Delete category?",
+      "description": "Transactions with this category will become uncategorized."
+    },
+    "toast": {
+      "created": "Category created.",
+      "updated": "Category updated.",
+      "saveError": "Error saving category.",
+      "deleted": "Category deleted.",
+      "deleteError": "Error deleting category."
+    }
+  }
+}

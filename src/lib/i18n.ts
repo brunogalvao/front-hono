@@ -17,6 +17,7 @@ import ptBRHome from '@/locales/pt-BR/home.json';
 import ptBRInsights from '@/locales/pt-BR/insights.json';
 import ptBRTransactions from '@/locales/pt-BR/transactions.json';
 import ptBRRecurring from '@/locales/pt-BR/recurring.json';
+import ptBRWorkspace from '@/locales/pt-BR/workspace.json';
 
 import enCommon from '@/locales/en/common.json';
 import enNav from '@/locales/en/nav.json';
@@ -33,6 +34,7 @@ import enHome from '@/locales/en/home.json';
 import enInsights from '@/locales/en/insights.json';
 import enTransactions from '@/locales/en/transactions.json';
 import enRecurring from '@/locales/en/recurring.json';
+import enWorkspace from '@/locales/en/workspace.json';
 
 export const defaultNS = 'common';
 export const supportedLngs = ['pt-BR', 'en'] as const;
@@ -59,6 +61,7 @@ i18n
         insights: ptBRInsights,
         transactions: ptBRTransactions,
         recurring: ptBRRecurring,
+        workspace: ptBRWorkspace,
       },
       en: {
         common: enCommon,
@@ -76,6 +79,7 @@ i18n
         insights: enInsights,
         transactions: enTransactions,
         recurring: enRecurring,
+        workspace: enWorkspace,
       },
     },
     defaultNS,

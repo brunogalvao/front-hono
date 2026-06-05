@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -37,6 +38,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export function CategoryManager() {
+  const { t } = useTranslation(['workspace', 'common']);
   const { activeWorkspaceId } = useWorkspace();
   const { data: categories = [] } = useCategories(activeWorkspaceId);
   const queryClient = useQueryClient();
@@ -99,14 +101,14 @@ export function CategoryManager() {
     try {
       if (editTarget) {
         await updateCat.mutateAsync({ id: editTarget.id, values });
-        toast.success('Categoria atualizada.');
+        toast.success(t('category.toast.updated'));
       } else {
         await createCat.mutateAsync(values);
-        toast.success('Categoria criada.');
+        toast.success(t('category.toast.created'));
       }
       setFormOpen(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao salvar categoria.');
+      toast.error(err instanceof Error ? err.message : t('category.toast.saveError'));
     }
   };
 
@@ -114,8 +116,8 @@ export function CategoryManager() {
     if (!deleteTarget) return;
     try {
       await deleteCat.mutateAsync(deleteTarget);
-      toast.success('Categoria excluída.');
-    } catch { toast.error('Erro ao excluir categoria.'); }
+      toast.success(t('category.toast.deleted'));
+    } catch { toast.error(t('category.toast.deleteError')); }
     setDeleteTarget(null);
   };
 
@@ -125,14 +127,14 @@ export function CategoryManager() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium">Categorias personalizadas</p>
+        <p className="text-sm font-medium">{t('category.customTitle')}</p>
         <Button size="sm" variant="outline" onClick={openCreate}>
-          <Plus className="mr-1 h-3 w-3" /> Nova
+          <Plus className="mr-1 h-3 w-3" /> {t('category.new')}
         </Button>
       </div>
 
       {custom.length === 0 && (
-        <p className="text-muted-foreground text-sm">Nenhuma categoria personalizada.</p>
+        <p className="text-muted-foreground text-sm">{t('category.empty')}</p>
       )}
 
       <div className="space-y-1">
@@ -141,7 +143,7 @@ export function CategoryManager() {
             {cat.icon && <CategoryIcon name={cat.icon} className="text-muted-foreground h-4 w-4 shrink-0" />}
             <span className="flex-1 text-sm">{cat.name}</span>
             <Badge variant={cat.type === 'receita' ? 'default' : 'secondary'} className="text-xs">
-              {cat.type}
+              {t(`category.type.${cat.type}`)}
             </Badge>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(cat)}>
               <Pencil className="h-3.5 w-3.5" />
@@ -158,7 +160,7 @@ export function CategoryManager() {
       </div>
 
       <div className="mt-4">
-        <p className="text-muted-foreground mb-2 text-xs font-medium">Categorias padrão (somente leitura)</p>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">{t('category.defaultTitle')}</p>
         <div className="flex flex-wrap gap-1">
           {defaults.map((cat) => (
             <Badge key={cat.id} variant="outline" className="text-xs">
@@ -171,25 +173,25 @@ export function CategoryManager() {
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>{editTarget ? 'Editar Categoria' : 'Nova Categoria'}</DialogTitle>
+            <DialogTitle>{editTarget ? t('category.editTitle') : t('category.newTitle')}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               <FormField control={form.control} name="name" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome</FormLabel>
-                  <FormControl><Input placeholder="Ex: Academia" {...field} /></FormControl>
+                  <FormLabel>{t('category.form.name')}</FormLabel>
+                  <FormControl><Input placeholder={t('category.form.namePlaceholder')} {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
               <FormField control={form.control} name="type" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo</FormLabel>
+                  <FormLabel>{t('category.form.type')}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                     <SelectContent>
-                      <SelectItem value="despesa">Despesa</SelectItem>
-                      <SelectItem value="receita">Receita</SelectItem>
+                      <SelectItem value="despesa">{t('category.type.despesa')}</SelectItem>
+                      <SelectItem value="receita">{t('category.type.receita')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -197,7 +199,7 @@ export function CategoryManager() {
               )} />
               <FormField control={form.control} name="icon" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Ícone</FormLabel>
+                  <FormLabel>{t('category.form.icon')}</FormLabel>
                   <div className="grid grid-cols-8 gap-1">
                     {CATEGORY_ICONS.map(({ name, label, Icon }) => (
                       <button
@@ -215,8 +217,8 @@ export function CategoryManager() {
                 </FormItem>
               )} />
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setFormOpen(false)}>Cancelar</Button>
-                <Button type="submit">{editTarget ? 'Salvar' : 'Criar'}</Button>
+                <Button type="button" variant="outline" onClick={() => setFormOpen(false)}>{t('common:cancel')}</Button>
+                <Button type="submit">{editTarget ? t('common:save') : t('category.form.create')}</Button>
               </DialogFooter>
             </form>
           </Form>
@@ -226,12 +228,12 @@ export function CategoryManager() {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir categoria?</AlertDialogTitle>
-            <AlertDialogDescription>Transações com esta categoria ficarão sem categoria.</AlertDialogDescription>
+            <AlertDialogTitle>{t('category.delete.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('category.delete.description')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={handleDelete}>Excluir</AlertDialogAction>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={handleDelete}>{t('common:delete')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

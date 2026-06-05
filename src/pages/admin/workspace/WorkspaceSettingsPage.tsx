@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardContent,
@@ -10,6 +11,7 @@ import { useWorkspace } from '@/context/WorkspaceContext';
 import { canManageMembers } from '@/lib/permissions';
 
 export default function WorkspaceSettingsPage() {
+  const { t } = useTranslation('workspace');
   const { activeWorkspace, activeRole } = useWorkspace();
 
   if (!activeWorkspace) return null;
@@ -17,25 +19,25 @@ export default function WorkspaceSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Configurações</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{t('settings.title')}</h1>
         <p className="text-muted-foreground text-sm">
-          Configurações do workspace
+          {t('settings.subtitle')}
         </p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>{activeWorkspace.name}</CardTitle>
-          <CardDescription>Workspace ativo</CardDescription>
+          <CardDescription>{t('settings.activeWorkspace')}</CardDescription>
         </CardHeader>
       </Card>
 
       {canManageMembers(activeRole) && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Categorias</CardTitle>
+            <CardTitle className="text-base">{t('settings.categoriesCard')}</CardTitle>
             <CardDescription>
-              Gerencie categorias personalizadas do workspace
+              {t('settings.categoriesCardDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -13,6 +13,7 @@ import type home from '@/locales/pt-BR/home.json';
 import type insights from '@/locales/pt-BR/insights.json';
 import type transactions from '@/locales/pt-BR/transactions.json';
 import type recurring from '@/locales/pt-BR/recurring.json';
+import type workspace from '@/locales/pt-BR/workspace.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -33,6 +34,7 @@ declare module 'i18next' {
       insights: typeof insights;
       transactions: typeof transactions;
       recurring: typeof recurring;
+      workspace: typeof workspace;
     };
   }
 }
