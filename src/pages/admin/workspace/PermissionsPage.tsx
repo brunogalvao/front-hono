@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
@@ -26,6 +27,7 @@ function useCurrentUserId() {
 }
 
 export default function PermissionsPage() {
+  const { t } = useTranslation(['permissions', 'common']);
   const navigate = useNavigate();
   const { activeWorkspace } = useWorkspace();
   const { can, isSuperAdmin, isLoading: isPermLoading } = usePermissions();
@@ -38,10 +40,10 @@ export default function PermissionsPage() {
   useEffect(() => {
     if (isPermLoading || !activeWorkspace) return;
     if (!canManageMembers) {
-      toast.error('Acesso restrito');
+      toast.error(t('page.accessDenied'));
       navigate({ to: '/admin/dashboard' });
     }
-  }, [isPermLoading, canManageMembers, activeWorkspace, navigate]);
+  }, [isPermLoading, canManageMembers, activeWorkspace, navigate, t]);
 
   if (isPermLoading || !activeWorkspace) {
     return (
@@ -66,23 +68,18 @@ export default function PermissionsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          {isSuperAdmin ? 'Gerenciamento de Permissões' : 'Gerenciamento de Membros'}
+          {isSuperAdmin ? t('page.titleSuperAdmin') : t('page.titleAdmin')}
         </h1>
         <p className="text-muted-foreground text-sm">
-          {isSuperAdmin
-            ? 'Gerencie o acesso e os papéis dos usuários no workspace'
-            : 'Convide e remova membros do workspace'}
+          {isSuperAdmin ? t('page.subtitleSuperAdmin') : t('page.subtitleAdmin')}
         </p>
       </div>
 
       {isSuperAdmin && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Matriz de permissões por papel</CardTitle>
-            <CardDescription>
-              Configure quais operações (Ler, Criar, Atualizar, Excluir) cada papel pode executar em cada tela.
-              Mudanças são aplicadas imediatamente para todos os membros.
-            </CardDescription>
+            <CardTitle className="text-base">{t('matrix.title')}</CardTitle>
+            <CardDescription>{t('matrix.description')}</CardDescription>
           </CardHeader>
           <CardContent>
             <PermissionMatrix workspaceId={activeWorkspace.id} currentUserId={currentUserId ?? ''} />
@@ -92,10 +89,8 @@ export default function PermissionsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Usuários da aplicação</CardTitle>
-          <CardDescription>
-            Todos os usuários cadastrados — membros do workspace e usuários sem acesso
-          </CardDescription>
+          <CardTitle className="text-base">{t('allUsers.title')}</CardTitle>
+          <CardDescription>{t('allUsers.description')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <AllUsersTable
@@ -109,7 +104,7 @@ export default function PermissionsPage() {
           <Separator />
 
           <div>
-            <p className="text-sm font-medium mb-3">Convidar por e-mail</p>
+            <p className="text-sm font-medium mb-3">{t('allUsers.inviteByEmail')}</p>
             <InviteForm onInvite={handleInvite} />
           </div>
         </CardContent>

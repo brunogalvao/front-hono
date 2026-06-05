@@ -1,0 +1,90 @@
+{
+  "page": {
+    "titleSuperAdmin": "Permissions Management",
+    "titleAdmin": "Members Management",
+    "subtitleSuperAdmin": "Manage user access and roles in the workspace",
+    "subtitleAdmin": "Invite and remove workspace members",
+    "accessDenied": "Access restricted"
+  },
+  "matrix": {
+    "title": "Permission matrix by role",
+    "description": "Configure which operations (Read, Create, Update, Delete) each role can perform on each screen. Changes apply immediately to all members.",
+    "colScreen": "Screen",
+    "updateError": "Failed to update permission"
+  },
+  "allUsers": {
+    "title": "Application users",
+    "description": "All registered users — workspace members and users without access",
+    "inviteByEmail": "Invite by email",
+    "noAccess": "No access",
+    "empty": "No users found",
+    "individualPermissions": "Individual permissions",
+    "cannotChangeOwnRole": "You cannot change your own role",
+    "onlySuperAdminCanChangeRoles": "Only the Super Admin can change roles",
+    "removeTitle": "Remove member?",
+    "removeDescription": "{{name}} will lose access to the workspace. The account remains active in the application.",
+    "remove": "Remove",
+    "addTitle": "Add to workspace",
+    "addDescription": "Select the role for <strong>{{name}}</strong> in the workspace.",
+    "add": "Add",
+    "guestDialogTitle": "Individual permissions — {{name}}",
+    "guestDialogDescription": "Configure specific permissions for this user, overriding the default role.",
+    "toast": {
+      "roleUpdated": "Role updated",
+      "roleUpdateError": "Failed to update role",
+      "memberRemoved": "Member removed from workspace",
+      "memberRemoveError": "Failed to remove member",
+      "userAdded": "User added to workspace",
+      "userAddError": "Failed to add user"
+    }
+  },
+  "guestEditor": {
+    "hint": "Individual permissions override the default role. Screens without an override use the assigned role's permissions.",
+    "colScreen": "Screen",
+    "fromRole": "(role)",
+    "resetToRole": "Reset to role default",
+    "toast": {
+      "updateError": "Failed to update individual permission",
+      "reset": "Permissions reset to the role default",
+      "resetError": "Failed to reset permissions"
+    }
+  },
+  "invite": {
+    "emailLabel": "Guest email",
+    "emailPlaceholder": "email@example.com",
+    "roleLabel": "Role",
+    "submitting": "Sending...",
+    "submit": "Invite",
+    "toast": {
+      "sent": "Invitation sent to {{email}}",
+      "error": "Failed to send invitation"
+    }
+  },
+  "roles": {
+    "super_administrador": "Super Admin",
+    "administrador": "Administrator",
+    "operador": "Operator",
+    "visualizador": "Viewer"
+  },
+  "resources": {
+    "transactions": "Transactions",
+    "installments": "Installments",
+    "recurring": "Recurring",
+    "categories": "Categories",
+    "settings": "Settings",
+    "members": "Members",
+    "permissions": "Permissions"
+  },
+  "actionsShort": {
+    "can_read": "R",
+    "can_create": "C",
+    "can_update": "U",
+    "can_delete": "D"
+  },
+  "actionsLong": {
+    "can_read": "Read",
+    "can_create": "Create",
+    "can_update": "Edit",
+    "can_delete": "Delete"
+  }
+}

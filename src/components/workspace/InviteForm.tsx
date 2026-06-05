@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,6 +26,7 @@ interface InviteFormProps {
 }
 
 export function InviteForm({ onInvite }: InviteFormProps) {
+  const { t } = useTranslation(['permissions', 'common']);
   const [submitting, setSubmitting] = useState(false);
 
   const form = useForm<FormValues>({
@@ -36,10 +38,10 @@ export function InviteForm({ onInvite }: InviteFormProps) {
     setSubmitting(true);
     try {
       await onInvite(values.email, values.role);
-      toast.success(`Convite enviado para ${values.email}`);
+      toast.success(t('invite.toast.sent', { email: values.email }));
       form.reset();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao enviar convite');
+      toast.error(err instanceof Error ? err.message : t('invite.toast.error'));
     } finally {
       setSubmitting(false);
     }
@@ -50,21 +52,21 @@ export function InviteForm({ onInvite }: InviteFormProps) {
       <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <FormField control={form.control} name="email" render={({ field }) => (
           <FormItem className="flex-1">
-            <FormLabel>E-mail do convidado</FormLabel>
-            <FormControl><Input type="email" placeholder="email@exemplo.com" {...field} /></FormControl>
+            <FormLabel>{t('invite.emailLabel')}</FormLabel>
+            <FormControl><Input type="email" placeholder={t('invite.emailPlaceholder')} {...field} /></FormControl>
             <FormMessage />
           </FormItem>
         )} />
 
         <FormField control={form.control} name="role" render={({ field }) => (
           <FormItem className="w-44">
-            <FormLabel>Papel</FormLabel>
+            <FormLabel>{t('invite.roleLabel')}</FormLabel>
             <Select onValueChange={field.onChange} value={field.value}>
               <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
               <SelectContent>
-                <SelectItem value="administrador">Administrador</SelectItem>
-                <SelectItem value="operador">Operador</SelectItem>
-                <SelectItem value="visualizador">Visualizador</SelectItem>
+                <SelectItem value="administrador">{t('roles.administrador')}</SelectItem>
+                <SelectItem value="operador">{t('roles.operador')}</SelectItem>
+                <SelectItem value="visualizador">{t('roles.visualizador')}</SelectItem>
               </SelectContent>
             </Select>
             <FormMessage />
@@ -72,7 +74,7 @@ export function InviteForm({ onInvite }: InviteFormProps) {
         )} />
 
         <Button type="submit" disabled={submitting} className="self-end">
-          {submitting ? 'Enviando...' : 'Convidar'}
+          {submitting ? t('invite.submitting') : t('invite.submit')}
         </Button>
       </form>
     </Form>

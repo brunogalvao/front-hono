@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from '@tanstack/react-router';
 import { Download, Trash2, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +14,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 export default function AccountSettingsPage() {
+  const { t } = useTranslation(['account', 'common']);
   const navigate = useNavigate();
   const [exporting, setExporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -31,9 +33,9 @@ export default function AccountSettingsPage() {
       a.download = `finance-export-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast.success('Dados exportados com sucesso.');
+      toast.success(t('toast.exported'));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao exportar dados.');
+      toast.error(err instanceof Error ? err.message : t('toast.exportError'));
     } finally {
       setExporting(false);
     }
@@ -52,10 +54,10 @@ export default function AccountSettingsPage() {
       }
 
       await supabase.auth.signOut();
-      toast.success('Conta excluída com sucesso.');
+      toast.success(t('toast.deleted'));
       navigate({ to: '/login' });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao excluir conta.');
+      toast.error(err instanceof Error ? err.message : t('toast.deleteError'));
     } finally {
       setDeleting(false);
     }
@@ -64,23 +66,23 @@ export default function AccountSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Configurações da Conta</h1>
-        <p className="text-muted-foreground text-sm">Gerencie seus dados e conta</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Download className="h-4 w-4" />
-            Exportar meus dados
+            {t('export.title')}
           </CardTitle>
           <CardDescription>
-            Baixe um arquivo JSON com todos os seus dados pessoais conforme a LGPD.
+            {t('export.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={handleExport} disabled={exporting} variant="outline">
-            {exporting ? 'Exportando...' : 'Exportar dados'}
+            {exporting ? t('export.exporting') : t('export.button')}
           </Button>
         </CardContent>
       </Card>
@@ -100,10 +102,10 @@ export default function AccountSettingsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base text-destructive">
             <Trash2 className="h-4 w-4" />
-            Zona de Perigo
+            {t('danger.title')}
           </CardTitle>
           <CardDescription>
-            A exclusão da conta é permanente e irrevogável. Todos os seus dados pessoais serão apagados.
+            {t('danger.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -112,7 +114,7 @@ export default function AccountSettingsPage() {
             onClick={() => setDeleteOpen(true)}
             disabled={deleting}
           >
-            Excluir minha conta
+            {t('danger.button')}
           </Button>
         </CardContent>
       </Card>
@@ -120,19 +122,19 @@ export default function AccountSettingsPage() {
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir conta permanentemente?</AlertDialogTitle>
+            <AlertDialogTitle>{t('delete.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. Todos os seus dados pessoais serão removidos. Transações do workspace serão preservadas sem autoria.
+              {t('delete.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={handleDelete}
               disabled={deleting}
             >
-              {deleting ? 'Excluindo...' : 'Sim, excluir minha conta'}
+              {deleting ? t('delete.deleting') : t('delete.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

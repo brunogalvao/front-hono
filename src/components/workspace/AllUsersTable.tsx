@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Shield, UserMinus, UserPlus } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -43,12 +44,12 @@ import { useWorkspaceMembers } from '@/hooks/useWorkspaceMembers';
 import type { AppUser } from '@/hooks/useAllAppUsers';
 import type { WorkspaceRole } from '@/context/WorkspaceContext';
 
-const ROLE_LABELS: Record<WorkspaceRole, string> = {
-  super_administrador: 'Super Admin',
-  administrador: 'Administrador',
-  operador: 'Operador',
-  visualizador: 'Visualizador',
-};
+const ROLE_KEYS: WorkspaceRole[] = [
+  'super_administrador',
+  'administrador',
+  'operador',
+  'visualizador',
+];
 
 interface AllUsersTableProps {
   users: AppUser[] | undefined;
@@ -65,6 +66,7 @@ export function AllUsersTable({
   workspaceId,
   isSuperAdmin = false,
 }: AllUsersTableProps) {
+  const { t } = useTranslation(['permissions', 'common']);
   const queryClient = useQueryClient();
   const { updateRole, removeMember } = useWorkspaceMembers(workspaceId);
   const [removeTarget, setRemoveTarget] = useState<AppUser | null>(null);
@@ -96,9 +98,9 @@ export function AllUsersTable({
     try {
       await updateRole.mutateAsync({ memberId, role });
       invalidateAll();
-      toast.success('Papel atualizado');
+      toast.success(t('allUsers.toast.roleUpdated'));
     } catch {
-      toast.error('Erro ao atualizar papel');
+      toast.error(t('allUsers.toast.roleUpdateError'));
     }
   };
 
@@ -107,9 +109,9 @@ export function AllUsersTable({
     try {
       await removeMember.mutateAsync(removeTarget.memberId);
       invalidateAll();
-      toast.success('Membro removido do workspace');
+      toast.success(t('allUsers.toast.memberRemoved'));
     } catch {
-      toast.error('Erro ao remover membro');
+      toast.error(t('allUsers.toast.memberRemoveError'));
     }
     setRemoveTarget(null);
   };
@@ -118,9 +120,9 @@ export function AllUsersTable({
     if (!addTarget) return;
     try {
       await addMember.mutateAsync({ userId: addTarget.profile.id, role: selectedRole });
-      toast.success('Usuário adicionado ao workspace');
+      toast.success(t('allUsers.toast.userAdded'));
     } catch {
-      toast.error('Erro ao adicionar usuário');
+      toast.error(t('allUsers.toast.userAddError'));
     }
     setAddTarget(null);
     setSelectedRole('visualizador');
@@ -163,15 +165,15 @@ export function AllUsersTable({
                     <TooltipTrigger asChild>
                       <span>
                         <Badge variant="secondary" className="text-xs">
-                          {ROLE_LABELS[role!]}
+                          {t(`roles.${role!}`, { defaultValue: role! })}
                         </Badge>
                       </span>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>
                         {isSelf
-                          ? 'Você não pode alterar seu próprio papel'
-                          : 'Apenas o Super Admin pode alterar papéis'}
+                          ? t('allUsers.cannotChangeOwnRole')
+                          : t('allUsers.onlySuperAdminCanChangeRoles')}
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -184,19 +186,17 @@ export function AllUsersTable({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(ROLE_LABELS)
-                        .filter(([k]) => k !== 'super_administrador')
-                        .map(([k, v]) => (
-                          <SelectItem key={k} value={k} className="text-xs">
-                            {v}
-                          </SelectItem>
-                        ))}
+                      {ROLE_KEYS.filter((k) => k !== 'super_administrador').map((k) => (
+                        <SelectItem key={k} value={k} className="text-xs">
+                          {t(`roles.${k}`, { defaultValue: k })}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 )
               ) : (
                 <Badge variant="outline" className="text-xs text-muted-foreground shrink-0">
-                  Sem acesso
+                  {t('allUsers.noAccess')}
                 </Badge>
               )}
 
@@ -208,7 +208,7 @@ export function AllUsersTable({
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 shrink-0"
-                      title="Permissões individuais"
+                      title={t('allUsers.individualPermissions')}
                       onClick={() => setPermissionsTarget(user)}
                     >
                       <Shield className="h-4 w-4" />
@@ -244,7 +244,7 @@ export function AllUsersTable({
 
         {(users ?? []).length === 0 && (
           <p className="text-muted-foreground text-sm text-center py-4">
-            Nenhum usuário encontrado
+            {t('allUsers.empty')}
           </p>
         )}
       </div>
@@ -253,19 +253,20 @@ export function AllUsersTable({
       <AlertDialog open={!!removeTarget} onOpenChange={(open) => !open && setRemoveTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remover membro?</AlertDialogTitle>
+            <AlertDialogTitle>{t('allUsers.removeTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {removeTarget?.profile.full_name ?? removeTarget?.profile.email} perderá acesso ao
-              workspace. A conta permanece ativa na aplicação.
+              {t('allUsers.removeDescription', {
+                name: removeTarget?.profile.full_name ?? removeTarget?.profile.email,
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={handleRemove}
             >
-              Remover
+              {t('allUsers.remove')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -275,11 +276,14 @@ export function AllUsersTable({
       <AlertDialog open={!!addTarget} onOpenChange={(open) => !open && setAddTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Adicionar ao workspace</AlertDialogTitle>
+            <AlertDialogTitle>{t('allUsers.addTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Selecione o papel de{' '}
-              <strong>{addTarget?.profile.full_name ?? addTarget?.profile.email}</strong> no
-              workspace.
+              <Trans
+                ns="permissions"
+                i18nKey="allUsers.addDescription"
+                values={{ name: addTarget?.profile.full_name ?? addTarget?.profile.email }}
+                components={{ strong: <strong /> }}
+              />
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="px-4 pb-2">
@@ -291,19 +295,17 @@ export function AllUsersTable({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(ROLE_LABELS)
-                  .filter(([k]) => k !== 'super_administrador')
-                  .map(([k, v]) => (
-                    <SelectItem key={k} value={k}>
-                      {v}
-                    </SelectItem>
-                  ))}
+                {ROLE_KEYS.filter((k) => k !== 'super_administrador').map((k) => (
+                  <SelectItem key={k} value={k}>
+                    {t(`roles.${k}`, { defaultValue: k })}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleAddToWorkspace}>Adicionar</AlertDialogAction>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleAddToWorkspace}>{t('allUsers.add')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -316,12 +318,11 @@ export function AllUsersTable({
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>
-              Permissões individuais —{' '}
-              {permissionsTarget?.profile.full_name ?? permissionsTarget?.profile.email}
+              {t('allUsers.guestDialogTitle', {
+                name: permissionsTarget?.profile.full_name ?? permissionsTarget?.profile.email,
+              })}
             </DialogTitle>
-            <DialogDescription>
-              Configure permissões específicas para este usuário, sobrescrevendo as do papel padrão.
-            </DialogDescription>
+            <DialogDescription>{t('allUsers.guestDialogDescription')}</DialogDescription>
           </DialogHeader>
           {permissionsTarget && (
             <GuestPermissionEditor

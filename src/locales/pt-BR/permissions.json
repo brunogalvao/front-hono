@@ -1,0 +1,90 @@
+{
+  "page": {
+    "titleSuperAdmin": "Gerenciamento de Permissões",
+    "titleAdmin": "Gerenciamento de Membros",
+    "subtitleSuperAdmin": "Gerencie o acesso e os papéis dos usuários no workspace",
+    "subtitleAdmin": "Convide e remova membros do workspace",
+    "accessDenied": "Acesso restrito"
+  },
+  "matrix": {
+    "title": "Matriz de permissões por papel",
+    "description": "Configure quais operações (Ler, Criar, Atualizar, Excluir) cada papel pode executar em cada tela. Mudanças são aplicadas imediatamente para todos os membros.",
+    "colScreen": "Tela",
+    "updateError": "Erro ao atualizar permissão"
+  },
+  "allUsers": {
+    "title": "Usuários da aplicação",
+    "description": "Todos os usuários cadastrados — membros do workspace e usuários sem acesso",
+    "inviteByEmail": "Convidar por e-mail",
+    "noAccess": "Sem acesso",
+    "empty": "Nenhum usuário encontrado",
+    "individualPermissions": "Permissões individuais",
+    "cannotChangeOwnRole": "Você não pode alterar seu próprio papel",
+    "onlySuperAdminCanChangeRoles": "Apenas o Super Admin pode alterar papéis",
+    "removeTitle": "Remover membro?",
+    "removeDescription": "{{name}} perderá acesso ao workspace. A conta permanece ativa na aplicação.",
+    "remove": "Remover",
+    "addTitle": "Adicionar ao workspace",
+    "addDescription": "Selecione o papel de <strong>{{name}}</strong> no workspace.",
+    "add": "Adicionar",
+    "guestDialogTitle": "Permissões individuais — {{name}}",
+    "guestDialogDescription": "Configure permissões específicas para este usuário, sobrescrevendo as do papel padrão.",
+    "toast": {
+      "roleUpdated": "Papel atualizado",
+      "roleUpdateError": "Erro ao atualizar papel",
+      "memberRemoved": "Membro removido do workspace",
+      "memberRemoveError": "Erro ao remover membro",
+      "userAdded": "Usuário adicionado ao workspace",
+      "userAddError": "Erro ao adicionar usuário"
+    }
+  },
+  "guestEditor": {
+    "hint": "Permissões individuais sobrepõem as do papel padrão. Telas sem override usam as permissões do papel atribuído.",
+    "colScreen": "Tela",
+    "fromRole": "(papel)",
+    "resetToRole": "Resetar para padrão do papel",
+    "toast": {
+      "updateError": "Erro ao atualizar permissão individual",
+      "reset": "Permissões resetadas para o padrão do papel",
+      "resetError": "Erro ao resetar permissões"
+    }
+  },
+  "invite": {
+    "emailLabel": "E-mail do convidado",
+    "emailPlaceholder": "email@exemplo.com",
+    "roleLabel": "Papel",
+    "submitting": "Enviando...",
+    "submit": "Convidar",
+    "toast": {
+      "sent": "Convite enviado para {{email}}",
+      "error": "Erro ao enviar convite"
+    }
+  },
+  "roles": {
+    "super_administrador": "Super Admin",
+    "administrador": "Administrador",
+    "operador": "Operador",
+    "visualizador": "Visualizador"
+  },
+  "resources": {
+    "transactions": "Transações",
+    "installments": "Parcelamentos",
+    "recurring": "Recorrências",
+    "categories": "Categorias",
+    "settings": "Configurações",
+    "members": "Membros",
+    "permissions": "Permissões"
+  },
+  "actionsShort": {
+    "can_read": "R",
+    "can_create": "C",
+    "can_update": "U",
+    "can_delete": "D"
+  },
+  "actionsLong": {
+    "can_read": "Ler",
+    "can_create": "Criar",
+    "can_update": "Editar",
+    "can_delete": "Excluir"
+  }
+}

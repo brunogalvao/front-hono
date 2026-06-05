@@ -1,0 +1,27 @@
+{
+  "title": "Configurações da Conta",
+  "subtitle": "Gerencie seus dados e conta",
+  "export": {
+    "title": "Exportar meus dados",
+    "description": "Baixe um arquivo JSON com todos os seus dados pessoais conforme a LGPD.",
+    "button": "Exportar dados",
+    "exporting": "Exportando..."
+  },
+  "danger": {
+    "title": "Zona de Perigo",
+    "description": "A exclusão da conta é permanente e irrevogável. Todos os seus dados pessoais serão apagados.",
+    "button": "Excluir minha conta"
+  },
+  "delete": {
+    "title": "Excluir conta permanentemente?",
+    "description": "Esta ação não pode ser desfeita. Todos os seus dados pessoais serão removidos. Transações do workspace serão preservadas sem autoria.",
+    "confirm": "Sim, excluir minha conta",
+    "deleting": "Excluindo..."
+  },
+  "toast": {
+    "exported": "Dados exportados com sucesso.",
+    "exportError": "Erro ao exportar dados.",
+    "deleted": "Conta excluída com sucesso.",
+    "deleteError": "Erro ao excluir conta."
+  }
+}

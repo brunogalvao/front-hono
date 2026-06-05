@@ -14,6 +14,8 @@ import type insights from '@/locales/pt-BR/insights.json';
 import type transactions from '@/locales/pt-BR/transactions.json';
 import type recurring from '@/locales/pt-BR/recurring.json';
 import type workspace from '@/locales/pt-BR/workspace.json';
+import type account from '@/locales/pt-BR/account.json';
+import type permissions from '@/locales/pt-BR/permissions.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -35,6 +37,8 @@ declare module 'i18next' {
       transactions: typeof transactions;
       recurring: typeof recurring;
       workspace: typeof workspace;
+      account: typeof account;
+      permissions: typeof permissions;
     };
   }
 }

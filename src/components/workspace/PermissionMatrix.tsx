@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -8,24 +9,23 @@ import { toast } from 'sonner';
 import { useRolePermissions, type RolePermission } from '@/hooks/useRolePermissions';
 import type { PermissionResource } from '@/lib/permissions';
 
-const ROLES: Array<{ key: RolePermission['role']; label: string }> = [
-  { key: 'administrador', label: 'Administrador' },
-  { key: 'operador', label: 'Operador' },
-  { key: 'visualizador', label: 'Visualizador' },
+const ROLE_KEYS: Array<RolePermission['role']> = [
+  'administrador',
+  'operador',
+  'visualizador',
 ];
 
-const RESOURCES: Array<{ key: PermissionResource; label: string }> = [
-  { key: 'transactions', label: 'Transações' },
-  { key: 'installments', label: 'Parcelamentos' },
-  { key: 'recurring', label: 'Recorrências' },
-  { key: 'categories', label: 'Categorias' },
-  { key: 'settings', label: 'Configurações' },
-  { key: 'members', label: 'Membros' },
-  { key: 'permissions', label: 'Permissões' },
+const RESOURCE_KEYS: PermissionResource[] = [
+  'transactions',
+  'installments',
+  'recurring',
+  'categories',
+  'settings',
+  'members',
+  'permissions',
 ];
 
 const ACTIONS = ['can_read', 'can_create', 'can_update', 'can_delete'] as const;
-const ACTION_LABELS = { can_read: 'R', can_create: 'C', can_update: 'U', can_delete: 'D' };
 
 interface PermissionMatrixProps {
   workspaceId: string;
@@ -33,6 +33,7 @@ interface PermissionMatrixProps {
 }
 
 export function PermissionMatrix({ workspaceId, currentUserId }: PermissionMatrixProps) {
+  const { t } = useTranslation(['permissions', 'common']);
   const { data: permissions = [], isLoading, upsert } = useRolePermissions(workspaceId);
 
   // Index by `${role}__${resource}` for O(1) lookup
@@ -66,7 +67,7 @@ export function PermissionMatrix({ workspaceId, currentUserId }: PermissionMatri
         updated_by: currentUserId,
       });
     } catch {
-      toast.error('Erro ao atualizar permissão');
+      toast.error(t('matrix.updateError'));
     }
   };
 
@@ -85,47 +86,49 @@ export function PermissionMatrix({ workspaceId, currentUserId }: PermissionMatri
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-40">Tela</TableHead>
-            {ROLES.map((role) => (
-              <TableHead key={role.key} colSpan={4} className="text-center border-l">
-                {role.label}
+            <TableHead className="w-40">{t('matrix.colScreen')}</TableHead>
+            {ROLE_KEYS.map((role) => (
+              <TableHead key={role} colSpan={4} className="text-center border-l">
+                {t(`roles.${role}`, { defaultValue: role })}
               </TableHead>
             ))}
           </TableRow>
           <TableRow>
             <TableHead />
-            {ROLES.map((role) =>
+            {ROLE_KEYS.map((role) =>
               ACTIONS.map((action) => (
                 <TableHead
-                  key={`${role.key}-${action}`}
+                  key={`${role}-${action}`}
                   className="text-center text-xs font-mono w-10 border-l first:border-l-0"
                 >
-                  {ACTION_LABELS[action]}
+                  {t(`actionsShort.${action}`, { defaultValue: action })}
                 </TableHead>
               )),
             )}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {RESOURCES.map((resource) => (
-            <TableRow key={resource.key}>
-              <TableCell className="font-medium">{resource.label}</TableCell>
-              {ROLES.map((role) =>
+          {RESOURCE_KEYS.map((resource) => (
+            <TableRow key={resource}>
+              <TableCell className="font-medium">
+                {t(`resources.${resource}`, { defaultValue: resource })}
+              </TableCell>
+              {ROLE_KEYS.map((role) =>
                 ACTIONS.map((action) => {
-                  const perm = matrix.get(`${role.key}__${resource.key}`);
+                  const perm = matrix.get(`${role}__${resource}`);
                   const checked = perm?.[action] ?? false;
                   // Lock permissions resource for non-superuser editing
-                  const locked = resource.key === 'permissions';
+                  const locked = resource === 'permissions';
                   return (
                     <TableCell
-                      key={`${role.key}-${resource.key}-${action}`}
+                      key={`${role}-${resource}-${action}`}
                       className="text-center border-l first:border-l-0"
                     >
                       <Checkbox
                         checked={checked}
                         disabled={locked || upsert.isPending}
                         onCheckedChange={(value) =>
-                          handleToggle(role.key, resource.key, action, value === true)
+                          handleToggle(role, resource, action, value === true)
                         }
                       />
                     </TableCell>

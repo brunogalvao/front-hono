@@ -1,0 +1,27 @@
+{
+  "title": "Account Settings",
+  "subtitle": "Manage your data and account",
+  "export": {
+    "title": "Export my data",
+    "description": "Download a JSON file with all your personal data in compliance with data protection laws.",
+    "button": "Export data",
+    "exporting": "Exporting..."
+  },
+  "danger": {
+    "title": "Danger Zone",
+    "description": "Account deletion is permanent and irreversible. All your personal data will be erased.",
+    "button": "Delete my account"
+  },
+  "delete": {
+    "title": "Permanently delete account?",
+    "description": "This action cannot be undone. All your personal data will be removed. Workspace transactions will be preserved without authorship.",
+    "confirm": "Yes, delete my account",
+    "deleting": "Deleting..."
+  },
+  "toast": {
+    "exported": "Data exported successfully.",
+    "exportError": "Error exporting data.",
+    "deleted": "Account deleted successfully.",
+    "deleteError": "Error deleting account."
+  }
+}
