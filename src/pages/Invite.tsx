@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
+import { useTranslation, Trans } from 'react-i18next';
 import { toast } from 'sonner';
 import { Users, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
@@ -12,6 +13,7 @@ import { acceptInvite } from '@/service/invite/acceptInvite';
 type Status = 'loading' | 'ready' | 'error' | 'accepted';
 
 export default function Invite() {
+  const { t } = useTranslation('invite');
   const { token } = useParams({ strict: false }) as { token: string };
   const navigate = useNavigate();
 
@@ -48,7 +50,7 @@ export default function Invite() {
     try {
       await acceptInvite(token);
       setStatus('accepted');
-      toast.success('Bem-vindo ao grupo!');
+      toast.success(t('welcome'));
       setTimeout(() => navigate({ to: '/admin/groups' }), 1500);
     } catch (err: any) {
       toast.error(err.message);
@@ -76,14 +78,14 @@ export default function Invite() {
           <>
             <CardHeader className="text-center pb-2">
               <XCircle className="size-12 mx-auto text-destructive mb-2" />
-              <CardTitle className="text-lg">Convite inválido</CardTitle>
+              <CardTitle className="text-lg">{t('invalidTitle')}</CardTitle>
             </CardHeader>
             <CardContent className="text-center text-muted-foreground text-sm">
               {errorMsg}
             </CardContent>
             <CardFooter className="justify-center">
               <Button variant="outline" onClick={() => navigate({ to: '/' })}>
-                Voltar ao início
+                {t('backHome')}
               </Button>
             </CardFooter>
           </>
@@ -95,23 +97,22 @@ export default function Invite() {
               <div className="size-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Users className="size-7 text-primary" />
               </div>
-              <CardTitle className="text-xl">Convite para o Finance</CardTitle>
+              <CardTitle className="text-xl">{t('title')}</CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-2 pb-2">
               <p className="text-muted-foreground text-sm">
-                Você foi convidado para colaborar no grupo
+                {t('subtitle')}
               </p>
               <p className="text-xl font-semibold">"{invite.group.name}"</p>
               <p className="text-xs text-muted-foreground mt-3">
-                Com acesso ao grupo você pode visualizar e adicionar{' '}
-                <strong>despesas, rendimentos e compras a prazo</strong> em conjunto.
+                <Trans ns="invite" i18nKey="description" components={{ bold: <strong /> }} />
               </p>
             </CardContent>
             <CardFooter className="flex flex-col gap-2">
               {session === null ? (
                 <Button disabled className="w-full">
                   <Loader2 className="size-4 animate-spin mr-2" />
-                  Verificando sessão...
+                  {t('checkingSession')}
                 </Button>
               ) : session ? (
                 <Button
@@ -122,21 +123,21 @@ export default function Invite() {
                   {accepting ? (
                     <>
                       <Loader2 className="size-4 animate-spin mr-2" />
-                      Aceitando...
+                      {t('accepting')}
                     </>
                   ) : (
-                    'Aceitar convite'
+                    t('accept')
                   )}
                 </Button>
               ) : (
                 <>
                   <Button onClick={handleLogin} className="w-full">
-                    Fazer login para aceitar
+                    {t('loginToAccept')}
                   </Button>
                   <p className="text-xs text-muted-foreground text-center">
-                    Não tem conta?{' '}
+                    {t('noAccount')}{' '}
                     <a href="/login" className="underline underline-offset-2">
-                      Criar conta
+                      {t('createAccount')}
                     </a>
                   </p>
                 </>
@@ -149,10 +150,10 @@ export default function Invite() {
           <>
             <CardHeader className="text-center pb-2">
               <CheckCircle className="size-12 mx-auto text-green-500 mb-2" />
-              <CardTitle className="text-lg">Convite aceito!</CardTitle>
+              <CardTitle className="text-lg">{t('acceptedTitle')}</CardTitle>
             </CardHeader>
             <CardContent className="text-center text-muted-foreground text-sm">
-              Redirecionando para o grupo...
+              {t('redirecting')}
             </CardContent>
           </>
         )}

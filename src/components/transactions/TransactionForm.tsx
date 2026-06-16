@@ -35,7 +35,7 @@ import { toast } from 'sonner';
 
 const schema = z.object({
   type: z.enum(['receita', 'despesa']),
-  status: z.enum(['pago', 'pendente']),
+  status: z.enum(['pago', 'pendente', 'recebido']),
   amount: z.coerce.number().positive('Valor deve ser maior que zero'),
   date: z.string().min(1, 'Data obrigatória'),
   category_id: z.string().optional().nullable(),
@@ -101,6 +101,15 @@ export function TransactionForm({
   const selectedType = form.watch('type');
   const filteredCategories = categories.filter((c) => c.type === selectedType);
 
+  // Auto-set status based on type
+  useEffect(() => {
+    if (selectedType === 'receita') {
+      form.setValue('status', 'recebido');
+    } else if (form.getValues('status') === 'recebido') {
+      form.setValue('status', 'pendente');
+    }
+  }, [selectedType, form]);
+
   const handleSubmit = async (values: FormValues) => {
     if (!activeWorkspaceId) return;
     setSubmitting(true);
@@ -153,35 +162,37 @@ export function TransactionForm({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('form.status')}</FormLabel>
-                  <div className="flex gap-2">
-                    {(['pendente', 'pago'] as const).map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => field.onChange(s)}
-                        className={cn(
-                          'flex-1 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors',
-                          field.value === s
-                            ? s === 'pago'
-                              ? 'border-green-500 bg-green-500/10 text-green-600 dark:text-green-400'
-                              : 'border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                            : 'border-border text-muted-foreground hover:bg-muted',
-                        )}
-                      >
-                        {s === 'pago' ? t('status.pago') : t('status.pendente')}
-                      </button>
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {selectedType === 'despesa' && (
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('form.status')}</FormLabel>
+                    <div className="flex gap-2">
+                      {(['pendente', 'pago'] as const).map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => field.onChange(s)}
+                          className={cn(
+                            'flex-1 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors',
+                            field.value === s
+                              ? s === 'pago'
+                                ? 'border-green-500 bg-green-500/10 text-green-600 dark:text-green-400'
+                                : 'border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                              : 'border-border text-muted-foreground hover:bg-muted',
+                          )}
+                        >
+                          {s === 'pago' ? t('status.pago') : t('status.pendente')}
+                        </button>
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}

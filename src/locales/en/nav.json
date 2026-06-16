@@ -6,5 +6,7 @@
   "history": "History",
   "advisor": "AI Advisor",
   "groups": "Group",
-  "profile": "Profile"
+  "profile": "Profile",
+  "logout": "Sign out",
+  "loggingOut": "Signing out"
 }

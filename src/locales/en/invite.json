@@ -1,0 +1,26 @@
+{
+  "title": "Invitation to Finance",
+  "subtitle": "You've been invited to collaborate on the group",
+  "description": "With group access you can view and add <bold>expenses, income and installment purchases</bold> together.",
+  "invalidTitle": "Invalid invitation",
+  "backHome": "Back to home",
+  "checkingSession": "Checking session...",
+  "accepting": "Accepting...",
+  "accept": "Accept invitation",
+  "loginToAccept": "Log in to accept",
+  "noAccount": "Don't have an account?",
+  "createAccount": "Create account",
+  "acceptedTitle": "Invitation accepted!",
+  "redirecting": "Redirecting to the group...",
+  "welcome": "Welcome to the group!",
+  "page": {
+    "noToken": "Invitation token not found.",
+    "expiredMessage": "This invitation has expired. Request a new invitation from the workspace administrator.",
+    "processing": "Processing invitation...",
+    "expiredTitle": "Invitation expired",
+    "errorTitle": "Error accepting invitation",
+    "processingDesc": "Please wait while we process your invitation.",
+    "successDesc": "Welcome to the workspace! Redirecting...",
+    "goToLogin": "Go to login"
+  }
+}

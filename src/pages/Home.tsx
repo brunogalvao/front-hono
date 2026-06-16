@@ -31,7 +31,13 @@ import { useState, useEffect } from 'react';
 
 const ICONS = { Clock7, Bell, Heart, Cog, BellOff, RefreshCcw } as const;
 
-type CardKey = 'register' | 'deadlines' | 'history' | 'insights' | 'alerts' | 'sync';
+type CardKey =
+  | 'register'
+  | 'deadlines'
+  | 'history'
+  | 'insights'
+  | 'alerts'
+  | 'sync';
 
 const CARD_ICONS: { key: CardKey; icon: keyof typeof ICONS }[] = [
   { key: 'register', icon: 'Clock7' },
@@ -73,12 +79,14 @@ function Home() {
           id="home"
           className="flex min-h-[calc(100vh-56px)] flex-col justify-center gap-12 md:flex-row md:items-center"
         >
-          <div className="flex w-full flex-col gap-4 md:w-[60%]">
+          <div className="flex w-full flex-col gap-1 md:w-[60%] md:gap-4">
             <GsapHeroTitle
-              className="w-full text-7xl font-bold md:text-8xl"
+              className="w-full text-5xl font-bold md:text-8xl"
               text={t('hero.title')}
             />
-            <p className="text-muted-foreground text-lg">{t('hero.headline')}</p>
+            <p className="text-muted-foreground text-sm md:text-lg">
+              {t('hero.headline')}
+            </p>
 
             <div className="mt-2 flex flex-col gap-4">
               <Link
@@ -127,7 +135,9 @@ function Home() {
           <div className="text-center">
             <SectionLabel>{t('features.label')}</SectionLabel>
             <h2 className="text-3xl font-bold">{t('features.title')}</h2>
-            <p className="text-muted-foreground mt-2 text-base">{t('features.description')}</p>
+            <p className="text-muted-foreground mt-2 text-base">
+              {t('features.description')}
+            </p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -141,17 +151,26 @@ function Home() {
                     initial={{ x: isLeft ? '-30%' : '30%', opacity: 0 }}
                     whileInView={{ x: '0%', opacity: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 1.2, ease: 'easeInOut', delay: idx * 0.05 }}
+                    transition={{
+                      duration: 1.2,
+                      ease: 'easeInOut',
+                      delay: idx * 0.05,
+                    }}
                   >
                     <Card data-value={key} className="bg-transparent">
                       <CardContent>
                         <AnimateIcon animateOnHover>
                           <CardTitle className="mb-4 flex flex-row items-center gap-3">
-                            <IconComponent className="text-primary size-8" animate="default" />
+                            <IconComponent
+                              className="text-primary size-8"
+                              animate="default"
+                            />
                             {t(`features.cards.${key}.title`)}
                           </CardTitle>
                         </AnimateIcon>
-                        <CardDescription>{t(`features.cards.${key}.description`)}</CardDescription>
+                        <CardDescription>
+                          {t(`features.cards.${key}.description`)}
+                        </CardDescription>
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -169,7 +188,9 @@ function Home() {
           <div className="text-center">
             <SectionLabel>{t('stats.label')}</SectionLabel>
             <h2 className="text-3xl font-bold">{t('stats.title')}</h2>
-            <p className="text-muted-foreground mt-2 text-base">{t('stats.subtitle')}</p>
+            <p className="text-muted-foreground mt-2 text-base">
+              {t('stats.subtitle')}
+            </p>
           </div>
 
           <StatsSection />
@@ -190,8 +211,12 @@ function Home() {
                       {t(`testimonials.items.${key}.text`)}
                     </p>
                     <div className="mt-auto">
-                      <p className="text-sm font-semibold">{t(`testimonials.items.${key}.name`)}</p>
-                      <p className="text-muted-foreground text-xs">{t(`testimonials.items.${key}.role`)}</p>
+                      <p className="text-sm font-semibold">
+                        {t(`testimonials.items.${key}.name`)}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {t(`testimonials.items.${key}.role`)}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -213,12 +238,19 @@ function Home() {
           <div className="from-background via-background/50 absolute inset-0 rounded-2xl bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,transparent_30%,var(--tw-gradient-stops))]" />
 
           <div className="relative z-10 flex flex-col items-center gap-6 text-center">
-            <span className="text-foreground text-3xl font-bold">{t('cta.title')}</span>
-            <p className="text-muted-foreground max-w-md text-sm">{t('cta.subtitle')}</p>
+            <span className="text-foreground text-3xl font-bold">
+              {t('cta.title')}
+            </span>
+            <p className="text-muted-foreground max-w-md text-sm">
+              {t('cta.subtitle')}
+            </p>
 
             <ul className="flex flex-col gap-2">
               {BENEFIT_KEYS.map((key) => (
-                <li key={key} className="text-muted-foreground flex items-center gap-2 text-sm">
+                <li
+                  key={key}
+                  className="text-muted-foreground flex items-center gap-2 text-sm"
+                >
                   <CheckCircle2 className="text-primary size-4 shrink-0" />
                   {t(`cta.benefits.${key}`)}
                 </li>

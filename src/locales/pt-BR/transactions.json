@@ -10,6 +10,7 @@
   "status": {
     "pago": "Pago",
     "pendente": "Pendente",
+    "recebido": "Recebido",
     "markPaid": "Marcar como pago",
     "markPending": "Marcar como pendente"
   },

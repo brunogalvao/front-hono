@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 
 const AuthCallback = () => {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,7 +39,7 @@ const AuthCallback = () => {
     <div className="flex min-h-screen items-center justify-center">
       <div className="flex flex-col items-center gap-4">
         <div className="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent" />
-        <p className="text-muted-foreground text-sm">Autenticando...</p>
+        <p className="text-muted-foreground text-sm">{t('authenticating')}</p>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   flexRender,
@@ -23,8 +23,10 @@ import {
 import { TransactionTableSkeleton } from './TransactionTableSkeleton';
 import { TransactionForm } from './TransactionForm';
 import { getTransactionColumns } from './transaction-columns';
+import { TrendingUp, CircleCheck, Clock } from 'lucide-react';
 import { useTransactions, type Transaction, type TransactionStatus } from '@/hooks/useTransactions';
 import { useWorkspace } from '@/context/WorkspaceContext';
+import { formatToBRL } from '@/utils/format';
 import { toast } from 'sonner';
 
 interface TransactionTableProps {
@@ -41,7 +43,6 @@ export function TransactionTable({
   onCategoryFilterChange,
 }: TransactionTableProps) {
   const { t } = useTranslation('transactions');
-  const columns = getTransactionColumns(t);
   const { activeWorkspaceId } = useWorkspace();
   const { data: transactions = [], isLoading, update, remove } = useTransactions(
     activeWorkspaceId,
@@ -50,18 +51,28 @@ export function TransactionTable({
   );
   const [editTarget, setEditTarget] = useState<Transaction | null>(null);
 
-  const categories = Array.from(
+  const columns = useMemo(() => getTransactionColumns(t), [t]);
+
+  const totals = useMemo(() => ({
+    pago: transactions.filter((tx) => tx.status === 'pago').reduce((s, tx) => s + tx.amount, 0),
+    pendente: transactions.filter((tx) => tx.status === 'pendente').reduce((s, tx) => s + tx.amount, 0),
+    recebido: transactions.filter((tx) => tx.status === 'recebido').reduce((s, tx) => s + tx.amount, 0),
+  }), [transactions]);
+
+  const categories = useMemo(() => Array.from(
     new Map(
       transactions
-        .filter((t) => t.categories)
-        .map((t) => [t.categories!.id, t.categories!]),
+        .filter((tx) => tx.categories)
+        .map((tx) => [tx.categories!.id, tx.categories!]),
     ).values(),
-  );
+  ), [transactions]);
 
-  const filtered =
+  const filtered = useMemo(() =>
     categoryFilter === 'all'
       ? transactions
-      : transactions.filter((t) => t.category_id === categoryFilter);
+      : transactions.filter((tx) => tx.category_id === categoryFilter),
+    [transactions, categoryFilter],
+  );
 
   const handleToggleStatus = async (id: string, status: TransactionStatus) => {
     try {
@@ -102,23 +113,50 @@ export function TransactionTable({
 
   return (
     <div className="space-y-4">
-      {categories.length > 0 && (
-        <div className="flex items-center gap-2">
-          <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder={t('table.filterByCategory')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('table.allCategories')}</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="flex items-center justify-between gap-4">
+
+        {/* Esquerda: filtro | recebido */}
+        <div className="flex items-center gap-3">
+          {categories.length > 0 && (
+            <>
+              <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder={t('table.filterByCategory')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('table.allCategories')}</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="h-5 w-px bg-border shrink-0" />
+            </>
+          )}
+          <div className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium bg-green-500/15 text-green-600 dark:text-green-400">
+            <TrendingUp className="h-4 w-4 shrink-0" />
+            <span>{t('status.recebido')}</span>
+            <span className="tabular-nums font-semibold">{formatToBRL(totals.recebido)}</span>
+          </div>
         </div>
-      )}
+
+        {/* Direita: pago + pendente empilhados */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium bg-green-500/15 text-green-600 dark:text-green-400">
+            <CircleCheck className="h-4 w-4 shrink-0" />
+            <span>{t('status.pago')}</span>
+            <span className="tabular-nums font-semibold">{formatToBRL(totals.pago)}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium bg-amber-500/15 text-amber-600 dark:text-amber-400">
+            <Clock className="h-4 w-4 shrink-0" />
+            <span>{t('status.pendente')}</span>
+            <span className="tabular-nums font-semibold">{formatToBRL(totals.pendente)}</span>
+          </div>
+        </div>
+
+      </div>
 
       {filtered.length === 0 ? (
         <div className="text-muted-foreground py-12 text-center">

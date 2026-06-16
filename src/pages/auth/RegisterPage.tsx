@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { useTranslation, Trans } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 
 export default function RegisterPage() {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +21,7 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!lgpdConsent) {
-      toast.error('Você precisa aceitar os termos de privacidade para continuar.');
+      toast.error(t('register.errors.lgpdRequired'));
       return;
     }
     setLoading(true);
@@ -35,10 +37,10 @@ export default function RegisterPage() {
         },
       });
       if (error) throw error;
-      toast.success('Conta criada! Verifique seu e-mail para confirmar.');
+      toast.success(t('register.created'));
       navigate({ to: '/login' });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao criar conta.');
+      toast.error(err instanceof Error ? err.message : t('register.errors.createFailed'));
     } finally {
       setLoading(false);
     }
@@ -48,40 +50,40 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Criar conta</CardTitle>
-          <CardDescription>Crie sua conta para gerenciar suas finanças</CardDescription>
+          <CardTitle>{t('register.title')}</CardTitle>
+          <CardDescription>{t('register.description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fullName">Nome completo</Label>
+              <Label htmlFor="fullName">{t('register.fullName')}</Label>
               <Input
                 id="fullName"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Seu nome"
+                placeholder={t('register.fullNamePlaceholder')}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="email">{t('register.email')}</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
+                placeholder={t('register.emailPlaceholder')}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password">{t('register.password')}</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mínimo 8 caracteres"
+                placeholder={t('register.passwordPlaceholder')}
                 minLength={8}
                 required
               />
@@ -93,18 +95,20 @@ export default function RegisterPage() {
                 onCheckedChange={(v) => setLgpdConsent(!!v)}
               />
               <Label htmlFor="lgpd" className="text-sm leading-tight cursor-pointer">
-                Concordo com a{' '}
-                <span className="text-primary underline">Política de Privacidade</span> e autorizo o
-                tratamento dos meus dados conforme a LGPD.
+                <Trans
+                  ns="auth"
+                  i18nKey="register.lgpd"
+                  components={{ highlight: <span className="text-primary underline" /> }}
+                />
               </Label>
             </div>
             <Button type="submit" className="w-full" disabled={loading || !lgpdConsent}>
-              {loading ? 'Criando conta...' : 'Criar conta'}
+              {loading ? t('register.creating') : t('register.create')}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              Já tem conta?{' '}
+              {t('register.alreadyHaveAccount')}{' '}
               <a href="/login" className="text-primary underline">
-                Entrar
+                {t('register.signIn')}
               </a>
             </p>
           </form>

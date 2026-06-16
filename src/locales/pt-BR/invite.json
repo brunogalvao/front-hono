@@ -1,0 +1,26 @@
+{
+  "title": "Convite para o Finance",
+  "subtitle": "Você foi convidado para colaborar no grupo",
+  "description": "Com acesso ao grupo você pode visualizar e adicionar <bold>despesas, rendimentos e compras a prazo</bold> em conjunto.",
+  "invalidTitle": "Convite inválido",
+  "backHome": "Voltar ao início",
+  "checkingSession": "Verificando sessão...",
+  "accepting": "Aceitando...",
+  "accept": "Aceitar convite",
+  "loginToAccept": "Fazer login para aceitar",
+  "noAccount": "Não tem conta?",
+  "createAccount": "Criar conta",
+  "acceptedTitle": "Convite aceito!",
+  "redirecting": "Redirecionando para o grupo...",
+  "welcome": "Bem-vindo ao grupo!",
+  "page": {
+    "noToken": "Token de convite não encontrado.",
+    "expiredMessage": "Este convite expirou. Solicite um novo convite ao administrador do workspace.",
+    "processing": "Processando convite...",
+    "expiredTitle": "Convite expirado",
+    "errorTitle": "Erro ao aceitar convite",
+    "processingDesc": "Aguarde enquanto processamos seu convite.",
+    "successDesc": "Bem-vindo ao workspace! Redirecionando...",
+    "goToLogin": "Ir para login"
+  }
+}

@@ -30,8 +30,19 @@ function StatusCell({
   const { t } = useTranslation('transactions');
   const { can } = usePermissions();
   const canUpdate = can('transactions', 'update');
-  const isPago = row.original.status === 'pago';
+  const { status } = row.original;
   const meta = table.options.meta;
+
+  // 'recebido' is auto-set for income — not togglable
+  if (status === 'recebido') {
+    return (
+      <span className="rounded-full px-2 py-0.5 text-xs font-medium bg-green-500/15 text-green-600 dark:text-green-400 cursor-default">
+        {t('status.recebido')}
+      </span>
+    );
+  }
+
+  const isPago = status === 'pago';
 
   return (
     <button

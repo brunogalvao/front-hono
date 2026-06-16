@@ -6,5 +6,7 @@
   "history": "Histórico",
   "advisor": "Consultor IA",
   "groups": "Grupo",
-  "profile": "Usuário"
+  "profile": "Usuário",
+  "logout": "Sair",
+  "loggingOut": "Saindo"
 }

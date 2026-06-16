@@ -16,6 +16,7 @@ import type recurring from '@/locales/pt-BR/recurring.json';
 import type workspace from '@/locales/pt-BR/workspace.json';
 import type account from '@/locales/pt-BR/account.json';
 import type permissions from '@/locales/pt-BR/permissions.json';
+import type invite from '@/locales/pt-BR/invite.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -39,6 +40,7 @@ declare module 'i18next' {
       workspace: typeof workspace;
       account: typeof account;
       permissions: typeof permissions;
+      invite: typeof invite;
     };
   }
 }

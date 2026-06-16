@@ -1,5 +1,6 @@
 {
   "loading": "Loading...",
+  "authenticating": "Authenticating...",
   "save": "Save",
   "cancel": "Cancel",
   "delete": "Delete",

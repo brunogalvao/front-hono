@@ -20,6 +20,7 @@ import ptBRRecurring from '@/locales/pt-BR/recurring.json';
 import ptBRWorkspace from '@/locales/pt-BR/workspace.json';
 import ptBRAccount from '@/locales/pt-BR/account.json';
 import ptBRPermissions from '@/locales/pt-BR/permissions.json';
+import ptBRInvite from '@/locales/pt-BR/invite.json';
 
 import enCommon from '@/locales/en/common.json';
 import enNav from '@/locales/en/nav.json';
@@ -39,6 +40,7 @@ import enRecurring from '@/locales/en/recurring.json';
 import enWorkspace from '@/locales/en/workspace.json';
 import enAccount from '@/locales/en/account.json';
 import enPermissions from '@/locales/en/permissions.json';
+import enInvite from '@/locales/en/invite.json';
 
 export const defaultNS = 'common';
 export const supportedLngs = ['pt-BR', 'en'] as const;
@@ -68,6 +70,7 @@ i18n
         workspace: ptBRWorkspace,
         account: ptBRAccount,
         permissions: ptBRPermissions,
+        invite: ptBRInvite,
       },
       en: {
         common: enCommon,
@@ -88,6 +91,7 @@ i18n
         workspace: enWorkspace,
         account: enAccount,
         permissions: enPermissions,
+        invite: enInvite,
       },
     },
     defaultNS,

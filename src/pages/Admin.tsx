@@ -15,8 +15,10 @@ import { RippleButton } from '@/components/animate-ui/buttons/ripple';
 import { NotificationBell } from '@/components/NotificationBell';
 import { useSessionGuard } from '@/hooks/useSessionGuard';
 import { WorkspaceProvider } from '@/context/WorkspaceContext';
+import { useTranslation } from 'react-i18next';
 
 function Admin() {
+  const { t } = useTranslation('nav');
   const navigate = useNavigate();
   useSessionGuard();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -79,12 +81,12 @@ function Admin() {
               >
                 {isLoggingOut ? (
                   <>
-                    Saindo
+                    {t('loggingOut')}
                     <Loader />
                   </>
                 ) : (
                   <>
-                    Sair
+                    {t('logout')}
                     <LogOut />
                   </>
                 )}

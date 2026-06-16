@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
 
-export type TransactionStatus = 'pago' | 'pendente';
+export type TransactionStatus = 'pago' | 'pendente' | 'recebido';
 
 export interface Transaction {
   id: string;

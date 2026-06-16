@@ -47,9 +47,10 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [textoTab, setTextoTab] = useState<'login' | 'register'>('login');
-  const textoAtual = textoTab === 'login'
-    ? t('home:hero.description')
-    : t('home:register.prompt');
+  const textoAtual =
+    textoTab === 'login'
+      ? t('home:hero.description')
+      : t('home:register.prompt');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -68,7 +69,9 @@ function Login() {
 
       navigate({ to: '/admin/dashboard' });
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('auth:login.errors.generic'));
+      setError(
+        err instanceof Error ? err.message : t('auth:login.errors.generic')
+      );
     } finally {
       setLoading(false);
     }
@@ -235,7 +238,9 @@ function Login() {
                     </div>
                     <div className="flex flex-col space-y-2">
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="password">{t('auth:login.password')}</Label>
+                        <Label htmlFor="password">
+                          {t('auth:login.password')}
+                        </Label>
                         <ForgotPassword />
                       </div>
                       <PasswordInput
@@ -287,7 +292,7 @@ function Login() {
       </div>
 
       <div className="flex h-auto items-center border-l border-none px-4 py-8 md:order-2 md:h-screen md:border-dashed md:pt-8">
-        <div className="flex flex-col space-y-2 px-2 md:px-10">
+        <div className="mt-14 flex flex-col space-y-2 px-2 md:mt-0 md:px-10">
           <AnimatePresence mode="wait">
             <motion.div
               key={textoAtual}
