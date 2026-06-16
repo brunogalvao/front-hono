@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { CheckCircle, CreditCard, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +24,7 @@ interface InstallmentListProps {
 }
 
 export function InstallmentList({ onDelete, highlightId }: InstallmentListProps) {
+  const { t } = useTranslation(['installments', 'common']);
   const { activeWorkspaceId, activeRole } = useWorkspace();
   const { data: items = [], isLoading, earlyPayoff } = useInstallments(activeWorkspaceId);
   const [payoffTarget, setPayoffTarget] = useState<Installment | null>(null);
@@ -39,9 +41,9 @@ export function InstallmentList({ onDelete, highlightId }: InstallmentListProps)
     if (!payoffTarget) return;
     try {
       await earlyPayoff.mutateAsync(payoffTarget.id);
-      toast.success('Parcelamento quitado antecipadamente.');
+      toast.success(t('toast.paidOff'));
     } catch {
-      toast.error('Erro ao quitar parcelamento.');
+      toast.error(t('toast.payoffError'));
     }
     setPayoffTarget(null);
   };
@@ -50,14 +52,13 @@ export function InstallmentList({ onDelete, highlightId }: InstallmentListProps)
     if (!deleteTarget) return;
     try {
       await onDelete(deleteTarget.id);
-      toast.success('Parcelamento excluído.');
+      toast.success(t('toast.deleted'));
     } catch {
-      toast.error('Erro ao excluir parcelamento.');
+      toast.error(t('toast.deleteError'));
     }
     setDeleteTarget(null);
   };
 
-  const statusLabel = { active: 'Ativo', completed: 'Quitado', cancelled: 'Cancelado' };
   const statusVariant = {
     active: 'default' as const,
     completed: 'secondary' as const,
@@ -78,8 +79,8 @@ export function InstallmentList({ onDelete, highlightId }: InstallmentListProps)
     return (
       <div className="text-muted-foreground py-12 text-center">
         <CreditCard className="mx-auto mb-3 h-10 w-10 opacity-30" />
-        <p className="font-medium">Nenhum parcelamento registrado</p>
-        <p className="text-sm">Adicione um parcelamento para começar.</p>
+        <p className="font-medium">{t('empty')}</p>
+        <p className="text-sm">{t('emptyHint')}</p>
       </div>
     );
   }
@@ -107,7 +108,7 @@ export function InstallmentList({ onDelete, highlightId }: InstallmentListProps)
                   <div className="space-y-0.5">
                     <p className="font-medium">{item.description}</p>
                     <div className="flex items-center gap-2">
-                      <Badge variant={statusVariant[item.status]}>{statusLabel[item.status]}</Badge>
+                      <Badge variant={statusVariant[item.status]}>{t(`status.${item.status}`)}</Badge>
                       {item.categories && (
                         <Badge variant="secondary" className="text-xs">
                           {item.categories.name}
@@ -117,18 +118,18 @@ export function InstallmentList({ onDelete, highlightId }: InstallmentListProps)
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="font-semibold text-red-500">
-                      {formatToBRL(item.installment_amount)}/mês
+                      {formatToBRL(item.installment_amount)}{t('perMonth')}
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      {formatToBRL(item.total_amount)} total
+                      {formatToBRL(item.total_amount)} {t('totalSuffix')}
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-1">
                   <div className="text-muted-foreground flex justify-between text-xs">
-                    <span>{item.paid_installments} de {item.total_installments} parcelas</span>
-                    <span>{remaining > 0 ? `${remaining} restantes` : 'Concluído'}</span>
+                    <span>{t('progress', { paid: item.paid_installments, total: item.total_installments })}</span>
+                    <span>{remaining > 0 ? t('remaining', { count: remaining }) : t('done')}</span>
                   </div>
                   <Progress value={progress} className="h-2" />
                 </div>
@@ -142,7 +143,7 @@ export function InstallmentList({ onDelete, highlightId }: InstallmentListProps)
                       onClick={() => setPayoffTarget(item)}
                     >
                       <CheckCircle className="h-3 w-3" />
-                      Quitar Antecipadamente
+                      {t('payoffEarly')}
                     </Button>
                     <Button
                       variant="ghost"
@@ -151,7 +152,7 @@ export function InstallmentList({ onDelete, highlightId }: InstallmentListProps)
                       onClick={() => setDeleteTarget(item)}
                     >
                       <Trash2 className="h-3 w-3" />
-                      Excluir Série
+                      {t('deleteSeries')}
                     </Button>
                   </div>
                 )}
@@ -165,7 +166,7 @@ export function InstallmentList({ onDelete, highlightId }: InstallmentListProps)
       <AlertDialog open={!!payoffTarget} onOpenChange={(open) => !open && setPayoffTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Quitar parcelamento antecipadamente?</AlertDialogTitle>
+            <AlertDialogTitle>{t('payoff.title')}</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-1">
                 {payoffTarget && (() => {
@@ -174,11 +175,14 @@ export function InstallmentList({ onDelete, highlightId }: InstallmentListProps)
                   return (
                     <>
                       <p>
-                        <strong>{pendingCount}</strong>{' '}
-                        {pendingCount === 1 ? 'parcela pendente será quitada' : 'parcelas pendentes serão quitadas'}{' '}
-                        — {formatToBRL(pendingTotal)} total.
+                        <Trans
+                          ns="installments"
+                          i18nKey={pendingCount === 1 ? 'payoff.descOne' : 'payoff.descMany'}
+                          values={{ count: pendingCount, amount: formatToBRL(pendingTotal) }}
+                          components={{ bold: <strong /> }}
+                        />
                       </p>
-                      <p>Esta ação não pode ser desfeita.</p>
+                      <p>{t('payoff.warning')}</p>
                     </>
                   );
                 })()}
@@ -186,8 +190,8 @@ export function InstallmentList({ onDelete, highlightId }: InstallmentListProps)
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handlePayoff}>Confirmar Quitação</AlertDialogAction>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handlePayoff}>{t('payoff.confirm')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -196,29 +200,32 @@ export function InstallmentList({ onDelete, highlightId }: InstallmentListProps)
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir série de parcelamento?</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-1">
                 {deleteTarget && (
                   <>
                     <p>
-                      <strong>{deleteTarget.total_installments}</strong>{' '}
-                      {deleteTarget.total_installments === 1 ? 'transação será excluída' : 'transações serão excluídas'}{' '}
-                      permanentemente.
+                      <Trans
+                        ns="installments"
+                        i18nKey={deleteTarget.total_installments === 1 ? 'deleteDialog.descOne' : 'deleteDialog.descMany'}
+                        values={{ count: deleteTarget.total_installments }}
+                        components={{ bold: <strong /> }}
+                      />
                     </p>
-                    <p>Esta ação não pode ser desfeita.</p>
+                    <p>{t('deleteDialog.warning')}</p>
                   </>
                 )}
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={handleDelete}
             >
-              Excluir Série
+              {t('deleteSeries')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

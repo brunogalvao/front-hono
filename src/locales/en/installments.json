@@ -1,33 +1,55 @@
 {
   "title": "Installments",
-  "subtitle": "Manage your installment purchases",
-  "noInstallments": "No installment purchases found.",
-  "noInstallmentsHint": "Click \"Add\" to register a new installment purchase.",
-  "open": "Open",
-  "remaining": "remaining",
-  "filterAll": "All",
-  "filterActive": "Active",
-  "filterPaid": "Paid off",
-  "tableTitle": "Installment Purchases",
-  "col": {
-    "description": "Description",
-    "category": "Category",
-    "installment": "Installment",
-    "progress": "Progress",
-    "total": "Total Amount",
-    "start": "Start",
-    "status": "Status"
-  },
+  "subtitle": "Track your installment purchases",
+  "new": "New Installment",
+  "empty": "No installments registered",
+  "emptyHint": "Add an installment to get started.",
   "perMonth": "/mo",
-  "archiveTitle": "Archive installment purchase?",
-  "archiveDescription": "\"{{title}}\" and all its {{total}} installments will be archived. This action can be reversed directly in the database.",
-  "archiveConfirm": "Archive",
+  "totalSuffix": "total",
+  "progress": "{{paid}} of {{total}} installments",
+  "remaining_one": "{{count}} remaining",
+  "remaining_other": "{{count}} remaining",
+  "done": "Completed",
+  "payoffEarly": "Pay Off Early",
+  "deleteSeries": "Delete Series",
+  "status": {
+    "active": "Active",
+    "completed": "Paid off",
+    "cancelled": "Cancelled"
+  },
+  "form": {
+    "title": "New Installment",
+    "description": "Description",
+    "descriptionPlaceholder": "E.g.: Smart TV",
+    "totalAmount": "Total Amount (R$)",
+    "installmentCount": "No. of Installments",
+    "preview": "Installments preview:",
+    "firstDate": "1st Installment Date",
+    "category": "Category",
+    "categoryPlaceholder": "No category",
+    "saving": "Saving...",
+    "create": "Create"
+  },
+  "payoff": {
+    "title": "Pay off installment early?",
+    "descOne": "<bold>{{count}}</bold> pending installment will be paid off — {{amount}} total.",
+    "descMany": "<bold>{{count}}</bold> pending installments will be paid off — {{amount}} total.",
+    "warning": "This action cannot be undone.",
+    "confirm": "Confirm Payoff"
+  },
+  "deleteDialog": {
+    "title": "Delete installment series?",
+    "descOne": "<bold>{{count}}</bold> transaction will be permanently deleted.",
+    "descMany": "<bold>{{count}}</bold> transactions will be permanently deleted.",
+    "warning": "This action cannot be undone."
+  },
   "toast": {
-    "updated": "Installment updated!",
-    "updateError": "Error updating installment.",
-    "archived": "Installment purchase archived.",
-    "archiveError": "Error archiving installment purchase.",
-    "deleted": "Installment deleted successfully.",
-    "deleteError": "Error deleting installment."
+    "created": "Installment created!",
+    "createError": "Error creating installment.",
+    "paidOff": "Installment paid off early.",
+    "payoffError": "Error paying off installment.",
+    "deleted": "Installment deleted.",
+    "deleteError": "Error deleting installment.",
+    "saveError": "Error saving"
   }
 }

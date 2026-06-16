@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,6 +35,7 @@ interface InstallmentFormProps {
 }
 
 export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFormProps) {
+  const { t } = useTranslation(['installments', 'common']);
   const { activeWorkspaceId } = useWorkspace();
   const { data: categories = [] } = useCategories(activeWorkspaceId);
 
@@ -72,7 +74,7 @@ export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFor
       });
       form.reset();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao salvar');
+      toast.error(err instanceof Error ? err.message : t('toast.saveError'));
     }
   };
 
@@ -80,14 +82,14 @@ export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFor
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Novo Parcelamento</DialogTitle>
+          <DialogTitle>{t('form.title')}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField control={form.control} name="description" render={({ field }) => (
               <FormItem>
-                <FormLabel>Descrição</FormLabel>
-                <FormControl><Input placeholder="Ex: Smart TV" {...field} /></FormControl>
+                <FormLabel>{t('form.description')}</FormLabel>
+                <FormControl><Input placeholder={t('form.descriptionPlaceholder')} {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />
@@ -95,7 +97,7 @@ export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFor
             <div className="grid grid-cols-2 gap-3">
               <FormField control={form.control} name="total_amount" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Valor Total (R$)</FormLabel>
+                  <FormLabel>{t('form.totalAmount')}</FormLabel>
                   <FormControl><Input type="number" step="0.01" min="0.01" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
@@ -103,7 +105,7 @@ export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFor
 
               <FormField control={form.control} name="total_installments" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nº de Parcelas</FormLabel>
+                  <FormLabel>{t('form.installmentCount')}</FormLabel>
                   <FormControl><Input type="number" min="2" step="1" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
@@ -112,7 +114,7 @@ export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFor
 
             {preview && (
               <div className="bg-muted rounded-lg p-3 text-sm">
-                <p className="font-medium">Preview das parcelas:</p>
+                <p className="font-medium">{t('form.preview')}</p>
                 <p className="text-muted-foreground">
                   {count - (preview.remainder_amount > 0 ? 1 : 0)}x {formatBRL(preview.installment_amount)}
                   {preview.remainder_amount > 0 && ` + 1x ${formatBRL(preview.installment_amount + preview.remainder_amount)}`}
@@ -122,7 +124,7 @@ export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFor
 
             <FormField control={form.control} name="first_installment_date" render={({ field }) => (
               <FormItem>
-                <FormLabel>Data da 1ª Parcela</FormLabel>
+                <FormLabel>{t('form.firstDate')}</FormLabel>
                 <FormControl><Input type="date" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
@@ -130,9 +132,9 @@ export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFor
 
             <FormField control={form.control} name="category_id" render={({ field }) => (
               <FormItem>
-                <FormLabel>Categoria</FormLabel>
+                <FormLabel>{t('form.category')}</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value ?? ''}>
-                  <FormControl><SelectTrigger><SelectValue placeholder="Sem categoria" /></SelectTrigger></FormControl>
+                  <FormControl><SelectTrigger><SelectValue placeholder={t('form.categoryPlaceholder')} /></SelectTrigger></FormControl>
                   <SelectContent>
                     {expenseCategories.map((cat) => (
                       <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
@@ -144,9 +146,9 @@ export function InstallmentForm({ open, onOpenChange, onSubmit }: InstallmentFor
             )} />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common:cancel')}</Button>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Salvando...' : 'Criar'}
+                {form.formState.isSubmitting ? t('form.saving') : t('form.create')}
               </Button>
             </DialogFooter>
           </form>

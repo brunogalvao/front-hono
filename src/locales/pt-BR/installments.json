@@ -1,33 +1,55 @@
 {
-  "title": "Compras a Prazo",
-  "subtitle": "Gerencie suas compras parceladas",
-  "noInstallments": "Nenhuma compra parcelada encontrada.",
-  "noInstallmentsHint": "Clique em \"Adicionar\" para registrar uma nova compra parcelada.",
-  "open": "Em aberto",
-  "remaining": "restantes",
-  "filterAll": "Todos",
-  "filterActive": "Ativo",
-  "filterPaid": "Quitada",
-  "tableTitle": "Compras Parceladas",
-  "col": {
-    "description": "Descrição",
-    "category": "Categoria",
-    "installment": "Parcela",
-    "progress": "Progresso",
-    "total": "Valor Total",
-    "start": "Início",
-    "status": "Status"
-  },
+  "title": "Parcelamentos",
+  "subtitle": "Acompanhe compras parceladas",
+  "new": "Novo Parcelamento",
+  "empty": "Nenhum parcelamento registrado",
+  "emptyHint": "Adicione um parcelamento para começar.",
   "perMonth": "/mês",
-  "archiveTitle": "Arquivar compra parcelada?",
-  "archiveDescription": "\"{{title}}\" e todas as suas {{total}} parcelas serão arquivadas. Essa ação pode ser revertida diretamente no banco de dados.",
-  "archiveConfirm": "Arquivar",
+  "totalSuffix": "total",
+  "progress": "{{paid}} de {{total}} parcelas",
+  "remaining_one": "{{count}} restante",
+  "remaining_other": "{{count}} restantes",
+  "done": "Concluído",
+  "payoffEarly": "Quitar Antecipadamente",
+  "deleteSeries": "Excluir Série",
+  "status": {
+    "active": "Ativo",
+    "completed": "Quitado",
+    "cancelled": "Cancelado"
+  },
+  "form": {
+    "title": "Novo Parcelamento",
+    "description": "Descrição",
+    "descriptionPlaceholder": "Ex: Smart TV",
+    "totalAmount": "Valor Total (R$)",
+    "installmentCount": "Nº de Parcelas",
+    "preview": "Preview das parcelas:",
+    "firstDate": "Data da 1ª Parcela",
+    "category": "Categoria",
+    "categoryPlaceholder": "Sem categoria",
+    "saving": "Salvando...",
+    "create": "Criar"
+  },
+  "payoff": {
+    "title": "Quitar parcelamento antecipadamente?",
+    "descOne": "<bold>{{count}}</bold> parcela pendente será quitada — {{amount}} total.",
+    "descMany": "<bold>{{count}}</bold> parcelas pendentes serão quitadas — {{amount}} total.",
+    "warning": "Esta ação não pode ser desfeita.",
+    "confirm": "Confirmar Quitação"
+  },
+  "deleteDialog": {
+    "title": "Excluir série de parcelamento?",
+    "descOne": "<bold>{{count}}</bold> transação será excluída permanentemente.",
+    "descMany": "<bold>{{count}}</bold> transações serão excluídas permanentemente.",
+    "warning": "Esta ação não pode ser desfeita."
+  },
   "toast": {
-    "updated": "Compra parcelada atualizada!",
-    "updateError": "Erro ao atualizar compra parcelada.",
-    "archived": "Compra parcelada arquivada.",
-    "archiveError": "Erro ao arquivar compra parcelada.",
-    "deleted": "Compra parcelada deletada com sucesso.",
-    "deleteError": "Erro ao deletar compra parcelada."
+    "created": "Parcelamento criado!",
+    "createError": "Erro ao criar parcelamento.",
+    "paidOff": "Parcelamento quitado antecipadamente.",
+    "payoffError": "Erro ao quitar parcelamento.",
+    "deleted": "Parcelamento excluído.",
+    "deleteError": "Erro ao excluir parcelamento.",
+    "saveError": "Erro ao salvar"
   }
 }

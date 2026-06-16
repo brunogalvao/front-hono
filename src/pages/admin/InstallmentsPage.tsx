@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { InstallmentList } from '@/components/installments/InstallmentList';
@@ -10,6 +11,7 @@ import { toast } from 'sonner';
 import { useSearch } from '@tanstack/react-router';
 
 export default function InstallmentsPage() {
+  const { t } = useTranslation('installments');
   const { activeWorkspaceId } = useWorkspace();
   const { can } = usePermissions();
   const [createOpen, setCreateOpen] = useState(false);
@@ -19,11 +21,11 @@ export default function InstallmentsPage() {
   const handleCreate = async (input: Parameters<typeof create.mutateAsync>[0]) => {
     try {
       await create.mutateAsync(input);
-      toast.success('Parcelamento criado!');
+      toast.success(t('toast.created'));
       setCreateOpen(false);
     } catch {
-      toast.error('Erro ao criar parcelamento.');
-      throw new Error('Erro ao criar parcelamento.');
+      toast.error(t('toast.createError'));
+      throw new Error(t('toast.createError'));
     }
   };
 
@@ -35,13 +37,13 @@ export default function InstallmentsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Parcelamentos</h1>
-          <p className="text-muted-foreground text-sm">Acompanhe compras parceladas</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
         {can('installments', 'create') && (
           <Button onClick={() => setCreateOpen(true)}>
             <Plus className="mr-1 h-4 w-4" />
-            Novo Parcelamento
+            {t('new')}
           </Button>
         )}
       </div>
