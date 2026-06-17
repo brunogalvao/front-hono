@@ -29,6 +29,14 @@ export interface InstallmentInput {
   category_id?: string | null;
 }
 
+export interface InstallmentUpdateInput {
+  description?: string;
+  category_id?: string | null;
+  installment_amount?: number;
+  total_installments?: number;
+  status?: 'active' | 'completed' | 'cancelled';
+}
+
 // T001 — helper para calcular a data de cada parcela
 function addMonths(dateStr: string, offset: number): string {
   const [year, month, day] = dateStr.split('-').map(Number);
@@ -159,6 +167,37 @@ export function useInstallments(workspaceId: string | null) {
     },
   });
 
+  const update = useMutation({
+    mutationFn: async ({ id, ...input }: InstallmentUpdateInput & { id: string }) => {
+      const { error } = await supabase
+        .from('installments')
+        .update({ ...input, updated_at: new Date().toISOString() })
+        .eq('id', id);
+      if (error) throw error;
+
+      // Propaga description e category_id para todas as transações vinculadas
+      const txAllFields: Record<string, unknown> = {};
+      if (input.description !== undefined) txAllFields.description = input.description;
+      if (input.category_id !== undefined) txAllFields.category_id = input.category_id;
+      if (Object.keys(txAllFields).length > 0) {
+        await supabase.from('transactions').update(txAllFields).eq('installment_id', id);
+      }
+
+      // Propaga installment_amount apenas para parcelas pendentes
+      if (input.installment_amount !== undefined) {
+        await supabase
+          .from('transactions')
+          .update({ amount: input.installment_amount })
+          .eq('installment_id', id)
+          .eq('status', 'pendente');
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: qKey });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+    },
+  });
+
   // T008 — deleta transactions antes de deletar o installment
   const remove = useMutation({
     mutationFn: async (id: string) => {
@@ -178,5 +217,5 @@ export function useInstallments(workspaceId: string | null) {
     },
   });
 
-  return { ...query, create, earlyPayoff, remove };
+  return { ...query, create, update, earlyPayoff, remove };
 }

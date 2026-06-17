@@ -58,9 +58,16 @@ export function useRecurring(workspaceId: string | null) {
         .select()
         .single();
       if (error) throw error;
-      return data;
+
+      // Gera as transações imediatamente para o mês atual, sem esperar o cron
+      await supabase.rpc('generate_recurring_transactions');
+
+      return data[0];
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: qKey }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: qKey });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    },
   });
 
   const toggleActive = useMutation({
@@ -80,12 +87,37 @@ export function useRecurring(workspaceId: string | null) {
         .from('recurring_expenses')
         .update({ ...input, updated_at: new Date().toISOString() })
         .eq('id', id)
-        .select()
-        .single();
+        .select();
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error('Recorrência não encontrada ou sem permissão para editar.');
+
+      // Propaga description para todas as transações vinculadas (renomear é cosmético)
+      if (input.description !== undefined) {
+        await supabase
+          .from('transactions')
+          .update({ description: input.description })
+          .eq('recurring_expense_id', id);
+      }
+
+      // Propaga amount e category_id apenas para transações futuras (preserva histórico)
+      const today = new Date().toISOString().split('T')[0];
+      const futureFields: Record<string, unknown> = {};
+      if (input.amount !== undefined) futureFields.amount = input.amount;
+      if (input.category_id !== undefined) futureFields.category_id = input.category_id;
+      if (Object.keys(futureFields).length > 0) {
+        await supabase
+          .from('transactions')
+          .update(futureFields)
+          .eq('recurring_expense_id', id)
+          .gt('date', today);
+      }
+
       return data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: qKey }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: qKey });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    },
   });
 
   const remove = useMutation({

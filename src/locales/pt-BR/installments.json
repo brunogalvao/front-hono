@@ -12,6 +12,13 @@
   "done": "Concluído",
   "payoffEarly": "Quitar Antecipadamente",
   "deleteSeries": "Excluir Série",
+  "table": {
+    "colName": "Descrição",
+    "colAmount": "Valor",
+    "colProgress": "Progresso",
+    "colStatus": "Status",
+    "colActions": "Ações"
+  },
   "status": {
     "active": "Ativo",
     "completed": "Quitado",
@@ -27,6 +34,9 @@
     "firstDate": "Data da 1ª Parcela",
     "category": "Categoria",
     "categoryPlaceholder": "Sem categoria",
+    "editTitle": "Editar Parcelamento",
+    "installmentAmount": "Valor por Parcela (R$)",
+    "status": "Status",
     "saving": "Salvando...",
     "create": "Criar"
   },

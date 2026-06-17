@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { InstallmentList } from '@/components/installments/InstallmentList';
+import { InstallmentTable } from '@/components/installments/InstallmentTable';
 import { InstallmentForm } from '@/components/installments/InstallmentForm';
 import { useInstallments } from '@/hooks/useInstallments';
 import { useWorkspace } from '@/context/WorkspaceContext';
@@ -15,7 +15,7 @@ export default function InstallmentsPage() {
   const { activeWorkspaceId } = useWorkspace();
   const { can } = usePermissions();
   const [createOpen, setCreateOpen] = useState(false);
-  const { create, remove } = useInstallments(activeWorkspaceId);
+  const { create } = useInstallments(activeWorkspaceId);
   const { highlight } = useSearch({ from: '/admin/installments' });
 
   const handleCreate = async (input: Parameters<typeof create.mutateAsync>[0]) => {
@@ -27,10 +27,6 @@ export default function InstallmentsPage() {
       toast.error(t('toast.createError'));
       throw new Error(t('toast.createError'));
     }
-  };
-
-  const handleDelete = async (id: string) => {
-    await remove.mutateAsync(id);
   };
 
   return (
@@ -48,7 +44,7 @@ export default function InstallmentsPage() {
         )}
       </div>
 
-      <InstallmentList onDelete={handleDelete} highlightId={highlight} />
+      <InstallmentTable highlightId={highlight} />
 
       <InstallmentForm
         open={createOpen}

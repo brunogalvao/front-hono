@@ -12,6 +12,13 @@
   "done": "Completed",
   "payoffEarly": "Pay Off Early",
   "deleteSeries": "Delete Series",
+  "table": {
+    "colName": "Description",
+    "colAmount": "Amount",
+    "colProgress": "Progress",
+    "colStatus": "Status",
+    "colActions": "Actions"
+  },
   "status": {
     "active": "Active",
     "completed": "Paid off",
@@ -27,6 +34,9 @@
     "firstDate": "1st Installment Date",
     "category": "Category",
     "categoryPlaceholder": "No category",
+    "editTitle": "Edit Installment",
+    "installmentAmount": "Amount per Installment (R$)",
+    "status": "Status",
     "saving": "Saving...",
     "create": "Create"
   },
