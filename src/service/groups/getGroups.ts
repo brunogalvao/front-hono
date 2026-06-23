@@ -1,14 +1,7 @@
 import { fetchWithAuth } from '@/lib/fetch-api';
+import type { GroupItem } from '@/model/group.model';
 
-export interface GroupItem {
-  id: string;
-  name: string;
-  type: 'personal' | 'shared';
-  owner_id: string;
-  created_at: string;
-  role: 'owner' | 'member';
-  joined_at: string;
-}
+export type { GroupItem };
 
 export async function getGroups(): Promise<GroupItem[]> {
   return fetchWithAuth<GroupItem[]>('/api/groups');

@@ -1,24 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
-import type { WorkspaceRole } from '@/context/WorkspaceContext';
+import type { WorkspaceMember, PendingInvite } from '@/model/workspace-member.model';
+import type { WorkspaceRole } from '@/model/workspace.model';
 
-export interface WorkspaceMember {
-  id: string;
-  workspace_id: string;
-  user_id: string;
-  role: WorkspaceRole;
-  created_at: string;
-  profiles?: { id: string; full_name: string | null; email: string; avatar_url: string | null } | null;
-}
-
-export interface PendingInvite {
-  id: string;
-  email: string;
-  role: WorkspaceRole;
-  expires_at: string;
-  created_at: string;
-}
+export type { WorkspaceMember, PendingInvite };
 
 async function fetchMembers(workspaceId: string): Promise<WorkspaceMember[]> {
   const { data, error } = await supabase

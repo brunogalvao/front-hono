@@ -1,22 +1,7 @@
 import { fetchWithAuth } from '@/lib/fetch-api';
+import type { IASimplificada, IAResponse } from '@/model/ia.model';
 
-export interface IASimplificada {
-  despesasPagas: number;
-  despesasPendentes: number;
-  totalDespesas: number;
-  rendimentoMes: number;
-  percentualDisponivel: number;
-  percentualGasto: number;
-  dicasEconomia: string[];
-  resultadoLiquido: number;
-  cotacaoDolar: number;
-  quantidadeDolar: number;
-}
-
-export interface IAResponse {
-  success: boolean;
-  data: IASimplificada;
-}
+export type { IASimplificada, IAResponse };
 
 function gerarDicasEconomia(percentualGasto: number): string[] {
   if (percentualGasto < 50) {

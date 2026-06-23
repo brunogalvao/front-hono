@@ -1,15 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
+import type { Category } from '@/model/category.model';
 
-export interface Category {
-  id: string;
-  name: string;
-  type: 'receita' | 'despesa';
-  is_default: boolean;
-  workspace_id: string | null;
-  icon: string | null;
-}
+export type { Category };
 
 async function fetchCategories(workspaceId: string): Promise<Category[]> {
   const { data, error } = await supabase

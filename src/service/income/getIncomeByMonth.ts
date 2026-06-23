@@ -1,10 +1,8 @@
 import { supabase } from '@/lib/supabase';
 import { getIncomes } from './getIncome';
+import type { IncomeByMonth } from '@/model/income.model';
 
-export interface IncomeByMonth {
-  mes: number;
-  total: number;
-}
+export type { IncomeByMonth };
 
 export async function getIncomesByMonth(): Promise<Record<number, number>> {
   try {

@@ -1,18 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
-import type { PermissionResource } from '@/lib/permissions';
+import type { RolePermission } from '@/model/workspace-member.model';
 
-export interface RolePermission {
-  id: string;
-  workspace_id: string;
-  role: 'administrador' | 'operador' | 'visualizador';
-  resource: PermissionResource;
-  can_read: boolean;
-  can_create: boolean;
-  can_update: boolean;
-  can_delete: boolean;
-}
+export type { RolePermission };
 
 export function useRolePermissions(workspaceId: string | null) {
   const queryClient = useQueryClient();

@@ -1,9 +1,6 @@
-export interface GroupAccess {
-  access_expenses: boolean;
-  access_incomes: boolean;
-  access_installments: boolean;
-  access_advisor: boolean;
-}
+import type { GroupAccess } from '@/model/group.model';
+
+export type { GroupAccess };
 
 export const defaultGroupAccess: GroupAccess = {
   access_expenses: true,

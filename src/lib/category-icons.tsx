@@ -3,14 +3,10 @@ import {
   Wrench, Car, Shirt, Briefcase, TrendingUp, Wallet, DollarSign, ShoppingCart,
   ShoppingBag, Coffee, Plane, Bus, Bike, Music, Film, Tv, Gamepad2, BookOpen,
   CreditCard, PiggyBank, BarChart2, Receipt, Gift, Tag, Zap, Building,
-  type LucideIcon,
 } from 'lucide-react';
+import type { CategoryIconOption } from '@/model/category.model';
 
-export interface CategoryIconOption {
-  name: string;
-  label: string;
-  Icon: LucideIcon;
-}
+export type { CategoryIconOption };
 
 export const CATEGORY_ICONS: CategoryIconOption[] = [
   { name: 'Utensils',      label: 'Alimentação',  Icon: Utensils },

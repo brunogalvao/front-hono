@@ -1,20 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
-import type { WorkspaceRole } from '@/context/WorkspaceContext';
+import type { AppUser, AppUserProfile } from '@/model/user.model';
+import type { WorkspaceRole } from '@/model/workspace.model';
 
-export interface UserProfile {
-  id: string;
-  email: string;
-  full_name: string | null;
-  avatar_url: string | null;
-}
-
-export interface AppUser {
-  profile: UserProfile;
-  role: WorkspaceRole | null;
-  memberId: string | null;
-}
+export type { AppUser };
 
 async function fetchAllAppUsers(workspaceId: string): Promise<AppUser[]> {
   const [{ data: profiles, error: profilesError }, { data: members, error: membersError }] =
@@ -39,7 +29,7 @@ async function fetchAllAppUsers(workspaceId: string): Promise<AppUser[]> {
   return (profiles ?? []).map((profile) => {
     const membership = memberMap.get(profile.id);
     return {
-      profile: profile as UserProfile,
+      profile: profile as AppUserProfile,
       role: membership?.role ?? null,
       memberId: membership?.memberId ?? null,
     };

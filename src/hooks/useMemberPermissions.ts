@@ -1,18 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
-import type { PermissionResource } from '@/lib/permissions';
+import type { MemberPermission } from '@/model/workspace-member.model';
+import type { PermissionResource } from '@/model/workspace.model';
 
-export interface MemberPermission {
-  id: string;
-  workspace_id: string;
-  user_id: string;
-  resource: PermissionResource;
-  can_read: boolean;
-  can_create: boolean;
-  can_update: boolean;
-  can_delete: boolean;
-}
+export type { MemberPermission };
 
 export function useMemberPermissions(workspaceId: string | null, userId: string | null) {
   const queryClient = useQueryClient();

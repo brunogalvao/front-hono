@@ -35,3 +35,13 @@ export type TaskTable = {
 
 // Modelo de criação
 export type NewTask = Omit<Task, 'id' | 'created_at'>;
+
+export type TasksByYear = Record<number, Task[]>;
+
+export type TasksCountByMonth = Record<number, number>;
+
+export type TasksMonthMeta = {
+  count: TasksCountByMonth;
+  hasRecorrente: Record<number, boolean>;
+  recorrenteNames: Record<number, string[]>;
+};

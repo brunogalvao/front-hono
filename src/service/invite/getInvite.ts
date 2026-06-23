@@ -1,10 +1,7 @@
 import { API_BASE_URL } from '@/config/api';
+import type { InviteInfo } from '@/model/invite.model';
 
-export interface InviteInfo {
-  email: string;
-  group: { id: string; name: string };
-  expires_at: string;
-}
+export type { InviteInfo };
 
 export async function getInvite(token: string): Promise<InviteInfo> {
   const res = await fetch(`${API_BASE_URL}/api/invite/${token}`);

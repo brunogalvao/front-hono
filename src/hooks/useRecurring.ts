@@ -1,32 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
+import type { RecurringExpense, RecurringInput } from '@/model/recurring.model';
 
-export interface RecurringExpense {
-  id: string;
-  workspace_id: string;
-  category_id: string | null;
-  created_by: string;
-  description: string;
-  amount: number;
-  frequency: 'monthly' | 'weekly' | 'yearly';
-  start_date: string;
-  end_date: string | null;
-  is_active: boolean;
-  last_generated_date: string | null;
-  created_at: string;
-  categories?: { id: string; name: string; icon: string | null } | null;
-}
-
-export interface RecurringInput {
-  workspace_id: string;
-  description: string;
-  amount: number;
-  frequency: 'monthly' | 'weekly' | 'yearly';
-  start_date: string;
-  end_date?: string | null;
-  category_id?: string | null;
-}
+export type { RecurringExpense, RecurringInput };
 
 async function fetchRecurring(workspaceId: string): Promise<RecurringExpense[]> {
   const { data, error } = await supabase

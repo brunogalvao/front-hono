@@ -1,22 +1,6 @@
-export type WorkspaceRole = 'super_administrador' | 'administrador' | 'operador' | 'visualizador';
+import type { WorkspaceRole, PermissionResource, ResourcePermission, PermissionMatrix } from '@/model/workspace.model';
 
-export type PermissionResource =
-  | 'transactions'
-  | 'installments'
-  | 'recurring'
-  | 'categories'
-  | 'settings'
-  | 'members'
-  | 'permissions';
-
-export interface ResourcePermission {
-  can_read: boolean;
-  can_create: boolean;
-  can_update: boolean;
-  can_delete: boolean;
-}
-
-export type PermissionMatrix = Record<PermissionResource, ResourcePermission>;
+export type { WorkspaceRole, PermissionResource, ResourcePermission, PermissionMatrix };
 
 export function canWrite(role: WorkspaceRole | null | undefined): boolean {
   return role === 'super_administrador' || role === 'administrador' || role === 'operador';

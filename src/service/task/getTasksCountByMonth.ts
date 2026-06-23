@@ -1,14 +1,8 @@
 import { API_BASE_URL } from '@/config/api';
 import { getAuthToken } from '@/lib/supabase';
-import type { Task } from '@/model/tasks.model';
+import type { Task, TasksCountByMonth, TasksMonthMeta } from '@/model/tasks.model';
 
-export type TasksCountByMonth = Record<number, number>;
-
-export type TasksMonthMeta = {
-  count: TasksCountByMonth;
-  hasRecorrente: Record<number, boolean>;
-  recorrenteNames: Record<number, string[]>;
-};
+export type { TasksCountByMonth, TasksMonthMeta };
 
 export const getTasksCountByMonth = async (
   year: number

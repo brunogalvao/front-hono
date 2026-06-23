@@ -1,8 +1,8 @@
-import type { Task } from '@/model/tasks.model';
+import type { Task, TasksByYear } from '@/model/tasks.model';
 import { API_BASE_URL } from '@/config/api';
 import { getAuthToken } from '@/lib/supabase';
 
-export type TasksByYear = Record<number, Task[]>;
+export type { TasksByYear };
 
 export const getTasksByYear = async (year: number): Promise<TasksByYear> => {
   const accessToken = await getAuthToken();

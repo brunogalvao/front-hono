@@ -1,10 +1,7 @@
 import { fetchWithAuth } from '@/lib/fetch-api';
-import type { GroupItem } from './getGroups';
+import type { CreateGroupPayload, GroupItem } from '@/model/group.model';
 
-export interface CreateGroupPayload {
-  name: string;
-  type: 'personal' | 'shared';
-}
+export type { CreateGroupPayload };
 
 export async function createGroup(payload: CreateGroupPayload): Promise<GroupItem> {
   return fetchWithAuth<GroupItem>('/api/groups', {

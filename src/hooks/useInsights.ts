@@ -1,12 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
+import type { Insight } from '@/model/insight.model';
 
-export interface Insight {
-  category: string;
-  observation: string;
-  suggestion: string;
-}
+export type { Insight };
 
 async function fetchInsights(
   workspaceId: string,
