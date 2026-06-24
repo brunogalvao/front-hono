@@ -18,6 +18,7 @@ import { getCurrentMonth, getCurrentYear } from '@/utils/date';
 import { useTranslation } from 'react-i18next';
 import { MonthNavigator } from '@/components/dashboard/MonthNavigator';
 import { SummaryCard } from '@/components/dashboard/SummaryCard';
+import { DollarConversionCard } from '@/components/dashboard/DollarConversionCard';
 import { useDashboard } from '@/hooks/useDashboard';
 import { useWorkspace } from '@/context/WorkspaceContext';
 
@@ -30,7 +31,11 @@ const Dashboard = () => {
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
-  const { workspaceSummary, individualSummary } = useDashboard(activeWorkspaceId, month, year);
+  const { workspaceSummary, individualSummary } = useDashboard(
+    activeWorkspaceId,
+    month,
+    year
+  );
 
   const subtitulo = `${getNomeMes(getCurrentMonth())} ${getCurrentYear()}`;
 
@@ -38,12 +43,19 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <TituloPage titulo={t('title')} subtitulo={subtitulo} />
-        <MonthNavigator month={month} year={year} onChange={(m, y) => { setMonth(m); setYear(y); }} />
+        <MonthNavigator
+          month={month}
+          year={year}
+          onChange={(m, y) => {
+            setMonth(m);
+            setYear(y);
+          }}
+        />
       </div>
 
       {/* Resumo do Workspace e Individual */}
       {activeWorkspaceId && (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
           <SummaryCard
             title="Workspace"
             summary={workspaceSummary.data}
@@ -53,6 +65,12 @@ const Dashboard = () => {
             title="Meus gastos"
             summary={individualSummary.data}
             isLoading={individualSummary.isLoading}
+          />
+          <DollarConversionCard
+            isLoading={shouldShowSkeleton}
+            cotacaoDolar={iaData?.data?.cotacaoDolar}
+            quantidadeDolar={iaData?.data?.quantidadeDolar}
+            resultadoLiquido={iaData?.data?.resultadoLiquido}
           />
         </div>
       )}
@@ -102,13 +120,13 @@ const Dashboard = () => {
 
       {/* Análise da IA */}
       {shouldShowSkeleton ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-[30%_40%_30%]">
+        <div className={`grid grid-cols-1 gap-4 ${!activeWorkspaceId ? 'md:grid-cols-[30%_40%_30%]' : 'md:grid-cols-2'}`}>
           <StatusSkeleton />
           <SummarySkeleton />
-          <DollarConversionSkeleton />
+          {!activeWorkspaceId && <DollarConversionSkeleton />}
         </div>
       ) : iaData?.data ? (
-        <IARecommendations data={iaData.data} />
+        <IARecommendations data={iaData.data} showDollarCard={!activeWorkspaceId} />
       ) : null}
     </div>
   );

@@ -11,13 +11,14 @@ import {
   Clock,
   Activity,
 } from 'lucide-react';
-import { FaChartArea, FaMoneyBill } from 'react-icons/fa6';
-import { MdTipsAndUpdates } from 'react-icons/md';
+import { FaChartArea } from 'react-icons/fa6';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { DollarConversionCard } from '@/components/dashboard/DollarConversionCard';
 
 type Props = {
   data: IASimplificada;
+  showDollarCard?: boolean;
 };
 
 const getStatusFinanceiro = (percentualGasto: number) => {
@@ -52,13 +53,13 @@ const getStatusFinanceiro = (percentualGasto: number) => {
   }
 };
 
-const IARecommendations = ({ data }: Props) => {
+const IARecommendations = ({ data, showDollarCard = false }: Props) => {
   const {
     percentualGasto,
     percentualDisponivel,
     resultadoLiquido,
-    cotacaoDolar,
     quantidadeDolar,
+    cotacaoDolar,
     rendimentoMes,
     despesasPagas,
     despesasPendentes,
@@ -68,7 +69,7 @@ const IARecommendations = ({ data }: Props) => {
   const IconComponent = statusInfo.icon;
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-[30%_40%_30%]">
+    <div className={`grid grid-cols-1 gap-4 ${showDollarCard ? 'md:grid-cols-[30%_40%_30%]' : 'md:grid-cols-2'}`}>
       {/* Status Financeiro */}
       <Card>
         <CardHeader className="pb-2">
@@ -172,41 +173,13 @@ const IARecommendations = ({ data }: Props) => {
         </CardContent>
       </Card>
 
-      {/* Conversão Dólar */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-primary flex flex-row items-center gap-2 text-lg">
-            <FaMoneyBill />
-            Conversão em Dólar
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-muted-foreground text-sm">Cotação atual:</p>
-              <p className="text-xl font-semibold text-emerald-600">
-                {formatToBRL(cotacaoDolar)}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-muted-foreground text-sm">Resultado em dólares:</p>
-              <p className="text-xl font-semibold text-blue-600">
-                ${quantidadeDolar.toFixed(2)}
-              </p>
-            </div>
-          </div>
-          <div className="bg-muted mt-4 rounded-lg p-3">
-            <p className="text-muted-foreground flex flex-row items-center gap-2 text-sm">
-              <MdTipsAndUpdates className="shrink-0 text-amber-500" />
-              <span>
-                Com {formatToBRL(resultadoLiquido)} você pode comprar $
-                {quantidadeDolar.toFixed(2)} dólares na cotação de{' '}
-                {formatToBRL(cotacaoDolar)}.
-              </span>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {showDollarCard && (
+        <DollarConversionCard
+          cotacaoDolar={cotacaoDolar}
+          quantidadeDolar={quantidadeDolar}
+          resultadoLiquido={resultadoLiquido}
+        />
+      )}
     </div>
   );
 };
