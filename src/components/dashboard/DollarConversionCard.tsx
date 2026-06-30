@@ -7,14 +7,14 @@ import { formatToBRL, formatToUSD } from '@/utils/format';
 interface DollarConversionCardProps {
   cotacaoDolar?: number;
   quantidadeDolar?: number;
-  resultadoLiquido?: number;
+  valorLivre?: number;
   isLoading?: boolean;
 }
 
 export function DollarConversionCard({
   cotacaoDolar,
   quantidadeDolar,
-  resultadoLiquido,
+  valorLivre,
   isLoading,
 }: DollarConversionCardProps) {
   if (isLoading || cotacaoDolar === undefined) {
@@ -45,9 +45,9 @@ export function DollarConversionCard({
             </p>
           </div>
           <div className="text-right">
-            <p className="text-muted-foreground text-sm">Resultado em dólares:</p>
-            <p className="text-xl font-semibold text-blue-600">
-              {formatToUSD(quantidadeDolar ?? 0)}
+            <p className="text-muted-foreground text-sm">Valor livre:</p>
+            <p className="text-xl font-semibold text-emerald-600">
+              {formatToBRL(valorLivre ?? 0)}
             </p>
           </div>
         </div>
@@ -55,8 +55,9 @@ export function DollarConversionCard({
           <p className="text-muted-foreground flex flex-row items-center gap-2 text-sm">
             <MdTipsAndUpdates className="shrink-0 text-amber-500" />
             <span>
-              Com {formatToBRL(resultadoLiquido ?? 0)} você pode comprar $
-              {(quantidadeDolar ?? 0).toFixed(2)} dólares na cotação de{' '}
+              Você pode converter{' '}
+              <span className="font-semibold text-blue-600">{formatToUSD(quantidadeDolar ?? 0)}</span>
+              {' '}com o valor livre de {formatToBRL(valorLivre ?? 0)} na cotação de{' '}
               {formatToBRL(cotacaoDolar)}.
             </span>
           </p>

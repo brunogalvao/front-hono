@@ -177,7 +177,7 @@ const IARecommendations = ({ data, showDollarCard = false }: Props) => {
         <DollarConversionCard
           cotacaoDolar={cotacaoDolar}
           quantidadeDolar={quantidadeDolar}
-          resultadoLiquido={resultadoLiquido}
+          valorLivre={data.valorLivre}
         />
       )}
     </div>

@@ -7,6 +7,7 @@ export interface IASimplificada {
   percentualGasto: number;
   dicasEconomia: string[];
   resultadoLiquido: number;
+  valorLivre: number;
   cotacaoDolar: number;
   quantidadeDolar: number;
 }

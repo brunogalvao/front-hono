@@ -8,8 +8,8 @@ export function useIA() {
   const query = useQuery({
     queryKey: queryKeys.ia.all,
     queryFn: () => getIA(),
-    staleTime: 1000 * 60 * 2, // 2 minutos
-    gcTime: 1000 * 60 * 5,
+    staleTime: 0,
+    gcTime: 0,
     refetchOnWindowFocus: false,
   });
 

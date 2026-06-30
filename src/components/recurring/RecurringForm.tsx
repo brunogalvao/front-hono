@@ -13,6 +13,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { CurrencyInput } from '@/components/ui/currency-input';
 import { Button } from '@/components/ui/button';
 import { useCategories } from '@/hooks/useCategories';
 import { useWorkspace } from '@/context/WorkspaceContext';
@@ -121,7 +122,7 @@ export function RecurringForm({
             <FormField control={form.control} name="amount" render={({ field }) => (
               <FormItem>
                 <FormLabel>{t('form.amount')}</FormLabel>
-                <FormControl><Input type="number" step="0.01" min="0.01" {...field} /></FormControl>
+                <FormControl><CurrencyInput value={field.value} onChange={field.onChange} /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />

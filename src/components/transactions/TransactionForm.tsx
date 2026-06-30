@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { CurrencyInput } from '@/components/ui/currency-input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/useCategories';
@@ -201,7 +202,7 @@ export function TransactionForm({
                 <FormItem>
                   <FormLabel>{t('form.amount')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.01" min="0.01" {...field} />
+                    <CurrencyInput value={field.value} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

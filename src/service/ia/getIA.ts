@@ -52,6 +52,7 @@ export async function getIA(): Promise<IAResponse> {
       percentualGasto: Math.round(raw.percentualGasto ?? 0),
       dicasEconomia: gerarDicasEconomia(raw.percentualGasto ?? 0),
       resultadoLiquido: raw.resultadoLiquido ?? 0,
+      valorLivre: raw.valorLivre ?? 0,
       cotacaoDolar: raw.cotacaoDolar > 0 ? raw.cotacaoDolar : 5.25,
       quantidadeDolar: raw.quantidadeDolar ?? 0,
     },

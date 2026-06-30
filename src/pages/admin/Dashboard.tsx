@@ -70,7 +70,7 @@ const Dashboard = () => {
             isLoading={shouldShowSkeleton}
             cotacaoDolar={iaData?.data?.cotacaoDolar}
             quantidadeDolar={iaData?.data?.quantidadeDolar}
-            resultadoLiquido={iaData?.data?.resultadoLiquido}
+            valorLivre={iaData?.data?.valorLivre}
           />
         </div>
       )}

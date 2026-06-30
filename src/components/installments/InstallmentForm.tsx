@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { CurrencyInput } from '@/components/ui/currency-input';
 import { Button } from '@/components/ui/button';
 import { useCategories } from '@/hooks/useCategories';
 import { useWorkspace } from '@/context/WorkspaceContext';
@@ -210,12 +211,7 @@ export function InstallmentForm({
                     <FormItem>
                       <FormLabel>{t('form.installmentAmount')}</FormLabel>
                       <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          min="0.01"
-                          {...field}
-                        />
+                        <CurrencyInput value={field.value} onChange={field.onChange} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -361,7 +357,7 @@ export function InstallmentForm({
                   <FormItem>
                     <FormLabel>{t('form.totalAmount')}</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" min="0.01" {...field} />
+                      <CurrencyInput value={field.value} onChange={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

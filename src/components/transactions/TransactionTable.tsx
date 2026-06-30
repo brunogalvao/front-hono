@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   flexRender,
@@ -27,7 +27,16 @@ import { TrendingUp, CircleCheck, Clock } from 'lucide-react';
 import { useTransactions, type Transaction, type TransactionStatus } from '@/hooks/useTransactions';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { formatToBRL } from '@/utils/format';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+
+const STATUS_ORDER: Record<string, number> = { pendente: 0, pago: 1, recebido: 2 };
+
+const GROUP_CONFIG = {
+  pendente: { Icon: Clock, colorClass: 'text-amber-600 dark:text-amber-400', bgClass: 'bg-amber-500/10' },
+  pago: { Icon: CircleCheck, colorClass: 'text-green-600 dark:text-green-400', bgClass: 'bg-green-500/10' },
+  recebido: { Icon: TrendingUp, colorClass: 'text-green-600 dark:text-green-400', bgClass: 'bg-green-500/10' },
+} as const;
 
 interface TransactionTableProps {
   month: number;
@@ -74,6 +83,19 @@ export function TransactionTable({
     [transactions, categoryFilter],
   );
 
+  const groupTotals = useMemo(() => {
+    const acc: Record<string, number> = {};
+    for (const tx of filtered) {
+      acc[tx.status] = (acc[tx.status] ?? 0) + tx.amount;
+    }
+    return acc;
+  }, [filtered]);
+
+  const sortedFiltered = useMemo(
+    () => [...filtered].sort((a, b) => (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99)),
+    [filtered],
+  );
+
   const handleToggleStatus = async (id: string, status: TransactionStatus) => {
     try {
       await update.mutateAsync({ id, status });
@@ -93,7 +115,7 @@ export function TransactionTable({
   };
 
   const table = useReactTable({
-    data: filtered,
+    data: sortedFiltered,
     columns,
     getCoreRowModel: getCoreRowModel(),
     meta: {
@@ -187,22 +209,41 @@ export function TransactionTable({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={
-                        cell.column.id === 'type' || cell.column.id === 'actions'
-                          ? 'hidden sm:table-cell'
-                          : undefined
-                      }
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
+              {table.getRowModel().rows.map((row, index, rows) => {
+                const isNewGroup = index === 0 || rows[index - 1].original.status !== row.original.status;
+                const config = GROUP_CONFIG[row.original.status as keyof typeof GROUP_CONFIG];
+                return (
+                  <Fragment key={row.id}>
+                    {isNewGroup && config && (
+                      <TableRow className={cn('hover:bg-transparent', config.bgClass)}>
+                        <TableCell colSpan={columns.length} className="py-2 px-4">
+                          <div className={cn('flex items-center gap-2 text-sm font-semibold', config.colorClass)}>
+                            <config.Icon className="h-4 w-4" />
+                            <span>{t(`status.${row.original.status}` as `status.${typeof row.original.status}`)}</span>
+                            <span className="ml-auto tabular-nums font-medium">
+                              {formatToBRL(groupTotals[row.original.status] ?? 0)}
+                            </span>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    <TableRow>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          className={
+                            cell.column.id === 'type' || cell.column.id === 'actions'
+                              ? 'hidden sm:table-cell'
+                              : undefined
+                          }
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </Fragment>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
