@@ -23,7 +23,7 @@ import {
 import { TransactionTableSkeleton } from './TransactionTableSkeleton';
 import { TransactionForm } from './TransactionForm';
 import { getTransactionColumns } from './transaction-columns';
-import { TrendingUp, CircleCheck, Clock } from 'lucide-react';
+import { TrendingUp, TrendingDown, CircleCheck, Clock } from 'lucide-react';
 import { useTransactions, type Transaction, type TransactionStatus } from '@/hooks/useTransactions';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { formatToBRL } from '@/utils/format';
@@ -62,11 +62,12 @@ export function TransactionTable({
 
   const columns = useMemo(() => getTransactionColumns(t), [t]);
 
-  const totals = useMemo(() => ({
-    pago: transactions.filter((tx) => tx.status === 'pago').reduce((s, tx) => s + tx.amount, 0),
-    pendente: transactions.filter((tx) => tx.status === 'pendente').reduce((s, tx) => s + tx.amount, 0),
-    recebido: transactions.filter((tx) => tx.status === 'recebido').reduce((s, tx) => s + tx.amount, 0),
-  }), [transactions]);
+  const totals = useMemo(() => {
+    const pago = transactions.filter((tx) => tx.status === 'pago').reduce((s, tx) => s + tx.amount, 0);
+    const pendente = transactions.filter((tx) => tx.status === 'pendente').reduce((s, tx) => s + tx.amount, 0);
+    const recebido = transactions.filter((tx) => tx.status === 'recebido').reduce((s, tx) => s + tx.amount, 0);
+    return { pago, pendente, recebido, saldo: recebido - pago };
+  }, [transactions]);
 
   const categories = useMemo(() => Array.from(
     new Map(
@@ -157,10 +158,17 @@ export function TransactionTable({
               <div className="h-5 w-px bg-border shrink-0" />
             </>
           )}
-          <div className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium bg-green-500/15 text-green-600 dark:text-green-400">
-            <TrendingUp className="h-4 w-4 shrink-0" />
-            <span>{t('status.recebido')}</span>
-            <span className="tabular-nums font-semibold">{formatToBRL(totals.recebido)}</span>
+          <div className={cn(
+            'flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium',
+            totals.saldo >= 0
+              ? 'bg-green-500/15 text-green-600 dark:text-green-400'
+              : 'bg-red-500/15 text-red-600 dark:text-red-400',
+          )}>
+            {totals.saldo >= 0
+              ? <TrendingUp className="h-4 w-4 shrink-0" />
+              : <TrendingDown className="h-4 w-4 shrink-0" />}
+            <span>{t('status.saldo')}</span>
+            <span className="tabular-nums font-semibold">{formatToBRL(totals.saldo)}</span>
           </div>
         </div>
 

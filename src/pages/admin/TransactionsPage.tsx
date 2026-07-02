@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { MonthNavigator } from '@/components/dashboard/MonthNavigator';
+import { MonthYearPicker } from '@/components/ui/month-year-picker';
 import { TransactionTable } from '@/components/transactions/TransactionTable';
 import { TransactionForm } from '@/components/transactions/TransactionForm';
 import { useTransactions } from '@/hooks/useTransactions';
@@ -45,7 +45,7 @@ export default function TransactionsPage() {
           <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
-          <MonthNavigator month={month} year={year} onChange={(m, y) => { setMonth(m); setYear(y); }} />
+          <MonthYearPicker month={month} year={year} onChange={(m, y) => { setMonth(m); setYear(y); }} />
           {can('transactions', 'create') && (
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="mr-1 h-4 w-4" />

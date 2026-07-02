@@ -11,6 +11,7 @@
     "pago": "Pago",
     "pendente": "Pendente",
     "recebido": "Recebido",
+    "saldo": "Saldo",
     "markPaid": "Marcar como pago",
     "markPending": "Marcar como pendente"
   },
