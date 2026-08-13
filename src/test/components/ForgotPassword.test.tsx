@@ -68,7 +68,9 @@ describe('ForgotPassword', () => {
     await waitFor(() => {
       expect(supabase.auth.resetPasswordForEmail).toHaveBeenCalledWith(
         'bruno@email.com',
-        expect.objectContaining({ redirectTo: expect.any(String) })
+        expect.objectContaining({
+          redirectTo: `${window.location.origin}/auth/reset-password`,
+        })
       );
     });
   });

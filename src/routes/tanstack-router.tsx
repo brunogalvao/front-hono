@@ -18,6 +18,7 @@ import Groups from '@/pages/admin/Groups';
 import Invite from '@/pages/Invite';
 // New pages
 import RegisterPage from '@/pages/auth/RegisterPage';
+import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
 import AcceptInvitePage from '@/pages/auth/AcceptInvitePage';
 import TransactionsPage from '@/pages/admin/TransactionsPage';
 import RecurringPage from '@/pages/admin/RecurringPage';
@@ -163,6 +164,12 @@ const authCallbackRoute = createRoute({
   component: AuthCallback,
 });
 
+const resetPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/auth/reset-password',
+  component: ResetPasswordPage,
+});
+
 const acceptInviteRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth/accept-invite',
@@ -183,6 +190,7 @@ const routeTree = rootRoute.addChildren([
   registerRoute,
   inviteRoute,
   authCallbackRoute,
+  resetPasswordRoute,
   acceptInviteRoute,
   adminRoute.addChildren([
     editUserRoute,
