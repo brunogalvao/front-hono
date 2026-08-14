@@ -105,7 +105,7 @@ const FinancialChart = () => {
   if (!hasData) return null;
 
   return (
-    <Card className="overflow-hidden">
+    <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-primary flex flex-row items-center gap-2 text-lg">
           <TrendingUp className="h-5 w-5" />
@@ -113,8 +113,7 @@ const FinancialChart = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={256}>
             <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="gradRendimento" x1="0" y1="0" x2="0" y2="1">
@@ -214,7 +213,6 @@ const FinancialChart = () => {
               />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
       </CardContent>
     </Card>
   );

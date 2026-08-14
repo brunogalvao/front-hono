@@ -23,7 +23,7 @@ import { useDashboard } from '@/hooks/useDashboard';
 import { useWorkspace } from '@/context/WorkspaceContext';
 
 const Dashboard = () => {
-  const { data: iaData, isLoading } = useIA();
+  const { data: iaData, isLoading, isError: iaIsError } = useIA();
   const { t } = useTranslation('dashboard');
   const shouldShowSkeleton = isLoading;
   const { activeWorkspaceId } = useWorkspace();
@@ -68,6 +68,7 @@ const Dashboard = () => {
           />
           <DollarConversionCard
             isLoading={shouldShowSkeleton}
+            isError={iaIsError}
             cotacaoDolar={iaData?.data?.cotacaoDolar}
             quantidadeDolar={iaData?.data?.quantidadeDolar}
             valorLivre={iaData?.data?.valorLivre}

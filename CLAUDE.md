@@ -276,6 +276,8 @@ Centralized in `src/lib/query-keys.ts`. Always reference from there — never in
 
 ## 8. Build System
 
+**Package Manager:** `pnpm` (v11+) — **nunca usar `npm` ou `yarn`**. O projeto usa `pnpm-lock.yaml` e tem `preinstall` que bloqueia outros gerenciadores.
+
 **Bundler:** Vite 6.4.1
 
 ### Manual Chunks (code-splitting)

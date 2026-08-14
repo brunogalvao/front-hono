@@ -1,5 +1,6 @@
 import { FaMoneyBill } from 'react-icons/fa6';
 import { MdTipsAndUpdates } from 'react-icons/md';
+import { WifiOff } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatToBRL, formatToUSD } from '@/utils/format';
@@ -9,6 +10,7 @@ interface DollarConversionCardProps {
   quantidadeDolar?: number;
   valorLivre?: number;
   isLoading?: boolean;
+  isError?: boolean;
 }
 
 export function DollarConversionCard({
@@ -16,13 +18,29 @@ export function DollarConversionCard({
   quantidadeDolar,
   valorLivre,
   isLoading,
+  isError,
 }: DollarConversionCardProps) {
-  if (isLoading || cotacaoDolar === undefined) {
+  if (isLoading) {
     return (
       <Card>
         <CardHeader><CardTitle className="text-base">Conversão em Dólar</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isError || cotacaoDolar === undefined) {
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Conversão em Dólar</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center justify-center gap-2 py-6 text-center">
+          <WifiOff className="h-8 w-8 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">API indisponível</p>
+          <p className="text-xs text-muted-foreground">Inicie o servidor para ver a cotação</p>
         </CardContent>
       </Card>
     );
