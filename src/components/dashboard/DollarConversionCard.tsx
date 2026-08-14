@@ -49,8 +49,8 @@ export function DollarConversionCard({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-primary flex flex-row items-center gap-2 text-lg">
-          <FaMoneyBill />
+        <CardTitle className="flex flex-row items-center gap-2 text-lg">
+          <FaMoneyBill className="text-primary shrink-0" />
           Conversão em Dólar
         </CardTitle>
       </CardHeader>

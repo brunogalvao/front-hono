@@ -107,8 +107,8 @@ const FinancialChart = () => {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-primary flex flex-row items-center gap-2 text-lg">
-          <TrendingUp className="h-5 w-5" />
+        <CardTitle className="flex flex-row items-center gap-2 text-lg">
+          <TrendingUp className="h-5 w-5 text-primary shrink-0" />
           Evolução Financeira {ano}
         </CardTitle>
       </CardHeader>

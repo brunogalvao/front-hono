@@ -73,8 +73,8 @@ const IARecommendations = ({ data, showDollarCard = false }: Props) => {
       {/* Status Financeiro */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-primary flex flex-row items-center gap-2 text-lg">
-            <Activity />
+          <CardTitle className="flex flex-row items-center gap-2 text-lg">
+            <Activity className="text-primary shrink-0" />
             Status Financeiro
           </CardTitle>
         </CardHeader>
@@ -103,13 +103,13 @@ const IARecommendations = ({ data, showDollarCard = false }: Props) => {
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <span className="text-muted-foreground text-xs">Resultado</span>
-              <div className="font-semibold text-blue-600">
+              <div className="font-semibold text-foreground">
                 {formatToBRL(resultadoLiquido)}
               </div>
             </div>
             <div>
               <span className="text-muted-foreground text-xs">Equivalente em dólar (USD)</span>
-              <div className="font-semibold text-purple-600">
+              <div className="font-semibold text-foreground">
                 {formatToUSD(quantidadeDolar)}
               </div>
             </div>
@@ -120,8 +120,8 @@ const IARecommendations = ({ data, showDollarCard = false }: Props) => {
       {/* Resumo Financeiro */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-primary flex flex-row items-center gap-2 text-lg">
-            <FaChartArea />
+          <CardTitle className="flex flex-row items-center gap-2 text-lg">
+            <FaChartArea className="text-primary shrink-0" />
             Resumo do Mês
           </CardTitle>
         </CardHeader>

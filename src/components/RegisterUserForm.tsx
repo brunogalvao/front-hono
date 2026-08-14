@@ -59,7 +59,7 @@ const RegisterUserForm = () => {
         data: {
           displayName: form.name,
         },
-        emailRedirectTo: `${window.location.origin}/admin/expenses`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 

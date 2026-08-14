@@ -109,7 +109,7 @@ const Dashboard = () => {
                     <Sparkles />
                     {t('advisorCta')}
                   </div>
-                  <div className="text-sm font-light text-gray-500 group-hover:text-white">
+                  <div className="text-sm font-light text-muted-foreground group-hover:text-white">
                     {t('advisorDescription')}
                   </div>
                 </div>
