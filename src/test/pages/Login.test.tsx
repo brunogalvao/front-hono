@@ -17,6 +17,7 @@ vi.mock('@/lib/supabase', () => ({
 const mockNavigate = vi.fn();
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mockNavigate,
+  useSearch: () => ({}),
   Link: ({ children, to }: any) => <a href={to}>{children}</a>,
 }));
 
