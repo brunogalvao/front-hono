@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, Link } from '@tanstack/react-router';
+import { useNavigate, useSearch, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import {
@@ -38,6 +38,8 @@ interface FormData {
 function Login() {
   const navigate = useNavigate();
   const { t } = useTranslation(['auth', 'home', 'common']);
+  const search = useSearch({ from: '/login' });
+  const redirectTo = (search as Record<string, string>).redirect ?? '/admin/dashboard';
 
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -67,7 +69,7 @@ function Login() {
 
       if (error) throw error;
 
-      navigate({ to: '/admin/dashboard' });
+      navigate({ to: redirectTo as '/admin/dashboard' });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : t('auth:login.errors.generic')
@@ -133,7 +135,7 @@ function Login() {
         data: { session },
       } = await supabase.auth.getSession();
       if (session) {
-        navigate({ to: '/admin/dashboard' });
+        navigate({ to: redirectTo as '/admin/dashboard' });
       }
     };
 

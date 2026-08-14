@@ -48,6 +48,9 @@ const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
   component: Login,
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search.redirect === 'string' ? search.redirect : undefined,
+  }),
 });
 
 const registerRoute = createRoute({
@@ -174,6 +177,9 @@ const acceptInviteRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth/accept-invite',
   component: AcceptInvitePage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    token: typeof search.token === 'string' ? search.token : '',
+  }),
 });
 
 // Catch-all route
