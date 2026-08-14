@@ -328,3 +328,100 @@ When translating Figma designs into this codebase:
 8. **Icons:** Match Figma icons to Lucide React names first; fall back to React Icons.
 9. **Dark mode:** All components must work in both light and dark — use semantic tokens only.
 10. **Responsive:** Implement mobile-first; use `sm:`, `md:`, `lg:` breakpoints.
+
+---
+
+## 10. Design Intent & Visual Language
+
+> Fonte canônica: `finance/design.md`. Esta seção resume as regras que o agent deve seguir ao criar ou modificar qualquer UI.
+
+### Tom do Produto
+
+**Calmo e preciso.** Não ansioso como um terminal de trading, não infantil como um app de cofrinho. Sério o suficiente para confiar com dinheiro real, limpo o suficiente para não cansar.
+
+### Semântica de Cores
+
+Cores têm **significado fixo** — nunca inverter:
+
+| Papel | Cor | Onde usar |
+|---|---|---|
+| Primary | Roxo `oklch(0.606 0.25 292.717)` | Ações principais, totais, badges de valor |
+| Receita / positivo | `text-emerald-500` | Valores de entrada, checkmarks, saúde financeira |
+| Alerta / IA tips | `text-amber-500` | Dicas de economia, atenção, Consultor IA |
+| Despesa / destrutivo | `text-destructive` | Exclusão, gastos críticos |
+
+**Regra crítica:** Não usar âmbar para receita nem emerald para alerta.
+
+### Elemento Signature — Consultor IA
+
+O **Consultor IA com `Sparkles`** é o elemento único do produto. Deve aparecer sempre que o app "pensa por você":
+
+- Ícone `Sparkles` + `text-amber-500` em insights e dicas
+- `CheckCircle2` + `text-emerald-500` em recomendações cumpridas
+- Link `/admin/advisor` com `rounded-full border border-primary hover:bg-primary` — **único CTA com esse tratamento no app**
+- Skeletons animados durante carregamento de IA (comunica "processando", não apenas "carregando")
+
+### Tipografia
+
+| Nível | Classes Tailwind | Uso |
+|---|---|---|
+| Título de página | `text-2xl font-semibold` | `TituloPage`, headings principais |
+| Subtítulo | `text-sm text-muted-foreground` | Período mensal, contexto |
+| Card title | `text-lg font-semibold` | Títulos de seção |
+| Valor monetário | `text-lg font-bold` em badge | Totais, saldos |
+| Corpo | `text-sm` | Descrições, células de tabela |
+| Metadado | `text-xs text-muted-foreground` | Labels de gráfico, datas |
+| Conteúdo IA | `font-light` | Parágrafos do advisor — tom consultivo |
+
+**Valores monetários** sempre em pill: `rounded-full bg-{color} px-3 text-lg font-bold text-white`
+
+### Espaçamento
+
+Base: **4px grid** (1 unidade Tailwind = 4px).
+
+| Contexto | Classes |
+|---|---|
+| Gap ícone / texto | `gap-2` |
+| Intra-componente | `p-4`, `gap-4` |
+| Entre seções | `space-y-6` |
+| Padding de card | `p-4` a `p-6` |
+
+### Profundidade
+
+Estratégia: **bordas + surface color shifts**. Sem sombras dramáticas.
+
+- Cards: `border` + `bg-card rounded-lg`
+- Tooltips/dropdowns flutuantes: única exceção com `shadow-lg`
+- Focus ring: `outline-ring/50` — presente mas não agressivo
+
+### Estados de Dados Obrigatórios
+
+Todo componente que carrega dados **deve** implementar os 4 estados:
+
+| Estado | Tratamento |
+|---|---|
+| Loading | Skeleton dedicado com dimensões realistas |
+| Error | `text-destructive` com mensagem descritiva |
+| Empty | Estado explícito — nunca tabela vazia sem contexto |
+| Success | Dado renderizado com hierarquia visual completa |
+
+### Animações
+
+| Biblioteca | Papel |
+|---|---|
+| **GSAP** | Animações de entrada pesadas — hero title na home |
+| **Framer Motion** | Transições de estado em componentes — presença/ausência |
+| **animate-ui/** | Micro-interações em ícones e botões — hover/click |
+
+**Regra:** Micro-interações 100–200ms, transições de layout 200–300ms, easing de desaceleração. **Sem spring/bounce** — o produto é sério.
+
+### O que Nunca Fazer
+
+- **Hex hardcoded** — sempre token semântico
+- **Cores sem significado** — âmbar é alerta, emerald é positivo; nunca inverter
+- **Sombras dramáticas** — apenas tooltips flutuantes usam `shadow-lg`
+- **Sidebar com background diferente** — mesma superfície, separada por borda
+- **Componentes sem skeleton** — estados de loading são parte do design
+- **Gradientes decorativos** — cor deve significar algo
+- **Múltiplos accents** — roxo é o único accent; emerald/âmbar são semânticos, não accents
+- **Valor monetário sem badge** — sempre `rounded-full bg-{color} font-bold`
