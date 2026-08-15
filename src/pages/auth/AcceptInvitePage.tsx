@@ -23,22 +23,37 @@ export default function AcceptInvitePage() {
 
     let done = false;
 
-    const accept = async () => {
+    const accept = async (accessToken: string) => {
       if (done) return;
       done = true;
 
+      // Explicitly pass the access token so the edge function always
+      // receives a valid Authorization header regardless of client timing.
       const { data, error } = await supabase.functions.invoke('accept-invite', {
         body: { token },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
 
-      if (error || data?.error) {
-        const msg = data?.error ?? error?.message ?? 'Erro desconhecido';
-        if (msg.includes('expired') || msg.includes('expirado')) {
+      // Extract the real error message from the response body when non-2xx
+      let errorMsg: string | null = null;
+      if (error) {
+        try {
+          const body = await (error as { context?: Response }).context?.json();
+          errorMsg = body?.error ?? error.message;
+        } catch {
+          errorMsg = error.message;
+        }
+      } else if (data?.error) {
+        errorMsg = data.error;
+      }
+
+      if (errorMsg) {
+        if (errorMsg.includes('expired') || errorMsg.includes('expirado')) {
           setStatus('expired');
           setMessage(t('page.expiredMessage'));
         } else {
           setStatus('error');
-          setMessage(msg);
+          setMessage(errorMsg);
         }
         return;
       }
@@ -47,20 +62,19 @@ export default function AcceptInvitePage() {
       setTimeout(() => navigate({ to: '/admin/dashboard' }), 2000);
     };
 
-    // Try immediately with a cached session
+    // Try immediately — session should already be set if coming from AuthCallback
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        accept();
+      if (session?.access_token) {
+        accept(session.access_token);
         return;
       }
 
-      // Session not ready yet (PKCE code still being exchanged).
-      // Wait for SIGNED_IN from onAuthStateChange.
+      // Fallback: session not ready yet, wait for SIGNED_IN
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_IN' && session) {
+        if (event === 'SIGNED_IN' && session?.access_token) {
           subscription.unsubscribe();
           clearTimeout(timeout);
-          accept();
+          accept(session.access_token);
         } else if (event === 'SIGNED_OUT') {
           subscription.unsubscribe();
           clearTimeout(timeout);
@@ -68,7 +82,7 @@ export default function AcceptInvitePage() {
         }
       });
 
-      // Safety timeout — if no session after 10s, send to login
+      // Safety timeout — 10s without session → back to login
       const timeout = setTimeout(() => {
         subscription.unsubscribe();
         if (!done) {
