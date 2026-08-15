@@ -8,23 +8,29 @@ const AuthCallback = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // With PKCE flow, the code may have been exchanged before this component mounted.
-    // Check for an existing session first to avoid missing the SIGNED_IN event.
+    // Resolve redirect once to avoid double-reading sessionStorage
+    // Priority: 1) ?next= param in URL (email confirmation) 2) sessionStorage (OAuth) 3) dashboard
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get('next');
+    const stored = sessionStorage.getItem('postAuthRedirect');
+    if (stored) sessionStorage.removeItem('postAuthRedirect');
+    const redirectTo = (next ?? stored ?? '/admin/dashboard') as '/admin/dashboard';
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate({ to: '/admin/dashboard' });
+        navigate({ to: redirectTo });
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        navigate({ to: '/admin/dashboard' });
+        navigate({ to: redirectTo });
       } else if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) {
         navigate({ to: '/login' });
       }
     });
 
-    // Timeout de segurança — se demorar mais de 10s, volta para login
+    // Safety timeout — if it takes more than 10s, return to login
     const timeout = setTimeout(() => {
       navigate({ to: '/login' });
     }, 10000);

@@ -20,7 +20,12 @@ import { AnimateIcon } from './animate-ui/icons/icon';
 import { Send } from './animate-ui/icons/send';
 import { Loader } from './animate-ui/icons/loader';
 
-const RegisterUserForm = () => {
+interface Props {
+  /** Where to redirect after successful auth. Defaults to /admin/dashboard. */
+  redirectAfter?: string;
+}
+
+const RegisterUserForm = ({ redirectAfter = '/admin/dashboard' }: Props) => {
   const { t } = useTranslation(['auth', 'common']);
   const [form, setForm] = useState({
     email: '',
@@ -42,15 +47,22 @@ const RegisterUserForm = () => {
 
     if (!result.success) {
       const errorMessages = result.error.flatten().fieldErrors;
-
-      // Pega a primeira mensagem de erro e exibe no toast
       const firstError = Object.values(errorMessages)[0]?.[0];
       if (firstError) toast.error(firstError);
-
       return;
     }
 
     setLoading(true);
+
+    // Store redirect so AuthCallback can pick it up after email confirmation.
+    // Also encode it in emailRedirectTo as ?next= param for cross-device/tab support.
+    if (redirectAfter !== '/admin/dashboard') {
+      sessionStorage.setItem('postAuthRedirect', redirectAfter);
+    }
+
+    const emailRedirectTo = redirectAfter !== '/admin/dashboard'
+      ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectAfter)}`
+      : `${window.location.origin}/auth/callback`;
 
     const { data, error } = await supabase.auth.signUp({
       email: form.email,
@@ -59,13 +71,15 @@ const RegisterUserForm = () => {
         data: {
           displayName: form.name,
         },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo,
       },
     });
 
     if (error) {
+      sessionStorage.removeItem('postAuthRedirect');
       toast.error(`${t('register.errors.generic')}: ${error.message}`);
     } else if (data.user && data.user.identities?.length === 0) {
+      sessionStorage.removeItem('postAuthRedirect');
       toast.error(t('register.errors.emailInUse'));
     } else {
       toast.success(t('register.success'));

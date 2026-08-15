@@ -82,6 +82,10 @@ function Login() {
   const handleGithubLogin = async () => {
     try {
       setLoading(true);
+      // Persist redirect so AuthCallback can restore it after OAuth
+      if (redirectTo !== '/admin/dashboard') {
+        sessionStorage.setItem('postAuthRedirect', redirectTo);
+      }
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
@@ -90,6 +94,7 @@ function Login() {
       });
       if (error) throw error;
     } catch (err) {
+      sessionStorage.removeItem('postAuthRedirect');
       setError(
         err instanceof Error ? err.message : t('auth:login.errors.github')
       );
@@ -100,6 +105,10 @@ function Login() {
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
+      // Persist redirect so AuthCallback can restore it after OAuth
+      if (redirectTo !== '/admin/dashboard') {
+        sessionStorage.setItem('postAuthRedirect', redirectTo);
+      }
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -108,6 +117,7 @@ function Login() {
       });
       if (error) throw error;
     } catch (err) {
+      sessionStorage.removeItem('postAuthRedirect');
       setError(
         err instanceof Error ? err.message : t('auth:login.errors.google')
       );
@@ -279,7 +289,8 @@ function Login() {
                 </form>
               </TabsContent>
               <TabsContent value="sign-up">
-                <RegisterUserForm />
+                {/* Pass redirectAfter so registration preserves the invite token */}
+                <RegisterUserForm redirectAfter={redirectTo} />
               </TabsContent>
             </CardContent>
             <CardFooter>
