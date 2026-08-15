@@ -21,12 +21,11 @@ export default function AcceptInvitePage() {
       return;
     }
 
+    let done = false;
+
     const accept = async () => {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
-        navigate({ to: '/login', search: { redirect: `/auth/accept-invite?token=${token}` } });
-        return;
-      }
+      if (done) return;
+      done = true;
 
       const { data, error } = await supabase.functions.invoke('accept-invite', {
         body: { token },
@@ -48,7 +47,35 @@ export default function AcceptInvitePage() {
       setTimeout(() => navigate({ to: '/admin/dashboard' }), 2000);
     };
 
-    accept();
+    // Try immediately with a cached session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        accept();
+        return;
+      }
+
+      // Session not ready yet (PKCE code still being exchanged).
+      // Wait for SIGNED_IN from onAuthStateChange.
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          subscription.unsubscribe();
+          clearTimeout(timeout);
+          accept();
+        } else if (event === 'SIGNED_OUT') {
+          subscription.unsubscribe();
+          clearTimeout(timeout);
+          navigate({ to: '/login', search: { redirect: `/auth/accept-invite?token=${token}` } });
+        }
+      });
+
+      // Safety timeout — if no session after 10s, send to login
+      const timeout = setTimeout(() => {
+        subscription.unsubscribe();
+        if (!done) {
+          navigate({ to: '/login', search: { redirect: `/auth/accept-invite?token=${token}` } });
+        }
+      }, 10000);
+    });
   }, [token, navigate]);
 
   return (
