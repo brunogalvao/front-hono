@@ -4,4 +4,4 @@ export const API_BASE_URL = configuredApiUrl !== ''
   ? configuredApiUrl
   : import.meta.env.DEV
     ? window.location.origin
-    : 'https://api-hono-jet.vercel.app';
+    : 'https://api.aivision.app.br';
