@@ -1,5 +1,5 @@
 import path from 'path';
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { copyFileSync, existsSync } from 'fs';
@@ -9,6 +9,7 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
+    exclude: [...configDefaults.exclude, 'supabase/**'],
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
@@ -124,12 +125,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000, // Increase limit to 1MB
   },
   optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      '@supabase/supabase-js',
-      'framer-motion',
-    ],
+    include: ['react', 'react-dom', '@supabase/supabase-js', 'framer-motion'],
     exclude: ['storybook-static'],
   },
 });

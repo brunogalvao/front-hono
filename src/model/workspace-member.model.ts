@@ -1,4 +1,7 @@
-import type { WorkspaceRole, PermissionResource } from '@/model/workspace.model';
+import type {
+  WorkspaceRole,
+  PermissionResource,
+} from '@/model/workspace.model';
 
 export interface WorkspaceMember {
   id: string;
@@ -6,14 +9,22 @@ export interface WorkspaceMember {
   user_id: string;
   role: WorkspaceRole;
   created_at: string;
-  profiles?: { id: string; full_name: string | null; email: string; avatar_url: string | null } | null;
+  profiles?: {
+    id: string;
+    full_name: string | null;
+    email: string;
+    avatar_url: string | null;
+  } | null;
 }
 
 export interface PendingInvite {
   id: string;
-  email: string;
+  email_normalized: string;
   role: WorkspaceRole;
-  expires_at: string;
+  delivery_status: 'pending' | 'sent' | 'failed';
+  expires_at: string | null;
+  sent_at: string | null;
+  last_delivery_attempt_at: string | null;
   created_at: string;
 }
 

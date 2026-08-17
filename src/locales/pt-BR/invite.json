@@ -1,9 +1,9 @@
 {
-  "title": "Convite para o Finance",
-  "subtitle": "Você foi convidado para colaborar no grupo",
-  "description": "Com acesso ao grupo você pode visualizar e adicionar <bold>despesas, rendimentos e compras a prazo</bold> em conjunto.",
-  "invalidTitle": "Convite inválido",
+  "title": "Convite para workspace",
+  "subtitle": "Revise o acesso antes de entrar",
+  "description": "Você recebeu acesso para colaborar em um workspace do FinanceTask.",
   "backHome": "Voltar ao início",
+  "invalidTitle": "Convite inválido",
   "checkingSession": "Verificando sessão...",
   "accepting": "Aceitando...",
   "accept": "Aceitar convite",
@@ -11,8 +11,8 @@
   "noAccount": "Não tem conta?",
   "createAccount": "Criar conta",
   "acceptedTitle": "Convite aceito!",
-  "redirecting": "Redirecionando para o grupo...",
-  "welcome": "Bem-vindo ao grupo!",
+  "redirecting": "Redirecionando para o workspace...",
+  "welcome": "Boas-vindas ao workspace!",
   "page": {
     "noToken": "Token de convite não encontrado.",
     "expiredMessage": "Este convite expirou. Solicite um novo convite ao administrador do workspace.",
@@ -20,7 +20,84 @@
     "expiredTitle": "Convite expirado",
     "errorTitle": "Erro ao aceitar convite",
     "processingDesc": "Aguarde enquanto processamos seu convite.",
-    "successDesc": "Bem-vindo ao workspace! Redirecionando...",
+    "successDesc": "Boas-vindas ao workspace! Redirecionando...",
     "goToLogin": "Ir para login"
+  },
+  "roles": {
+    "administrador": "Administrador",
+    "operador": "Operador",
+    "visualizador": "Visualizador"
+  },
+  "form": {
+    "title": "Convidar pessoa",
+    "email": "E-mail",
+    "emailPlaceholder": "pessoa@exemplo.com",
+    "role": "Papel",
+    "submit": "Enviar convite",
+    "submitting": "Enviando convite...",
+    "resend": "Reenviar",
+    "cancel": "Cancelar convite"
+  },
+  "mutation": {
+    "sent": "Convite enviado com segurança.",
+    "delivery_failed": "Não foi possível entregar o convite. Tente reenviar.",
+    "already_member": "Essa pessoa já participa do workspace.",
+    "existing_pending_invite": "Já existe um convite pendente para esse e-mail.",
+    "rate_limited": "Limite de convites atingido. Aguarde antes de tentar novamente."
+  },
+  "list": {
+    "title": "Convites pendentes",
+    "empty": "Nenhum convite pendente.",
+    "loading": "Carregando convites",
+    "cancelled": "Convite cancelado.",
+    "delivery": {
+      "pending": "Preparando envio",
+      "sent": "Enviado",
+      "failed": "Falha no envio"
+    }
+  },
+  "landing": {
+    "eyebrow": "Convite seguro",
+    "title": "Continue para revisar seu convite",
+    "description": "Abrir esta página não aceita o convite. Sua identidade será confirmada antes de qualquer acesso.",
+    "continue": "Continuar com segurança",
+    "preparing": "Preparando acesso seguro...",
+    "privacy": "O convite só pode ser aceito pelo e-mail destinatário."
+  },
+  "review": {
+    "title": "Revise seu convite",
+    "workspace": "Workspace",
+    "invitedBy": "Convidado por",
+    "role": "Seu papel",
+    "expiresAt": "Válido até {{date}}",
+    "accept": "Aceitar convite",
+    "accepting": "Aceitando convite..."
+  },
+  "onboarding": {
+    "title": "Complete seu perfil",
+    "description": "Você já possui acesso. Pode completar seu nome agora ou continuar depois.",
+    "fullName": "Nome completo",
+    "save": "Salvar e continuar",
+    "skip": "Fazer isso depois",
+    "error": "Não foi possível salvar seu nome. Tente novamente ou continue sem preencher agora."
+  },
+  "states": {
+    "loadingTitle": "Verificando convite",
+    "loadingDescription": "Isso leva apenas alguns segundos.",
+    "successTitle": "Convite aceito",
+    "successDescription": "Preparando o workspace para você...",
+    "invalidTitle": "Convite inválido",
+    "invalidDescription": "Este link não corresponde a um convite disponível.",
+    "expiredTitle": "Convite expirado",
+    "expiredDescription": "Solicite um novo convite ao administrador do workspace.",
+    "cancelledTitle": "Convite cancelado",
+    "cancelledDescription": "Este convite foi cancelado pelo administrador.",
+    "alreadyAcceptedTitle": "Convite já utilizado",
+    "alreadyAcceptedDescription": "Este convite já foi aceito e não pode ser usado novamente.",
+    "emailMismatchTitle": "Use o e-mail convidado",
+    "emailMismatchDescription": "Entre com o mesmo e-mail que recebeu este convite.",
+    "failedTitle": "Não foi possível continuar",
+    "failedDescription": "Tente novamente ou solicite um novo convite.",
+    "switchAccount": "Trocar de conta"
   }
 }

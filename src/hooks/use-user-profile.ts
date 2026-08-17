@@ -47,3 +47,32 @@ export function useUpdateUserProfile() {
     },
   });
 }
+
+export function useCompleteProfileOnboarding() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      fullName,
+    }: {
+      userId: string;
+      fullName: string;
+    }) => {
+      const normalizedName = fullName.trim();
+      if (!normalizedName) throw new Error('full_name_required');
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: normalizedName,
+          onboarding_status: 'complete',
+          onboarding_completed_at: new Date().toISOString(),
+        })
+        .eq('id', userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.all });
+    },
+  });
+}

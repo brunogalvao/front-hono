@@ -1,9 +1,9 @@
 {
-  "title": "Invitation to Finance",
-  "subtitle": "You've been invited to collaborate on the group",
-  "description": "With group access you can view and add <bold>expenses, income and installment purchases</bold> together.",
-  "invalidTitle": "Invalid invitation",
+  "title": "Workspace invitation",
+  "subtitle": "Review your access before joining",
+  "description": "You received access to collaborate in a FinanceTask workspace.",
   "backHome": "Back to home",
+  "invalidTitle": "Invalid invitation",
   "checkingSession": "Checking session...",
   "accepting": "Accepting...",
   "accept": "Accept invitation",
@@ -11,8 +11,8 @@
   "noAccount": "Don't have an account?",
   "createAccount": "Create account",
   "acceptedTitle": "Invitation accepted!",
-  "redirecting": "Redirecting to the group...",
-  "welcome": "Welcome to the group!",
+  "redirecting": "Redirecting to the workspace...",
+  "welcome": "Welcome to the workspace!",
   "page": {
     "noToken": "Invitation token not found.",
     "expiredMessage": "This invitation has expired. Request a new invitation from the workspace administrator.",
@@ -22,5 +22,82 @@
     "processingDesc": "Please wait while we process your invitation.",
     "successDesc": "Welcome to the workspace! Redirecting...",
     "goToLogin": "Go to login"
+  },
+  "roles": {
+    "administrador": "Administrator",
+    "operador": "Operator",
+    "visualizador": "Viewer"
+  },
+  "form": {
+    "title": "Invite person",
+    "email": "Email",
+    "emailPlaceholder": "person@example.com",
+    "role": "Role",
+    "submit": "Send invitation",
+    "submitting": "Sending invitation...",
+    "resend": "Resend",
+    "cancel": "Cancel invitation"
+  },
+  "mutation": {
+    "sent": "Invitation sent securely.",
+    "delivery_failed": "The invitation could not be delivered. Try resending it.",
+    "already_member": "This person already belongs to the workspace.",
+    "existing_pending_invite": "A pending invitation already exists for this email.",
+    "rate_limited": "Invitation limit reached. Wait before trying again."
+  },
+  "list": {
+    "title": "Pending invitations",
+    "empty": "No pending invitations.",
+    "loading": "Loading invitations",
+    "cancelled": "Invitation cancelled.",
+    "delivery": {
+      "pending": "Preparing delivery",
+      "sent": "Sent",
+      "failed": "Delivery failed"
+    }
+  },
+  "landing": {
+    "eyebrow": "Secure invitation",
+    "title": "Continue to review your invitation",
+    "description": "Opening this page does not accept the invitation. Your identity is confirmed before access is granted.",
+    "continue": "Continue securely",
+    "preparing": "Preparing secure access...",
+    "privacy": "Only the invited email address can accept this invitation."
+  },
+  "review": {
+    "title": "Review your invitation",
+    "workspace": "Workspace",
+    "invitedBy": "Invited by",
+    "role": "Your role",
+    "expiresAt": "Valid until {{date}}",
+    "accept": "Accept invitation",
+    "accepting": "Accepting invitation..."
+  },
+  "onboarding": {
+    "title": "Complete your profile",
+    "description": "You already have access. Complete your name now or continue later.",
+    "fullName": "Full name",
+    "save": "Save and continue",
+    "skip": "Do this later",
+    "error": "Your name could not be saved. Try again or continue without completing it now."
+  },
+  "states": {
+    "loadingTitle": "Checking invitation",
+    "loadingDescription": "This should only take a few seconds.",
+    "successTitle": "Invitation accepted",
+    "successDescription": "Preparing the workspace for you...",
+    "invalidTitle": "Invalid invitation",
+    "invalidDescription": "This link does not match an available invitation.",
+    "expiredTitle": "Invitation expired",
+    "expiredDescription": "Request a new invitation from the workspace administrator.",
+    "cancelledTitle": "Invitation cancelled",
+    "cancelledDescription": "This invitation was cancelled by the administrator.",
+    "alreadyAcceptedTitle": "Invitation already used",
+    "alreadyAcceptedDescription": "This invitation was already accepted and cannot be used again.",
+    "emailMismatchTitle": "Use the invited email",
+    "emailMismatchDescription": "Sign in with the same email address that received this invitation.",
+    "failedTitle": "Unable to continue",
+    "failedDescription": "Try again or request a new invitation.",
+    "switchAccount": "Switch account"
   }
 }

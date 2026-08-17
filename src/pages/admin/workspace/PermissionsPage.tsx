@@ -3,11 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AllUsersTable } from '@/components/workspace/AllUsersTable';
 import { InviteForm } from '@/components/workspace/InviteForm';
+import { PendingInviteList } from '@/components/workspace/PendingInviteList';
 import { PermissionMatrix } from '@/components/workspace/PermissionMatrix';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useAllAppUsers } from '@/hooks/useAllAppUsers';
@@ -27,13 +34,16 @@ function useCurrentUserId() {
 }
 
 export default function PermissionsPage() {
-  const { t } = useTranslation(['permissions', 'common']);
+  const { t } = useTranslation(['permissions', 'common', 'invite']);
   const navigate = useNavigate();
   const { activeWorkspace } = useWorkspace();
   const { can, isSuperAdmin, isLoading: isPermLoading } = usePermissions();
   const { data: currentUserId } = useCurrentUserId();
-  const { data: users, isLoading: isUsersLoading } = useAllAppUsers(activeWorkspace?.id ?? null);
-  const { inviteMember } = useWorkspaceMembers(activeWorkspace?.id ?? null);
+  const { data: users, isLoading: isUsersLoading } = useAllAppUsers(
+    activeWorkspace?.id ?? null
+  );
+  const { inviteMember, pendingInvites, resendInvite, cancelInvite } =
+    useWorkspaceMembers(activeWorkspace?.id ?? null);
 
   const canManageMembers = can('members', 'read');
 
@@ -61,8 +71,29 @@ export default function PermissionsPage() {
 
   const handleInvite = (
     email: string,
-    role: Parameters<typeof inviteMember.mutateAsync>[0]['role'],
+    role: Parameters<typeof inviteMember.mutateAsync>[0]['role']
   ) => inviteMember.mutateAsync({ email, role });
+
+  const handleResend = async (inviteId: string) => {
+    try {
+      const result = await resendInvite.mutateAsync(inviteId);
+      if (result.status === 'sent') toast.success(t('invite:mutation.sent'));
+      else if (result.status === 'rate_limited') {
+        toast.warning(t('invite:mutation.rate_limited'));
+      } else toast.error(t('invite:mutation.delivery_failed'));
+    } catch {
+      toast.error(t('invite:states.failedDescription'));
+    }
+  };
+
+  const handleCancel = async (inviteId: string) => {
+    try {
+      await cancelInvite.mutateAsync(inviteId);
+      toast.success(t('invite:list.cancelled'));
+    } catch {
+      toast.error(t('invite:states.failedDescription'));
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -71,7 +102,9 @@ export default function PermissionsPage() {
           {isSuperAdmin ? t('page.titleSuperAdmin') : t('page.titleAdmin')}
         </h1>
         <p className="text-muted-foreground text-sm">
-          {isSuperAdmin ? t('page.subtitleSuperAdmin') : t('page.subtitleAdmin')}
+          {isSuperAdmin
+            ? t('page.subtitleSuperAdmin')
+            : t('page.subtitleAdmin')}
         </p>
       </div>
 
@@ -82,7 +115,10 @@ export default function PermissionsPage() {
             <CardDescription>{t('matrix.description')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <PermissionMatrix workspaceId={activeWorkspace.id} currentUserId={currentUserId ?? ''} />
+            <PermissionMatrix
+              workspaceId={activeWorkspace.id}
+              currentUserId={currentUserId ?? ''}
+            />
           </CardContent>
         </Card>
       )}
@@ -104,8 +140,27 @@ export default function PermissionsPage() {
           <Separator />
 
           <div>
-            <p className="text-sm font-medium mb-3">{t('allUsers.inviteByEmail')}</p>
+            <p className="mb-3 text-sm font-medium">
+              {t('allUsers.inviteByEmail')}
+            </p>
             <InviteForm onInvite={handleInvite} />
+          </div>
+
+          <Separator />
+
+          <div className="space-y-3">
+            <p className="text-sm font-medium">{t('invite:list.title')}</p>
+            <PendingInviteList
+              invites={pendingInvites.data ?? []}
+              isLoading={pendingInvites.isLoading}
+              busyInviteId={
+                resendInvite.isPending || cancelInvite.isPending
+                  ? (resendInvite.variables ?? cancelInvite.variables)
+                  : undefined
+              }
+              onResend={handleResend}
+              onCancel={handleCancel}
+            />
           </div>
         </CardContent>
       </Card>

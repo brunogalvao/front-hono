@@ -35,11 +35,25 @@ interface FormData {
   password: string;
 }
 
+function safeLoginRedirect(value: string | undefined): string {
+  if (
+    !value ||
+    !value.startsWith('/') ||
+    value.startsWith('//') ||
+    value.includes('\\')
+  ) {
+    return '/admin/dashboard';
+  }
+  return value;
+}
+
 function Login() {
   const navigate = useNavigate();
   const { t } = useTranslation(['auth', 'home', 'common']);
   const search = useSearch({ from: '/login' });
-  const redirectTo = (search as Record<string, string>).redirect ?? '/admin/dashboard';
+  const redirectTo = safeLoginRedirect(
+    (search as Record<string, string>).redirect
+  );
 
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -150,7 +164,7 @@ function Login() {
     };
 
     checkSession();
-  }, [navigate]);
+  }, [navigate, redirectTo]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2">

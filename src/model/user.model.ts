@@ -15,6 +15,16 @@ export interface AppUserProfile {
   email: string;
   full_name: string | null;
   avatar_url: string | null;
+  email_normalized?: string;
+  signup_origin?: 'self_signup' | 'workspace_invite';
+  onboarding_status?: 'incomplete' | 'complete';
+  onboarding_completed_at?: string | null;
+}
+
+export interface ProfileOnboardingUpdate {
+  full_name: string;
+  onboarding_status: 'complete';
+  onboarding_completed_at: string;
 }
 
 export interface AppUser {

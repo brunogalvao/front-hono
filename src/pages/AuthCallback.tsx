@@ -2,6 +2,18 @@ import { useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
+import { readWorkspaceInviteToken } from '@/lib/workspace-invite-session';
+
+function safeInternalRedirect(value: string | null): string | null {
+  if (
+    !value ||
+    !value.startsWith('/') ||
+    value.startsWith('//') ||
+    value.includes('\\')
+  )
+    return null;
+  return value;
+}
 
 const AuthCallback = () => {
   const { t } = useTranslation('common');
@@ -11,10 +23,18 @@ const AuthCallback = () => {
     // Resolve redirect once to avoid double-reading sessionStorage
     // Priority: 1) ?next= param in URL (email confirmation) 2) sessionStorage (OAuth) 3) dashboard
     const params = new URLSearchParams(window.location.search);
-    const next = params.get('next');
-    const stored = sessionStorage.getItem('postAuthRedirect');
+    const inviteFlow = params.get('flow') === 'workspace-invite';
+    const next = safeInternalRedirect(params.get('next'));
+    const stored = safeInternalRedirect(
+      sessionStorage.getItem('postAuthRedirect')
+    );
     if (stored) sessionStorage.removeItem('postAuthRedirect');
-    const redirectTo = (next ?? stored ?? '/admin/dashboard') as '/admin/dashboard';
+    const hasInviteToken = Boolean(readWorkspaceInviteToken());
+    const redirectTo = (
+      inviteFlow && hasInviteToken
+        ? '/auth/accept-invite'
+        : (next ?? stored ?? '/admin/dashboard')
+    ) as '/admin/dashboard';
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -22,10 +42,15 @@ const AuthCallback = () => {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         navigate({ to: redirectTo });
-      } else if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) {
+      } else if (
+        event === 'SIGNED_OUT' ||
+        (!session && event !== 'INITIAL_SESSION')
+      ) {
         navigate({ to: '/login' });
       }
     });

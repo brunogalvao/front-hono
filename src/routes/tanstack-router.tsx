@@ -20,6 +20,7 @@ import Invite from '@/pages/Invite';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
 import AcceptInvitePage from '@/pages/auth/AcceptInvitePage';
+import InviteLandingPage from '@/pages/auth/InviteLandingPage';
 import TransactionsPage from '@/pages/admin/TransactionsPage';
 import RecurringPage from '@/pages/admin/RecurringPage';
 import InsightsPage from '@/pages/admin/InsightsPage';
@@ -101,7 +102,8 @@ const parcelasRoute = createRoute({
   path: '/installments',
   component: InstallmentsPage,
   validateSearch: (search: Record<string, unknown>) => ({
-    highlight: typeof search.highlight === 'string' ? search.highlight : undefined,
+    highlight:
+      typeof search.highlight === 'string' ? search.highlight : undefined,
   }),
 });
 
@@ -165,6 +167,16 @@ const authCallbackRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth/callback',
   component: AuthCallback,
+  validateSearch: (search: Record<string, unknown>) => ({
+    flow:
+      search.flow === 'workspace-invite'
+        ? ('workspace-invite' as const)
+        : undefined,
+    next:
+      typeof search.next === 'string' && search.next.startsWith('/')
+        ? search.next
+        : undefined,
+  }),
 });
 
 const resetPasswordRoute = createRoute({
@@ -177,8 +189,17 @@ const acceptInviteRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth/accept-invite',
   component: AcceptInvitePage,
+});
+
+const workspaceInviteLandingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/auth/workspace-invite',
+  component: InviteLandingPage,
   validateSearch: (search: Record<string, unknown>) => ({
-    token: typeof search.token === 'string' ? search.token : '',
+    token:
+      typeof search.token === 'string' && /^[a-f0-9]{64}$/.test(search.token)
+        ? search.token
+        : undefined,
   }),
 });
 
@@ -197,6 +218,7 @@ const routeTree = rootRoute.addChildren([
   inviteRoute,
   authCallbackRoute,
   resetPasswordRoute,
+  workspaceInviteLandingRoute,
   acceptInviteRoute,
   adminRoute.addChildren([
     editUserRoute,

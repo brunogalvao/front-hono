@@ -48,13 +48,10 @@ coverage/
 *.swo
 .vercel
 
-# Supabse
+# Supabase local state
 .supabase
-# Remova isso se existir:
-supabase/
-
-# OU adicione a exceção:
-!supabase/client.ts
+supabase/.branches/
+supabase/.temp/
 
 
 #Anotações

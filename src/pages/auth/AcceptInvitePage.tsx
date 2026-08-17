@@ -1,120 +1,358 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useSearch } from '@tanstack/react-router';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { Loader2, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { queryClient } from '@/lib/query-client';
+import { queryKeys } from '@/lib/query-keys';
+import {
+  clearWorkspaceInviteToken,
+  readWorkspaceInviteToken,
+} from '@/lib/workspace-invite-session';
+import type {
+  InviteAcceptanceResult,
+  InviteErrorResult,
+  InvitePreview,
+} from '@/model/invite.model';
+import { useCompleteProfileOnboarding } from '@/hooks/use-user-profile';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
+type PageState =
+  | 'loading'
+  | 'review'
+  | 'accepting'
+  | 'onboarding'
+  | 'success'
+  | InviteErrorResult['status'];
+
+function isInviteError(
+  result: InvitePreview | InviteAcceptanceResult | InviteErrorResult
+): result is InviteErrorResult {
+  return [
+    'invalid',
+    'expired',
+    'cancelled',
+    'already_accepted',
+    'email_mismatch',
+    'failed',
+  ].includes(result.status);
+}
+
+async function inviteOperation(
+  operation: 'preview' | 'accept',
+  token: string
+): Promise<InvitePreview | InviteAcceptanceResult | InviteErrorResult> {
+  const { data, error } = await supabase.functions.invoke('accept-invite', {
+    body: { operation, token },
+  });
+  if (!error)
+    return data as InvitePreview | InviteAcceptanceResult | InviteErrorResult;
+  if ('context' in error && error.context instanceof Response) {
+    try {
+      return (await error.context.clone().json()) as InviteErrorResult;
+    } catch {
+      // Fall through to the stable client-side failure below.
+    }
+  }
+  return { status: 'failed', error_code: 'invite_operation_failed' };
+}
 
 export default function AcceptInvitePage() {
-  const { t } = useTranslation('invite');
+  const { t, i18n } = useTranslation('invite');
   const navigate = useNavigate();
-  const search = useSearch({ from: '/auth/accept-invite' });
-  const token = (search as Record<string, string>).token;
-  const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading');
-  const [message, setMessage] = useState('');
+  const completeOnboarding = useCompleteProfileOnboarding();
+  const [token] = useState(() => readWorkspaceInviteToken());
+  const [state, setState] = useState<PageState>('loading');
+  const [preview, setPreview] = useState<InvitePreview | null>(null);
+  const [fullName, setFullName] = useState('');
+  const [userId, setUserId] = useState<string | null>(null);
+
+  const finish = useCallback(
+    async (workspaceId: string) => {
+      localStorage.setItem('active_workspace_id', workspaceId);
+      clearWorkspaceInviteToken();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.workspaces.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.permissions.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.user.all }),
+      ]);
+      setState('success');
+      navigate({ to: '/admin/dashboard' });
+    },
+    [navigate]
+  );
 
   useEffect(() => {
-    if (!token) {
-      setStatus('error');
-      setMessage(t('page.noToken'));
+    let active = true;
+    const load = async () => {
+      if (!token) {
+        setState('invalid');
+        return;
+      }
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) {
+        navigate({ to: '/login', search: { redirect: '/auth/accept-invite' } });
+        return;
+      }
+      setUserId(data.user.id);
+      const result = await inviteOperation('preview', token);
+      if (!active) return;
+      if (result.status === 'valid') {
+        setPreview(result);
+        setState('review');
+      } else if (isInviteError(result)) {
+        setState(result.status);
+      } else {
+        setState('failed');
+      }
+    };
+    void load();
+    return () => {
+      active = false;
+    };
+  }, [navigate, token]);
+
+  const accept = async () => {
+    if (!token) return;
+    setState('accepting');
+    const result = await inviteOperation('accept', token);
+    if (isInviteError(result)) {
+      setState(result.status);
       return;
     }
+    if (result.status !== 'accepted' && result.status !== 'already_member') {
+      setState('failed');
+      return;
+    }
+    if (result.profile_onboarding_status === 'incomplete') {
+      setPreview(
+        (current) =>
+          current ?? {
+            status: 'valid',
+            workspace: result.workspace,
+            inviter: { display_name: '' },
+            role: result.role,
+            expires_at: '',
+            profile_onboarding_status: 'incomplete',
+          }
+      );
+      setState('onboarding');
+      return;
+    }
+    await finish(result.workspace.id);
+  };
 
-    let done = false;
+  const saveOnboarding = async () => {
+    if (!userId || !preview) return;
+    try {
+      await completeOnboarding.mutateAsync({ userId, fullName });
+      await finish(preview.workspace.id);
+    } catch {
+      setState('onboarding');
+    }
+  };
 
-    const accept = async (accessToken: string) => {
-      if (done) return;
-      done = true;
+  const switchAccount = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: '/login', search: { redirect: '/auth/accept-invite' } });
+  };
 
-      // Explicitly pass the access token so the edge function always
-      // receives a valid Authorization header regardless of client timing.
-      const { data, error } = await supabase.functions.invoke('accept-invite', {
-        body: { token },
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-
-      // Extract the real error message from the response body when non-2xx
-      let errorMsg: string | null = null;
-      if (error) {
-        try {
-          const body = await (error as { context?: Response }).context?.json();
-          errorMsg = body?.error ?? error.message;
-        } catch {
-          errorMsg = error.message;
-        }
-      } else if (data?.error) {
-        errorMsg = data.error;
-      }
-
-      if (errorMsg) {
-        if (errorMsg.includes('expired') || errorMsg.includes('expirado')) {
-          setStatus('expired');
-          setMessage(t('page.expiredMessage'));
-        } else {
-          setStatus('error');
-          setMessage(errorMsg);
-        }
-        return;
-      }
-
-      setStatus('success');
-      setTimeout(() => navigate({ to: '/admin/dashboard' }), 2000);
-    };
-
-    // Try immediately — session should already be set if coming from AuthCallback
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.access_token) {
-        accept(session.access_token);
-        return;
-      }
-
-      // Fallback: session not ready yet, wait for SIGNED_IN
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_IN' && session?.access_token) {
-          subscription.unsubscribe();
-          clearTimeout(timeout);
-          accept(session.access_token);
-        } else if (event === 'SIGNED_OUT') {
-          subscription.unsubscribe();
-          clearTimeout(timeout);
-          navigate({ to: '/login', search: { redirect: `/auth/accept-invite?token=${token}` } });
-        }
-      });
-
-      // Safety timeout — 10s without session → back to login
-      const timeout = setTimeout(() => {
-        subscription.unsubscribe();
-        if (!done) {
-          navigate({ to: '/login', search: { redirect: `/auth/accept-invite?token=${token}` } });
-        }
-      }, 10000);
-    });
-  }, [token, navigate]);
+  const errorState = [
+    'invalid',
+    'expired',
+    'cancelled',
+    'already_accepted',
+    'email_mismatch',
+    'failed',
+  ].includes(state);
+  const errorCopy = (() => {
+    switch (state) {
+      case 'expired':
+        return {
+          title: t('states.expiredTitle'),
+          description: t('states.expiredDescription'),
+        };
+      case 'cancelled':
+        return {
+          title: t('states.cancelledTitle'),
+          description: t('states.cancelledDescription'),
+        };
+      case 'already_accepted':
+        return {
+          title: t('states.alreadyAcceptedTitle'),
+          description: t('states.alreadyAcceptedDescription'),
+        };
+      case 'email_mismatch':
+        return {
+          title: t('states.emailMismatchTitle'),
+          description: t('states.emailMismatchDescription'),
+        };
+      case 'failed':
+        return {
+          title: t('states.failedTitle'),
+          description: t('states.failedDescription'),
+        };
+      default:
+        return {
+          title: t('states.invalidTitle'),
+          description: t('states.invalidDescription'),
+        };
+    }
+  })();
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-md text-center">
-        <CardHeader>
-          <CardTitle>
-            {status === 'loading' && t('page.processing')}
-            {status === 'success' && t('acceptedTitle')}
-            {status === 'expired' && t('page.expiredTitle')}
-            {status === 'error' && t('page.errorTitle')}
-          </CardTitle>
-          <CardDescription>
-            {status === 'loading' && t('page.processingDesc')}
-            {status === 'success' && t('page.successDesc')}
-            {(status === 'error' || status === 'expired') && message}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {status === 'loading' && <Loader2 className="mx-auto h-8 w-8 animate-spin" />}
-          {(status === 'error' || status === 'expired') && (
-            <Button onClick={() => navigate({ to: '/login' })}>{t('page.goToLogin')}</Button>
-          )}
-        </CardContent>
+    <main className="flex min-h-screen items-center justify-center p-4">
+      <Card className="w-full max-w-lg">
+        {(state === 'loading' || state === 'accepting') && (
+          <CardContent
+            className="flex flex-col items-center gap-4 py-10"
+            aria-live="polite"
+          >
+            <Loader2
+              aria-hidden="true"
+              className="text-primary h-8 w-8 animate-spin"
+            />
+            <p>
+              {state === 'accepting'
+                ? t('review.accepting')
+                : t('states.loadingDescription')}
+            </p>
+          </CardContent>
+        )}
+
+        {state === 'review' && preview && (
+          <>
+            <CardHeader>
+              <ShieldCheck
+                aria-hidden="true"
+                className="text-primary mb-2 h-9 w-9"
+              />
+              <CardTitle>
+                <h1>{t('review.title')}</h1>
+              </CardTitle>
+              <CardDescription>{t('description')}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <dl className="grid gap-3 text-sm">
+                <div>
+                  <dt className="text-muted-foreground">
+                    {t('review.workspace')}
+                  </dt>
+                  <dd className="font-medium">{preview.workspace.name}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">
+                    {t('review.invitedBy')}
+                  </dt>
+                  <dd className="font-medium">
+                    {preview.inviter.display_name}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">{t('review.role')}</dt>
+                  <dd className="font-medium">{t(`roles.${preview.role}`)}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">
+                    {t('review.expiresAt', {
+                      date: new Intl.DateTimeFormat(
+                        i18n.resolvedLanguage ?? 'pt-BR',
+                        {
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        }
+                      ).format(new Date(preview.expires_at)),
+                    })}
+                  </dt>
+                </div>
+              </dl>
+              <Button className="min-h-11 w-full" onClick={accept}>
+                {t('review.accept')}
+              </Button>
+            </CardContent>
+          </>
+        )}
+
+        {state === 'onboarding' && preview && (
+          <>
+            <CardHeader>
+              <CardTitle>
+                <h1>{t('onboarding.title')}</h1>
+              </CardTitle>
+              <CardDescription>{t('onboarding.description')}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="invite-full-name">
+                  {t('onboarding.fullName')}
+                </Label>
+                <Input
+                  id="invite-full-name"
+                  value={fullName}
+                  onChange={(event) => setFullName(event.target.value)}
+                  autoComplete="name"
+                />
+                {completeOnboarding.isError && (
+                  <p className="text-destructive text-sm" role="alert">
+                    {t('onboarding.error')}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button
+                  disabled={!fullName.trim() || completeOnboarding.isPending}
+                  onClick={saveOnboarding}
+                >
+                  {t('onboarding.save')}
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => finish(preview.workspace.id)}
+                >
+                  {t('onboarding.skip')}
+                </Button>
+              </div>
+            </CardContent>
+          </>
+        )}
+
+        {errorState && (
+          <>
+            <CardHeader>
+              <CardTitle>
+                <h1>{errorCopy.title}</h1>
+              </CardTitle>
+              <CardDescription>{errorCopy.description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {state === 'email_mismatch' ? (
+                <Button onClick={switchAccount}>
+                  {t('states.switchAccount')}
+                </Button>
+              ) : (
+                <Button onClick={() => navigate({ to: '/login' })}>
+                  {t('page.goToLogin')}
+                </Button>
+              )}
+            </CardContent>
+          </>
+        )}
+
+        {state === 'success' && (
+          <CardContent className="py-10 text-center">
+            {t('states.successDescription')}
+          </CardContent>
+        )}
       </Card>
-    </div>
+    </main>
   );
 }
