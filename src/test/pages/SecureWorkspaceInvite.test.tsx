@@ -10,6 +10,8 @@ const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
   getUser: vi.fn(),
   invoke: vi.fn(),
+  fetch: vi.fn(),
+  getAuthToken: vi.fn(),
   signOut: vi.fn(),
 }));
 
@@ -29,11 +31,13 @@ const localStorageMock: Storage = {
   },
 };
 vi.stubGlobal('localStorage', localStorageMock);
+vi.stubGlobal('fetch', mocks.fetch);
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mocks.navigate,
 }));
 vi.mock('@/lib/supabase', () => ({
+  getAuthToken: mocks.getAuthToken,
   supabase: {
     auth: {
       getSession: mocks.getSession,
@@ -64,6 +68,7 @@ describe('secure workspace invitation pages', () => {
     window.history.replaceState({}, '', '/');
     mocks.getSession.mockResolvedValue({ data: { session: null } });
     mocks.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } } });
+    mocks.getAuthToken.mockResolvedValue('session-token');
   });
 
   it('captures and removes the token without consuming the invitation on GET', async () => {
@@ -87,34 +92,43 @@ describe('secure workspace invitation pages', () => {
 
   it('previews, accepts explicitly, allows postponing onboarding and activates the invited workspace', async () => {
     sessionStorage.setItem('pendingWorkspaceInviteToken', 'b'.repeat(64));
-    mocks.invoke
-      .mockResolvedValueOnce({
-        data: {
-          status: 'valid',
-          workspace: { id: 'workspace-1', name: 'Casa' },
-          inviter: { display_name: 'Admin' },
-          role: 'visualizador',
-          expires_at: '2026-08-18T12:00:00.000Z',
-          profile_onboarding_status: 'incomplete',
-        },
-        error: null,
-      })
-      .mockResolvedValueOnce({
-        data: {
-          status: 'accepted',
-          workspace: { id: 'workspace-1', name: 'Casa' },
-          role: 'visualizador',
-          profile_onboarding_status: 'incomplete',
-        },
-        error: null,
-      });
+    mocks.fetch
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            status: 'valid',
+            workspace: { id: 'workspace-1', name: 'Casa' },
+            inviter: { display_name: 'Admin' },
+            role: 'visualizador',
+            expires_at: '2026-08-18T12:00:00.000Z',
+            profile_onboarding_status: 'incomplete',
+          }),
+          { status: 200 }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            status: 'accepted',
+            workspace: { id: 'workspace-1', name: 'Casa' },
+            role: 'visualizador',
+            profile_onboarding_status: 'incomplete',
+          }),
+          { status: 200 }
+        )
+      );
 
     renderWithQuery(<AcceptInvitePage />);
 
     expect(await screen.findByText('Casa')).toBeInTheDocument();
-    expect(mocks.invoke).toHaveBeenNthCalledWith(1, 'accept-invite', {
-      body: { operation: 'preview', token: 'b'.repeat(64) },
-    });
+    expect(mocks.fetch).toHaveBeenNthCalledWith(
+      1,
+      expect.stringContaining('/api/workspace-invites/operation'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ operation: 'preview', token: 'b'.repeat(64) }),
+      })
+    );
     await userEvent.click(
       screen.getByRole('button', { name: 'Aceitar convite' })
     );
@@ -134,20 +148,15 @@ describe('secure workspace invitation pages', () => {
 
   it('renders email mismatch and offers account switching without accepting', async () => {
     sessionStorage.setItem('pendingWorkspaceInviteToken', 'c'.repeat(64));
-    mocks.invoke.mockResolvedValue({
-      data: null,
-      error: {
-        context: new Response(
-          JSON.stringify({
-            status: 'email_mismatch',
-            error_code: 'email_mismatch',
-          }),
-          {
-            status: 403,
-          }
-        ),
-      },
-    });
+    mocks.fetch.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          status: 'email_mismatch',
+          error_code: 'email_mismatch',
+        }),
+        { status: 403 }
+      )
+    );
 
     renderWithQuery(<AcceptInvitePage />);
 

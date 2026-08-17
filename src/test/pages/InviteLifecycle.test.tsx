@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   navigate: vi.fn(),
   getUser: vi.fn(),
   invoke: vi.fn(),
+  fetch: vi.fn(),
+  getAuthToken: vi.fn(),
   signOut: vi.fn(),
 }));
 
@@ -27,11 +29,13 @@ vi.stubGlobal('localStorage', {
     localValues.set(key, String(value));
   },
 } satisfies Storage);
+vi.stubGlobal('fetch', mocks.fetch);
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mocks.navigate,
 }));
 vi.mock('@/lib/supabase', () => ({
+  getAuthToken: mocks.getAuthToken,
   supabase: {
     auth: { getUser: mocks.getUser, signOut: mocks.signOut },
     functions: { invoke: mocks.invoke },
@@ -53,6 +57,7 @@ describe('invitation lifecycle', () => {
     sessionStorage.clear();
     localValues.clear();
     mocks.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } } });
+    mocks.getAuthToken.mockResolvedValue('session-token');
   });
 
   it('lists delivery state and calls resend/cancel actions', async () => {
@@ -94,24 +99,25 @@ describe('invitation lifecycle', () => {
     'renders terminal state %s without invoking accept',
     async (status, title) => {
       sessionStorage.setItem('pendingWorkspaceInviteToken', 'a'.repeat(64));
-      mocks.invoke.mockResolvedValue({
-        data: null,
-        error: {
-          context: new Response(
-            JSON.stringify({ status, error_code: `invite_${status}` }),
-            {
-              status: 410,
-            }
-          ),
-        },
-      });
+      mocks.fetch.mockResolvedValue(
+        new Response(
+          JSON.stringify({ status, error_code: `invite_${status}` }),
+          { status: 410 }
+        )
+      );
 
       renderWithQuery(<AcceptInvitePage />);
       expect(await screen.findByText(title)).toBeInTheDocument();
-      await waitFor(() => expect(mocks.invoke).toHaveBeenCalledTimes(1));
-      expect(mocks.invoke).toHaveBeenCalledWith('accept-invite', {
-        body: { operation: 'preview', token: 'a'.repeat(64) },
-      });
+      await waitFor(() => expect(mocks.fetch).toHaveBeenCalledTimes(1));
+      expect(mocks.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/workspace-invites/operation'),
+        expect.objectContaining({
+          body: JSON.stringify({
+            operation: 'preview',
+            token: 'a'.repeat(64),
+          }),
+        })
+      );
     }
   );
 });

@@ -8,6 +8,8 @@ import type {
 import type { WorkspaceRole } from '@/model/workspace.model';
 import type { InviteLocale, InviteMutationResult } from '@/model/invite.model';
 import i18n from '@/lib/i18n';
+import { API_BASE_URL } from '@/config/api';
+import { getAuthToken } from '@/lib/supabase';
 
 export type { WorkspaceMember, PendingInvite };
 
@@ -42,29 +44,30 @@ function activeInviteLocale(): InviteLocale {
   return i18n.resolvedLanguage === 'en' ? 'en' : 'pt-BR';
 }
 
-function isPublicInviteResult(value: unknown): value is InviteMutationResult {
+function isInviteApiResult(value: unknown): value is { status: string } {
   if (!value || typeof value !== 'object' || !('status' in value)) return false;
-  return [
-    'sent',
-    'delivery_failed',
-    'already_member',
-    'existing_pending_invite',
-    'rate_limited',
-  ].includes(String(value.status));
+  return typeof value.status === 'string';
 }
 
-async function publicFunctionError(
-  error: unknown
-): Promise<InviteMutationResult | null> {
-  if (!error || typeof error !== 'object' || !('context' in error)) return null;
-  const context = error.context;
-  if (!(context instanceof Response)) return null;
-  try {
-    const body: unknown = await context.clone().json();
-    return isPublicInviteResult(body) ? body : null;
-  } catch {
-    return null;
-  }
+async function inviteApi<T extends { status: string }>(
+  path: string,
+  method: 'POST' | 'DELETE',
+  body?: Record<string, unknown>
+): Promise<T> {
+  const token = await getAuthToken();
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(body ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const result: unknown = await response.json().catch(() => null);
+  if (isInviteApiResult(result)) return result as T;
+  throw new Error(
+    response.ok ? 'invalid_invite_response' : 'invite_request_failed'
+  );
 }
 
 export function useWorkspaceMembers(workspaceId: string | null) {
@@ -126,23 +129,15 @@ export function useWorkspaceMembers(workspaceId: string | null) {
       email: string;
       role: WorkspaceRole;
     }): Promise<InviteMutationResult> => {
-      const { data, error } = await supabase.functions.invoke('invite-member', {
-        body: {
-          operation: 'create',
-          workspace_id: workspaceId,
+      return inviteApi<InviteMutationResult>(
+        `/api/workspaces/${workspaceId}/invites`,
+        'POST',
+        {
           email: email.trim().toLowerCase(),
           role,
           locale: activeInviteLocale(),
-        },
-      });
-      if (error) {
-        const publicResult = await publicFunctionError(error);
-        if (publicResult) return publicResult;
-        throw error;
-      }
-      if (!isPublicInviteResult(data))
-        throw new Error('invalid_invite_response');
-      return data;
+        }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -153,21 +148,13 @@ export function useWorkspaceMembers(workspaceId: string | null) {
 
   const resendInvite = useMutation({
     mutationFn: async (inviteId: string): Promise<InviteMutationResult> => {
-      const { data, error } = await supabase.functions.invoke('invite-member', {
-        body: {
-          operation: 'resend',
-          invite_id: inviteId,
+      return inviteApi<InviteMutationResult>(
+        `/api/workspaces/${workspaceId}/invites/${inviteId}/resend`,
+        'POST',
+        {
           locale: activeInviteLocale(),
-        },
-      });
-      if (error) {
-        const publicResult = await publicFunctionError(error);
-        if (publicResult) return publicResult;
-        throw error;
-      }
-      if (!isPublicInviteResult(data))
-        throw new Error('invalid_invite_response');
-      return data;
+        }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -178,14 +165,10 @@ export function useWorkspaceMembers(workspaceId: string | null) {
 
   const cancelInvite = useMutation({
     mutationFn: async (inviteId: string) => {
-      const { data, error } = await supabase.functions.invoke('cancel-invite', {
-        body: { invite_id: inviteId },
-      });
-      if (error) throw error;
-      if (
-        data?.status !== 'cancelled' &&
-        data?.status !== 'already_cancelled'
-      ) {
+      const data = await inviteApi<{
+        status: 'cancelled' | 'already_cancelled' | string;
+      }>(`/api/workspaces/${workspaceId}/invites/${inviteId}`, 'DELETE');
+      if (data.status !== 'cancelled' && data.status !== 'already_cancelled') {
         throw new Error('invalid_cancel_response');
       }
       return data as { status: 'cancelled' | 'already_cancelled' };

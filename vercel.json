@@ -2,5 +2,9 @@
   "buildCommand": "pnpm run test:run && pnpm run build",
   "installCommand": "pnpm install",
   "outputDirectory": "dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(?!_vercel/).*\\.[^/]+$", "status": 404 },
+    { "src": "/(?!_vercel/).*", "dest": "/index.html" }
+  ]
 }

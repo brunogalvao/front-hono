@@ -8,7 +8,9 @@ const rootDir = process.cwd();
 // ─── package.json ─────────────────────────────────────────────────────────────
 
 describe('package.json', () => {
-  const pkg = JSON.parse(readFileSync(resolve(rootDir, 'package.json'), 'utf-8'));
+  const pkg = JSON.parse(
+    readFileSync(resolve(rootDir, 'package.json'), 'utf-8')
+  );
 
   it('usa pnpm como packageManager', () => {
     expect(pkg.packageManager).toMatch(/^pnpm@/);
@@ -21,12 +23,6 @@ describe('package.json', () => {
   it('tem script preinstall bloqueando npm/yarn', () => {
     expect(pkg.scripts?.preinstall).toContain('only-allow pnpm');
   });
-
-  it('permite build apenas para esbuild e core-js (onlyBuiltDependencies)', () => {
-    const allowed: string[] = pkg.pnpm?.onlyBuiltDependencies ?? [];
-    expect(allowed).toContain('esbuild');
-    expect(allowed).toContain('core-js');
-  });
 });
 
 // ─── pnpm-workspace.yaml ──────────────────────────────────────────────────────
@@ -34,8 +30,10 @@ describe('package.json', () => {
 describe('pnpm-workspace.yaml', () => {
   const yaml = readFileSync(resolve(rootDir, 'pnpm-workspace.yaml'), 'utf-8');
 
-  it('não contém allowBuilds (usar onlyBuiltDependencies em package.json)', () => {
-    expect(yaml).not.toMatch(/^allowBuilds:/m);
+  it('permite build apenas para esbuild e core-js', () => {
+    expect(yaml.trim()).toBe(
+      ['allowBuilds:', '  core-js: true', '  esbuild: true'].join('\n')
+    );
   });
 
   it('não contém placeholders não preenchidos', () => {

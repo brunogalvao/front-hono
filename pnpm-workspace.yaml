@@ -1,2 +1,3 @@
-# Permissões de build de dependências são controladas em package.json
-# via "pnpm": { "onlyBuiltDependencies": ["core-js", "esbuild"] }
+allowBuilds:
+  core-js: true
+  esbuild: true

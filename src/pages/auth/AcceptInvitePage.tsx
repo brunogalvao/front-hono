@@ -3,6 +3,8 @@ import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Loader2, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { getAuthToken } from '@/lib/supabase';
+import { API_BASE_URL } from '@/config/api';
 import { queryClient } from '@/lib/query-client';
 import { queryKeys } from '@/lib/query-keys';
 import {
@@ -51,19 +53,26 @@ async function inviteOperation(
   operation: 'preview' | 'accept',
   token: string
 ): Promise<InvitePreview | InviteAcceptanceResult | InviteErrorResult> {
-  const { data, error } = await supabase.functions.invoke('accept-invite', {
-    body: { operation, token },
-  });
-  if (!error)
-    return data as InvitePreview | InviteAcceptanceResult | InviteErrorResult;
-  if ('context' in error && error.context instanceof Response) {
-    try {
-      return (await error.context.clone().json()) as InviteErrorResult;
-    } catch {
-      // Fall through to the stable client-side failure below.
+  const authToken = await getAuthToken();
+  const response = await fetch(
+    `${API_BASE_URL}/api/workspace-invites/operation`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ operation, token }),
     }
+  );
+  try {
+    return (await response.json()) as
+      | InvitePreview
+      | InviteAcceptanceResult
+      | InviteErrorResult;
+  } catch {
+    return { status: 'failed', error_code: 'invite_operation_failed' };
   }
-  return { status: 'failed', error_code: 'invite_operation_failed' };
 }
 
 export default function AcceptInvitePage() {

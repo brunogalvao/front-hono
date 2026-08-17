@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { API_BASE_URL } from '@/config/api';
 
 export default function InviteLandingPage() {
   const { t } = useTranslation('invite');
@@ -47,7 +48,7 @@ export default function InviteLandingPage() {
     );
   }
 
-  const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/prepare-invite-auth`;
+  const prepareAuthUrl = `${API_BASE_URL}/api/workspace-invites/prepare-auth`;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-violet-50/50 p-4 dark:bg-violet-950/10">
@@ -74,7 +75,7 @@ export default function InviteLandingPage() {
               {t('landing.continue')}
             </Button>
           ) : (
-            <form method="post" action={functionUrl}>
+            <form method="post" action={prepareAuthUrl}>
               <input type="hidden" name="token" value={token} />
               <Button type="submit" className="min-h-11 w-full">
                 {t('landing.continue')}
