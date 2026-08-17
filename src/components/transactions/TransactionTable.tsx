@@ -1,4 +1,4 @@
-import { useState, useMemo, Fragment } from 'react';
+import { useEffect, useState, useMemo, Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   flexRender,
@@ -24,18 +24,38 @@ import { TransactionTableSkeleton } from './TransactionTableSkeleton';
 import { TransactionForm } from './TransactionForm';
 import { getTransactionColumns } from './transaction-columns';
 import { TrendingUp, TrendingDown, CircleCheck, Clock } from 'lucide-react';
-import { useTransactions, type Transaction, type TransactionStatus } from '@/hooks/useTransactions';
+import {
+  useTransactions,
+  type Transaction,
+  type TransactionStatus,
+} from '@/hooks/useTransactions';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { formatToBRL } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
-const STATUS_ORDER: Record<string, number> = { pendente: 0, pago: 1, recebido: 2 };
+const STATUS_ORDER: Record<string, number> = {
+  pendente: 0,
+  pago: 1,
+  recebido: 2,
+};
 
 const GROUP_CONFIG = {
-  pendente: { Icon: Clock, colorClass: 'text-amber-600 dark:text-amber-400', bgClass: 'bg-amber-500/10' },
-  pago: { Icon: CircleCheck, colorClass: 'text-green-600 dark:text-green-400', bgClass: 'bg-green-500/10' },
-  recebido: { Icon: TrendingUp, colorClass: 'text-green-600 dark:text-green-400', bgClass: 'bg-green-500/10' },
+  pendente: {
+    Icon: Clock,
+    colorClass: 'text-amber-600 dark:text-amber-400',
+    bgClass: 'bg-amber-500/10',
+  },
+  pago: {
+    Icon: CircleCheck,
+    colorClass: 'text-green-600 dark:text-green-400',
+    bgClass: 'bg-green-500/10',
+  },
+  recebido: {
+    Icon: TrendingUp,
+    colorClass: 'text-green-600 dark:text-green-400',
+    bgClass: 'bg-green-500/10',
+  },
 } as const;
 
 interface TransactionTableProps {
@@ -43,6 +63,9 @@ interface TransactionTableProps {
   year: number;
   categoryFilter: string;
   onCategoryFilterChange: (value: string) => void;
+  statusFilter: TransactionStatus | 'all';
+  onStatusFilterChange: (value: TransactionStatus | 'all') => void;
+  highlightId?: string;
 }
 
 export function TransactionTable({
@@ -50,38 +73,56 @@ export function TransactionTable({
   year,
   categoryFilter,
   onCategoryFilterChange,
+  statusFilter,
+  onStatusFilterChange,
+  highlightId,
 }: TransactionTableProps) {
   const { t } = useTranslation('transactions');
   const { activeWorkspaceId } = useWorkspace();
-  const { data: transactions = [], isLoading, update, remove } = useTransactions(
-    activeWorkspaceId,
-    month,
-    year,
-  );
+  const {
+    data: transactions = [],
+    isLoading,
+    update,
+    remove,
+  } = useTransactions(activeWorkspaceId, month, year);
   const [editTarget, setEditTarget] = useState<Transaction | null>(null);
 
   const columns = useMemo(() => getTransactionColumns(t), [t]);
 
   const totals = useMemo(() => {
-    const pago = transactions.filter((tx) => tx.status === 'pago').reduce((s, tx) => s + tx.amount, 0);
-    const pendente = transactions.filter((tx) => tx.status === 'pendente').reduce((s, tx) => s + tx.amount, 0);
-    const recebido = transactions.filter((tx) => tx.status === 'recebido').reduce((s, tx) => s + tx.amount, 0);
+    const pago = transactions
+      .filter((tx) => tx.status === 'pago')
+      .reduce((s, tx) => s + tx.amount, 0);
+    const pendente = transactions
+      .filter((tx) => tx.status === 'pendente')
+      .reduce((s, tx) => s + tx.amount, 0);
+    const recebido = transactions
+      .filter((tx) => tx.status === 'recebido')
+      .reduce((s, tx) => s + tx.amount, 0);
     return { pago, pendente, recebido, saldo: recebido - pago };
   }, [transactions]);
 
-  const categories = useMemo(() => Array.from(
-    new Map(
-      transactions
-        .filter((tx) => tx.categories)
-        .map((tx) => [tx.categories!.id, tx.categories!]),
-    ).values(),
-  ), [transactions]);
+  const categories = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          transactions
+            .filter((tx) => tx.categories)
+            .map((tx) => [tx.categories!.id, tx.categories!])
+        ).values()
+      ),
+    [transactions]
+  );
 
-  const filtered = useMemo(() =>
-    categoryFilter === 'all'
-      ? transactions
-      : transactions.filter((tx) => tx.category_id === categoryFilter),
-    [transactions, categoryFilter],
+  const filtered = useMemo(
+    () =>
+      transactions.filter(
+        (transaction) =>
+          (categoryFilter === 'all' ||
+            transaction.category_id === categoryFilter) &&
+          (statusFilter === 'all' || transaction.status === statusFilter)
+      ),
+    [categoryFilter, statusFilter, transactions]
   );
 
   const groupTotals = useMemo(() => {
@@ -93,14 +134,26 @@ export function TransactionTable({
   }, [filtered]);
 
   const sortedFiltered = useMemo(
-    () => [...filtered].sort((a, b) => (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99)),
-    [filtered],
+    () =>
+      [...filtered].sort(
+        (a, b) =>
+          (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99)
+      ),
+    [filtered]
   );
+
+  useEffect(() => {
+    if (!highlightId || isLoading) return;
+    const element = document.getElementById(`transaction-${highlightId}`);
+    element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [highlightId, isLoading, sortedFiltered]);
 
   const handleToggleStatus = async (id: string, status: TransactionStatus) => {
     try {
       await update.mutateAsync({ id, status });
-      toast.success(status === 'pago' ? t('toast.markedPaid') : t('toast.markedPending'));
+      toast.success(
+        status === 'pago' ? t('toast.markedPaid') : t('toast.markedPending')
+      );
     } catch {
       toast.error(t('toast.statusError'));
     }
@@ -137,17 +190,21 @@ export function TransactionTable({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
-
         {/* Esquerda: filtro | recebido */}
         <div className="flex items-center gap-3">
           {categories.length > 0 && (
             <>
-              <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
+              <Select
+                value={categoryFilter}
+                onValueChange={onCategoryFilterChange}
+              >
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder={t('table.filterByCategory')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t('table.allCategories')}</SelectItem>
+                  <SelectItem value="all">
+                    {t('table.allCategories')}
+                  </SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id}>
                       {cat.name}
@@ -155,37 +212,62 @@ export function TransactionTable({
                   ))}
                 </SelectContent>
               </Select>
-              <div className="h-5 w-px bg-border shrink-0" />
+              <div className="bg-border h-5 w-px shrink-0" />
             </>
           )}
-          <div className={cn(
-            'flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium',
-            totals.saldo >= 0
-              ? 'bg-green-500/15 text-green-600 dark:text-green-400'
-              : 'bg-red-500/15 text-red-600 dark:text-red-400',
-          )}>
-            {totals.saldo >= 0
-              ? <TrendingUp className="h-4 w-4 shrink-0" />
-              : <TrendingDown className="h-4 w-4 shrink-0" />}
+          <Select
+            value={statusFilter}
+            onValueChange={(value) =>
+              onStatusFilterChange(value as TransactionStatus | 'all')
+            }
+          >
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder={t('table.filterByStatus')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('table.allStatuses')}</SelectItem>
+              <SelectItem value="pendente">{t('status.pendente')}</SelectItem>
+              <SelectItem value="pago">{t('status.pago')}</SelectItem>
+              <SelectItem value="recebido">{t('status.recebido')}</SelectItem>
+            </SelectContent>
+          </Select>
+          <div
+            className={cn(
+              'flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium',
+              totals.saldo >= 0
+                ? 'bg-green-500/15 text-green-600 dark:text-green-400'
+                : 'bg-red-500/15 text-red-600 dark:text-red-400'
+            )}
+          >
+            {totals.saldo >= 0 ? (
+              <TrendingUp className="h-4 w-4 shrink-0" />
+            ) : (
+              <TrendingDown className="h-4 w-4 shrink-0" />
+            )}
             <span>{t('status.saldo')}</span>
-            <span className="tabular-nums font-semibold">{formatToBRL(totals.saldo)}</span>
+            <span className="font-semibold tabular-nums">
+              {formatToBRL(totals.saldo)}
+            </span>
           </div>
         </div>
 
         {/* Direita: pago + pendente empilhados */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium bg-green-500/15 text-green-600 dark:text-green-400">
+          <div className="flex items-center gap-2 rounded-lg bg-green-500/15 px-3 py-1.5 text-sm font-medium text-green-600 dark:text-green-400">
             <CircleCheck className="h-4 w-4 shrink-0" />
             <span>{t('status.pago')}</span>
-            <span className="tabular-nums font-semibold">{formatToBRL(totals.pago)}</span>
+            <span className="font-semibold tabular-nums">
+              {formatToBRL(totals.pago)}
+            </span>
           </div>
-          <div className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium bg-amber-500/15 text-amber-600 dark:text-amber-400">
+          <div className="flex items-center gap-2 rounded-lg bg-amber-500/15 px-3 py-1.5 text-sm font-medium text-amber-600 dark:text-amber-400">
             <Clock className="h-4 w-4 shrink-0" />
             <span>{t('status.pendente')}</span>
-            <span className="tabular-nums font-semibold">{formatToBRL(totals.pendente)}</span>
+            <span className="font-semibold tabular-nums">
+              {formatToBRL(totals.pendente)}
+            </span>
           </div>
         </div>
-
       </div>
 
       {filtered.length === 0 ? (
@@ -210,7 +292,10 @@ export function TransactionTable({
                     >
                       {header.isPlaceholder
                         ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -218,34 +303,65 @@ export function TransactionTable({
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows.map((row, index, rows) => {
-                const isNewGroup = index === 0 || rows[index - 1].original.status !== row.original.status;
-                const config = GROUP_CONFIG[row.original.status as keyof typeof GROUP_CONFIG];
+                const isNewGroup =
+                  index === 0 ||
+                  rows[index - 1].original.status !== row.original.status;
+                const config =
+                  GROUP_CONFIG[
+                    row.original.status as keyof typeof GROUP_CONFIG
+                  ];
                 return (
                   <Fragment key={row.id}>
                     {isNewGroup && config && (
-                      <TableRow className={cn('hover:bg-transparent', config.bgClass)}>
-                        <TableCell colSpan={columns.length} className="py-2 px-4">
-                          <div className={cn('flex items-center gap-2 text-sm font-semibold', config.colorClass)}>
+                      <TableRow
+                        className={cn('hover:bg-transparent', config.bgClass)}
+                      >
+                        <TableCell
+                          colSpan={columns.length}
+                          className="px-4 py-2"
+                        >
+                          <div
+                            className={cn(
+                              'flex items-center gap-2 text-sm font-semibold',
+                              config.colorClass
+                            )}
+                          >
                             <config.Icon className="h-4 w-4" />
-                            <span>{t(`status.${row.original.status}` as `status.${typeof row.original.status}`)}</span>
-                            <span className="ml-auto tabular-nums font-medium">
-                              {formatToBRL(groupTotals[row.original.status] ?? 0)}
+                            <span>
+                              {t(
+                                `status.${row.original.status}` as `status.${typeof row.original.status}`
+                              )}
+                            </span>
+                            <span className="ml-auto font-medium tabular-nums">
+                              {formatToBRL(
+                                groupTotals[row.original.status] ?? 0
+                              )}
                             </span>
                           </div>
                         </TableCell>
                       </TableRow>
                     )}
-                    <TableRow>
+                    <TableRow
+                      id={`transaction-${row.original.id}`}
+                      className={cn(
+                        row.original.id === highlightId &&
+                          'bg-primary/10 outline-primary outline-1 -outline-offset-1'
+                      )}
+                    >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell
                           key={cell.id}
                           className={
-                            cell.column.id === 'type' || cell.column.id === 'actions'
+                            cell.column.id === 'type' ||
+                            cell.column.id === 'actions'
                               ? 'hidden sm:table-cell'
                               : undefined
                           }
                         >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
                         </TableCell>
                       ))}
                     </TableRow>

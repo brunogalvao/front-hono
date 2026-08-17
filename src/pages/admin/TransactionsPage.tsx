@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
+import { useSearch } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { MonthYearPicker } from '@/components/ui/month-year-picker';
 import { TransactionTable } from '@/components/transactions/TransactionTable';
@@ -9,20 +10,33 @@ import { useTransactions } from '@/hooks/useTransactions';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import { toast } from 'sonner';
+import type { TransactionStatus } from '@/model/transaction.model';
 
 export default function TransactionsPage() {
   const { t } = useTranslation('transactions');
   const { activeWorkspaceId } = useWorkspace();
   const { can } = usePermissions();
+  const search = useSearch({ from: '/admin/transactions' });
   const now = new Date();
-  const [month, setMonth] = useState(now.getMonth() + 1);
-  const [year, setYear] = useState(now.getFullYear());
+  const [month, setMonth] = useState(search.month ?? now.getMonth() + 1);
+  const [year, setYear] = useState(search.year ?? now.getFullYear());
   const [createOpen, setCreateOpen] = useState(false);
 
   const { create } = useTransactions(activeWorkspaceId, month, year);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<TransactionStatus | 'all'>(
+    search.status ?? 'all'
+  );
 
-  const handleCreate = async (input: Parameters<typeof create.mutateAsync>[0]) => {
+  useEffect(() => {
+    if (search.month) setMonth(search.month);
+    if (search.year) setYear(search.year);
+    setStatusFilter(search.status ?? 'all');
+  }, [search.month, search.status, search.year]);
+
+  const handleCreate = async (
+    input: Parameters<typeof create.mutateAsync>[0]
+  ) => {
     try {
       await create.mutateAsync(input);
       if (categoryFilter !== 'all') {
@@ -45,7 +59,14 @@ export default function TransactionsPage() {
           <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
-          <MonthYearPicker month={month} year={year} onChange={(m, y) => { setMonth(m); setYear(y); }} />
+          <MonthYearPicker
+            month={month}
+            year={year}
+            onChange={(m, y) => {
+              setMonth(m);
+              setYear(y);
+            }}
+          />
           {can('transactions', 'create') && (
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="mr-1 h-4 w-4" />
@@ -60,6 +81,9 @@ export default function TransactionsPage() {
         year={year}
         categoryFilter={categoryFilter}
         onCategoryFilterChange={setCategoryFilter}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        highlightId={search.highlight}
       />
 
       <TransactionForm

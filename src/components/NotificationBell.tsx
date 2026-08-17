@@ -1,104 +1,185 @@
-import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { queryKeys } from '@/lib/query-keys';
-import { getTasksPendentes } from '@/service/task/getTasksPendentes';
+import { useMemo, useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { Bell, CalendarClock } from 'lucide-react';
+import { useTransactions, type Transaction } from '@/hooks/useTransactions';
+import { useWorkspace } from '@/context/WorkspaceContext';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { Bell } from 'lucide-react';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { formatToBRL } from '@/utils/format';
-import { cn } from '@/lib/utils';
-import type { Task } from '@/model/tasks.model';
 import { getNomeMes } from '@/model/mes.enum';
+
+const MAX_VISIBLE_ITEMS = 6;
+
+function getTransactionPeriod(transaction: Transaction) {
+  const [year, month] = transaction.date.split('-').map(Number);
+  return { month, year };
+}
 
 export function NotificationBell() {
   const navigate = useNavigate();
+  const { activeWorkspaceId } = useWorkspace();
+  const [open, setOpen] = useState(false);
   const now = new Date();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
 
-  const { data: pendentes = [] } = useQuery({
-    queryKey: queryKeys.notifications.pending(month, year),
-    queryFn: () => getTasksPendentes({ month, year }),
-    staleTime: 1000 * 60 * 5,
-  });
+  const {
+    data: transactions = [],
+    isLoading,
+    isError,
+  } = useTransactions(activeWorkspaceId, month, year);
+
+  const pendentes = useMemo(
+    () =>
+      transactions
+        .filter(
+          (transaction) =>
+            transaction.type === 'despesa' && transaction.status === 'pendente'
+        )
+        .sort((a, b) => a.date.localeCompare(b.date)),
+    [transactions]
+  );
 
   const count = pendentes.length;
-  const totalPendente = pendentes.reduce((acc, t) => acc + (t.price ?? 0), 0);
+  const totalPendente = pendentes.reduce(
+    (total, transaction) => total + transaction.amount,
+    0
+  );
 
-  const handleTaskClick = (task: Task) => {
-    sessionStorage.setItem('highlightTaskId', task.id);
-    navigate({ to: '/admin/expenses' });
+  const openTransaction = (transaction: Transaction) => {
+    const period = getTransactionPeriod(transaction);
+    setOpen(false);
+    navigate({
+      to: '/admin/transactions',
+      search: {
+        ...period,
+        status: 'pendente',
+        highlight: transaction.id,
+      },
+    });
+  };
+
+  const openAllPending = () => {
+    setOpen(false);
+    navigate({
+      to: '/admin/transactions',
+      search: { month, year, status: 'pendente', highlight: undefined },
+    });
   };
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Link
-          to="/admin/expenses"
-          className="hover:bg-accent relative flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="relative rounded-full"
+          aria-label={
+            count > 0
+              ? `Pendências financeiras: ${count}`
+              : 'Nenhuma pendência financeira'
+          }
         >
-          <Bell
-            className={cn(
-              'size-5',
-              count > 0 ? 'text-amber-500' : 'text-muted-foreground'
-            )}
-          />
+          <Bell className={count > 0 ? 'text-amber-500' : undefined} />
           {count > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+            <Badge
+              variant="destructive"
+              className="absolute -top-1 -right-1 min-w-4 px-1 py-0 text-[10px]"
+            >
               {count > 9 ? '9+' : count}
-            </span>
+            </Badge>
           )}
-        </Link>
-      </TooltipTrigger>
+        </Button>
+      </PopoverTrigger>
 
-      <TooltipContent side="bottom" align="end" className="max-w-72 p-3">
-        {count === 0 ? (
-          <p className="text-xs">Nenhuma despesa pendente</p>
+      <PopoverContent align="end" className="w-80 p-0">
+        <div className="flex flex-col gap-1 p-4">
+          <p className="font-semibold">Pendências financeiras</p>
+          <p className="text-muted-foreground text-xs">
+            {getNomeMes(month)} {year}
+          </p>
+        </div>
+        <Separator />
+
+        {!activeWorkspaceId ? (
+          <p className="text-muted-foreground p-4 text-sm">
+            Selecione um workspace para visualizar as pendências.
+          </p>
+        ) : isLoading ? (
+          <div
+            className="flex flex-col gap-3 p-4"
+            aria-label="Carregando pendências"
+          >
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        ) : isError ? (
+          <p className="text-destructive p-4 text-sm" role="alert">
+            Não foi possível carregar as pendências.
+          </p>
+        ) : count === 0 ? (
+          <div className="flex flex-col items-center gap-2 p-6 text-center">
+            <CalendarClock className="text-muted-foreground size-5" />
+            <p className="text-sm font-medium">Tudo em dia</p>
+            <p className="text-muted-foreground text-xs">
+              Não há despesas pendentes neste mês.
+            </p>
+          </div>
         ) : (
-          <div className="min-w-56">
-            <div className="mb-2">
-              <p className="text-sm font-semibold">Despesas pendentes</p>
-              <p className="text-muted-foreground text-xs">
-                {getNomeMes(month)} {year}
-              </p>
-            </div>
-            <Separator className="mb-2" />
-            <ul className="space-y-1">
-              {pendentes.map((task) => (
-                <li
-                  key={task.id}
-                  onClick={() => handleTaskClick(task)}
-                  className="hover:bg-accent/20 flex cursor-pointer items-start justify-between gap-4 rounded px-1 py-1.5 transition-colors"
-                >
-                  <div className="flex flex-col">
-                    <span className="text-xs font-medium">{task.title}</span>
-                    {task.type && (
-                      <span className="text-muted-foreground text-[11px]">{task.type}</span>
-                    )}
-                  </div>
-                  <span className="shrink-0 text-xs font-semibold text-amber-400">
-                    {task.price != null ? formatToBRL(task.price) : '—'}
-                  </span>
+          <>
+            <ul className="flex max-h-80 flex-col gap-1 overflow-y-auto p-2">
+              {pendentes.slice(0, MAX_VISIBLE_ITEMS).map((transaction) => (
+                <li key={transaction.id}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="h-auto w-full justify-between px-2 py-2 text-left whitespace-normal"
+                    onClick={() => openTransaction(transaction)}
+                  >
+                    <span className="flex min-w-0 flex-col items-start">
+                      <span className="max-w-44 truncate font-medium">
+                        {transaction.description || 'Despesa sem descrição'}
+                      </span>
+                      <span className="text-muted-foreground text-xs">
+                        {transaction.categories?.name || 'Sem categoria'}
+                      </span>
+                    </span>
+                    <span className="shrink-0 font-semibold text-amber-600">
+                      {formatToBRL(transaction.amount)}
+                    </span>
+                  </Button>
                 </li>
               ))}
             </ul>
-            <Separator className="my-2" />
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground text-xs">Total pendente</span>
-              <span className="text-xs font-bold text-red-400">
-                {formatToBRL(totalPendente)}
-              </span>
+            <Separator />
+            <div className="flex flex-col gap-2 p-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Total pendente</span>
+                <span className="font-semibold">
+                  {formatToBRL(totalPendente)}
+                </span>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={openAllPending}
+              >
+                Ver todas as pendências
+              </Button>
             </div>
-            <p className="text-muted-foreground mt-2 text-center text-[11px]">
-              Clique em uma despesa para destacá-la
-            </p>
-          </div>
+          </>
         )}
-      </TooltipContent>
-    </Tooltip>
+      </PopoverContent>
+    </Popover>
   );
 }

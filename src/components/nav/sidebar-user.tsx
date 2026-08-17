@@ -21,26 +21,28 @@ import {
 import { ChevronsUpDown, Bell, LogOut } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 import { supabase } from '@/lib/supabase';
-import { useQuery } from '@tanstack/react-query';
-import { queryKeys } from '@/lib/query-keys';
-import { getTasksPendentes } from '@/service/task/getTasksPendentes';
 import { AnimatedThemeToggle } from '@/components/theme-toggle-animated';
 import { AnimatedLanguageToggle } from '@/components/language-toggle-animated';
+import { useTransactions } from '@/hooks/useTransactions';
+import { useWorkspace } from '@/context/WorkspaceContext';
 
 export function SidebarUser() {
-  const [fetchedProfile, setFetchedProfile] = useState<UserProfile | null>(null);
+  const [fetchedProfile, setFetchedProfile] = useState<UserProfile | null>(
+    null
+  );
   const { profile } = useUser();
   const navigate = useNavigate();
+  const { activeWorkspaceId } = useWorkspace();
 
   const now = new Date();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
 
-  const { data: pendentes = [] } = useQuery({
-    queryKey: queryKeys.notifications.pending(month, year),
-    queryFn: () => getTasksPendentes({ month, year }),
-    staleTime: 1000 * 60 * 5,
-  });
+  const { data: transactions = [] } = useTransactions(
+    activeWorkspaceId,
+    month,
+    year
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -66,7 +68,10 @@ export function SidebarUser() {
     navigate({ to: '/login' });
   };
 
-  const notifCount = pendentes.length;
+  const notifCount = transactions.filter(
+    (transaction) =>
+      transaction.type === 'despesa' && transaction.status === 'pendente'
+  ).length;
 
   return (
     <SidebarMenu>
@@ -86,7 +91,7 @@ export function SidebarUser() {
                 {displayName && (
                   <span className="truncate font-semibold">{displayName}</span>
                 )}
-                <span className="truncate text-xs text-muted-foreground">
+                <span className="text-muted-foreground truncate text-xs">
                   {email}
                 </span>
               </div>
@@ -109,9 +114,11 @@ export function SidebarUser() {
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   {displayName && (
-                    <span className="truncate font-semibold">{displayName}</span>
+                    <span className="truncate font-semibold">
+                      {displayName}
+                    </span>
                   )}
-                  <span className="truncate text-xs text-muted-foreground">
+                  <span className="text-muted-foreground truncate text-xs">
                     {email}
                   </span>
                 </div>
@@ -123,7 +130,17 @@ export function SidebarUser() {
             {/* Notificações */}
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onClick={() => navigate({ to: '/admin/expenses' })}
+                onClick={() =>
+                  navigate({
+                    to: '/admin/transactions',
+                    search: {
+                      month,
+                      year,
+                      status: 'pendente',
+                      highlight: undefined,
+                    },
+                  })
+                }
               >
                 <Bell className="size-4" />
                 <span>Notificações</span>

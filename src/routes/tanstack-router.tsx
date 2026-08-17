@@ -3,12 +3,12 @@ import {
   createRoute,
   createRootRoute,
   Outlet,
+  redirect,
 } from '@tanstack/react-router';
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
 import Admin from '@/pages/Admin';
 import AuthCallback from '@/pages/AuthCallback';
-import Expenses from '@/pages/admin/Expenses';
 import Income from '@/pages/admin/Income';
 import EditUser from '@/pages/admin/EditUser';
 import Dashboard from '@/pages/admin/Dashboard';
@@ -76,7 +76,18 @@ const editUserRoute = createRoute({
 const expensesRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: '/expenses',
-  component: Expenses,
+  beforeLoad: () => {
+    throw redirect({
+      to: '/admin/transactions',
+      search: {
+        month: undefined,
+        year: undefined,
+        status: undefined,
+        highlight: undefined,
+      },
+      replace: true,
+    });
+  },
 });
 
 const dashboardRoute = createRoute({
@@ -124,6 +135,28 @@ const transactionsRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: '/transactions',
   component: TransactionsPage,
+  validateSearch: (search: Record<string, unknown>) => {
+    const parsedMonth = Number(search.month);
+    const parsedYear = Number(search.year);
+    const validStatuses = ['pago', 'pendente', 'recebido'] as const;
+    const status = validStatuses.find((value) => value === search.status);
+
+    return {
+      month:
+        Number.isInteger(parsedMonth) && parsedMonth >= 1 && parsedMonth <= 12
+          ? parsedMonth
+          : undefined,
+      year:
+        Number.isInteger(parsedYear) && parsedYear >= 2000 && parsedYear <= 2100
+          ? parsedYear
+          : undefined,
+      status,
+      highlight:
+        typeof search.highlight === 'string' && search.highlight.length <= 128
+          ? search.highlight
+          : undefined,
+    };
+  },
 });
 
 const recurringRoute = createRoute({

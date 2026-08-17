@@ -36,6 +36,8 @@
   "table": {
     "filterByCategory": "Filtrar por categoria",
     "allCategories": "Todas as categorias",
+    "filterByStatus": "Filtrar por status",
+    "allStatuses": "Todos os status",
     "empty": "Nenhuma transação encontrada",
     "emptyHint": "Clique em \"Nova Transação\" para começar.",
     "name": "Nome",
