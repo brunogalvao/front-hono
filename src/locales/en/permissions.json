@@ -16,6 +16,7 @@
     "title": "Application users",
     "description": "All registered users — workspace members and users without access",
     "inviteByEmail": "Invite by email",
+    "pendingInvite": "Pending invitation",
     "noAccess": "No access",
     "empty": "No users found",
     "individualPermissions": "Individual permissions",

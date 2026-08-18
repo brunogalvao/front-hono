@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Shield, UserMinus, UserPlus } from 'lucide-react';
+import {
+  Loader2,
+  RotateCw,
+  Shield,
+  UserMinus,
+  UserPlus,
+  X,
+} from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -42,6 +49,7 @@ import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
 import { useWorkspaceMembers } from '@/hooks/useWorkspaceMembers';
 import type { AppUser } from '@/hooks/useAllAppUsers';
+import type { PendingInvite } from '@/model/workspace-member.model';
 import type { WorkspaceRole } from '@/context/WorkspaceContext';
 
 const ROLE_KEYS: WorkspaceRole[] = [
@@ -57,6 +65,10 @@ interface AllUsersTableProps {
   currentUserId: string;
   workspaceId: string;
   isSuperAdmin?: boolean;
+  pendingInvites: PendingInvite[];
+  busyInviteId?: string;
+  onResendInvite: (inviteId: string) => Promise<unknown>;
+  onCancelInvite: (inviteId: string) => Promise<unknown>;
 }
 
 export function AllUsersTable({
@@ -65,32 +77,53 @@ export function AllUsersTable({
   currentUserId,
   workspaceId,
   isSuperAdmin = false,
+  pendingInvites,
+  busyInviteId,
+  onResendInvite,
+  onCancelInvite,
 }: AllUsersTableProps) {
-  const { t } = useTranslation(['permissions', 'common']);
+  const { t } = useTranslation(['permissions', 'common', 'invite']);
   const queryClient = useQueryClient();
   const { updateRole, removeMember } = useWorkspaceMembers(workspaceId);
   const [removeTarget, setRemoveTarget] = useState<AppUser | null>(null);
   const [addTarget, setAddTarget] = useState<AppUser | null>(null);
-  const [permissionsTarget, setPermissionsTarget] = useState<AppUser | null>(null);
-  const [selectedRole, setSelectedRole] = useState<WorkspaceRole>('visualizador');
+  const [permissionsTarget, setPermissionsTarget] = useState<AppUser | null>(
+    null
+  );
+  const [selectedRole, setSelectedRole] =
+    useState<WorkspaceRole>('visualizador');
 
   // Direct insert for existing app users (no email invite needed)
   const addMember = useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: WorkspaceRole }) => {
+    mutationFn: async ({
+      userId,
+      role,
+    }: {
+      userId: string;
+      role: WorkspaceRole;
+    }) => {
       const { error } = await supabase
         .from('workspace_members')
         .insert({ workspace_id: workspaceId, user_id: userId, role });
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.appUsers.byWorkspace(workspaceId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.workspaces.members(workspaceId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.appUsers.byWorkspace(workspaceId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.workspaces.members(workspaceId),
+      });
     },
   });
 
   const invalidateAll = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.appUsers.byWorkspace(workspaceId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.workspaces.members(workspaceId) });
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.appUsers.byWorkspace(workspaceId),
+    });
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.workspaces.members(workspaceId),
+    });
     queryClient.invalidateQueries({ queryKey: queryKeys.workspaces.list });
   };
 
@@ -119,7 +152,10 @@ export function AllUsersTable({
   const handleAddToWorkspace = async () => {
     if (!addTarget) return;
     try {
-      await addMember.mutateAsync({ userId: addTarget.profile.id, role: selectedRole });
+      await addMember.mutateAsync({
+        userId: addTarget.profile.id,
+        role: selectedRole,
+      });
       toast.success(t('allUsers.toast.userAdded'));
     } catch {
       toast.error(t('allUsers.toast.userAddError'));
@@ -138,6 +174,13 @@ export function AllUsersTable({
     );
   }
 
+  const pendingInviteByEmail = new Map(
+    pendingInvites.map((invite) => [
+      invite.email_normalized.toLowerCase(),
+      invite,
+    ])
+  );
+
   return (
     <TooltipProvider>
       <div className="space-y-2">
@@ -146,16 +189,25 @@ export function AllUsersTable({
           const name = profile.full_name ?? profile.email;
           const isSelf = profile.id === currentUserId;
           const isMember = role !== null;
+          const pendingInvite = pendingInviteByEmail.get(
+            profile.email.toLowerCase()
+          );
+          const inviteIsBusy = pendingInvite?.id === busyInviteId;
 
           return (
-            <div key={profile.id} className="flex items-center gap-3 rounded-lg border p-3">
+            <div
+              key={profile.id}
+              className="flex items-center gap-3 rounded-lg border p-3"
+            >
               <Avatar className="h-9 w-9 shrink-0">
                 <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
 
-              <div className="flex-1 min-w-0">
-                <p className="truncate font-medium text-sm">{name}</p>
-                <p className="text-muted-foreground truncate text-xs">{profile.email}</p>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{name}</p>
+                <p className="text-muted-foreground truncate text-xs">
+                  {profile.email}
+                </p>
               </div>
 
               {/* Role area */}
@@ -180,22 +232,33 @@ export function AllUsersTable({
                 ) : (
                   <Select
                     value={role!}
-                    onValueChange={(v) => handleUpdateRole(memberId!, v as WorkspaceRole)}
+                    onValueChange={(v) =>
+                      handleUpdateRole(memberId!, v as WorkspaceRole)
+                    }
                   >
-                    <SelectTrigger className="w-36 h-8 text-xs">
+                    <SelectTrigger className="h-8 w-36 text-xs">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {ROLE_KEYS.filter((k) => k !== 'super_administrador').map((k) => (
-                        <SelectItem key={k} value={k} className="text-xs">
-                          {t(`roles.${k}`, { defaultValue: k })}
-                        </SelectItem>
-                      ))}
+                      {ROLE_KEYS.filter((k) => k !== 'super_administrador').map(
+                        (k) => (
+                          <SelectItem key={k} value={k} className="text-xs">
+                            {t(`roles.${k}`, { defaultValue: k })}
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                 )
+              ) : pendingInvite ? (
+                <Badge variant="outline" className="shrink-0 text-xs">
+                  {t('allUsers.pendingInvite')}
+                </Badge>
               ) : (
-                <Badge variant="outline" className="text-xs text-muted-foreground shrink-0">
+                <Badge
+                  variant="outline"
+                  className="text-muted-foreground shrink-0 text-xs"
+                >
                   {t('allUsers.noAccess')}
                 </Badge>
               )}
@@ -214,18 +277,65 @@ export function AllUsersTable({
                       <Shield className="h-4 w-4" />
                     </Button>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive hover:text-destructive h-8 w-8 shrink-0"
-                    onClick={() => setRemoveTarget(user)}
-                  >
-                    <UserMinus className="h-4 w-4" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive h-8 w-8 shrink-0"
+                        aria-label={t('allUsers.remove')}
+                        onClick={() => setRemoveTarget(user)}
+                      >
+                        <UserMinus className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{t('allUsers.remove')}</TooltipContent>
+                  </Tooltip>
                 </>
               )}
 
-              {!isMember && (
+              {!isMember && pendingInvite && (
+                <>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        aria-label={t('invite:form.resend')}
+                        disabled={inviteIsBusy}
+                        onClick={() => void onResendInvite(pendingInvite.id)}
+                      >
+                        {inviteIsBusy ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <RotateCw className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{t('invite:form.resend')}</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive h-8 w-8 shrink-0"
+                        aria-label={t('invite:form.cancel')}
+                        disabled={inviteIsBusy}
+                        onClick={() => void onCancelInvite(pendingInvite.id)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{t('invite:form.cancel')}</TooltipContent>
+                  </Tooltip>
+                </>
+              )}
+
+              {!isMember && !pendingInvite && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -243,20 +353,25 @@ export function AllUsersTable({
         })}
 
         {(users ?? []).length === 0 && (
-          <p className="text-muted-foreground text-sm text-center py-4">
+          <p className="text-muted-foreground py-4 text-center text-sm">
             {t('allUsers.empty')}
           </p>
         )}
       </div>
 
       {/* Remove confirmation dialog */}
-      <AlertDialog open={!!removeTarget} onOpenChange={(open) => !open && setRemoveTarget(null)}>
+      <AlertDialog
+        open={!!removeTarget}
+        onOpenChange={(open) => !open && setRemoveTarget(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('allUsers.removeTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
               {t('allUsers.removeDescription', {
-                name: removeTarget?.profile.full_name ?? removeTarget?.profile.email,
+                name:
+                  removeTarget?.profile.full_name ??
+                  removeTarget?.profile.email,
               })}
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -273,7 +388,10 @@ export function AllUsersTable({
       </AlertDialog>
 
       {/* Add to workspace dialog */}
-      <AlertDialog open={!!addTarget} onOpenChange={(open) => !open && setAddTarget(null)}>
+      <AlertDialog
+        open={!!addTarget}
+        onOpenChange={(open) => !open && setAddTarget(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('allUsers.addTitle')}</AlertDialogTitle>
@@ -281,7 +399,10 @@ export function AllUsersTable({
               <Trans
                 ns="permissions"
                 i18nKey="allUsers.addDescription"
-                values={{ name: addTarget?.profile.full_name ?? addTarget?.profile.email }}
+                values={{
+                  name:
+                    addTarget?.profile.full_name ?? addTarget?.profile.email,
+                }}
                 components={{ strong: <strong /> }}
               />
             </AlertDialogDescription>
@@ -295,17 +416,21 @@ export function AllUsersTable({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {ROLE_KEYS.filter((k) => k !== 'super_administrador').map((k) => (
-                  <SelectItem key={k} value={k}>
-                    {t(`roles.${k}`, { defaultValue: k })}
-                  </SelectItem>
-                ))}
+                {ROLE_KEYS.filter((k) => k !== 'super_administrador').map(
+                  (k) => (
+                    <SelectItem key={k} value={k}>
+                      {t(`roles.${k}`, { defaultValue: k })}
+                    </SelectItem>
+                  )
+                )}
               </SelectContent>
             </Select>
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleAddToWorkspace}>{t('allUsers.add')}</AlertDialogAction>
+            <AlertDialogAction onClick={handleAddToWorkspace}>
+              {t('allUsers.add')}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -319,10 +444,14 @@ export function AllUsersTable({
           <DialogHeader>
             <DialogTitle>
               {t('allUsers.guestDialogTitle', {
-                name: permissionsTarget?.profile.full_name ?? permissionsTarget?.profile.email,
+                name:
+                  permissionsTarget?.profile.full_name ??
+                  permissionsTarget?.profile.email,
               })}
             </DialogTitle>
-            <DialogDescription>{t('allUsers.guestDialogDescription')}</DialogDescription>
+            <DialogDescription>
+              {t('allUsers.guestDialogDescription')}
+            </DialogDescription>
           </DialogHeader>
           {permissionsTarget && (
             <GuestPermissionEditor

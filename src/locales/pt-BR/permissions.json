@@ -16,6 +16,7 @@
     "title": "Usuários da aplicação",
     "description": "Todos os usuários cadastrados — membros do workspace e usuários sem acesso",
     "inviteByEmail": "Convidar por e-mail",
+    "pendingInvite": "Convite pendente",
     "noAccess": "Sem acesso",
     "empty": "Nenhum usuário encontrado",
     "individualPermissions": "Permissões individuais",

@@ -95,6 +95,17 @@ export default function PermissionsPage() {
     }
   };
 
+  const busyInviteId =
+    resendInvite.isPending || cancelInvite.isPending
+      ? (resendInvite.variables ?? cancelInvite.variables)
+      : undefined;
+  const registeredUserEmails = new Set(
+    (users ?? []).map((user) => user.profile.email.toLowerCase())
+  );
+  const invitesWithoutRegisteredUser = (pendingInvites.data ?? []).filter(
+    (invite) => !registeredUserEmails.has(invite.email_normalized.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -135,12 +146,16 @@ export default function PermissionsPage() {
             currentUserId={currentUserId ?? ''}
             workspaceId={activeWorkspace.id}
             isSuperAdmin={isSuperAdmin}
+            pendingInvites={pendingInvites.data ?? []}
+            busyInviteId={busyInviteId}
+            onResendInvite={handleResend}
+            onCancelInvite={handleCancel}
           />
 
           <Separator />
 
           <div>
-            <p className="mb-3 text-sm font-medium">
+            <p className="mb-0 text-sm font-medium">
               {t('allUsers.inviteByEmail')}
             </p>
             <InviteForm onInvite={handleInvite} />
@@ -151,13 +166,9 @@ export default function PermissionsPage() {
           <div className="space-y-3">
             <p className="text-sm font-medium">{t('invite:list.title')}</p>
             <PendingInviteList
-              invites={pendingInvites.data ?? []}
+              invites={invitesWithoutRegisteredUser}
               isLoading={pendingInvites.isLoading}
-              busyInviteId={
-                resendInvite.isPending || cancelInvite.isPending
-                  ? (resendInvite.variables ?? cancelInvite.variables)
-                  : undefined
-              }
+              busyInviteId={busyInviteId}
               onResend={handleResend}
               onCancel={handleCancel}
             />

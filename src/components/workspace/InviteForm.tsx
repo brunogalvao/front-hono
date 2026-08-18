@@ -81,7 +81,7 @@ export function InviteForm({ onInvite }: InviteFormProps) {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
-          className="flex flex-col gap-3 sm:flex-row sm:items-end"
+          className="flex flex-col items-end gap-3 sm:flex-row sm:items-end"
         >
           <FormField
             control={form.control}
@@ -110,7 +110,7 @@ export function InviteForm({ onInvite }: InviteFormProps) {
                 <FormLabel>{t('form.role')}</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="mb-0">
                       <SelectValue />
                     </SelectTrigger>
                   </FormControl>
