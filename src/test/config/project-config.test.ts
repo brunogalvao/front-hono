@@ -34,14 +34,34 @@ describe('package.json', () => {
 describe('pnpm-workspace.yaml', () => {
   const yaml = readFileSync(resolve(rootDir, 'pnpm-workspace.yaml'), 'utf-8');
 
-  it('permite build apenas para esbuild e core-js', () => {
+  it('permite build apenas para esbuild, core-js e workerd', () => {
     expect(yaml.trim()).toBe(
-      ['allowBuilds:', '  core-js: true', '  esbuild: true'].join('\n')
+      [
+        'allowBuilds:',
+        '  core-js: true',
+        '  esbuild: true',
+        '  workerd: true',
+      ].join('\n')
     );
   });
 
   it('não contém placeholders não preenchidos', () => {
     expect(yaml).not.toContain('set this to true or false');
+  });
+});
+
+// ─── Cloudflare Workers ──────────────────────────────────────────────────────
+
+describe('wrangler.jsonc', () => {
+  const config = readFileSync(resolve(rootDir, 'wrangler.jsonc'), 'utf-8');
+
+  it('publica o build Vite no Worker correto', () => {
+    expect(config).toContain('"name": "front-hono"');
+    expect(config).toContain('"directory": "./dist"');
+  });
+
+  it('mantém fallback de navegação para a SPA', () => {
+    expect(config).toContain('"not_found_handling": "single-page-application"');
   });
 });
 

@@ -70,3 +70,8 @@ storybook-static
 # Generated build metadata
 public/version.json
 src/version.json
+
+# Cloudflare Wrangler local state and development secrets
+.wrangler/
+.dev.vars*
+!.dev.vars.example
