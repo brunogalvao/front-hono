@@ -15,6 +15,16 @@ vi.mock('@/hooks/useWorkspaceMembers', () => ({
   useWorkspaceMembers: () => workspaceMembers,
 }));
 
+vi.mock('@/lib/supabase', () => ({
+  supabase: {
+    from: vi.fn(),
+  },
+}));
+
+vi.mock('@/components/workspace/GuestPermissionEditor', () => ({
+  GuestPermissionEditor: () => null,
+}));
+
 function renderTable({
   user,
   pendingInvites = [],
