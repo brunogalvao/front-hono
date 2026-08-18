@@ -2,7 +2,6 @@ import path from 'path';
 import { configDefaults, defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import { copyFileSync, existsSync } from 'fs';
 
 export default defineConfig({
   test: {
@@ -14,22 +13,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  plugins: [
-    react(),
-    tailwindcss(),
-    {
-      name: 'copy-version-file',
-      writeBundle() {
-        // Copy version.json to dist if it exists
-        if (existsSync('src/version.json')) {
-          copyFileSync('src/version.json', 'dist/version.json');
-          console.log('✅ Version file copied to dist');
-        } else {
-          console.log('⚠️  No version.json found, using fallback');
-        }
-      },
-    },
-  ],
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

@@ -23,6 +23,10 @@ describe('package.json', () => {
   it('tem script preinstall bloqueando npm/yarn', () => {
     expect(pkg.scripts?.preinstall).toContain('only-allow pnpm');
   });
+
+  it('gera os metadados de versão no build padrão', () => {
+    expect(pkg.scripts?.build).toContain('scripts/generate-version.js');
+  });
 });
 
 // ─── pnpm-workspace.yaml ──────────────────────────────────────────────────────
@@ -38,5 +42,28 @@ describe('pnpm-workspace.yaml', () => {
 
   it('não contém placeholders não preenchidos', () => {
     expect(yaml).not.toContain('set this to true or false');
+  });
+});
+
+describe('continuous integration', () => {
+  const workflow = readFileSync(
+    resolve(rootDir, '.github/workflows/build.yml'),
+    'utf-8'
+  );
+  const versionScript = readFileSync(
+    resolve(rootDir, 'scripts/generate-version.js'),
+    'utf-8'
+  );
+
+  it('deixa o deploy a cargo da integração nativa da Vercel', () => {
+    expect(workflow).not.toContain('VERCEL_TOKEN');
+    expect(workflow).not.toContain('vercel deploy');
+    expect(workflow).toContain('pnpm run test:run && pnpm run build');
+  });
+
+  it('usa os metadados de commit fornecidos pela Vercel', () => {
+    expect(versionScript).toContain('VERCEL_GIT_COMMIT_SHA');
+    expect(versionScript).toContain('VERCEL_GIT_COMMIT_MESSAGE');
+    expect(versionScript).toContain('VERCEL_GIT_COMMIT_REF');
   });
 });

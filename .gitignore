@@ -66,3 +66,7 @@ CLEANUP_COMPLETE.md
 
 *storybook.log
 storybook-static
+
+# Generated build metadata
+public/version.json
+src/version.json
