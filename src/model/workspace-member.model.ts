@@ -21,6 +21,7 @@ export interface PendingInvite {
   id: string;
   email_normalized: string;
   role: WorkspaceRole;
+  status: 'pending' | 'expired';
   delivery_status: 'pending' | 'sent' | 'failed';
   expires_at: string | null;
   sent_at: string | null;

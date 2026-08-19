@@ -17,6 +17,8 @@
     "description": "Todos os usuários cadastrados — membros do workspace e usuários sem acesso",
     "inviteByEmail": "Convidar por e-mail",
     "pendingInvite": "Convite pendente",
+    "expiredInvite": "Convite expirado",
+    "currentSession": "(você)",
     "noAccess": "Sem acesso",
     "empty": "Nenhum usuário encontrado",
     "individualPermissions": "Permissões individuais",
@@ -28,6 +30,14 @@
     "addTitle": "Adicionar ao workspace",
     "addDescription": "Selecione o papel de <strong>{{name}}</strong> no workspace.",
     "add": "Adicionar",
+    "pagination": {
+      "label": "Paginação de usuários",
+      "total_one": "{{count}} usuário cadastrado",
+      "total_other": "{{count}} usuários cadastrados",
+      "page": "Página {{page}} de {{total}}",
+      "previous": "Página anterior",
+      "next": "Próxima página"
+    },
     "guestDialogTitle": "Permissões individuais — {{name}}",
     "guestDialogDescription": "Configure permissões específicas para este usuário, sobrescrevendo as do papel padrão.",
     "toast": {

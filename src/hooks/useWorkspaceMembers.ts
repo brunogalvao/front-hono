@@ -30,10 +30,10 @@ async function fetchPendingInvites(
   const { data, error } = await supabase
     .from('workspace_invites')
     .select(
-      'id, email_normalized, role, delivery_status, expires_at, sent_at, last_delivery_attempt_at, created_at'
+      'id, email_normalized, role, status, delivery_status, expires_at, sent_at, last_delivery_attempt_at, created_at'
     )
     .eq('workspace_id', workspaceId)
-    .eq('status', 'pending')
+    .in('status', ['pending', 'expired'])
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -83,6 +83,9 @@ export function useWorkspaceMembers(workspaceId: string | null) {
     queryKey: queryKeys.workspaces.pendingInvites(workspaceId ?? ''),
     queryFn: () => fetchPendingInvites(workspaceId!),
     enabled: !!workspaceId,
+    staleTime: 15_000,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: 'always',
   });
 
   const updateRole = useMutation({

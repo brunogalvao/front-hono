@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import {
+  ChevronLeft,
+  ChevronRight,
   Loader2,
   RotateCw,
   Shield,
@@ -69,6 +71,10 @@ interface AllUsersTableProps {
   busyInviteId?: string;
   onResendInvite: (inviteId: string) => Promise<unknown>;
   onCancelInvite: (inviteId: string) => Promise<unknown>;
+  page: number;
+  pageCount: number;
+  total: number;
+  onPageChange: (page: number) => void;
 }
 
 export function AllUsersTable({
@@ -81,6 +87,10 @@ export function AllUsersTable({
   busyInviteId,
   onResendInvite,
   onCancelInvite,
+  page,
+  pageCount,
+  total,
+  onPageChange,
 }: AllUsersTableProps) {
   const { t } = useTranslation(['permissions', 'common', 'invite']);
   const queryClient = useQueryClient();
@@ -192,6 +202,11 @@ export function AllUsersTable({
           const pendingInvite = pendingInviteByEmail.get(
             profile.email.toLowerCase()
           );
+          const inviteHasExpired =
+            pendingInvite?.status === 'expired' ||
+            (pendingInvite?.expires_at !== null &&
+              pendingInvite?.expires_at !== undefined &&
+              new Date(pendingInvite.expires_at).getTime() <= Date.now());
           const inviteIsBusy = pendingInvite?.id === busyInviteId;
 
           return (
@@ -204,7 +219,14 @@ export function AllUsersTable({
               </Avatar>
 
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{name}</p>
+                <p className="truncate text-sm font-medium">
+                  {name}
+                  {isSelf && (
+                    <span className="text-muted-foreground ml-1 font-normal">
+                      {t('allUsers.currentSession')}
+                    </span>
+                  )}
+                </p>
                 <p className="text-muted-foreground truncate text-xs">
                   {profile.email}
                 </p>
@@ -252,7 +274,11 @@ export function AllUsersTable({
                 )
               ) : pendingInvite ? (
                 <Badge variant="outline" className="shrink-0 text-xs">
-                  {t('allUsers.pendingInvite')}
+                  {t(
+                    inviteHasExpired
+                      ? 'allUsers.expiredInvite'
+                      : 'allUsers.pendingInvite'
+                  )}
                 </Badge>
               ) : (
                 <Badge
@@ -356,6 +382,45 @@ export function AllUsersTable({
           <p className="text-muted-foreground py-4 text-center text-sm">
             {t('allUsers.empty')}
           </p>
+        )}
+
+        {total > 0 && (
+          <nav
+            aria-label={t('allUsers.pagination.label')}
+            className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <p className="text-muted-foreground text-xs">
+              {t('allUsers.pagination.total', { count: total })}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={page <= 1}
+                aria-label={t('allUsers.pagination.previous')}
+                onClick={() => onPageChange(page - 1)}
+              >
+                <ChevronLeft aria-hidden="true" className="h-4 w-4" />
+              </Button>
+              <span className="text-muted-foreground min-w-24 text-center text-xs">
+                {t('allUsers.pagination.page', {
+                  page,
+                  total: Math.max(pageCount, 1),
+                })}
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={page >= pageCount}
+                aria-label={t('allUsers.pagination.next')}
+                onClick={() => onPageChange(page + 1)}
+              >
+                <ChevronRight aria-hidden="true" className="h-4 w-4" />
+              </Button>
+            </div>
+          </nav>
         )}
       </div>
 

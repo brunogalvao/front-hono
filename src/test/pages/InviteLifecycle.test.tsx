@@ -70,6 +70,7 @@ describe('invitation lifecycle', () => {
             id: 'invite-1',
             email_normalized: 'person@example.com',
             role: 'visualizador',
+            status: 'pending',
             delivery_status: 'failed',
             expires_at: null,
             sent_at: null,
@@ -82,13 +83,40 @@ describe('invitation lifecycle', () => {
         onCancel={cancel}
       />
     );
-    expect(screen.getByText(/Falha no envio/)).toBeInTheDocument();
+    expect(screen.getByText(/falha no envio/i)).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /Reenviar/ }));
     await userEvent.click(
       screen.getByRole('button', { name: /Cancelar convite/ })
     );
     expect(resend).toHaveBeenCalledWith('invite-1');
     expect(cancel).toHaveBeenCalledWith('invite-1');
+  });
+
+  it('shows an expired invite while keeping resend and cancel available', () => {
+    render(
+      <PendingInviteList
+        invites={[
+          {
+            id: 'invite-expired',
+            email_normalized: 'expired@example.com',
+            role: 'operador',
+            status: 'expired',
+            delivery_status: 'sent',
+            expires_at: '2026-08-17T12:00:00.000Z',
+            sent_at: '2026-08-16T12:00:00.000Z',
+            last_delivery_attempt_at: '2026-08-16T12:00:00.000Z',
+            created_at: '2026-08-16T12:00:00.000Z',
+          },
+        ]}
+        isLoading={false}
+        onResend={vi.fn()}
+        onCancel={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText(/Expirado/)).toBeInTheDocument();
+    expect(screen.getByText(/Resend: enviado/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Reenviar/ })).toBeEnabled();
   });
 
   it.each([

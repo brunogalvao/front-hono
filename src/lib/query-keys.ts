@@ -75,8 +75,10 @@ export const queryKeys = {
   workspaces: {
     all: ['workspaces'] as const,
     list: ['workspaces', 'list'] as const,
-    members: (workspaceId: string) => ['workspaces', workspaceId, 'members'] as const,
-    pendingInvites: (workspaceId: string) => ['workspaces', workspaceId, 'pending-invites'] as const,
+    members: (workspaceId: string) =>
+      ['workspaces', workspaceId, 'members'] as const,
+    pendingInvites: (workspaceId: string) =>
+      ['workspaces', workspaceId, 'pending-invites'] as const,
   },
 
   transactions: {
@@ -121,6 +123,8 @@ export const queryKeys = {
   appUsers: {
     all: ['app-users'] as const,
     byWorkspace: (workspaceId: string) => ['app-users', workspaceId] as const,
+    page: (workspaceId: string, page: number, pageSize: number) =>
+      ['app-users', workspaceId, 'page', { page, pageSize }] as const,
   },
 
   permissions: {

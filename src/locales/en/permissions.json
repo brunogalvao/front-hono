@@ -17,6 +17,8 @@
     "description": "All registered users — workspace members and users without access",
     "inviteByEmail": "Invite by email",
     "pendingInvite": "Pending invitation",
+    "expiredInvite": "Expired invitation",
+    "currentSession": "(you)",
     "noAccess": "No access",
     "empty": "No users found",
     "individualPermissions": "Individual permissions",
@@ -28,6 +30,14 @@
     "addTitle": "Add to workspace",
     "addDescription": "Select the role for <strong>{{name}}</strong> in the workspace.",
     "add": "Add",
+    "pagination": {
+      "label": "User pagination",
+      "total_one": "{{count}} registered user",
+      "total_other": "{{count}} registered users",
+      "page": "Page {{page}} of {{total}}",
+      "previous": "Previous page",
+      "next": "Next page"
+    },
     "guestDialogTitle": "Individual permissions — {{name}}",
     "guestDialogDescription": "Configure specific permissions for this user, overriding the default role.",
     "toast": {

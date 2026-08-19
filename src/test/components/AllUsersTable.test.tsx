@@ -30,11 +30,19 @@ function renderTable({
   pendingInvites = [],
   onResendInvite = vi.fn().mockResolvedValue(undefined),
   onCancelInvite = vi.fn().mockResolvedValue(undefined),
+  page = 1,
+  pageCount = 1,
+  total = 1,
+  onPageChange = vi.fn(),
 }: {
   user: AppUser;
   pendingInvites?: PendingInvite[];
   onResendInvite?: (inviteId: string) => Promise<unknown>;
   onCancelInvite?: (inviteId: string) => Promise<unknown>;
+  page?: number;
+  pageCount?: number;
+  total?: number;
+  onPageChange?: (page: number) => void;
 }) {
   render(
     <QueryClientProvider client={new QueryClient()}>
@@ -47,11 +55,15 @@ function renderTable({
         pendingInvites={pendingInvites}
         onResendInvite={onResendInvite}
         onCancelInvite={onCancelInvite}
+        page={page}
+        pageCount={pageCount}
+        total={total}
+        onPageChange={onPageChange}
       />
     </QueryClientProvider>
   );
 
-  return { onResendInvite, onCancelInvite };
+  return { onResendInvite, onCancelInvite, onPageChange };
 }
 
 const profile = {
@@ -69,6 +81,7 @@ describe('AllUsersTable', () => {
       id: 'invite-1',
       email_normalized: profile.email,
       role: 'visualizador',
+      status: 'pending',
       delivery_status: 'sent',
       expires_at: null,
       sent_at: null,
@@ -103,5 +116,20 @@ describe('AllUsersTable', () => {
     expect(
       screen.queryByRole('button', { name: 'Reenviar' })
     ).not.toBeInTheDocument();
+  });
+
+  it('navega pelas páginas da lista de usuários', async () => {
+    const actions = renderTable({
+      user: { profile, role: null, memberId: null },
+      page: 1,
+      pageCount: 3,
+      total: 25,
+    });
+
+    expect(screen.getByText('Página 1 de 3')).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Próxima página' })
+    );
+    expect(actions.onPageChange).toHaveBeenCalledWith(2);
   });
 });

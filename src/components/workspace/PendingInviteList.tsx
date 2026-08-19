@@ -36,6 +36,10 @@ export function PendingInviteList({
     <ul className="divide-y rounded-lg border">
       {invites.map((invite) => {
         const busy = busyInviteId === invite.id;
+        const hasExpired =
+          invite.status === 'expired' ||
+          (invite.expires_at !== null &&
+            new Date(invite.expires_at).getTime() <= Date.now());
         const role =
           invite.role === 'super_administrador' ? 'administrador' : invite.role;
         return (
@@ -49,6 +53,7 @@ export function PendingInviteList({
               </p>
               <p className="text-muted-foreground text-xs">
                 {t(`roles.${role}`)} ·{' '}
+                {t(`list.status.${hasExpired ? 'expired' : 'pending'}`)} ·{' '}
                 {t(`list.delivery.${invite.delivery_status}`)}
               </p>
             </div>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
@@ -23,6 +23,8 @@ import { useWorkspace } from '@/context/WorkspaceContext';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
 
+const USERS_PAGE_SIZE = 10;
+
 function useCurrentUserId() {
   return useQuery({
     queryKey: queryKeys.auth.session,
@@ -37,15 +39,31 @@ export default function PermissionsPage() {
   const { t } = useTranslation(['permissions', 'common', 'invite']);
   const navigate = useNavigate();
   const { activeWorkspace } = useWorkspace();
+  const [usersPage, setUsersPage] = useState(1);
   const { can, isSuperAdmin, isLoading: isPermLoading } = usePermissions();
   const { data: currentUserId } = useCurrentUserId();
-  const { data: users, isLoading: isUsersLoading } = useAllAppUsers(
-    activeWorkspace?.id ?? null
+  const { data: usersResult, isLoading: isUsersLoading } = useAllAppUsers(
+    activeWorkspace?.id ?? null,
+    usersPage,
+    USERS_PAGE_SIZE
   );
   const { inviteMember, pendingInvites, resendInvite, cancelInvite } =
     useWorkspaceMembers(activeWorkspace?.id ?? null);
 
   const canManageMembers = can('members', 'read');
+  const users = usersResult?.users;
+  const usersTotal = usersResult?.total ?? 0;
+  const usersPageCount = Math.ceil(usersTotal / USERS_PAGE_SIZE);
+
+  useEffect(() => {
+    setUsersPage(1);
+  }, [activeWorkspace?.id]);
+
+  useEffect(() => {
+    if (usersPageCount > 0 && usersPage > usersPageCount) {
+      setUsersPage(usersPageCount);
+    }
+  }, [usersPage, usersPageCount]);
 
   useEffect(() => {
     if (isPermLoading || !activeWorkspace) return;
@@ -99,13 +117,6 @@ export default function PermissionsPage() {
     resendInvite.isPending || cancelInvite.isPending
       ? (resendInvite.variables ?? cancelInvite.variables)
       : undefined;
-  const registeredUserEmails = new Set(
-    (users ?? []).map((user) => user.profile.email.toLowerCase())
-  );
-  const invitesWithoutRegisteredUser = (pendingInvites.data ?? []).filter(
-    (invite) => !registeredUserEmails.has(invite.email_normalized.toLowerCase())
-  );
-
   return (
     <div className="space-y-6">
       <div>
@@ -150,6 +161,10 @@ export default function PermissionsPage() {
             busyInviteId={busyInviteId}
             onResendInvite={handleResend}
             onCancelInvite={handleCancel}
+            page={usersPage}
+            pageCount={usersPageCount}
+            total={usersTotal}
+            onPageChange={setUsersPage}
           />
 
           <Separator />
@@ -166,7 +181,7 @@ export default function PermissionsPage() {
           <div className="space-y-3">
             <p className="text-sm font-medium">{t('invite:list.title')}</p>
             <PendingInviteList
-              invites={invitesWithoutRegisteredUser}
+              invites={pendingInvites.data ?? []}
               isLoading={pendingInvites.isLoading}
               busyInviteId={busyInviteId}
               onResend={handleResend}

@@ -46,14 +46,18 @@
     "rate_limited": "Invitation limit reached. Wait before trying again."
   },
   "list": {
-    "title": "Pending invitations",
-    "empty": "No pending invitations.",
+    "title": "Sent invitations",
+    "empty": "No invitations sent.",
     "loading": "Loading invitations",
     "cancelled": "Invitation cancelled.",
+    "status": {
+      "pending": "Awaiting acceptance",
+      "expired": "Expired"
+    },
     "delivery": {
       "pending": "Preparing delivery",
-      "sent": "Sent",
-      "failed": "Delivery failed"
+      "sent": "Resend: sent",
+      "failed": "Resend: delivery failed"
     }
   },
   "landing": {

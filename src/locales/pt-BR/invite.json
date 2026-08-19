@@ -46,14 +46,18 @@
     "rate_limited": "Limite de convites atingido. Aguarde antes de tentar novamente."
   },
   "list": {
-    "title": "Convites pendentes",
-    "empty": "Nenhum convite pendente.",
+    "title": "Convites enviados",
+    "empty": "Nenhum convite enviado.",
     "loading": "Carregando convites",
     "cancelled": "Convite cancelado.",
+    "status": {
+      "pending": "Aguardando aceite",
+      "expired": "Expirado"
+    },
     "delivery": {
       "pending": "Preparando envio",
-      "sent": "Enviado",
-      "failed": "Falha no envio"
+      "sent": "Resend: enviado",
+      "failed": "Resend: falha no envio"
     }
   },
   "landing": {
