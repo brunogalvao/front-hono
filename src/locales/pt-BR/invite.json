@@ -85,6 +85,23 @@
     "skip": "Fazer isso depois",
     "error": "Não foi possível salvar seu nome. Tente novamente ou continue sem preencher agora."
   },
+  "passwordSetup": {
+    "title": "Crie sua senha de acesso",
+    "description": "Seu convite foi aceito e você já está no workspace. Crie uma senha para entrar novamente quando quiser.",
+    "fullName": "Nome completo (opcional)",
+    "password": "Nova senha",
+    "passwordHint": "Use pelo menos 8 caracteres.",
+    "confirmPassword": "Confirmar nova senha",
+    "save": "Criar senha",
+    "saving": "Criando senha...",
+    "later": "Fazer depois",
+    "success": "Senha criada com sucesso.",
+    "errors": {
+      "tooShort": "A senha deve ter pelo menos 8 caracteres.",
+      "mismatch": "As senhas não coincidem.",
+      "generic": "Não foi possível criar sua senha. Tente novamente."
+    }
+  },
   "states": {
     "loadingTitle": "Verificando convite",
     "loadingDescription": "Isso leva apenas alguns segundos.",

@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShieldCheck } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 import {
   captureWorkspaceInviteToken,
   readWorkspaceInviteToken,
@@ -19,19 +17,11 @@ import { API_BASE_URL } from '@/config/api';
 
 export default function InviteLandingPage() {
   const { t } = useTranslation('invite');
-  const navigate = useNavigate();
   const [token] = useState<string | null>(
     () =>
       captureWorkspaceInviteToken(new URL(window.location.href)) ??
       readWorkspaceInviteToken()
   );
-  const [hasSession, setHasSession] = useState(false);
-
-  useEffect(() => {
-    supabase.auth
-      .getSession()
-      .then(({ data }) => setHasSession(Boolean(data.session)));
-  }, []);
 
   if (!token) {
     return (
@@ -67,21 +57,12 @@ export default function InviteLandingPage() {
           <CardDescription>{t('landing.description')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {hasSession ? (
-            <Button
-              className="min-h-11 w-full"
-              onClick={() => navigate({ to: '/auth/accept-invite' })}
-            >
+          <form method="post" action={prepareAuthUrl}>
+            <input type="hidden" name="token" value={token} />
+            <Button type="submit" className="min-h-11 w-full">
               {t('landing.continue')}
             </Button>
-          ) : (
-            <form method="post" action={prepareAuthUrl}>
-              <input type="hidden" name="token" value={token} />
-              <Button type="submit" className="min-h-11 w-full">
-                {t('landing.continue')}
-              </Button>
-            </form>
-          )}
+          </form>
           <p className="text-muted-foreground text-center text-xs">
             {t('landing.privacy')}
           </p>

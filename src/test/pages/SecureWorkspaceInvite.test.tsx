@@ -146,6 +146,50 @@ describe('secure workspace invitation pages', () => {
     expect(sessionStorage.getItem('pendingWorkspaceInviteToken')).toBeNull();
   });
 
+  it('activates the invited workspace immediately when a provisioned account needs a password', async () => {
+    sessionStorage.setItem('pendingWorkspaceInviteToken', 'd'.repeat(64));
+    mocks.fetch
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            status: 'valid',
+            workspace: { id: 'workspace-guest', name: 'Equipe' },
+            inviter: { display_name: 'Admin' },
+            role: 'visualizador',
+            expires_at: '2026-08-20T12:00:00.000Z',
+            profile_onboarding_status: 'incomplete',
+            password_setup_required: true,
+          }),
+          { status: 200 }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            status: 'accepted',
+            workspace: { id: 'workspace-guest', name: 'Equipe' },
+            role: 'visualizador',
+            profile_onboarding_status: 'incomplete',
+            password_setup_required: true,
+          }),
+          { status: 200 }
+        )
+      );
+
+    renderWithQuery(<AcceptInvitePage />);
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Aceitar convite' })
+    );
+
+    await waitFor(() =>
+      expect(mocks.navigate).toHaveBeenCalledWith({ to: '/admin/dashboard' })
+    );
+    expect(localStorage.getItem('active_workspace_id')).toBe('workspace-guest');
+    expect(
+      screen.queryByRole('button', { name: 'Fazer isso depois' })
+    ).not.toBeInTheDocument();
+  });
+
   it('renders email mismatch and offers account switching without accepting', async () => {
     sessionStorage.setItem('pendingWorkspaceInviteToken', 'c'.repeat(64));
     mocks.fetch.mockResolvedValue(

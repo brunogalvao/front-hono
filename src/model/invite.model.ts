@@ -81,6 +81,7 @@ export interface InvitePreview {
   role: InviteRole;
   expires_at: string;
   profile_onboarding_status: 'incomplete' | 'complete';
+  password_setup_required: boolean;
 }
 
 export interface InviteAcceptanceResult {
@@ -88,6 +89,7 @@ export interface InviteAcceptanceResult {
   workspace: InviteWorkspaceSummary;
   role: InviteRole;
   profile_onboarding_status: 'incomplete' | 'complete';
+  password_setup_required: boolean;
 }
 
 export interface InviteErrorResult {

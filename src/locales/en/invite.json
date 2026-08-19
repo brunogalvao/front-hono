@@ -85,6 +85,23 @@
     "skip": "Do this later",
     "error": "Your name could not be saved. Try again or continue without completing it now."
   },
+  "passwordSetup": {
+    "title": "Create your sign-in password",
+    "description": "Your invitation was accepted and you are already in the workspace. Create a password so you can sign in again whenever you need to.",
+    "fullName": "Full name (optional)",
+    "password": "New password",
+    "passwordHint": "Use at least 8 characters.",
+    "confirmPassword": "Confirm new password",
+    "save": "Create password",
+    "saving": "Creating password...",
+    "later": "Do this later",
+    "success": "Password created successfully.",
+    "errors": {
+      "tooShort": "Your password must contain at least 8 characters.",
+      "mismatch": "The passwords do not match.",
+      "generic": "Your password could not be created. Try again."
+    }
+  },
   "states": {
     "loadingTitle": "Checking invitation",
     "loadingDescription": "This should only take a few seconds.",

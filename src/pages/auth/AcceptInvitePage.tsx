@@ -142,6 +142,10 @@ export default function AcceptInvitePage() {
       setState('failed');
       return;
     }
+    if (result.password_setup_required) {
+      await finish(result.workspace.id);
+      return;
+    }
     if (result.profile_onboarding_status === 'incomplete') {
       setPreview(
         (current) =>
@@ -152,6 +156,7 @@ export default function AcceptInvitePage() {
             role: result.role,
             expires_at: '',
             profile_onboarding_status: 'incomplete',
+            password_setup_required: false,
           }
       );
       setState('onboarding');

@@ -16,6 +16,7 @@ import { NotificationBell } from '@/components/NotificationBell';
 import { useSessionGuard } from '@/hooks/useSessionGuard';
 import { WorkspaceProvider } from '@/context/WorkspaceContext';
 import { useTranslation } from 'react-i18next';
+import { InvitePasswordSetupDialog } from '@/components/workspace/InvitePasswordSetupDialog';
 
 function Admin() {
   const { t } = useTranslation('nav');
@@ -64,45 +65,46 @@ function Admin() {
 
   return (
     <WorkspaceProvider>
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
+      {sessionReady && <InvitePasswordSetupDialog />}
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+            <SidebarTrigger className="-ml-1" />
 
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <div className="flex w-full items-center justify-end gap-4">
-            {sessionReady && <NotificationBell />}
-            <AnimateIcon animateOnHover>
-              <RippleButton
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-                className="w-40 rounded-full px-6!"
-              >
-                {isLoggingOut ? (
-                  <>
-                    {t('loggingOut')}
-                    <Loader />
-                  </>
-                ) : (
-                  <>
-                    {t('logout')}
-                    <LogOut />
-                  </>
-                )}
-              </RippleButton>
-            </AnimateIcon>
-          </div>
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          <div className="bg-muted/50 min-h-0 flex-1 overflow-auto rounded-xl px-8 py-6 md:min-h-min">
-            <div className="h-full w-full">
-              {sessionReady ? <Outlet /> : null}
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <div className="flex w-full items-center justify-end gap-4">
+              {sessionReady && <NotificationBell />}
+              <AnimateIcon animateOnHover>
+                <RippleButton
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="w-40 rounded-full px-6!"
+                >
+                  {isLoggingOut ? (
+                    <>
+                      {t('loggingOut')}
+                      <Loader />
+                    </>
+                  ) : (
+                    <>
+                      {t('logout')}
+                      <LogOut />
+                    </>
+                  )}
+                </RippleButton>
+              </AnimateIcon>
+            </div>
+          </header>
+          <div className="flex flex-1 flex-col gap-4 p-4">
+            <div className="bg-muted/50 min-h-0 flex-1 overflow-auto rounded-xl px-8 py-6 md:min-h-min">
+              <div className="h-full w-full">
+                {sessionReady ? <Outlet /> : null}
+              </div>
             </div>
           </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+        </SidebarInset>
+      </SidebarProvider>
     </WorkspaceProvider>
   );
 }
