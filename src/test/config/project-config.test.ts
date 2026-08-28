@@ -35,7 +35,7 @@ describe('pnpm-workspace.yaml', () => {
   const yaml = readFileSync(resolve(rootDir, 'pnpm-workspace.yaml'), 'utf-8');
 
   it('permite build apenas para esbuild, core-js e workerd', () => {
-    expect(yaml.trim()).toBe(
+    expect(yaml).toContain(
       [
         'allowBuilds:',
         '  core-js: true',
@@ -43,6 +43,15 @@ describe('pnpm-workspace.yaml', () => {
         '  workerd: true',
       ].join('\n')
     );
+    expect(yaml).not.toMatch(/^  (?!core-js|esbuild|workerd)[^:\n]+: true$/m);
+  });
+
+  it('fixa versões transitivas com correções de segurança', () => {
+    expect(yaml).toContain('overrides:');
+    expect(yaml).toContain('  nanoid: ^3.3.18');
+    expect(yaml).toContain('  picomatch: ^4.0.4');
+    expect(yaml).toContain('  postcss: ^8.5.26');
+    expect(yaml).toContain('  rollup: ^4.59.0');
   });
 
   it('não contém placeholders não preenchidos', () => {

@@ -1,4 +1,4 @@
-import { createClient } from 'npm:@supabase/supabase-js@2.95.3';
+import { createClient } from 'npm:@supabase/supabase-js@2.112.4';
 
 import { inviteCallbackUrl } from '../_shared/invites/config.ts';
 import { jsonResponse, preflightResponse } from '../_shared/invites/http.ts';

@@ -27,18 +27,12 @@ export function useFinancialAdvisor(): FinancialAdvisorState {
       setError(null);
       setRetrySeconds(null);
 
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser();
-      if (userError || !userData.user)
-        throw new Error('Usuário não autenticado.');
-
       const { data: sessionData, error: sessionError } =
         await supabase.auth.getSession();
       if (sessionError || !sessionData.session)
         throw new Error('Sessão inválida.');
 
       const token = sessionData.session.access_token;
-      const user = userData.user;
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -51,14 +45,18 @@ export function useFinancialAdvisor(): FinancialAdvisorState {
             apikey: supabaseAnonKey,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ userId: user.id, period }),
+          body: JSON.stringify({ period }),
         }
       );
 
       if (!response.ok) {
         const body = await response.text();
         let parsed: Record<string, unknown> = {};
-        try { parsed = JSON.parse(body); } catch { /* ignora */ }
+        try {
+          parsed = JSON.parse(body);
+        } catch {
+          /* ignora */
+        }
 
         if (response.status === 429 || parsed.error === 'QUOTA_EXCEEDED') {
           setRetrySeconds((parsed.retrySeconds as number) ?? null);
@@ -66,10 +64,17 @@ export function useFinancialAdvisor(): FinancialAdvisorState {
         }
 
         if (parsed.error === 'GEMINI_ERROR') {
-          throw new Error((parsed.message as string) ?? 'Erro ao conectar com o serviço de IA.');
+          throw new Error(
+            (parsed.message as string) ??
+              'Erro ao conectar com o serviço de IA.'
+          );
         }
 
-        throw new Error((parsed.error as string) ?? (parsed.message as string) ?? `Erro ${response.status}`);
+        throw new Error(
+          (parsed.error as string) ??
+            (parsed.message as string) ??
+            `Erro ${response.status}`
+        );
       }
 
       const reader = response.body?.getReader();

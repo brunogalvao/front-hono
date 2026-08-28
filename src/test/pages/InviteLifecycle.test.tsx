@@ -137,6 +137,7 @@ describe('invitation lifecycle', () => {
       renderWithQuery(<AcceptInvitePage />);
       expect(await screen.findByText(title)).toBeInTheDocument();
       await waitFor(() => expect(mocks.fetch).toHaveBeenCalledTimes(1));
+      expect(sessionStorage.getItem('pendingWorkspaceInviteToken')).toBeNull();
       expect(mocks.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/api/workspace-invites/operation'),
         expect.objectContaining({

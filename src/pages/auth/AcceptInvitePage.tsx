@@ -49,6 +49,12 @@ function isInviteError(
   ].includes(result.status);
 }
 
+function isTerminalInviteError(status: InviteErrorResult['status']): boolean {
+  return ['invalid', 'expired', 'cancelled', 'already_accepted'].includes(
+    status
+  );
+}
+
 async function inviteOperation(
   operation: 'preview' | 'accept',
   token: string
@@ -119,6 +125,7 @@ export default function AcceptInvitePage() {
         setPreview(result);
         setState('review');
       } else if (isInviteError(result)) {
+        if (isTerminalInviteError(result.status)) clearWorkspaceInviteToken();
         setState(result.status);
       } else {
         setState('failed');
@@ -135,6 +142,7 @@ export default function AcceptInvitePage() {
     setState('accepting');
     const result = await inviteOperation('accept', token);
     if (isInviteError(result)) {
+      if (isTerminalInviteError(result.status)) clearWorkspaceInviteToken();
       setState(result.status);
       return;
     }

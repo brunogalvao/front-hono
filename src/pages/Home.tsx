@@ -122,7 +122,7 @@ function Home() {
         {/* Como funciona */}
         <section
           id="como-funciona"
-          className="flex h-svh scroll-mt-16 flex-col justify-center"
+          className="flex min-h-svh scroll-mt-16 flex-col justify-center"
         >
           <HowItWorks />
         </section>
@@ -130,11 +130,13 @@ function Home() {
         {/* Recursos */}
         <section
           id="recursos"
-          className="flex h-svh scroll-mt-16 flex-col justify-center gap-10"
+          className="flex min-h-svh scroll-mt-16 flex-col justify-center gap-8 py-16 md:gap-10"
         >
           <div className="text-center">
             <SectionLabel>{t('features.label')}</SectionLabel>
-            <h2 className="text-3xl font-bold">{t('features.title')}</h2>
+            <h2 className="text-2xl font-bold text-balance sm:text-3xl">
+              {t('features.title')}
+            </h2>
             <p className="text-muted-foreground mt-2 text-base">
               {t('features.description')}
             </p>
@@ -183,11 +185,13 @@ function Home() {
         {/* Estatísticas */}
         <section
           id="estatisticas"
-          className="flex h-svh scroll-mt-16 flex-col items-center justify-center gap-12"
+          className="flex min-h-svh scroll-mt-16 flex-col items-center justify-center gap-8 py-16 md:gap-12"
         >
           <div className="text-center">
             <SectionLabel>{t('stats.label')}</SectionLabel>
-            <h2 className="text-3xl font-bold">{t('stats.title')}</h2>
+            <h2 className="text-2xl font-bold text-balance sm:text-3xl">
+              {t('stats.title')}
+            </h2>
             <p className="text-muted-foreground mt-2 text-base">
               {t('stats.subtitle')}
             </p>
@@ -226,7 +230,7 @@ function Home() {
         </section>
 
         {/* CTA intermediário */}
-        <div className="border-border relative flex h-svh flex-col items-center justify-center gap-8 overflow-hidden rounded-2xl border">
+        <div className="border-border relative flex min-h-svh flex-col items-center justify-center gap-8 overflow-hidden rounded-2xl border py-16">
           <div
             className="absolute inset-0 rounded-2xl"
             style={{

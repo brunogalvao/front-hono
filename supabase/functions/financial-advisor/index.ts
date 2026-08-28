@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'npm:@supabase/supabase-js@2.112.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,60 +12,115 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { userId, period } = await req.json() as {
-      userId: string;
+    if (req.method !== 'POST') {
+      return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+        status: 405,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+          Allow: 'POST',
+        },
+      });
+    }
+
+    const { period } = (await req.json()) as {
       period: { month: number; year: number };
     };
 
-    if (!userId || !period?.month || !period?.year) {
-      return new Response(
-        JSON.stringify({ error: 'Parâmetros inválidos: userId, period.month e period.year são obrigatórios.' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (
+      !Number.isInteger(period?.month) ||
+      period.month < 1 ||
+      period.month > 12 ||
+      !Number.isInteger(period?.year) ||
+      period.year < 2020 ||
+      period.year > 2100
+    ) {
+      return new Response(JSON.stringify({ error: 'Período inválido.' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     if (!geminiApiKey) {
       return new Response(
         JSON.stringify({ error: 'GEMINI_API_KEY não configurada.' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
       );
     }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Buscar despesas (tasks) do período
     const { data: tasks, error: tasksError } = await supabase
       .from('tasks')
       .select('title, price, done, type')
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .eq('mes', period.month)
       .eq('ano', period.year);
 
-    if (tasksError) throw new Error(`Erro ao buscar despesas: ${tasksError.message}`);
+    if (tasksError)
+      throw new Error(`Erro ao buscar despesas: ${tasksError.message}`);
 
     // Buscar rendimentos do período
     const { data: incomes, error: incomesError } = await supabase
       .from('incomes')
       .select('descricao, valor')
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .eq('mes', period.month)
       .eq('ano', period.year);
 
-    if (incomesError) throw new Error(`Erro ao buscar rendimentos: ${incomesError.message}`);
+    if (incomesError)
+      throw new Error(`Erro ao buscar rendimentos: ${incomesError.message}`);
 
     const despesasPagas = tasks?.filter((t) => t.done === 'Pago') ?? [];
     const despesasPendentes = tasks?.filter((t) => t.done === 'Pendente') ?? [];
     const despesasFixas = tasks?.filter((t) => t.done === 'Fixo') ?? [];
 
-    const totalDespesasPagas = despesasPagas.reduce((s, t) => s + (t.price ?? 0), 0);
-    const totalDespesasPendentes = despesasPendentes.reduce((s, t) => s + (t.price ?? 0), 0);
-    const totalDespesasFixas = despesasFixas.reduce((s, t) => s + (t.price ?? 0), 0);
-    const totalDespesas = totalDespesasPagas + totalDespesasPendentes + totalDespesasFixas;
-    const totalRendimentos = incomes?.reduce((s, i) => s + (i.valor ?? 0), 0) ?? 0;
+    const totalDespesasPagas = despesasPagas.reduce(
+      (s, t) => s + (t.price ?? 0),
+      0
+    );
+    const totalDespesasPendentes = despesasPendentes.reduce(
+      (s, t) => s + (t.price ?? 0),
+      0
+    );
+    const totalDespesasFixas = despesasFixas.reduce(
+      (s, t) => s + (t.price ?? 0),
+      0
+    );
+    const totalDespesas =
+      totalDespesasPagas + totalDespesasPendentes + totalDespesasFixas;
+    const totalRendimentos =
+      incomes?.reduce((s, i) => s + (i.valor ?? 0), 0) ?? 0;
     const saldoLiquido = totalRendimentos - totalDespesas;
 
     // Agrupar por categoria/tipo
@@ -74,12 +129,24 @@ Deno.serve(async (req) => {
       const cat = t.type?.trim() || 'Sem categoria';
       categorias[cat] = (categorias[cat] ?? 0) + (t.price ?? 0);
     }
-    const categoriaOrdenada = Object.entries(categorias).sort((a, b) => b[1] - a[1]);
+    const categoriaOrdenada = Object.entries(categorias).sort(
+      (a, b) => b[1] - a[1]
+    );
     const maiorCategoria = categoriaOrdenada[0];
 
     const meses = [
-      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro',
     ];
     const nomeMes = meses[period.month - 1] ?? String(period.month);
 
@@ -91,9 +158,13 @@ Deno.serve(async (req) => {
 ## Dados Financeiros — ${nomeMes}/${period.year}
 
 ### Rendimentos
-${incomes && incomes.length > 0
-  ? incomes.map((i) => `- ${i.descricao || 'Rendimento'}: ${formatBRL(i.valor)}`).join('\n')
-  : '- Nenhum rendimento registrado'}
+${
+  incomes && incomes.length > 0
+    ? incomes
+        .map((i) => `- ${i.descricao || 'Rendimento'}: ${formatBRL(i.valor)}`)
+        .join('\n')
+    : '- Nenhum rendimento registrado'
+}
 **Total de rendimentos: ${formatBRL(totalRendimentos)}**
 
 ### Despesas
@@ -124,14 +195,17 @@ Faça um resumo claro de receitas x despesas, o saldo resultante, qual foi a mai
 Identifique comportamentos problemáticos, gastos que podem ser reduzidos ou eliminados. Seja específico com base nos dados fornecidos.
 
 ## 3. Recomendação de Investimento
-${saldoLiquido > 0
-  ? `Com saldo positivo de ${formatBRL(saldoLiquido)}, sugira estratégias de investimento adequadas ao contexto brasileiro: Tesouro Direto, CDB, LCI/LCA, FIIs, ações. Considere diferentes perfis de risco.`
-  : `Com saldo negativo ou zerado de ${formatBRL(saldoLiquido)}, foque em estratégias de equilíbrio financeiro: como zerar dívidas, criar reserva de emergência e recuperar o orçamento.`}
+${
+  saldoLiquido > 0
+    ? `Com saldo positivo de ${formatBRL(saldoLiquido)}, sugira estratégias de investimento adequadas ao contexto brasileiro: Tesouro Direto, CDB, LCI/LCA, FIIs, ações. Considere diferentes perfis de risco.`
+    : `Com saldo negativo ou zerado de ${formatBRL(saldoLiquido)}, foque em estratégias de equilíbrio financeiro: como zerar dívidas, criar reserva de emergência e recuperar o orçamento.`
+}
 
 Use linguagem acessível, seja direto e prático. Não repita os dados brutos — interprete-os.`;
 
     // Chamar Gemini API com streaming
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse`;
+    const geminiUrl =
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse';
 
     const geminiResponse = await fetch(geminiUrl, {
       method: 'POST',
@@ -147,23 +221,33 @@ Use linguagem acessível, seja direto e prático. Não repita os dados brutos �
 
     if (!geminiResponse.ok) {
       const errText = await geminiResponse.text();
-      console.error('[financial-advisor] Gemini error:', geminiResponse.status, errText);
+      console.error(
+        '[financial-advisor] Gemini error:',
+        geminiResponse.status,
+        errText
+      );
 
       if (geminiResponse.status === 429) {
         let retrySeconds: number | null = null;
         try {
           const errJson = JSON.parse(errText);
           const retryInfo = errJson?.error?.details?.find(
-            (d: { '@type': string }) => d['@type'] === 'type.googleapis.com/google.rpc.RetryInfo'
+            (d: { '@type': string }) =>
+              d['@type'] === 'type.googleapis.com/google.rpc.RetryInfo'
           );
           if (retryInfo?.retryDelay) {
             retrySeconds = parseInt(retryInfo.retryDelay.replace('s', ''), 10);
           }
-        } catch { /* ignora */ }
+        } catch {
+          /* ignora */
+        }
 
         return new Response(
           JSON.stringify({ error: 'QUOTA_EXCEEDED', retrySeconds }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          {
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
         );
       }
 
@@ -171,11 +255,20 @@ Use linguagem acessível, seja direto e prático. Não repita os dados brutos �
       try {
         const errJson = JSON.parse(errText);
         if (errJson?.error?.message) geminiMessage = errJson.error.message;
-      } catch { /* ignora */ }
+      } catch {
+        /* ignora */
+      }
 
       return new Response(
-        JSON.stringify({ error: 'GEMINI_ERROR', message: geminiMessage, status: geminiResponse.status }),
-        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({
+          error: 'GEMINI_ERROR',
+          message: geminiMessage,
+          status: geminiResponse.status,
+        }),
+        {
+          status: 502,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
       );
     }
 
@@ -220,10 +313,10 @@ Use linguagem acessível, seja direto e prático. Não repita os dados brutos �
       },
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Erro interno';
-    return new Response(
-      JSON.stringify({ error: message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    console.error('[financial-advisor] unexpected error:', err);
+    return new Response(JSON.stringify({ error: 'Erro interno' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });

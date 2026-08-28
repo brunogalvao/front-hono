@@ -1,0 +1,250 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e4]:
+      - banner [ref=e5]:
+        - generic [ref=e7]:
+          - generic [ref=e8]:
+            - img "Task's Finance logo" [ref=e9]
+            - generic [ref=e10]: Task's Finance
+          - navigation [ref=e11]:
+            - button "Home" [ref=e12] [cursor=pointer]
+            - button "Como funciona" [ref=e13] [cursor=pointer]
+            - button "Recursos" [ref=e14] [cursor=pointer]
+            - button "Estatísticas" [ref=e15] [cursor=pointer]
+          - generic [ref=e16]:
+            - button "Alternar tema" [ref=e17]
+            - button "🇺🇸 EN" [ref=e19]:
+              - generic [ref=e20]: 🇺🇸
+              - generic [ref=e21]: EN
+            - link "Entrar" [ref=e22] [cursor=pointer]:
+              - /url: /login
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - generic [ref=e26]:
+              - generic [ref=e27]: T
+              - generic [ref=e28]: a
+              - generic [ref=e29]: s
+              - generic [ref=e30]: k
+              - generic [ref=e31]: "'"
+              - generic [ref=e32]: s
+              - generic [ref=e33]: F
+              - generic [ref=e34]: i
+              - generic [ref=e35]: "n"
+              - generic [ref=e36]: a
+              - generic [ref=e37]: "n"
+              - generic [ref=e38]: c
+              - generic [ref=e39]: e
+            - paragraph [ref=e40]: Gerencie suas finanças de forma simples e eficiente.
+            - generic [ref=e41]:
+              - link "Começar agora" [ref=e42] [cursor=pointer]:
+                - /url: /login
+              - generic [ref=e43]:
+                - generic [ref=e44]: 100% Gratuito
+                - generic [ref=e48]: Insights com IA
+                - generic [ref=e52]: Sem cartão de crédito
+          - paragraph [ref=e56]: Task's Finance organiza suas receitas, despesas e tarefas financeiras em um só lugar. Acompanhe seu saldo em tempo real, visualize o histórico mensal e receba sugestões inteligentes para melhorar sua saúde financeira.
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - heading "Como funciona" [level=2] [ref=e60]
+            - paragraph [ref=e61]: Em três passos simples você já está no controle.
+          - generic [ref=e62]:
+            - generic [ref=e64]:
+              - generic [ref=e65]: "01"
+              - generic [ref=e70]:
+                - heading "Crie sua conta" [level=3] [ref=e71]
+                - paragraph [ref=e72]: Cadastre-se gratuitamente em segundos. Sem cartão de crédito, sem burocracia.
+            - generic [ref=e73]:
+              - generic [ref=e74]: "02"
+              - generic [ref=e79]:
+                - heading "Registre suas finanças" [level=3] [ref=e80]
+                - paragraph [ref=e81]: Adicione receitas, despesas e tarefas financeiras com poucos cliques. Organize tudo por mês.
+            - generic [ref=e82]:
+              - generic [ref=e83]: "03"
+              - generic [ref=e87]:
+                - heading "Acompanhe seus resultados" [level=3] [ref=e88]
+                - paragraph [ref=e89]: Visualize seu saldo, histórico mensal e receba insights inteligentes para melhorar sua saúde financeira.
+        - generic [ref=e90]:
+          - generic [ref=e91]:
+            - generic [ref=e92]: Funcionalidades
+            - heading "Tudo que você precisa" [level=2] [ref=e93]
+            - paragraph [ref=e94]: Ferramentas simples para um controle financeiro poderoso.
+          - generic [ref=e95]:
+            - generic [ref=e99]:
+              - generic [ref=e100]: Registre na hora
+              - generic [ref=e104]: Adicione receitas e despesas rapidamente, sem complicação.
+            - generic [ref=e108]:
+              - generic [ref=e109]: Nunca perca um prazo
+              - generic [ref=e113]: Organize tarefas financeiras por mês e mantenha tudo em dia.
+            - generic [ref=e117]:
+              - generic [ref=e118]: Histórico completo
+              - generic [ref=e131]: Visualize entradas, saídas e saldo mês a mês com clareza.
+            - generic [ref=e135]:
+              - generic [ref=e136]: Insights inteligentes
+              - generic [ref=e139]: Receba recomendações automáticas baseadas no seu perfil financeiro.
+            - generic [ref=e143]:
+              - generic [ref=e144]: Alertas automáticos
+              - generic [ref=e150]: Seja avisado quando seus gastos ultrapassarem o planejado para o mês.
+            - generic [ref=e154]:
+              - generic [ref=e155]: Sincronização em tempo real
+              - generic [ref=e161]: Seus dados sempre atualizados em qualquer dispositivo, sem precisar recarregar.
+        - generic [ref=e162]:
+          - generic [ref=e163]:
+            - generic [ref=e164]: Números
+            - heading "Números que falam por si" [level=2] [ref=e165]
+            - paragraph [ref=e166]: Simples, rápido e gratuito desde o primeiro dia.
+          - generic [ref=e168]:
+            - generic [ref=e169]:
+              - generic [ref=e170]:
+                - generic [ref=e172]:
+                  - generic [ref=e173]: "0"
+                  - generic [ref=e174]: "1"
+                  - generic [ref=e175]: "2"
+                  - generic [ref=e176]: "3"
+                  - generic [ref=e177]: "4"
+                  - generic [ref=e178]: "5"
+                  - generic [ref=e179]: "6"
+                  - generic [ref=e180]: "7"
+                  - generic [ref=e181]: "8"
+                  - generic [ref=e182]: "9"
+                - generic [ref=e183]: "%"
+              - paragraph [ref=e184]: Gratuito
+              - paragraph [ref=e185]: Sem custos ocultos
+            - generic [ref=e186]:
+              - generic [ref=e189]:
+                - generic [ref=e190]: "0"
+                - generic [ref=e191]: "1"
+                - generic [ref=e192]: "2"
+                - generic [ref=e193]: "3"
+                - generic [ref=e194]: "4"
+                - generic [ref=e195]: "5"
+                - generic [ref=e196]: "6"
+                - generic [ref=e197]: "7"
+                - generic [ref=e198]: "8"
+                - generic [ref=e199]: "9"
+              - paragraph [ref=e200]: Meses de histórico
+              - paragraph [ref=e201]: Visão anual completa
+            - generic [ref=e202]:
+              - generic [ref=e203]:
+                - generic [ref=e205]:
+                  - generic [ref=e206]: "0"
+                  - generic [ref=e207]: "1"
+                  - generic [ref=e208]: "2"
+                  - generic [ref=e209]: "3"
+                  - generic [ref=e210]: "4"
+                  - generic [ref=e211]: "5"
+                  - generic [ref=e212]: "6"
+                  - generic [ref=e213]: "7"
+                  - generic [ref=e214]: "8"
+                  - generic [ref=e215]: "9"
+                - generic [ref=e216]: s
+              - paragraph [ref=e217]: Para registrar
+              - paragraph [ref=e218]: Receitas e despesas
+            - generic [ref=e219]:
+              - generic [ref=e222]:
+                - generic [ref=e223]: "0"
+                - generic [ref=e224]: "1"
+                - generic [ref=e225]: "2"
+                - generic [ref=e226]: "3"
+                - generic [ref=e227]: "4"
+                - generic [ref=e228]: "5"
+                - generic [ref=e229]: "6"
+                - generic [ref=e230]: "7"
+                - generic [ref=e231]: "8"
+                - generic [ref=e232]: "9"
+              - paragraph [ref=e233]: Lugar só
+              - paragraph [ref=e234]: Para tudo que é seu
+          - generic [ref=e235]:
+            - generic [ref=e238]:
+              - paragraph [ref=e242]: Finalmente consigo ver pra onde meu dinheiro vai todo mês. Simples e muito rápido de usar.
+              - generic [ref=e243]:
+                - paragraph [ref=e244]: Ana Lima
+                - paragraph [ref=e245]: Freelancer
+            - generic [ref=e248]:
+              - paragraph [ref=e252]: Os insights automáticos me ajudaram a cortar gastos que eu nem sabia que tinha. Recomendo muito.
+              - generic [ref=e253]:
+                - paragraph [ref=e254]: Carlos Mendes
+                - paragraph [ref=e255]: Empreendedor
+            - generic [ref=e258]:
+              - paragraph [ref=e262]: Uso todo mês para fechar as contas. A interface é limpa e nunca trava. Perfeito.
+              - generic [ref=e263]:
+                - paragraph [ref=e264]: Juliana Costa
+                - paragraph [ref=e265]: Professora
+        - generic [ref=e269]:
+          - generic [ref=e270]: Pronto para começar?
+          - paragraph [ref=e271]: Junte-se a quem já usa o Task's Finance para organizar as finanças com praticidade e inteligência.
+          - list [ref=e272]:
+            - listitem [ref=e273]: Registre receitas e despesas em segundos
+            - listitem [ref=e277]: Histórico completo mês a mês
+            - listitem [ref=e281]: Recomendações inteligentes baseadas no seu perfil
+            - listitem [ref=e285]: Acesso imediato, sem burocracia
+          - link "Faça o login" [ref=e289] [cursor=pointer]:
+            - /url: /login
+        - generic [ref=e291]:
+          - generic [ref=e292]:
+            - generic [ref=e293]: O app em ação
+            - heading "Simples de usar, poderoso no resultado" [level=2] [ref=e294]
+            - paragraph [ref=e295]: Veja como é fácil registrar, acompanhar e entender suas finanças em um só lugar — sem planilhas, sem complicação.
+          - generic [ref=e297]:
+            - generic [ref=e298]:
+              - generic [ref=e299]: Task's Finance
+              - generic [ref=e305]: Dashboard
+              - generic [ref=e310]: Despesas
+              - generic [ref=e314]: Rendimento
+              - generic [ref=e319]: Histórico
+              - generic [ref=e325]: Usuário
+            - generic [ref=e339]:
+              - generic [ref=e340]:
+                - generic [ref=e341]:
+                  - paragraph [ref=e342]: Visão Geral
+                  - paragraph [ref=e343]: Março de 2026
+                - button "Adicionar" [ref=e344]
+              - generic [ref=e348]:
+                - generic [ref=e349]: Evolução Financeira 2026
+                - application [ref=e356]:
+                  - generic [ref=e385]:
+                    - generic [ref=e386]:
+                      - generic [ref=e387]: Jan
+                      - generic [ref=e389]: Fev
+                      - generic [ref=e391]: Mar
+                    - generic [ref=e393]:
+                      - generic [ref=e394]: R$0k
+                      - generic [ref=e396]: R$2k
+                      - generic [ref=e398]: R$3k
+                      - generic [ref=e400]: R$5k
+                      - generic [ref=e402]: R$6k
+              - generic [ref=e404]:
+                - paragraph [ref=e405]: 💡 Dicas de Economia
+                - list [ref=e406]:
+                  - listitem [ref=e407]:
+                    - generic [ref=e408]: ✓
+                    - text: Reduza gastos com alimentação fora
+                  - listitem [ref=e409]:
+                    - generic [ref=e410]: ✓
+                    - text: Reserve 20% do salário todo mês
+          - generic [ref=e411]:
+            - generic [ref=e412]: Registre receitas e despesas em segundos
+            - generic [ref=e416]: Gráfico de evolução financeira mensal
+            - generic [ref=e420]: Insights automáticos com IA
+            - generic [ref=e424]: Histórico completo e organizado
+        - generic [ref=e439]:
+          - heading "Pronto para organizar suas finanças?" [level=2] [ref=e440]
+          - paragraph [ref=e441]: Crie sua conta gratuitamente e comece a registrar receitas, despesas e metas ainda hoje.
+          - generic [ref=e442]:
+            - link "Começar agora" [ref=e443] [cursor=pointer]:
+              - /url: /login
+            - link "Já tenho conta" [ref=e444] [cursor=pointer]:
+              - /url: /login
+      - contentinfo [ref=e445]:
+        - generic [ref=e446]:
+          - list [ref=e447]:
+            - listitem [ref=e448]:
+              - link [ref=e449] [cursor=pointer]:
+                - /url: https://x.com/brunogalvao
+            - listitem [ref=e452]:
+              - link [ref=e453] [cursor=pointer]:
+                - /url: https://github.com/brunogalvao
+          - generic [ref=e456]: 2026 AiVision. All rights reserved.
+    - region "Notifications alt+T"
+    - region "Notifications alt+T"
+  - generic [ref=e459]: R$5k

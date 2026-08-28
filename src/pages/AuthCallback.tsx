@@ -20,10 +20,9 @@ const AuthCallback = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Resolve redirect once to avoid double-reading sessionStorage
-    // Priority: 1) ?next= param in URL (email confirmation) 2) sessionStorage (OAuth) 3) dashboard
+    // Supabase may omit custom query parameters from redirect URLs. The
+    // persisted invite token is therefore the source of truth for this flow.
     const params = new URLSearchParams(window.location.search);
-    const inviteFlow = params.get('flow') === 'workspace-invite';
     const next = safeInternalRedirect(params.get('next'));
     const stored = safeInternalRedirect(
       sessionStorage.getItem('postAuthRedirect')
@@ -31,26 +30,20 @@ const AuthCallback = () => {
     if (stored) sessionStorage.removeItem('postAuthRedirect');
     const hasInviteToken = Boolean(readWorkspaceInviteToken());
     const redirectTo = (
-      inviteFlow && hasInviteToken
+      hasInviteToken
         ? '/auth/accept-invite'
         : (next ?? stored ?? '/admin/dashboard')
     ) as '/admin/dashboard';
+    let active = true;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // getSession waits for the client to finish processing the auth callback.
+    // Using one resolution path avoids an old session winning a race against
+    // the session contained in the invitation magic link.
+    void supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!active) return;
       if (session) {
         navigate({ to: redirectTo });
-      }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        navigate({ to: redirectTo });
-      } else if (
-        event === 'SIGNED_OUT' ||
-        (!session && event !== 'INITIAL_SESSION')
-      ) {
+      } else {
         navigate({ to: '/login' });
       }
     });
@@ -61,7 +54,7 @@ const AuthCallback = () => {
     }, 10000);
 
     return () => {
-      subscription.unsubscribe();
+      active = false;
       clearTimeout(timeout);
     };
   }, [navigate]);

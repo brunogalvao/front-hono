@@ -13,8 +13,8 @@ const StatsSection = () => {
   const { t } = useTranslation('home');
 
   return (
-    <section className="border-border w-full rounded-2xl border py-12">
-      <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+    <section className="border-border w-full rounded-2xl border px-4 py-10 sm:px-6 sm:py-12">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 md:gap-8">
         {STATS.map((stat, idx) => (
           <motion.div
             key={stat.key}
@@ -24,12 +24,16 @@ const StatsSection = () => {
             transition={{ duration: 0.4, delay: idx * 0.1 }}
             className="flex flex-col items-center gap-1 text-center"
           >
-            <div className="text-primary flex items-end text-4xl font-bold">
+            <div className="text-primary flex items-end text-3xl font-bold sm:text-4xl">
               <SlidingNumber number={stat.value} inView />
               <span>{stat.suffix}</span>
             </div>
-            <p className="text-sm font-semibold">{t(`stats.items.${stat.key}.label`)}</p>
-            <p className="text-muted-foreground text-xs">{t(`stats.items.${stat.key}.description`)}</p>
+            <p className="text-sm font-semibold text-balance">
+              {t(`stats.items.${stat.key}.label`)}
+            </p>
+            <p className="text-muted-foreground text-xs text-balance">
+              {t(`stats.items.${stat.key}.description`)}
+            </p>
           </motion.div>
         ))}
       </div>

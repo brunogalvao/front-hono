@@ -1,7 +1,7 @@
 import {
   createClient,
   type SupabaseClient,
-} from 'npm:@supabase/supabase-js@2.95.3';
+} from 'npm:@supabase/supabase-js@2.112.4';
 
 import {
   inviteLandingUrl,

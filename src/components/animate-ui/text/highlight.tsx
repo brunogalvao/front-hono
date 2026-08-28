@@ -25,6 +25,7 @@ function HighlightText({
   className,
   inView = false,
   inViewMargin = '0px',
+  inViewOnce = true,
   transition = { duration: 2, ease: 'easeInOut' },
   ...props
 }: HighlightTextProps) {
@@ -32,7 +33,7 @@ function HighlightText({
   React.useImperativeHandle(ref, () => localRef.current as HTMLSpanElement);
 
   const inViewResult = useInView(localRef, {
-    once: true,
+    once: inViewOnce,
     margin: inViewMargin,
   });
   const isInView = !inView || inViewResult;
@@ -52,7 +53,7 @@ function HighlightText({
         display: 'inline',
       }}
       className={cn(
-        `relative inline-block rounded-lg bg-gradient-to-r from-blue-100 to-purple-100 px-2 py-1 dark:from-blue-500 dark:to-purple-500`,
+        'relative inline-block rounded-lg bg-gradient-to-r from-blue-100 to-purple-100 px-2 py-1 dark:from-blue-500 dark:to-purple-500',
         className
       )}
       {...props}

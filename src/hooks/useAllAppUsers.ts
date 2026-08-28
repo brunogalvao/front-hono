@@ -19,44 +19,49 @@ async function fetchAllAppUsers(
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
   const {
-    data: profiles,
-    error: profilesError,
+    data: members,
+    error: membersError,
     count,
   } = await supabase
-    .from('profiles')
-    .select('id, email, full_name, avatar_url', { count: 'exact' })
-    .order('full_name', { ascending: true, nullsFirst: false })
-    .order('email', { ascending: true })
+    .from('workspace_members')
+    .select('id, user_id, role', { count: 'exact' })
+    .eq('workspace_id', workspaceId)
+    .order('joined_at', { ascending: true })
     .range(from, to);
-
-  if (profilesError) throw profilesError;
-
-  const profileIds = (profiles ?? []).map((profile) => profile.id);
-  const { data: members, error: membersError } = profileIds.length
-    ? await supabase
-        .from('workspace_members')
-        .select('id, user_id, role')
-        .eq('workspace_id', workspaceId)
-        .in('user_id', profileIds)
-    : { data: [], error: null };
 
   if (membersError) throw membersError;
 
-  const memberMap = new Map(
-    (members ?? []).map((m) => [
-      m.user_id,
-      { role: m.role as WorkspaceRole, memberId: m.id },
-    ])
+  const profileIds = (members ?? []).map((member) => member.user_id);
+  const { data: profiles, error: profilesError } = profileIds.length
+    ? await supabase
+        .from('profiles')
+        .select('id, email, full_name, avatar_url')
+        .in('id', profileIds)
+    : { data: [], error: null };
+
+  if (profilesError) throw profilesError;
+
+  const profileMap = new Map(
+    (profiles ?? []).map((profile) => [profile.id, profile as AppUserProfile])
   );
 
-  const users = (profiles ?? []).map((profile) => {
-    const membership = memberMap.get(profile.id);
-    return {
-      profile: profile as AppUserProfile,
-      role: membership?.role ?? null,
-      memberId: membership?.memberId ?? null,
-    };
-  });
+  const users = (members ?? [])
+    .reduce<AppUser[]>((result, membership) => {
+      const profile = profileMap.get(membership.user_id);
+      if (!profile) return result;
+
+      result.push({
+        profile,
+        role: membership.role as WorkspaceRole,
+        memberId: membership.id,
+      });
+      return result;
+    }, [])
+    .sort((a, b) => {
+      const aLabel = a.profile.full_name ?? a.profile.email;
+      const bLabel = b.profile.full_name ?? b.profile.email;
+      return aLabel.localeCompare(bLabel, 'pt-BR');
+    });
 
   return { users, total: count ?? 0 };
 }
