@@ -39,6 +39,9 @@ Thumbs.db
 coverage/
 *.lcov
 
+# Playwright CLI artifacts generated during local browser validation
+.playwright-cli/
+
 # Git
 .git/
 .gitignore

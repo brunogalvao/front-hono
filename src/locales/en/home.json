@@ -21,9 +21,18 @@
     "title": "How it works",
     "subtitle": "In three simple steps you're already in control.",
     "steps": {
-      "1": { "title": "Create your account", "description": "Sign up for free in seconds. No credit card, no hassle." },
-      "2": { "title": "Record your finances", "description": "Add income, expenses and financial tasks with a few clicks. Organize everything by month." },
-      "3": { "title": "Track your results", "description": "View your balance, monthly history and receive smart insights to improve your financial health." }
+      "1": {
+        "title": "Create your account",
+        "description": "Sign up for free in seconds. No credit card, no hassle."
+      },
+      "2": {
+        "title": "Record your finances",
+        "description": "Add income, expenses and financial tasks with a few clicks. Organize everything by month."
+      },
+      "3": {
+        "title": "Track your results",
+        "description": "View your balance, monthly history and receive smart insights to improve your financial health."
+      }
     }
   },
   "features": {
@@ -31,12 +40,30 @@
     "title": "Everything you need",
     "description": "Simple tools for powerful financial control.",
     "cards": {
-      "register": { "title": "Record instantly", "description": "Add income and expenses quickly, without hassle." },
-      "deadlines": { "title": "Never miss a deadline", "description": "Organize financial tasks by month and stay on top of everything." },
-      "history": { "title": "Complete history", "description": "View income, expenses and balance month by month with clarity." },
-      "insights": { "title": "Smart insights", "description": "Receive automatic recommendations based on your financial profile." },
-      "alerts": { "title": "Automatic alerts", "description": "Get notified when your spending exceeds what was planned for the month." },
-      "sync": { "title": "Real-time sync", "description": "Your data always up to date on any device, without reloading." }
+      "register": {
+        "title": "Record instantly",
+        "description": "Add income and expenses quickly, without hassle."
+      },
+      "deadlines": {
+        "title": "Never miss a deadline",
+        "description": "Organize financial tasks by month and stay on top of everything."
+      },
+      "history": {
+        "title": "Complete history",
+        "description": "View income, expenses and balance month by month with clarity."
+      },
+      "insights": {
+        "title": "Smart insights",
+        "description": "Receive automatic recommendations based on your financial profile."
+      },
+      "alerts": {
+        "title": "Automatic alerts",
+        "description": "Get notified when your spending exceeds what was planned for the month."
+      },
+      "sync": {
+        "title": "Real-time sync",
+        "description": "Your data always up to date on any device, without reloading."
+      }
     }
   },
   "stats": {
@@ -45,16 +72,34 @@
     "subtitle": "Simple, fast and free from day one.",
     "items": {
       "free": { "label": "Free", "description": "No hidden costs" },
-      "months": { "label": "Months of history", "description": "Complete annual view" },
+      "months": {
+        "label": "Months of history",
+        "description": "Complete annual view"
+      },
       "record": { "label": "To record", "description": "Income and expenses" },
-      "place": { "label": "One place", "description": "For everything that's yours" }
+      "place": {
+        "label": "One place",
+        "description": "For everything that's yours"
+      }
     }
   },
   "testimonials": {
     "items": {
-      "ana": { "name": "Ana Lima", "role": "Freelancer", "text": "I can finally see where my money goes every month. Simple and very fast to use." },
-      "carlos": { "name": "Carlos Mendes", "role": "Entrepreneur", "text": "The automatic insights helped me cut expenses I didn't even know I had. Highly recommended." },
-      "juliana": { "name": "Juliana Costa", "role": "Teacher", "text": "I use it every month to close accounts. The interface is clean and never crashes. Perfect." }
+      "ana": {
+        "name": "Ana Lima",
+        "role": "Freelancer",
+        "text": "I can finally see where my money goes every month. Simple and very fast to use."
+      },
+      "carlos": {
+        "name": "Carlos Mendes",
+        "role": "Entrepreneur",
+        "text": "The automatic insights helped me cut expenses I didn't even know I had. Highly recommended."
+      },
+      "juliana": {
+        "name": "Juliana Costa",
+        "role": "Teacher",
+        "text": "I use it every month to close accounts. The interface is clean and never crashes. Perfect."
+      }
     }
   },
   "cta": {
@@ -89,5 +134,11 @@
   },
   "register": {
     "prompt": "Record your finances easily and quickly."
+  },
+  "scrollTop": "Back to top",
+  "footer": {
+    "productBy": "A product by",
+    "visitAiVision": "Visit the AI Vision website",
+    "copyright": "AI Vision Tech. All rights reserved."
   }
 }

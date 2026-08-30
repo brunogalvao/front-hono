@@ -81,7 +81,7 @@ function Home() {
         >
           <div className="flex w-full flex-col gap-1 md:w-[60%] md:gap-4">
             <GsapHeroTitle
-              className="w-full text-5xl font-bold md:text-8xl"
+              className="w-full text-[clamp(2.25rem,11.5vw,6rem)] leading-[0.98] font-bold tracking-[-0.035em] whitespace-nowrap"
               text={t('hero.title')}
             />
             <p className="text-muted-foreground text-sm md:text-lg">
@@ -230,7 +230,7 @@ function Home() {
         </section>
 
         {/* CTA intermediário */}
-        <div className="border-border relative flex min-h-svh flex-col items-center justify-center gap-8 overflow-hidden rounded-2xl border py-16">
+        <section className="border-border relative flex flex-col items-center justify-center overflow-hidden rounded-2xl border px-5 py-14 sm:px-8 sm:py-20 md:min-h-[70svh]">
           <div
             className="absolute inset-0 rounded-2xl"
             style={{
@@ -241,36 +241,39 @@ function Home() {
           />
           <div className="from-background via-background/50 absolute inset-0 rounded-2xl bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,transparent_30%,var(--tw-gradient-stops))]" />
 
-          <div className="relative z-10 flex flex-col items-center gap-6 text-center">
-            <span className="text-foreground text-3xl font-bold">
+          <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-center gap-5 text-center sm:gap-6">
+            <h2 className="text-foreground text-3xl leading-tight font-bold tracking-[-0.03em] text-balance sm:text-4xl">
               {t('cta.title')}
-            </span>
-            <p className="text-muted-foreground max-w-md text-sm">
+            </h2>
+            <p className="text-muted-foreground max-w-xl text-sm leading-relaxed text-pretty sm:text-base">
               {t('cta.subtitle')}
             </p>
 
-            <ul className="flex flex-col gap-2">
+            <ul className="flex w-full max-w-xl flex-col gap-3 text-left">
               {BENEFIT_KEYS.map((key) => (
                 <li
                   key={key}
-                  className="text-muted-foreground flex items-center gap-2 text-sm"
+                  className="text-muted-foreground flex items-start gap-3 text-sm leading-relaxed sm:text-base"
                 >
-                  <CheckCircle2 className="text-primary size-4 shrink-0" />
-                  {t(`cta.benefits.${key}`)}
+                  <CheckCircle2 className="text-primary mt-0.5 size-5 shrink-0" />
+                  <span>{t(`cta.benefits.${key}`)}</span>
                 </li>
               ))}
             </ul>
 
-            <Link to="/login">
+            <Link
+              to="/login"
+              className="focus-visible:ring-primary mt-2 inline-flex min-h-12 w-full max-w-sm items-center justify-center rounded-full focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+            >
               <HighlightText
                 text={t('cta.login')}
                 transition={{ duration: 4, ease: 'easeInOut' }}
                 inViewOnce
-                className="cursor-pointer rounded-full px-16 py-2 font-bold duration-200 hover:underline"
+                className="flex min-h-12 w-full cursor-pointer items-center justify-center rounded-full px-8 py-3 font-bold duration-200 hover:underline"
               />
             </Link>
           </div>
-        </div>
+        </section>
 
         {/* Description */}
         <section className="flex min-h-svh flex-col items-center justify-center py-16">
@@ -287,7 +290,8 @@ function Home() {
         <Button
           variant="outline"
           size="icon"
-          className="fixed right-8 bottom-8 rounded-full shadow-md"
+          aria-label={t('scrollTop')}
+          className="fixed right-4 bottom-4 rounded-full shadow-md sm:right-8 sm:bottom-8"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <ArrowUp className="size-4" />

@@ -65,8 +65,13 @@ export function LandingNavbar() {
       )}
     >
       <div className="container mx-auto flex flex-col items-center">
-        <div className="flex w-full flex-row justify-between px-6 py-7">
-          <Logo size={36} />
+        <div className="flex w-full flex-row items-center justify-between gap-3 px-4 py-5 sm:px-6 sm:py-7">
+          <Logo
+            size={32}
+            showWordmark={false}
+            className="shrink-0 min-[360px]:hidden"
+          />
+          <Logo size={36} className="hidden shrink-0 min-[360px]:flex" />
 
           <nav className="hidden items-center gap-3 md:flex">
             {NAV_LINKS.map((link) => (
@@ -85,14 +90,14 @@ export function LandingNavbar() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-1 sm:gap-2">
             <ModeToggle />
             <LanguageSwitcher />
             <Link
               to="/login"
               className={cn(
                 buttonVariants({ variant: 'default', size: 'sm' }),
-                'gap-2 rounded-full px-6!'
+                'gap-2 rounded-full px-4! sm:px-6!'
               )}
             >
               {t('nav.enter')}

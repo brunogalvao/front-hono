@@ -21,9 +21,18 @@
     "title": "Como funciona",
     "subtitle": "Em três passos simples você já está no controle.",
     "steps": {
-      "1": { "title": "Crie sua conta", "description": "Cadastre-se gratuitamente em segundos. Sem cartão de crédito, sem burocracia." },
-      "2": { "title": "Registre suas finanças", "description": "Adicione receitas, despesas e tarefas financeiras com poucos cliques. Organize tudo por mês." },
-      "3": { "title": "Acompanhe seus resultados", "description": "Visualize seu saldo, histórico mensal e receba insights inteligentes para melhorar sua saúde financeira." }
+      "1": {
+        "title": "Crie sua conta",
+        "description": "Cadastre-se gratuitamente em segundos. Sem cartão de crédito, sem burocracia."
+      },
+      "2": {
+        "title": "Registre suas finanças",
+        "description": "Adicione receitas, despesas e tarefas financeiras com poucos cliques. Organize tudo por mês."
+      },
+      "3": {
+        "title": "Acompanhe seus resultados",
+        "description": "Visualize seu saldo, histórico mensal e receba insights inteligentes para melhorar sua saúde financeira."
+      }
     }
   },
   "features": {
@@ -31,12 +40,30 @@
     "title": "Tudo que você precisa",
     "description": "Ferramentas simples para um controle financeiro poderoso.",
     "cards": {
-      "register": { "title": "Registre na hora", "description": "Adicione receitas e despesas rapidamente, sem complicação." },
-      "deadlines": { "title": "Nunca perca um prazo", "description": "Organize tarefas financeiras por mês e mantenha tudo em dia." },
-      "history": { "title": "Histórico completo", "description": "Visualize entradas, saídas e saldo mês a mês com clareza." },
-      "insights": { "title": "Insights inteligentes", "description": "Receba recomendações automáticas baseadas no seu perfil financeiro." },
-      "alerts": { "title": "Alertas automáticos", "description": "Seja avisado quando seus gastos ultrapassarem o planejado para o mês." },
-      "sync": { "title": "Sincronização em tempo real", "description": "Seus dados sempre atualizados em qualquer dispositivo, sem precisar recarregar." }
+      "register": {
+        "title": "Registre na hora",
+        "description": "Adicione receitas e despesas rapidamente, sem complicação."
+      },
+      "deadlines": {
+        "title": "Nunca perca um prazo",
+        "description": "Organize tarefas financeiras por mês e mantenha tudo em dia."
+      },
+      "history": {
+        "title": "Histórico completo",
+        "description": "Visualize entradas, saídas e saldo mês a mês com clareza."
+      },
+      "insights": {
+        "title": "Insights inteligentes",
+        "description": "Receba recomendações automáticas baseadas no seu perfil financeiro."
+      },
+      "alerts": {
+        "title": "Alertas automáticos",
+        "description": "Seja avisado quando seus gastos ultrapassarem o planejado para o mês."
+      },
+      "sync": {
+        "title": "Sincronização em tempo real",
+        "description": "Seus dados sempre atualizados em qualquer dispositivo, sem precisar recarregar."
+      }
     }
   },
   "stats": {
@@ -45,16 +72,34 @@
     "subtitle": "Simples, rápido e gratuito desde o primeiro dia.",
     "items": {
       "free": { "label": "Gratuito", "description": "Sem custos ocultos" },
-      "months": { "label": "Meses de histórico", "description": "Visão anual completa" },
-      "record": { "label": "Para registrar", "description": "Receitas e despesas" },
+      "months": {
+        "label": "Meses de histórico",
+        "description": "Visão anual completa"
+      },
+      "record": {
+        "label": "Para registrar",
+        "description": "Receitas e despesas"
+      },
       "place": { "label": "Lugar só", "description": "Para tudo que é seu" }
     }
   },
   "testimonials": {
     "items": {
-      "ana": { "name": "Ana Lima", "role": "Freelancer", "text": "Finalmente consigo ver pra onde meu dinheiro vai todo mês. Simples e muito rápido de usar." },
-      "carlos": { "name": "Carlos Mendes", "role": "Empreendedor", "text": "Os insights automáticos me ajudaram a cortar gastos que eu nem sabia que tinha. Recomendo muito." },
-      "juliana": { "name": "Juliana Costa", "role": "Professora", "text": "Uso todo mês para fechar as contas. A interface é limpa e nunca trava. Perfeito." }
+      "ana": {
+        "name": "Ana Lima",
+        "role": "Freelancer",
+        "text": "Finalmente consigo ver pra onde meu dinheiro vai todo mês. Simples e muito rápido de usar."
+      },
+      "carlos": {
+        "name": "Carlos Mendes",
+        "role": "Empreendedor",
+        "text": "Os insights automáticos me ajudaram a cortar gastos que eu nem sabia que tinha. Recomendo muito."
+      },
+      "juliana": {
+        "name": "Juliana Costa",
+        "role": "Professora",
+        "text": "Uso todo mês para fechar as contas. A interface é limpa e nunca trava. Perfeito."
+      }
     }
   },
   "cta": {
@@ -89,5 +134,11 @@
   },
   "register": {
     "prompt": "Registre suas finanças de forma fácil e rápida."
+  },
+  "scrollTop": "Voltar ao topo",
+  "footer": {
+    "productBy": "Um produto da",
+    "visitAiVision": "Visitar o site da AI Vision",
+    "copyright": "AI Vision Tech. Todos os direitos reservados."
   }
 }

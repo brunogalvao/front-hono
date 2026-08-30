@@ -21,7 +21,8 @@ export function GsapHeroTitle({ text, className }: GsapHeroTitleProps) {
   useGSAP(
     () => {
       const letterEls = Array.from(
-        containerRef.current?.querySelectorAll<HTMLElement>('.gsap-letter') ?? [],
+        containerRef.current?.querySelectorAll<HTMLElement>('.gsap-letter') ??
+          []
       );
       if (!letterEls.length) return;
 
@@ -49,7 +50,7 @@ export function GsapHeroTitle({ text, className }: GsapHeroTitleProps) {
         },
       });
     },
-    { scope: containerRef },
+    { scope: containerRef }
   );
 
   return (
@@ -64,7 +65,7 @@ export function GsapHeroTitle({ text, className }: GsapHeroTitleProps) {
             backgroundPosition: `${n > 1 ? (i / (n - 1)) * 100 : 0}% 0%`,
           }}
         >
-          {char}
+          {char === ' ' ? '\u00A0' : char}
         </span>
       ))}
     </span>
