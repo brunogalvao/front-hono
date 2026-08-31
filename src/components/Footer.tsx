@@ -47,12 +47,11 @@ const Footer = () => {
             </span>
           </a>
         </div>
-
       </div>
 
-      <div className='flex justify-center'>
-          <small className="text-center w-full text-xs leading-relaxed text-zinc-300 sm:text-sm">
-            {t('footer.copyright')}
+      <div className="flex justify-center">
+        <small className="w-full text-center text-xs leading-relaxed text-zinc-300 sm:text-sm">
+          {t('footer.copyright')}
         </small>
       </div>
     </footer>

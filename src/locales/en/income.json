@@ -9,6 +9,28 @@
   "noIncomeTooltip": "Add your income in the fields above.",
   "annualTotal": "Annual Total",
   "loadError": "Error loading income. Check your connection and try again.",
+  "table": {
+    "empty": "No income found.",
+    "noDescription": "No description",
+    "item": "income",
+    "filterPlaceholder": "Filter by name...",
+    "columnsMenu": "Columns",
+    "resultCount_one": "{{count}} row found.",
+    "resultCount_other": "{{count}} rows found.",
+    "previous": "Previous",
+    "next": "Next",
+    "columns": {
+      "name": "Name",
+      "amount": "Amount",
+      "month": "Month",
+      "year": "Year",
+      "actions": "Actions"
+    }
+  },
+  "actions": {
+    "edit": "Edit income",
+    "delete": "Delete income"
+  },
   "toast": {
     "updated": "Record Updated",
     "created": "New record saved",

@@ -18,7 +18,9 @@ export default function InstallmentsPage() {
   const { create } = useInstallments(activeWorkspaceId);
   const { highlight } = useSearch({ from: '/admin/installments' });
 
-  const handleCreate = async (input: Parameters<typeof create.mutateAsync>[0]) => {
+  const handleCreate = async (
+    input: Parameters<typeof create.mutateAsync>[0]
+  ) => {
     try {
       await create.mutateAsync(input);
       toast.success(t('toast.created'));
@@ -37,7 +39,10 @@ export default function InstallmentsPage() {
           <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
         {can('installments', 'create') && (
-          <Button onClick={() => setCreateOpen(true)}>
+          <Button
+            className="min-h-11 w-full sm:w-auto"
+            onClick={() => setCreateOpen(true)}
+          >
             <Plus className="mr-1 h-4 w-4" />
             {t('new')}
           </Button>

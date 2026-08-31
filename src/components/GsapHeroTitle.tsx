@@ -26,6 +26,11 @@ export function GsapHeroTitle({ text, className }: GsapHeroTitleProps) {
       );
       if (!letterEls.length) return;
 
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        gsap.set(letterEls, { clearProps: 'transform,opacity' });
+        return;
+      }
+
       // 1. Entrance: each letter drops from above with stagger
       gsap.from(letterEls, {
         y: -80,

@@ -7,19 +7,37 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import {
-  Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from '@/components/ui/form';
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel,
-  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
-  AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useCategories, type Category } from '@/hooks/useCategories';
 import { CategoryIcon, CATEGORY_ICONS } from '@/lib/category-icons';
@@ -69,8 +87,13 @@ export function CategoryManager() {
 
   const updateCat = useMutation({
     mutationFn: async ({ id, values }: { id: string; values: FormValues }) => {
-      const { error } = await supabase.from('categories')
-        .update({ name: values.name, type: values.type, icon: values.icon ?? null })
+      const { error } = await supabase
+        .from('categories')
+        .update({
+          name: values.name,
+          type: values.type,
+          icon: values.icon ?? null,
+        })
         .eq('id', id);
       if (error) throw error;
     },
@@ -108,7 +131,9 @@ export function CategoryManager() {
       }
       setFormOpen(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('category.toast.saveError'));
+      toast.error(
+        err instanceof Error ? err.message : t('category.toast.saveError')
+      );
     }
   };
 
@@ -117,7 +142,9 @@ export function CategoryManager() {
     try {
       await deleteCat.mutateAsync(deleteTarget);
       toast.success(t('category.toast.deleted'));
-    } catch { toast.error(t('category.toast.deleteError')); }
+    } catch {
+      toast.error(t('category.toast.deleteError'));
+    }
     setDeleteTarget(null);
   };
 
@@ -139,18 +166,37 @@ export function CategoryManager() {
 
       <div className="space-y-1">
         {custom.map((cat) => (
-          <div key={cat.id} className="flex items-center gap-2 rounded-lg border p-2">
-            {cat.icon && <CategoryIcon name={cat.icon} className="text-muted-foreground h-4 w-4 shrink-0" />}
+          <div
+            key={cat.id}
+            className="flex items-center gap-2 rounded-lg border p-2"
+          >
+            {cat.icon && (
+              <CategoryIcon
+                name={cat.icon}
+                className="text-muted-foreground h-4 w-4 shrink-0"
+              />
+            )}
             <span className="flex-1 text-sm">{cat.name}</span>
-            <Badge variant={cat.type === 'receita' ? 'default' : 'secondary'} className="text-xs">
+            <Badge
+              variant={cat.type === 'receita' ? 'default' : 'secondary'}
+              className="text-xs"
+            >
               {t(`category.type.${cat.type}`)}
             </Badge>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(cat)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-11 md:size-8"
+              aria-label={t('common:edit')}
+              onClick={() => openEdit(cat)}
+            >
               <Pencil className="h-3.5 w-3.5" />
             </Button>
             <Button
-              variant="ghost" size="icon"
-              className="text-destructive hover:text-destructive h-7 w-7"
+              variant="ghost"
+              size="icon"
+              className="text-destructive hover:text-destructive size-11 md:size-8"
+              aria-label={t('common:delete')}
               onClick={() => setDeleteTarget(cat.id)}
             >
               <Trash2 className="h-3.5 w-3.5" />
@@ -160,7 +206,9 @@ export function CategoryManager() {
       </div>
 
       <div className="mt-4">
-        <p className="text-muted-foreground mb-2 text-xs font-medium">{t('category.defaultTitle')}</p>
+        <p className="text-muted-foreground mb-2 text-xs font-medium">
+          {t('category.defaultTitle')}
+        </p>
         <div className="flex flex-wrap gap-1">
           {defaults.map((cat) => (
             <Badge key={cat.id} variant="outline" className="text-xs">
@@ -173,67 +221,117 @@ export function CategoryManager() {
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>{editTarget ? t('category.editTitle') : t('category.newTitle')}</DialogTitle>
+            <DialogTitle>
+              {editTarget ? t('category.editTitle') : t('category.newTitle')}
+            </DialogTitle>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-              <FormField control={form.control} name="name" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('category.form.name')}</FormLabel>
-                  <FormControl><Input placeholder={t('category.form.namePlaceholder')} {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="type" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('category.form.type')}</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                    <SelectContent>
-                      <SelectItem value="despesa">{t('category.type.despesa')}</SelectItem>
-                      <SelectItem value="receita">{t('category.type.receita')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="icon" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('category.form.icon')}</FormLabel>
-                  <div className="grid grid-cols-8 gap-1">
-                    {CATEGORY_ICONS.map(({ name, label, Icon }) => (
-                      <button
-                        key={name}
-                        type="button"
-                        title={label}
-                        onClick={() => field.onChange(field.value === name ? null : name)}
-                        className={`flex items-center justify-center rounded-md p-1.5 transition-colors hover:bg-muted ${field.value === name ? 'bg-primary/10 text-primary ring-1 ring-primary' : 'text-muted-foreground'}`}
-                      >
-                        <Icon className="h-4 w-4" />
-                      </button>
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )} />
+            <form
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('category.form.name')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t('category.form.namePlaceholder')}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('category.form.type')}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="despesa">
+                          {t('category.type.despesa')}
+                        </SelectItem>
+                        <SelectItem value="receita">
+                          {t('category.type.receita')}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="icon"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('category.form.icon')}</FormLabel>
+                    <div className="grid grid-cols-8 gap-1">
+                      {CATEGORY_ICONS.map(({ name, label, Icon }) => (
+                        <button
+                          key={name}
+                          type="button"
+                          title={label}
+                          onClick={() =>
+                            field.onChange(field.value === name ? null : name)
+                          }
+                          className={`hover:bg-muted flex items-center justify-center rounded-md p-1.5 transition-colors ${field.value === name ? 'bg-primary/10 text-primary ring-primary ring-1' : 'text-muted-foreground'}`}
+                        >
+                          <Icon className="h-4 w-4" />
+                        </button>
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setFormOpen(false)}>{t('common:cancel')}</Button>
-                <Button type="submit">{editTarget ? t('common:save') : t('category.form.create')}</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setFormOpen(false)}
+                >
+                  {t('common:cancel')}
+                </Button>
+                <Button type="submit">
+                  {editTarget ? t('common:save') : t('category.form.create')}
+                </Button>
               </DialogFooter>
             </form>
           </Form>
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('category.delete.title')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('category.delete.description')}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {t('category.delete.description')}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common:cancel')}</AlertDialogCancel>
-            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={handleDelete}>{t('common:delete')}</AlertDialogAction>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleDelete}
+            >
+              {t('common:delete')}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

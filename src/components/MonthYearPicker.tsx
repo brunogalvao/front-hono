@@ -7,14 +7,22 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { getMesesLista, getNomeMes } from '@/model/mes.enum';
+import { useTranslation } from 'react-i18next';
 
 interface MonthYearPickerProps {
   mes: number;
   ano: number;
   onChange: (mes: number, ano: number) => void;
+  ariaLabel?: string;
 }
 
-export function MonthYearPicker({ mes, ano, onChange }: MonthYearPickerProps) {
+export function MonthYearPicker({
+  mes,
+  ano,
+  onChange,
+  ariaLabel,
+}: MonthYearPickerProps) {
+  const { t } = useTranslation('common');
   const [yearView, setYearView] = useState(ano);
   const [open, setOpen] = useState(false);
 
@@ -26,7 +34,11 @@ export function MonthYearPicker({ mes, ano, onChange }: MonthYearPickerProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-full justify-start gap-2">
+        <Button
+          variant="outline"
+          aria-label={ariaLabel}
+          className="min-h-11 w-full justify-start gap-2 sm:min-h-9"
+        >
           <CalendarIcon className="size-4" />
           {getNomeMes(mes)} {ano}
         </Button>
@@ -38,6 +50,7 @@ export function MonthYearPicker({ mes, ano, onChange }: MonthYearPickerProps) {
           <Button
             variant="ghost"
             size="icon"
+            aria-label={t('previousYear')}
             onClick={() => setYearView((y) => y - 1)}
           >
             <ChevronLeft className="size-4" />
@@ -46,6 +59,7 @@ export function MonthYearPicker({ mes, ano, onChange }: MonthYearPickerProps) {
           <Button
             variant="ghost"
             size="icon"
+            aria-label={t('nextYear')}
             onClick={() => setYearView((y) => y + 1)}
           >
             <ChevronRight className="size-4" />

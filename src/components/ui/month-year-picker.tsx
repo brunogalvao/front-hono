@@ -12,9 +12,13 @@ interface MonthYearPickerProps {
 }
 
 const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
-type MonthNum = typeof MONTHS[number];
+type MonthNum = (typeof MONTHS)[number];
 
-export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps) {
+export function MonthYearPicker({
+  month,
+  year,
+  onChange,
+}: MonthYearPickerProps) {
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
   const [pickerYear, setPickerYear] = useState(year);
@@ -40,9 +44,14 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="gap-2 font-semibold min-w-44 justify-between">
-          <CalendarDays className="h-4 w-4 text-muted-foreground" />
-          <span>{t(`months.${month as MonthNum}`)} {year}</span>
+        <Button
+          variant="outline"
+          className="min-h-11 w-full min-w-0 justify-between gap-2 font-semibold sm:w-auto sm:min-w-44"
+        >
+          <CalendarDays className="text-muted-foreground h-4 w-4" />
+          <span>
+            {t(`months.${month as MonthNum}`)} {year}
+          </span>
           <span />
         </Button>
       </PopoverTrigger>
@@ -52,7 +61,8 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7"
+            aria-label={t('previousYear')}
+            className="size-11 md:size-7"
             onClick={() => setPickerYear((y) => y - 1)}
           >
             <ChevronLeft className="h-4 w-4" />
@@ -61,7 +71,8 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7"
+            aria-label={t('nextYear')}
+            className="size-11 md:size-7"
             disabled={pickerYear >= currentYear}
             onClick={() => setPickerYear((y) => y + 1)}
           >
@@ -81,11 +92,11 @@ export function MonthYearPicker({ month, year, onChange }: MonthYearPickerProps)
                 disabled={disabled}
                 onClick={() => handleSelect(m)}
                 className={cn(
-                  'rounded-md px-2 py-1.5 text-sm transition-colors',
+                  'min-h-11 rounded-md px-2 py-1.5 text-sm transition-colors md:min-h-0',
                   isSelected
                     ? 'bg-primary text-primary-foreground font-semibold'
                     : 'hover:bg-muted',
-                  disabled && 'cursor-not-allowed opacity-30',
+                  disabled && 'cursor-not-allowed opacity-30'
                 )}
               >
                 {t(`months.${m as MonthNum}`).slice(0, 3)}

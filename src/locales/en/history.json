@@ -24,7 +24,8 @@
     "amount": "Amount"
   },
   "modal": {
-    "title": "Expenses — {{month}} / {{year}}"
+    "title": "Expenses — {{month}} / {{year}}",
+    "total": "Total"
   },
   "paidPercent": "{{pct}}% paid",
   "pendingPercent": "{{pct}}% pending",

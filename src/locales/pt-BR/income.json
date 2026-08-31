@@ -9,6 +9,28 @@
   "noIncomeTooltip": "Adicione seus rendimentos nos campos acima.",
   "annualTotal": "Total Anual",
   "loadError": "Erro ao carregar rendimentos. Verifique sua conexão e tente novamente.",
+  "table": {
+    "empty": "Nenhum rendimento encontrado.",
+    "noDescription": "Sem descrição",
+    "item": "rendimento",
+    "filterPlaceholder": "Filtrar por nome...",
+    "columnsMenu": "Colunas",
+    "resultCount_one": "{{count}} linha encontrada.",
+    "resultCount_other": "{{count}} linhas encontradas.",
+    "previous": "Anterior",
+    "next": "Próximo",
+    "columns": {
+      "name": "Nome",
+      "amount": "Valor",
+      "month": "Mês",
+      "year": "Ano",
+      "actions": "Ações"
+    }
+  },
+  "actions": {
+    "edit": "Editar rendimento",
+    "delete": "Excluir rendimento"
+  },
   "toast": {
     "updated": "Cadastro Editado",
     "created": "Salvo novo cadastro",

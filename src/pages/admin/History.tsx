@@ -34,6 +34,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  MobileRecordList,
+  MobileRecordListItem,
+} from '@/components/ui/mobile-record-list';
 
 interface MonthSummary {
   mes: number;
@@ -77,7 +82,9 @@ function StatusBar({ pago, pendente }: { pago: number; pendente: number }) {
   const { t } = useTranslation('history');
   const total = pago + pendente;
   if (total === 0) {
-    return <span className="text-muted-foreground text-xs">{t('noExpenses')}</span>;
+    return (
+      <span className="text-muted-foreground text-xs">{t('noExpenses')}</span>
+    );
   }
   const pagoPercent = Math.round((pago / total) * 100);
 
@@ -90,8 +97,12 @@ function StatusBar({ pago, pendente }: { pago: number; pendente: number }) {
         />
       </div>
       <div className="text-muted-foreground flex justify-between text-xs">
-        <span className="text-emerald-500">{t('paidPercent', { pct: pagoPercent })}</span>
-        <span className="text-amber-500">{t('pendingPercent', { pct: 100 - pagoPercent })}</span>
+        <span className="text-emerald-500">
+          {t('paidPercent', { pct: pagoPercent })}
+        </span>
+        <span className="text-amber-500">
+          {t('pendingPercent', { pct: 100 - pagoPercent })}
+        </span>
       </div>
     </div>
   );
@@ -117,7 +128,7 @@ function SaldoBadge({ saldo }: { saldo: number }) {
 
 function HistorySkeleton() {
   return (
-    <div className="space-y-2">
+    <div data-slot="collection-loading" className="space-y-2">
       {Array.from({ length: 6 }).map((_, i) => (
         <Skeleton key={i} className="h-12 w-full" />
       ))}
@@ -171,7 +182,9 @@ function DespesasModal({ tasks, mes, ano, open, onClose }: DespesasModalProps) {
                       <span className="text-muted-foreground text-xs">—</span>
                     )}
                   </TableCell>
-                  <TableCell>{price != null ? formatToBRL(price) : '—'}</TableCell>
+                  <TableCell>
+                    {price != null ? formatToBRL(price) : '—'}
+                  </TableCell>
                   <TableCell>
                     <Badge
                       className={
@@ -192,8 +205,10 @@ function DespesasModal({ tasks, mes, ano, open, onClose }: DespesasModalProps) {
         {tasks.length > 0 && (
           <div className="flex justify-end border-t pt-3">
             <span className="text-muted-foreground text-sm">
-              Total:{' '}
-              <span className="text-foreground font-semibold">{formatToBRL(total)}</span>
+              {t('modal.total')}:{' '}
+              <span className="text-foreground font-semibold">
+                {formatToBRL(total)}
+              </span>
             </span>
           </div>
         )}
@@ -204,6 +219,7 @@ function DespesasModal({ tasks, mes, ano, open, onClose }: DespesasModalProps) {
 
 function History() {
   const { t } = useTranslation('history');
+  const isMobile = useIsMobile();
   const currentYear = new Date().getFullYear();
   const [ano, setAno] = useState(currentYear);
   const [selectedMes, setSelectedMes] = useState<number | null>(null);
@@ -233,24 +249,24 @@ function History() {
 
   const summaries = useMemo(
     () => buildSummaries(incomes, tasksByYear, ano),
-    [incomes, tasksByYear, ano],
+    [incomes, tasksByYear, ano]
   );
 
   const totalRendimento = useMemo(
     () => summaries.reduce((s, m) => s + m.rendimento, 0),
-    [summaries],
+    [summaries]
   );
   const totalDespesas = useMemo(
     () => summaries.reduce((s, m) => s + m.totalDespesas, 0),
-    [summaries],
+    [summaries]
   );
   const totalPago = useMemo(
     () => summaries.reduce((s, m) => s + m.pago, 0),
-    [summaries],
+    [summaries]
   );
   const totalPendente = useMemo(
     () => summaries.reduce((s, m) => s + m.pendente, 0),
-    [summaries],
+    [summaries]
   );
   const totalSaldo = totalRendimento - totalDespesas;
 
@@ -260,7 +276,9 @@ function History() {
 
       {/* Filtro de Ano */}
       <div className="flex items-center gap-3">
-        <span className="text-muted-foreground text-sm font-medium">{t('year')}:</span>
+        <span className="text-muted-foreground text-sm font-medium">
+          {t('year')}:
+        </span>
         <Select value={String(ano)} onValueChange={(v) => setAno(Number(v))}>
           <SelectTrigger className="w-32">
             <SelectValue />
@@ -275,14 +293,10 @@ function History() {
         </Select>
       </div>
 
-      {isError && (
-        <p className="text-sm text-red-500">
-          {t('loadError')}
-        </p>
-      )}
+      {isError && <p className="text-sm text-red-500">{t('loadError')}</p>}
 
       {/* Cards de Resumo Anual */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-muted-foreground text-sm font-medium">
@@ -291,7 +305,11 @@ function History() {
           </CardHeader>
           <CardContent>
             <p className="text-lg font-bold text-emerald-500">
-              {loading ? <Skeleton className="h-6 w-24" /> : formatToBRL(totalRendimento)}
+              {loading ? (
+                <Skeleton className="h-6 w-24" />
+              ) : (
+                formatToBRL(totalRendimento)
+              )}
             </p>
           </CardContent>
         </Card>
@@ -304,7 +322,11 @@ function History() {
           </CardHeader>
           <CardContent>
             <p className="text-lg font-bold text-red-500">
-              {loading ? <Skeleton className="h-6 w-24" /> : formatToBRL(totalDespesas)}
+              {loading ? (
+                <Skeleton className="h-6 w-24" />
+              ) : (
+                formatToBRL(totalDespesas)
+              )}
             </p>
           </CardContent>
         </Card>
@@ -317,7 +339,11 @@ function History() {
           </CardHeader>
           <CardContent>
             <p className="text-lg font-bold">
-              {loading ? <Skeleton className="h-6 w-24" /> : formatToBRL(totalPago)}
+              {loading ? (
+                <Skeleton className="h-6 w-24" />
+              ) : (
+                formatToBRL(totalPago)
+              )}
             </p>
             <p className="text-muted-foreground text-xs">
               {t('pending')}: {loading ? '...' : formatToBRL(totalPendente)}
@@ -355,66 +381,141 @@ function History() {
         <CardContent>
           {loading ? (
             <HistorySkeleton />
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[110px]">{t('col.month')}</TableHead>
-                  <TableHead>{t('col.income')}</TableHead>
-                  <TableHead>{t('col.expenses')}</TableHead>
-                  <TableHead>{t('col.paid')}</TableHead>
-                  <TableHead>{t('col.pending')}</TableHead>
-                  <TableHead>{t('col.balance')}</TableHead>
-                  <TableHead className="min-w-[160px]">{t('col.status')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {summaries.map(({ mes, rendimento, totalDespesas, pago, pendente, saldo }) => (
-                  <TableRow key={mes}>
-                    <TableCell className="font-medium">{getNomeMes(mes)}</TableCell>
-                    <TableCell className="text-emerald-500">
-                      {rendimento > 0 ? (
-                        formatToBRL(rendimento)
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {totalDespesas > 0 ? (
-                        <button
-                          onClick={() => setSelectedMes(mes)}
-                          className="text-foreground hover:text-primary cursor-pointer underline-offset-4 hover:underline"
-                        >
-                          {formatToBRL(totalDespesas)}
-                        </button>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-emerald-500">
-                      {pago > 0 ? (
-                        formatToBRL(pago)
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-amber-500">
-                      {pendente > 0 ? (
-                        formatToBRL(pendente)
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
+          ) : isMobile ? (
+            <MobileRecordList aria-label={t('monthlyTitle', { year: ano })}>
+              {summaries.map(
+                ({ mes, rendimento, totalDespesas, pago, pendente, saldo }) => (
+                  <MobileRecordListItem key={mes} className="space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-semibold">{getNomeMes(mes)}</p>
                       <SaldoBadge saldo={saldo} />
-                    </TableCell>
-                    <TableCell>
-                      <StatusBar pago={pago} pendente={pendente} />
-                    </TableCell>
+                    </div>
+                    <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                      <div className="min-w-0">
+                        <dt className="text-muted-foreground text-xs">
+                          {t('col.income')}
+                        </dt>
+                        <dd className="truncate font-medium text-emerald-500 tabular-nums">
+                          {rendimento > 0 ? formatToBRL(rendimento) : '—'}
+                        </dd>
+                      </div>
+                      <div className="min-w-0">
+                        <dt className="text-muted-foreground text-xs">
+                          {t('col.expenses')}
+                        </dt>
+                        <dd>
+                          {totalDespesas > 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedMes(mes)}
+                              className="hover:text-primary min-h-11 max-w-full truncate rounded-md pr-2 font-medium tabular-nums underline-offset-4 hover:underline"
+                            >
+                              {formatToBRL(totalDespesas)}
+                            </button>
+                          ) : (
+                            '—'
+                          )}
+                        </dd>
+                      </div>
+                      <div className="min-w-0">
+                        <dt className="text-muted-foreground text-xs">
+                          {t('col.paid')}
+                        </dt>
+                        <dd className="truncate font-medium text-emerald-500 tabular-nums">
+                          {pago > 0 ? formatToBRL(pago) : '—'}
+                        </dd>
+                      </div>
+                      <div className="min-w-0">
+                        <dt className="text-muted-foreground text-xs">
+                          {t('col.pending')}
+                        </dt>
+                        <dd className="truncate font-medium text-amber-500 tabular-nums">
+                          {pendente > 0 ? formatToBRL(pendente) : '—'}
+                        </dd>
+                      </div>
+                    </dl>
+                    <StatusBar pago={pago} pendente={pendente} />
+                  </MobileRecordListItem>
+                )
+              )}
+            </MobileRecordList>
+          ) : (
+            <div data-slot="desktop-table" className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[110px]">
+                      {t('col.month')}
+                    </TableHead>
+                    <TableHead>{t('col.income')}</TableHead>
+                    <TableHead>{t('col.expenses')}</TableHead>
+                    <TableHead>{t('col.paid')}</TableHead>
+                    <TableHead>{t('col.pending')}</TableHead>
+                    <TableHead>{t('col.balance')}</TableHead>
+                    <TableHead className="min-w-[160px]">
+                      {t('col.status')}
+                    </TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {summaries.map(
+                    ({
+                      mes,
+                      rendimento,
+                      totalDespesas,
+                      pago,
+                      pendente,
+                      saldo,
+                    }) => (
+                      <TableRow key={mes}>
+                        <TableCell className="font-medium">
+                          {getNomeMes(mes)}
+                        </TableCell>
+                        <TableCell className="text-emerald-500">
+                          {rendimento > 0 ? (
+                            formatToBRL(rendimento)
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {totalDespesas > 0 ? (
+                            <button
+                              onClick={() => setSelectedMes(mes)}
+                              className="text-foreground hover:text-primary cursor-pointer underline-offset-4 hover:underline"
+                            >
+                              {formatToBRL(totalDespesas)}
+                            </button>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-emerald-500">
+                          {pago > 0 ? (
+                            formatToBRL(pago)
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-amber-500">
+                          {pendente > 0 ? (
+                            formatToBRL(pendente)
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <SaldoBadge saldo={saldo} />
+                        </TableCell>
+                        <TableCell>
+                          <StatusBar pago={pago} pendente={pendente} />
+                        </TableCell>
+                      </TableRow>
+                    )
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

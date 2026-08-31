@@ -97,7 +97,10 @@ function Admin() {
             </div>
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4">
-            <div className="bg-muted/50 min-h-0 flex-1 overflow-auto rounded-xl px-8 py-6 md:min-h-min">
+            <div
+              data-slot="admin-content"
+              className="bg-muted/50 min-h-0 flex-1 overflow-auto rounded-xl px-4 py-4 sm:px-6 sm:py-5 md:min-h-min md:px-8 md:py-6"
+            >
               <div className="h-full w-full">
                 {sessionReady ? <Outlet /> : null}
               </div>

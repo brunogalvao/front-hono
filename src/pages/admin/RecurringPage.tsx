@@ -16,7 +16,9 @@ export default function RecurringPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const { create } = useRecurring(activeWorkspaceId);
 
-  const handleCreate = async (input: Parameters<typeof create.mutateAsync>[0]) => {
+  const handleCreate = async (
+    input: Parameters<typeof create.mutateAsync>[0]
+  ) => {
     try {
       await create.mutateAsync(input);
       toast.success(t('toast.created'));
@@ -34,7 +36,10 @@ export default function RecurringPage() {
           <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
         {can('recurring', 'create') && (
-          <Button onClick={() => setCreateOpen(true)}>
+          <Button
+            className="min-h-11 w-full sm:w-auto"
+            onClick={() => setCreateOpen(true)}
+          >
             <Plus className="mr-1 h-4 w-4" />
             {t('newRecurring')}
           </Button>

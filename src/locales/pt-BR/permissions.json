@@ -10,6 +10,8 @@
     "title": "Matriz de permissões por papel",
     "description": "Configure quais operações (Ler, Criar, Atualizar, Excluir) cada papel pode executar em cada tela. Mudanças são aplicadas imediatamente para todos os membros.",
     "colScreen": "Tela",
+    "scrollHint": "Matriz de permissões. Role horizontalmente para visualizar todas as colunas.",
+    "permissionLabel": "{{action}} em {{resource}} para {{role}}",
     "updateError": "Erro ao atualizar permissão"
   },
   "allUsers": {

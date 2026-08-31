@@ -40,6 +40,8 @@
     "allStatuses": "Todos os status",
     "empty": "Nenhuma transação encontrada",
     "emptyHint": "Clique em \"Nova Transação\" para começar.",
+    "clearFilters": "Limpar filtros",
+    "loading": "Carregando transações",
     "name": "Nome",
     "noDescription": "Sem descrição",
     "colType": "Tipo",

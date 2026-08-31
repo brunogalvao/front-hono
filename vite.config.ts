@@ -8,7 +8,7 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
-    exclude: [...configDefaults.exclude, 'supabase/**'],
+    exclude: [...configDefaults.exclude, 'supabase/**', 'e2e/**'],
     alias: {
       '@': path.resolve(__dirname, './src'),
     },

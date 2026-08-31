@@ -3,10 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { useRolePermissions, type RolePermission } from '@/hooks/useRolePermissions';
+import {
+  useRolePermissions,
+  type RolePermission,
+} from '@/hooks/useRolePermissions';
 import type { PermissionResource } from '@/lib/permissions';
 
 const ROLE_KEYS: Array<RolePermission['role']> = [
@@ -32,9 +40,16 @@ interface PermissionMatrixProps {
   currentUserId: string;
 }
 
-export function PermissionMatrix({ workspaceId, currentUserId }: PermissionMatrixProps) {
+export function PermissionMatrix({
+  workspaceId,
+  currentUserId,
+}: PermissionMatrixProps) {
   const { t } = useTranslation(['permissions', 'common']);
-  const { data: permissions = [], isLoading, upsert } = useRolePermissions(workspaceId);
+  const {
+    data: permissions = [],
+    isLoading,
+    upsert,
+  } = useRolePermissions(workspaceId);
 
   // Index by `${role}__${resource}` for O(1) lookup
   const matrix = useMemo(() => {
@@ -46,8 +61,8 @@ export function PermissionMatrix({ workspaceId, currentUserId }: PermissionMatri
   const handleToggle = async (
     role: RolePermission['role'],
     resource: PermissionResource,
-    action: typeof ACTIONS[number],
-    nextValue: boolean,
+    action: (typeof ACTIONS)[number],
+    nextValue: boolean
   ) => {
     const existing = matrix.get(`${role}__${resource}`);
     const base = existing ?? {
@@ -82,13 +97,22 @@ export function PermissionMatrix({ workspaceId, currentUserId }: PermissionMatri
   }
 
   return (
-    <div className="rounded-md border overflow-x-auto">
+    <div
+      role="region"
+      tabIndex={0}
+      aria-label={t('matrix.scrollHint')}
+      className="max-w-full overflow-x-auto rounded-md border focus-visible:outline-2 focus-visible:outline-offset-2"
+    >
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead className="w-40">{t('matrix.colScreen')}</TableHead>
             {ROLE_KEYS.map((role) => (
-              <TableHead key={role} colSpan={4} className="text-center border-l">
+              <TableHead
+                key={role}
+                colSpan={4}
+                className="border-l text-center"
+              >
                 {t(`roles.${role}`, { defaultValue: role })}
               </TableHead>
             ))}
@@ -99,11 +123,11 @@ export function PermissionMatrix({ workspaceId, currentUserId }: PermissionMatri
               ACTIONS.map((action) => (
                 <TableHead
                   key={`${role}-${action}`}
-                  className="text-center text-xs font-mono w-10 border-l first:border-l-0"
+                  className="w-10 border-l text-center font-mono text-xs first:border-l-0"
                 >
                   {t(`actionsShort.${action}`, { defaultValue: action })}
                 </TableHead>
-              )),
+              ))
             )}
           </TableRow>
         </TableHeader>
@@ -122,9 +146,14 @@ export function PermissionMatrix({ workspaceId, currentUserId }: PermissionMatri
                   return (
                     <TableCell
                       key={`${role}-${resource}-${action}`}
-                      className="text-center border-l first:border-l-0"
+                      className="border-l text-center first:border-l-0"
                     >
                       <Checkbox
+                        aria-label={t('matrix.permissionLabel', {
+                          action: t(`actionsLong.${action}`),
+                          resource: t(`resources.${resource}`),
+                          role: t(`roles.${role}`),
+                        })}
                         checked={checked}
                         disabled={locked || upsert.isPending}
                         onCheckedChange={(value) =>
@@ -133,7 +162,7 @@ export function PermissionMatrix({ workspaceId, currentUserId }: PermissionMatri
                       />
                     </TableCell>
                   );
-                }),
+                })
               )}
             </TableRow>
           ))}

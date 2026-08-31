@@ -52,7 +52,11 @@ function Income() {
   const deleteIncomeMutation = useDeleteIncome();
 
   // React Query gerencia os dados — sem useEffect manual
-  const { data: incomes = [], isLoading, isError } = useQuery({
+  const {
+    data: incomes = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: queryKeys.incomes.list,
     queryFn: getIncomes,
   });
@@ -134,11 +138,12 @@ function Income() {
           />
 
           <div className="flex flex-col space-y-6">
-            <div className="flex flex-row gap-3">
+            <div className="flex flex-col gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end">
               <div className="flex w-full flex-col space-y-3">
-                <Label>{t('description')}</Label>
+                <Label htmlFor="income-description">{t('description')}</Label>
                 <Input
-                  className="w-full"
+                  id="income-description"
+                  className="min-h-11 w-full sm:min-h-9"
                   placeholder={t('description')}
                   value={form.descricao}
                   onChange={(e) =>
@@ -148,8 +153,9 @@ function Income() {
               </div>
 
               <div className="flex w-full flex-col space-y-3">
-                <Label>{t('amount')}</Label>
+                <Label htmlFor="income-amount">{t('amount')}</Label>
                 <NumericFormat
+                  id="income-amount"
                   value={form.valor}
                   onValueChange={({ floatValue }) => {
                     setForm((f) => ({ ...f, valor: floatValue ?? 0 }));
@@ -161,24 +167,26 @@ function Income() {
                   allowNegative={false}
                   fixedDecimalScale={false}
                   customInput={Input}
+                  className="min-h-11 w-full sm:min-h-9"
                 />
               </div>
 
               <div className="flex w-full flex-col space-y-3">
                 <Label>{t('monthYear')}</Label>
                 <MonthYearPicker
+                  ariaLabel={t('monthYear')}
                   mes={form.mes}
                   ano={form.ano}
                   onChange={(mes, ano) => setForm((f) => ({ ...f, mes, ano }))}
                 />
               </div>
-              <div className="flex items-end">
+              <div className="flex w-full items-end sm:col-span-2 lg:col-span-1 lg:w-auto">
                 <AnimateIcon animateOnHover>
                   <LiquidButton
-                    className="text-white"
+                    className="min-h-11 w-full text-white sm:min-h-10 lg:w-auto"
                     onClick={handleAddOrEdit}
                   >
-                    <div className="flex flex-row items-center gap-3 px-12">
+                    <div className="flex flex-row items-center gap-3 px-6 sm:px-12">
                       {editingId ? (
                         <>
                           {t('common:update')}
@@ -207,20 +215,19 @@ function Income() {
           {isLoading ? (
             <IncomeListSkeleton />
           ) : isError ? (
-            <p className="text-center text-sm text-red-500">
-              {t('loadError')}
-            </p>
+            <p className="text-center text-sm text-red-500">{t('loadError')}</p>
           ) : incomes.length <= 0 ? (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <p className="cursor-pointer p-0 text-center text-sm text-zinc-500">
+                  <p
+                    data-slot="collection-empty-state"
+                    className="cursor-pointer p-0 text-center text-sm text-zinc-500"
+                  >
                     {t('noIncome')}
                   </p>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {t('noIncomeTooltip')}
-                </TooltipContent>
+                <TooltipContent>{t('noIncomeTooltip')}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           ) : (

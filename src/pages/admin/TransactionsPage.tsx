@@ -58,7 +58,7 @@ export default function TransactionsPage() {
           <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
           <MonthYearPicker
             month={month}
             year={year}
@@ -68,7 +68,10 @@ export default function TransactionsPage() {
             }}
           />
           {can('transactions', 'create') && (
-            <Button onClick={() => setCreateOpen(true)}>
+            <Button
+              className="min-h-11 w-full sm:w-auto"
+              onClick={() => setCreateOpen(true)}
+            >
               <Plus className="mr-1 h-4 w-4" />
               {t('newTransaction')}
             </Button>

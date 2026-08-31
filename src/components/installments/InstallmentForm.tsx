@@ -194,6 +194,7 @@ export function InstallmentForm({
                     <FormLabel>{t('form.description')}</FormLabel>
                     <FormControl>
                       <Input
+                        className="min-h-11 sm:min-h-9"
                         placeholder={t('form.descriptionPlaceholder')}
                         {...field}
                       />
@@ -203,7 +204,7 @@ export function InstallmentForm({
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <FormField
                   control={editForm.control}
                   name="installment_amount"
@@ -211,7 +212,11 @@ export function InstallmentForm({
                     <FormItem>
                       <FormLabel>{t('form.installmentAmount')}</FormLabel>
                       <FormControl>
-                        <CurrencyInput value={field.value} onChange={field.onChange} />
+                        <CurrencyInput
+                          className="min-h-11 sm:min-h-9"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -225,7 +230,13 @@ export function InstallmentForm({
                     <FormItem>
                       <FormLabel>{t('form.installmentCount')}</FormLabel>
                       <FormControl>
-                        <Input type="number" min="1" step="1" {...field} />
+                        <Input
+                          className="min-h-11 sm:min-h-9"
+                          type="number"
+                          min="1"
+                          step="1"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -233,7 +244,7 @@ export function InstallmentForm({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <FormField
                   control={editForm.control}
                   name="status"
@@ -245,7 +256,7 @@ export function InstallmentForm({
                         value={field.value}
                       >
                         <FormControl className="w-full">
-                          <SelectTrigger>
+                          <SelectTrigger className="min-h-11 w-full sm:min-h-9">
                             <SelectValue />
                           </SelectTrigger>
                         </FormControl>
@@ -277,7 +288,7 @@ export function InstallmentForm({
                         value={field.value ?? ''}
                       >
                         <FormControl>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger className="min-h-11 w-full sm:min-h-9">
                             <SelectValue
                               placeholder={t('form.categoryPlaceholder')}
                             />
@@ -301,12 +312,14 @@ export function InstallmentForm({
                 <Button
                   type="button"
                   variant="outline"
+                  className="min-h-11 sm:min-h-9"
                   onClick={() => onOpenChange(false)}
                 >
                   {t('common:cancel')}
                 </Button>
                 <Button
                   type="submit"
+                  className="min-h-11 sm:min-h-9"
                   disabled={editForm.formState.isSubmitting}
                 >
                   {editForm.formState.isSubmitting
@@ -340,6 +353,7 @@ export function InstallmentForm({
                   <FormLabel>{t('form.description')}</FormLabel>
                   <FormControl>
                     <Input
+                      className="min-h-11 sm:min-h-9"
                       placeholder={t('form.descriptionPlaceholder')}
                       {...field}
                     />
@@ -349,7 +363,7 @@ export function InstallmentForm({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <FormField
                 control={createForm.control}
                 name="total_amount"
@@ -357,7 +371,11 @@ export function InstallmentForm({
                   <FormItem>
                     <FormLabel>{t('form.totalAmount')}</FormLabel>
                     <FormControl>
-                      <CurrencyInput value={field.value} onChange={field.onChange} />
+                      <CurrencyInput
+                        className="min-h-11 sm:min-h-9"
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -371,7 +389,13 @@ export function InstallmentForm({
                   <FormItem>
                     <FormLabel>{t('form.installmentCount')}</FormLabel>
                     <FormControl>
-                      <Input type="number" min="2" step="1" {...field} />
+                      <Input
+                        className="min-h-11 sm:min-h-9"
+                        type="number"
+                        min="2"
+                        step="1"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -398,7 +422,11 @@ export function InstallmentForm({
                 <FormItem>
                   <FormLabel>{t('form.firstDate')}</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input
+                      className="min-h-11 sm:min-h-9"
+                      type="date"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -416,7 +444,7 @@ export function InstallmentForm({
                     value={field.value ?? ''}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="min-h-11 w-full sm:min-h-9">
                         <SelectValue
                           placeholder={t('form.categoryPlaceholder')}
                         />
@@ -439,12 +467,14 @@ export function InstallmentForm({
               <Button
                 type="button"
                 variant="outline"
+                className="min-h-11 sm:min-h-9"
                 onClick={() => onOpenChange(false)}
               >
                 {t('common:cancel')}
               </Button>
               <Button
                 type="submit"
+                className="min-h-11 sm:min-h-9"
                 disabled={createForm.formState.isSubmitting}
               >
                 {createForm.formState.isSubmitting

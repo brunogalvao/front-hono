@@ -4,13 +4,26 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import {
-  Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from '@/components/ui/form';
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { CurrencyInput } from '@/components/ui/currency-input';
@@ -40,7 +53,11 @@ interface RecurringFormProps {
 }
 
 export function RecurringForm({
-  open, onOpenChange, recurring, onSubmit, mode = 'create',
+  open,
+  onOpenChange,
+  recurring,
+  onSubmit,
+  mode = 'create',
 }: RecurringFormProps) {
   const { t } = useTranslation(['recurring', 'common']);
   const { activeWorkspaceId } = useWorkspace();
@@ -72,9 +89,12 @@ export function RecurringForm({
       });
     } else if (!recurring && open) {
       form.reset({
-        description: '', amount: 0, frequency: 'monthly',
+        description: '',
+        amount: 0,
+        frequency: 'monthly',
         start_date: new Date().toISOString().split('T')[0],
-        end_date: null, category_id: null,
+        end_date: null,
+        category_id: null,
       });
     }
   }, [recurring, open, form]);
@@ -94,7 +114,9 @@ export function RecurringForm({
         end_date: values.end_date ?? null,
         category_id: values.category_id ?? null,
       });
-      toast.success(mode === 'create' ? t('toast.created') : t('toast.updated'));
+      toast.success(
+        mode === 'create' ? t('toast.created') : t('toast.updated')
+      );
       onOpenChange(false);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t('toast.saveError'));
@@ -107,80 +129,169 @@ export function RecurringForm({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{mode === 'create' ? t('newRecurring') : t('editRecurring')}</DialogTitle>
+          <DialogTitle>
+            {mode === 'create' ? t('newRecurring') : t('editRecurring')}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField control={form.control} name="description" render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('form.description')}</FormLabel>
-                <FormControl><Input placeholder={t('form.descriptionPlaceholder')} {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-
-            <FormField control={form.control} name="amount" render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('form.amount')}</FormLabel>
-                <FormControl><CurrencyInput value={field.value} onChange={field.onChange} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-
-            <FormField control={form.control} name="frequency" render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('form.frequency')}</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                  <SelectContent>
-                    {FREQ_KEYS.map((k) => (
-                      <SelectItem key={k} value={k}>{t(`frequency.${k}`)}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
-
-            <div className="grid grid-cols-2 gap-3">
-              <FormField control={form.control} name="start_date" render={({ field }) => (
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('form.startDate')}</FormLabel>
-                  <FormControl><Input type="date" {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-
-              <FormField control={form.control} name="end_date" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('form.endDate')}</FormLabel>
+                  <FormLabel>{t('form.description')}</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value || null)} />
+                    <Input
+                      className="min-h-11 sm:min-h-9"
+                      placeholder={t('form.descriptionPlaceholder')}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )} />
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('form.amount')}</FormLabel>
+                  <FormControl>
+                    <CurrencyInput
+                      className="min-h-11 sm:min-h-9"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="frequency"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('form.frequency')}</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="min-h-11 w-full sm:min-h-9">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {FREQ_KEYS.map((k) => (
+                        <SelectItem
+                          className="min-h-11 sm:min-h-8"
+                          key={k}
+                          value={k}
+                        >
+                          {t(`frequency.${k}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="start_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('form.startDate')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        className="min-h-11 sm:min-h-9"
+                        type="date"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="end_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('form.endDate')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        className="min-h-11 sm:min-h-9"
+                        type="date"
+                        {...field}
+                        value={field.value ?? ''}
+                        onChange={(e) => field.onChange(e.target.value || null)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
-            <FormField control={form.control} name="category_id" render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('form.category')}</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value ?? ''}>
-                  <FormControl><SelectTrigger><SelectValue placeholder={t('form.categoryPlaceholder')} /></SelectTrigger></FormControl>
-                  <SelectContent>
-                    {expenseCategories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="category_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('form.category')}</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value ?? ''}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="min-h-11 w-full sm:min-h-9">
+                        <SelectValue
+                          placeholder={t('form.categoryPlaceholder')}
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {expenseCategories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common:cancel')}</Button>
-              <Button type="submit" disabled={submitting}>
-                {submitting ? t('form.saving') : mode === 'create' ? t('form.create') : t('common:save')}
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11 sm:min-h-9"
+                onClick={() => onOpenChange(false)}
+              >
+                {t('common:cancel')}
+              </Button>
+              <Button
+                type="submit"
+                className="min-h-11 sm:min-h-9"
+                disabled={submitting}
+              >
+                {submitting
+                  ? t('form.saving')
+                  : mode === 'create'
+                    ? t('form.create')
+                    : t('common:save')}
               </Button>
             </DialogFooter>
           </form>

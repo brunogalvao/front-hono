@@ -10,6 +10,8 @@
     "title": "Permission matrix by role",
     "description": "Configure which operations (Read, Create, Update, Delete) each role can perform on each screen. Changes apply immediately to all members.",
     "colScreen": "Screen",
+    "scrollHint": "Permission matrix. Scroll horizontally to view every column.",
+    "permissionLabel": "{{action}} on {{resource}} for {{role}}",
     "updateError": "Failed to update permission"
   },
   "allUsers": {

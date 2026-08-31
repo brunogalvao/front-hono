@@ -40,6 +40,8 @@
     "allStatuses": "All statuses",
     "empty": "No transactions found",
     "emptyHint": "Click \"New Transaction\" to get started.",
+    "clearFilters": "Clear filters",
+    "loading": "Loading transactions",
     "name": "Name",
     "noDescription": "No description",
     "colType": "Type",

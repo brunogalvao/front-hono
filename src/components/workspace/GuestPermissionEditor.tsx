@@ -4,10 +4,18 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { useMemberPermissions, type MemberPermission } from '@/hooks/useMemberPermissions';
+import {
+  useMemberPermissions,
+  type MemberPermission,
+} from '@/hooks/useMemberPermissions';
 import type { PermissionResource } from '@/lib/permissions';
 
 const RESOURCE_KEYS: PermissionResource[] = [
@@ -27,9 +35,18 @@ interface GuestPermissionEditorProps {
   currentUserId: string;
 }
 
-export function GuestPermissionEditor({ workspaceId, userId, currentUserId }: GuestPermissionEditorProps) {
+export function GuestPermissionEditor({
+  workspaceId,
+  userId,
+  currentUserId,
+}: GuestPermissionEditorProps) {
   const { t } = useTranslation(['permissions', 'common']);
-  const { data: overrides = [], isLoading, upsert, resetAll } = useMemberPermissions(workspaceId, userId);
+  const {
+    data: overrides = [],
+    isLoading,
+    upsert,
+    resetAll,
+  } = useMemberPermissions(workspaceId, userId);
 
   const overrideMap = useMemo(() => {
     const map = new Map<PermissionResource, MemberPermission>();
@@ -39,8 +56,8 @@ export function GuestPermissionEditor({ workspaceId, userId, currentUserId }: Gu
 
   const handleToggle = async (
     resource: PermissionResource,
-    action: typeof ACTIONS[number],
-    nextValue: boolean,
+    action: (typeof ACTIONS)[number],
+    nextValue: boolean
   ) => {
     const existing = overrideMap.get(resource);
     const base = existing ?? {
@@ -81,13 +98,20 @@ export function GuestPermissionEditor({ workspaceId, userId, currentUserId }: Gu
     <div className="space-y-3">
       <p className="text-muted-foreground text-xs">{t('guestEditor.hint')}</p>
 
-      <div className="rounded-md border overflow-x-auto">
+      <div
+        role="region"
+        tabIndex={0}
+        aria-label={t('matrix.scrollHint')}
+        className="max-w-full overflow-x-auto rounded-md border focus-visible:outline-2 focus-visible:outline-offset-2"
+      >
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-40">{t('guestEditor.colScreen')}</TableHead>
+              <TableHead className="w-40">
+                {t('guestEditor.colScreen')}
+              </TableHead>
               {ACTIONS.map((action) => (
-                <TableHead key={action} className="text-center w-20">
+                <TableHead key={action} className="w-20 text-center">
                   {t(`actionsLong.${action}`, { defaultValue: action })}
                 </TableHead>
               ))}
@@ -109,6 +133,11 @@ export function GuestPermissionEditor({ workspaceId, userId, currentUserId }: Gu
                   {ACTIONS.map((action) => (
                     <TableCell key={action} className="text-center">
                       <Checkbox
+                        aria-label={t('matrix.permissionLabel', {
+                          action: t(`actionsLong.${action}`),
+                          resource: t(`resources.${resource}`),
+                          role: t('roles.visualizador'),
+                        })}
                         checked={override?.[action] ?? false}
                         disabled={upsert.isPending}
                         onCheckedChange={(value) =>

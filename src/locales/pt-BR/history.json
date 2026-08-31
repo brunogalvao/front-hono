@@ -24,7 +24,8 @@
     "amount": "Valor"
   },
   "modal": {
-    "title": "Despesas — {{month}} / {{year}}"
+    "title": "Despesas — {{month}} / {{year}}",
+    "total": "Total"
   },
   "paidPercent": "{{pct}}% pago",
   "pendingPercent": "{{pct}}% pendente",

@@ -59,6 +59,8 @@
     "pt-BR": "Português",
     "en": "English"
   },
+  "previousYear": "Ano anterior",
+  "nextYear": "Próximo ano",
   "errors": {
     "unauthenticated": "Usuário não autenticado.",
     "generic": "Ocorreu um erro. Tente novamente.",

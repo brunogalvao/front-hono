@@ -27,7 +27,7 @@ interface ColumnOpts {
   onDelete: (id: string) => void;
 }
 
-function ActionsCell({
+export function InstallmentActionsCell({
   item,
   onEdit,
   onPayoff,
@@ -48,13 +48,19 @@ function ActionsCell({
   return (
     <>
       <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(item)}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-11 md:size-8"
+          aria-label={t('common:edit')}
+          onClick={() => onEdit(item)}
+        >
           <Pencil className="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="gap-1 text-xs"
+          className="min-h-11 gap-1 text-xs md:min-h-8"
           onClick={() => setPayoffOpen(true)}
         >
           <CheckCircle className="h-3 w-3" />
@@ -63,7 +69,7 @@ function ActionsCell({
         <Button
           variant="ghost"
           size="sm"
-          className="text-destructive hover:text-destructive gap-1 text-xs"
+          className="text-destructive hover:text-destructive min-h-11 gap-1 text-xs md:min-h-8"
           onClick={() => setDeleteOpen(true)}
         >
           <Trash2 className="h-3 w-3" />
@@ -80,8 +86,13 @@ function ActionsCell({
                 <p>
                   <Trans
                     ns="installments"
-                    i18nKey={pendingCount === 1 ? 'payoff.descOne' : 'payoff.descMany'}
-                    values={{ count: pendingCount, amount: formatToBRL(pendingTotal) }}
+                    i18nKey={
+                      pendingCount === 1 ? 'payoff.descOne' : 'payoff.descMany'
+                    }
+                    values={{
+                      count: pendingCount,
+                      amount: formatToBRL(pendingTotal),
+                    }}
                     components={{ bold: <strong /> }}
                   />
                 </p>
@@ -113,7 +124,9 @@ function ActionsCell({
                   <Trans
                     ns="installments"
                     i18nKey={
-                      item.total_installments === 1 ? 'deleteDialog.descOne' : 'deleteDialog.descMany'
+                      item.total_installments === 1
+                        ? 'deleteDialog.descOne'
+                        : 'deleteDialog.descMany'
                     }
                     values={{ count: item.total_installments }}
                     components={{ bold: <strong /> }}
@@ -149,7 +162,7 @@ const statusVariant = {
 
 export function getInstallmentColumns(
   t: TFunction<['installments', 'common']>,
-  opts: ColumnOpts,
+  opts: ColumnOpts
 ): ColumnDef<Installment>[] {
   return [
     {
@@ -170,11 +183,18 @@ export function getInstallmentColumns(
         const { description, categories, status } = row.original;
         return (
           <div className="flex flex-col gap-0.5">
-            <span className={cn('font-medium leading-tight', status !== 'active' && 'opacity-70')}>
+            <span
+              className={cn(
+                'leading-tight font-medium',
+                status !== 'active' && 'opacity-70'
+              )}
+            >
               {description}
             </span>
             {categories && (
-              <span className="text-muted-foreground text-xs">{categories.name}</span>
+              <span className="text-muted-foreground text-xs">
+                {categories.name}
+              </span>
             )}
           </div>
         );
@@ -188,7 +208,7 @@ export function getInstallmentColumns(
         const { installment_amount, total_amount } = row.original;
         return (
           <div className="flex flex-col gap-0.5">
-            <span className="font-semibold tabular-nums text-red-500">
+            <span className="font-semibold text-red-500 tabular-nums">
               {formatToBRL(installment_amount)}
               {t('perMonth')}
             </span>
@@ -210,8 +230,17 @@ export function getInstallmentColumns(
         return (
           <div className="w-40 space-y-1">
             <div className="text-muted-foreground flex justify-between text-xs">
-              <span>{t('progress', { paid: paid_installments, total: total_installments })}</span>
-              <span>{remaining > 0 ? t('remaining', { count: remaining }) : t('done')}</span>
+              <span>
+                {t('progress', {
+                  paid: paid_installments,
+                  total: total_installments,
+                })}
+              </span>
+              <span>
+                {remaining > 0
+                  ? t('remaining', { count: remaining })
+                  : t('done')}
+              </span>
             </div>
             <Progress value={progress} className="h-2" />
           </div>
@@ -224,7 +253,9 @@ export function getInstallmentColumns(
       header: t('table.colStatus'),
       cell: ({ row }) => {
         const { status } = row.original;
-        return <Badge variant={statusVariant[status]}>{t(`status.${status}`)}</Badge>;
+        return (
+          <Badge variant={statusVariant[status]}>{t(`status.${status}`)}</Badge>
+        );
       },
     },
     ...(opts.canAct
@@ -236,7 +267,7 @@ export function getInstallmentColumns(
             cell: ({ row }: { row: { original: Installment } }) => {
               if (row.original.status !== 'active') return null;
               return (
-                <ActionsCell
+                <InstallmentActionsCell
                   item={row.original}
                   onEdit={opts.onEdit}
                   onPayoff={opts.onPayoff}

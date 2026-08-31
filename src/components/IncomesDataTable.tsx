@@ -37,6 +37,13 @@ import { formatToBRL } from '@/utils/format';
 import { getNomeMes } from '@/model/mes.enum';
 import { Pencil, Trash } from 'lucide-react';
 import { DialogConfirmDelete } from './DialogConfirmDelete';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
+import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  MobileRecordList,
+  MobileRecordListItem,
+} from '@/components/ui/mobile-record-list';
 
 type Income = IncomeItem & {
   onEdit?: (income: IncomeItem) => void;
@@ -99,112 +106,119 @@ const IncomesDataTableSkeleton = () => (
   </div>
 );
 
-const columns: ColumnDef<Income>[] = [
-  {
-    accessorKey: 'descricao',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Nome
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="font-medium">{row.getValue('descricao')}</div>
-    ),
-  },
-  {
-    accessorKey: 'valor',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Valor
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const valor = parseFloat(row.getValue('valor'));
-      return <div className="font-medium">{formatToBRL(valor)}</div>;
-    },
-  },
-  {
-    accessorKey: 'mes',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Mês
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const mes = row.getValue('mes') as number;
-      const ano = row.getValue('ano') as number;
-      return (
-        <div>
-          {getNomeMes(mes)} / {ano}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'ano',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Ano
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const ano = row.getValue('ano') as number;
-      return <div className="font-medium">{ano}</div>;
-    },
-  },
-  {
-    id: 'actions',
-    enableHiding: false,
-    header: 'Ações',
-    cell: ({ row }) => {
-      const income = row.original;
-
-      return (
-        <div className="flex gap-2">
+function getIncomeColumns(t: TFunction<'income'>): ColumnDef<Income>[] {
+  return [
+    {
+      accessorKey: 'descricao',
+      header: ({ column }) => {
+        return (
           <Button
-            variant="outline"
-            size="sm"
-            onClick={() => income.onEdit?.(income)}
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            <Pencil className="h-4 w-4" />
+            {t('table.columns.name')}
+            <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-          <DialogConfirmDelete
-            description={income.descricao ?? 'item'}
-            onConfirm={() => income.onDelete?.(income.id)}
-          >
-            <Button variant="destructive" size="sm">
-              <Trash className="h-4 w-4" />
-            </Button>
-          </DialogConfirmDelete>
-        </div>
-      );
+        );
+      },
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue('descricao')}</div>
+      ),
     },
-  },
-];
+    {
+      accessorKey: 'valor',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {t('table.columns.amount')}
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        const valor = parseFloat(row.getValue('valor'));
+        return <div className="font-medium">{formatToBRL(valor)}</div>;
+      },
+    },
+    {
+      accessorKey: 'mes',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {t('table.columns.month')}
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        const mes = row.getValue('mes') as number;
+        const ano = row.getValue('ano') as number;
+        return (
+          <div>
+            {getNomeMes(mes)} / {ano}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'ano',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {t('table.columns.year')}
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        const ano = row.getValue('ano') as number;
+        return <div className="font-medium">{ano}</div>;
+      },
+    },
+    {
+      id: 'actions',
+      enableHiding: false,
+      header: t('table.columns.actions'),
+      cell: ({ row }) => {
+        const income = row.original;
+
+        return (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              aria-label={t('actions.edit')}
+              onClick={() => income.onEdit?.(income)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <DialogConfirmDelete
+              description={income.descricao ?? t('table.item')}
+              onConfirm={() => income.onDelete?.(income.id)}
+            >
+              <Button
+                variant="destructive"
+                size="sm"
+                aria-label={t('actions.delete')}
+              >
+                <Trash className="h-4 w-4" />
+              </Button>
+            </DialogConfirmDelete>
+          </div>
+        );
+      },
+    },
+  ];
+}
 
 export function IncomesDataTable({
   data,
@@ -212,12 +226,15 @@ export function IncomesDataTable({
   onDelete,
   isLoading,
 }: IncomesDataTableProps) {
+  const { t } = useTranslation('income');
+  const isMobile = useIsMobile();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+  const columns = React.useMemo(() => getIncomeColumns(t), [t]);
 
   // Adiciona as funções de callback aos dados
   const dataWithCallbacks = React.useMemo(() => {
@@ -251,21 +268,24 @@ export function IncomesDataTable({
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center">
         <Input
-          placeholder="Filtrar por nome..."
+          placeholder={t('table.filterPlaceholder')}
           value={
             (table.getColumn('descricao')?.getFilterValue() as string) ?? ''
           }
           onChange={(event) =>
             table.getColumn('descricao')?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="min-h-11 w-full sm:min-h-9 sm:max-w-sm"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Colunas <ChevronDown className="ml-2 h-4 w-4" />
+            <Button
+              variant="outline"
+              className="min-h-11 w-full sm:ml-auto sm:min-h-9 sm:w-auto"
+            >
+              {t('table.columnsMenu')} <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -283,13 +303,13 @@ export function IncomesDataTable({
                     }
                   >
                     {column.id === 'descricao'
-                      ? 'Nome'
+                      ? t('table.columns.name')
                       : column.id === 'valor'
-                        ? 'Valor'
+                        ? t('table.columns.amount')
                         : column.id === 'mes'
-                          ? 'Mês'
+                          ? t('table.columns.month')
                           : column.id === 'ano'
-                            ? 'Ano'
+                            ? t('table.columns.year')
                             : column.id}
                   </DropdownMenuCheckboxItem>
                 );
@@ -297,78 +317,141 @@ export function IncomesDataTable({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {cell.getIsPlaceholder()
-                        ? null
-                        : flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                    </TableCell>
-                  ))}
+      {isMobile ? (
+        <MobileRecordList
+          aria-label={t('listTitle')}
+          emptyState={
+            <div className="text-muted-foreground py-10 text-center">
+              {t('table.empty')}
+            </div>
+          }
+        >
+          {table.getRowModel().rows.map((row) => {
+            const income = row.original;
+            return (
+              <MobileRecordListItem key={row.id} className="space-y-3">
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">
+                      {income.descricao || t('table.noDescription')}
+                    </p>
+                    <p className="text-muted-foreground text-sm">
+                      {getNomeMes(income.mes)} / {income.ano}
+                    </p>
+                  </div>
+                  <span className="shrink-0 font-semibold text-emerald-600 tabular-nums">
+                    {formatToBRL(Number(income.valor))}
+                  </span>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="size-11"
+                    aria-label={t('actions.edit')}
+                    onClick={() => onEdit(income)}
+                  >
+                    <Pencil className="size-4" />
+                  </Button>
+                  <DialogConfirmDelete
+                    description={income.descricao ?? t('table.item')}
+                    onConfirm={() => onDelete(income.id)}
+                  >
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="size-11"
+                      aria-label={t('actions.delete')}
+                    >
+                      <Trash className="size-4" />
+                    </Button>
+                  </DialogConfirmDelete>
+                </div>
+              </MobileRecordListItem>
+            );
+          })}
+        </MobileRecordList>
+      ) : (
+        <div
+          data-slot="desktop-table"
+          className="hidden rounded-md border md:block"
+        >
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Nenhum resultado encontrado.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredRowModel().rows.length} linha(s) encontrada(s).
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {cell.getIsPlaceholder()
+                          ? null
+                          : flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    {t('table.empty')}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
-        <div className="space-x-2">
+      )}
+      <div className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-end">
+        <div className="text-muted-foreground w-full text-sm sm:flex-1">
+          {t('table.resultCount', {
+            count: table.getFilteredRowModel().rows.length,
+          })}
+        </div>
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
           <Button
             variant="outline"
             size="sm"
+            className="min-h-11 sm:min-h-8"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Anterior
+            {t('table.previous')}
           </Button>
           <Button
             variant="outline"
             size="sm"
+            className="min-h-11 sm:min-h-8"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Próximo
+            {t('table.next')}
           </Button>
         </div>
       </div>

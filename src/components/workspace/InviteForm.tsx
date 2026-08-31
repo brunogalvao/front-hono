@@ -87,10 +87,11 @@ export function InviteForm({ onInvite }: InviteFormProps) {
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem className="flex-1">
+              <FormItem className="w-full flex-1">
                 <FormLabel>{t('form.email')}</FormLabel>
                 <FormControl>
                   <Input
+                    className="min-h-11 sm:min-h-9"
                     type="email"
                     placeholder={t('form.emailPlaceholder')}
                     autoComplete="email"
@@ -106,11 +107,11 @@ export function InviteForm({ onInvite }: InviteFormProps) {
             control={form.control}
             name="role"
             render={({ field }) => (
-              <FormItem className="w-44">
+              <FormItem className="w-full sm:w-44">
                 <FormLabel>{t('form.role')}</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger className="mb-0">
+                    <SelectTrigger className="mb-0 min-h-11 w-full sm:min-h-9">
                       <SelectValue />
                     </SelectTrigger>
                   </FormControl>
@@ -131,7 +132,11 @@ export function InviteForm({ onInvite }: InviteFormProps) {
             )}
           />
 
-          <Button type="submit" disabled={submitting} className="self-end">
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="min-h-11 w-full self-end sm:min-h-9 sm:w-auto"
+          >
             {submitting ? t('form.submitting') : t('form.submit')}
           </Button>
         </form>

@@ -23,6 +23,8 @@
     "format:check": "prettier --check .",
     "test": "vitest",
     "test:run": "tsc -b && vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:responsive": "playwright test e2e/responsive-finance.spec.ts",
     "test:edge": "pnpm dlx deno@2.5.6 test supabase/functions",
     "test:invite:concurrency": "pnpm dlx deno@2.5.6 test --allow-env --allow-net=127.0.0.1:55322 supabase/tests/accept_workspace_invite_concurrency.test.ts",
     "storybook": "storybook dev -p 6006",

@@ -3,9 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel,
-  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
-  AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { usePermissions } from '@/hooks/usePermissions';
 import type { Transaction } from '@/hooks/useTransactions';
@@ -16,7 +21,11 @@ interface TransactionActionsCellProps {
   onDelete: (id: string) => void;
 }
 
-export function TransactionActionsCell({ transaction, onEdit, onDelete }: TransactionActionsCellProps) {
+export function TransactionActionsCell({
+  transaction,
+  onEdit,
+  onDelete,
+}: TransactionActionsCellProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const { t } = useTranslation(['transactions', 'common']);
   const { can } = usePermissions();
@@ -24,7 +33,8 @@ export function TransactionActionsCell({ transaction, onEdit, onDelete }: Transa
   const canUpdate = can('transactions', 'update');
   const canDelete = can('transactions', 'delete');
 
-  if ((!canUpdate && !canDelete) || transaction.origin === 'installment') return null;
+  if ((!canUpdate && !canDelete) || transaction.origin === 'installment')
+    return null;
 
   return (
     <>
@@ -33,7 +43,8 @@ export function TransactionActionsCell({ transaction, onEdit, onDelete }: Transa
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="size-11 md:size-8"
+            aria-label={t('common:edit')}
             onClick={() => onEdit(transaction)}
           >
             <Pencil className="h-4 w-4" />
@@ -43,7 +54,8 @@ export function TransactionActionsCell({ transaction, onEdit, onDelete }: Transa
           <Button
             variant="ghost"
             size="icon"
-            className="text-destructive hover:text-destructive h-8 w-8"
+            className="text-destructive hover:text-destructive size-11 md:size-8"
+            aria-label={t('common:delete')}
             onClick={() => setDeleteOpen(true)}
           >
             <Trash2 className="h-4 w-4" />

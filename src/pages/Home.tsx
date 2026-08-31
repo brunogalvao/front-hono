@@ -79,16 +79,18 @@ function Home() {
           id="home"
           className="flex min-h-[calc(100vh-56px)] flex-col justify-center gap-12 md:flex-row md:items-center"
         >
-          <div className="flex w-full flex-col gap-1 md:w-[60%] md:gap-4">
-            <GsapHeroTitle
-              className="w-full text-[clamp(2.25rem,11.5vw,6rem)] leading-[0.98] font-bold tracking-[-0.035em] whitespace-nowrap"
-              text={t('hero.title')}
-            />
+          <div className="flex w-full min-w-0 flex-col gap-1 md:w-[60%] md:gap-4">
+            <h1 className="min-w-0">
+              <GsapHeroTitle
+                className="block w-full max-w-full text-[clamp(2rem,11vw,6rem)] leading-[0.98] font-bold tracking-[-0.035em] text-balance"
+                text={t('hero.title')}
+              />
+            </h1>
             <p className="text-muted-foreground text-sm md:text-lg">
               {t('hero.headline')}
             </p>
 
-            <div className="mt-2 flex flex-col gap-4">
+            <div className="mt-2 flex min-w-0 flex-col gap-4">
               <Link
                 to="/login"
                 className={cn(
@@ -100,7 +102,7 @@ function Home() {
                 <ArrowRight className="size-4" />
               </Link>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex min-w-0 flex-wrap gap-x-3 gap-y-2">
                 {(['free', 'ai', 'noCard'] as const).map((key) => (
                   <span
                     key={key}
@@ -114,7 +116,7 @@ function Home() {
             </div>
           </div>
 
-          <p className="text-muted-foreground w-full text-base md:w-[40%] md:ps-8 md:text-end">
+          <p className="text-muted-foreground w-full max-w-[70ch] min-w-0 text-base text-pretty md:w-[40%] md:ps-8 md:text-end">
             {t('hero.description')}
           </p>
         </section>

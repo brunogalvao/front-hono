@@ -38,6 +38,10 @@ Thumbs.db
 # Testing
 coverage/
 *.lcov
+test-results/
+playwright-report/
+blob-report/
+e2e/.auth/
 
 # Playwright CLI artifacts generated during local browser validation
 .playwright-cli/

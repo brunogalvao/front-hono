@@ -258,7 +258,7 @@ export function AllUsersTable({
                       handleUpdateRole(memberId!, v as WorkspaceRole)
                     }
                   >
-                    <SelectTrigger className="h-8 w-36 text-xs">
+                    <SelectTrigger className="min-h-11 w-36 text-xs md:min-h-8">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -296,7 +296,8 @@ export function AllUsersTable({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 shrink-0"
+                      className="size-11 shrink-0 md:size-8"
+                      aria-label={t('allUsers.individualPermissions')}
                       title={t('allUsers.individualPermissions')}
                       onClick={() => setPermissionsTarget(user)}
                     >
@@ -308,7 +309,7 @@ export function AllUsersTable({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-destructive hover:text-destructive h-8 w-8 shrink-0"
+                        className="text-destructive hover:text-destructive size-11 shrink-0 md:size-8"
                         aria-label={t('allUsers.remove')}
                         onClick={() => setRemoveTarget(user)}
                       >
@@ -328,7 +329,7 @@ export function AllUsersTable({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 shrink-0"
+                        className="size-11 shrink-0 md:size-8"
                         aria-label={t('invite:form.resend')}
                         disabled={inviteIsBusy}
                         onClick={() => void onResendInvite(pendingInvite.id)}
@@ -348,7 +349,7 @@ export function AllUsersTable({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="text-destructive hover:text-destructive h-8 w-8 shrink-0"
+                        className="text-destructive hover:text-destructive size-11 shrink-0 md:size-8"
                         aria-label={t('invite:form.cancel')}
                         disabled={inviteIsBusy}
                         onClick={() => void onCancelInvite(pendingInvite.id)}
@@ -365,7 +366,8 @@ export function AllUsersTable({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 shrink-0"
+                  className="size-11 shrink-0 md:size-8"
+                  aria-label={t('allUsers.add')}
                   onClick={() => {
                     setAddTarget(user);
                     setSelectedRole('visualizador');
