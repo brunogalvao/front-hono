@@ -2,32 +2,55 @@ import {
   createRouter,
   createRoute,
   createRootRoute,
+  lazyRouteComponent,
   Outlet,
   redirect,
 } from '@tanstack/react-router';
 import Home from '@/pages/Home';
-import Login from '@/pages/Login';
-import Admin from '@/pages/Admin';
-import AuthCallback from '@/pages/AuthCallback';
-import Income from '@/pages/admin/Income';
-import EditUser from '@/pages/admin/EditUser';
-import Dashboard from '@/pages/admin/Dashboard';
-import History from '@/pages/admin/History';
-import Advisor from '@/pages/admin/Advisor';
-import Groups from '@/pages/admin/Groups';
-import Invite from '@/pages/Invite';
-// New pages
-import RegisterPage from '@/pages/auth/RegisterPage';
-import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
-import AcceptInvitePage from '@/pages/auth/AcceptInvitePage';
-import InviteLandingPage from '@/pages/auth/InviteLandingPage';
-import TransactionsPage from '@/pages/admin/TransactionsPage';
-import RecurringPage from '@/pages/admin/RecurringPage';
-import InsightsPage from '@/pages/admin/InsightsPage';
-import InstallmentsPage from '@/pages/admin/InstallmentsPage';
-import WorkspaceSettingsPage from '@/pages/admin/workspace/WorkspaceSettingsPage';
-import PermissionsPage from '@/pages/admin/workspace/PermissionsPage';
-import AccountSettingsPage from '@/pages/admin/AccountSettingsPage';
+
+const Login = lazyRouteComponent(() => import('@/pages/Login'));
+const Admin = lazyRouteComponent(() => import('@/pages/Admin'));
+const AuthCallback = lazyRouteComponent(() => import('@/pages/AuthCallback'));
+const Income = lazyRouteComponent(() => import('@/pages/admin/Income'));
+const EditUser = lazyRouteComponent(() => import('@/pages/admin/EditUser'));
+const Dashboard = lazyRouteComponent(() => import('@/pages/admin/Dashboard'));
+const History = lazyRouteComponent(() => import('@/pages/admin/History'));
+const Advisor = lazyRouteComponent(() => import('@/pages/admin/Advisor'));
+const Groups = lazyRouteComponent(() => import('@/pages/admin/Groups'));
+const Invite = lazyRouteComponent(() => import('@/pages/Invite'));
+const RegisterPage = lazyRouteComponent(
+  () => import('@/pages/auth/RegisterPage')
+);
+const ResetPasswordPage = lazyRouteComponent(
+  () => import('@/pages/auth/ResetPasswordPage')
+);
+const AcceptInvitePage = lazyRouteComponent(
+  () => import('@/pages/auth/AcceptInvitePage')
+);
+const InviteLandingPage = lazyRouteComponent(
+  () => import('@/pages/auth/InviteLandingPage')
+);
+const TransactionsPage = lazyRouteComponent(
+  () => import('@/pages/admin/TransactionsPage')
+);
+const RecurringPage = lazyRouteComponent(
+  () => import('@/pages/admin/RecurringPage')
+);
+const InsightsPage = lazyRouteComponent(
+  () => import('@/pages/admin/InsightsPage')
+);
+const InstallmentsPage = lazyRouteComponent(
+  () => import('@/pages/admin/InstallmentsPage')
+);
+const WorkspaceSettingsPage = lazyRouteComponent(
+  () => import('@/pages/admin/workspace/WorkspaceSettingsPage')
+);
+const PermissionsPage = lazyRouteComponent(
+  () => import('@/pages/admin/workspace/PermissionsPage')
+);
+const AccountSettingsPage = lazyRouteComponent(
+  () => import('@/pages/admin/AccountSettingsPage')
+);
 
 // Root Route
 const rootRoute = createRootRoute({

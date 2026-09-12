@@ -23,7 +23,7 @@ const Footer = () => {
             href="https://aivision.app.br/"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={t('footer.visitAiVision')}
+            aria-label={`AI Vision Technology — ${t('footer.visitAiVision')}`}
             className="flex items-center gap-2.5 rounded-md focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 focus-visible:outline-none"
           >
             <span className="flex size-8 items-center justify-center">

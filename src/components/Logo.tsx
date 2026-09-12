@@ -32,7 +32,7 @@ export function Logo({
         <span
           className={`text-base leading-none font-bold tracking-tight ${wordmarkClassName}`}
         >
-          Task's <span className="text-primary">Finance</span>
+          Task's <span className="text-primary-text">Finance</span>
         </span>
       )}
     </div>

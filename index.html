@@ -10,6 +10,118 @@
     <link rel="apple-touch-icon" href="/icone.png" />
     <meta name="theme-color" content="#9340DB" />
 
+    <style>
+      body {
+        margin: 0;
+        background: #111116;
+        color: #fafafa;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+      }
+      .prerender-shell {
+        min-height: 100vh;
+        background: #111116;
+      }
+      .prerender-shell__header {
+        display: flex;
+        min-height: 4.75rem;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0 1rem;
+        border-bottom: 1px solid rgb(255 255 255 / 10%);
+      }
+      .prerender-shell__brand {
+        color: #fafafa;
+        font-weight: 700;
+        text-decoration: none;
+      }
+      .prerender-shell__brand span {
+        color: #c4a7ff;
+      }
+      .prerender-shell__login,
+      .prerender-shell__cta {
+        display: inline-flex;
+        min-height: 2.75rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #7c3aed;
+        color: #fff;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .prerender-shell__login {
+        min-height: 2.5rem;
+        padding: 0 1rem;
+      }
+      .prerender-shell__hero {
+        display: flex;
+        box-sizing: border-box;
+        min-height: calc(100vh - 4.75rem);
+        flex-direction: column;
+        justify-content: center;
+        gap: 2.5rem;
+        padding: 2rem 1rem;
+      }
+      .prerender-shell__hero-copy {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      .prerender-shell__hero h1 {
+        max-width: 12ch;
+        margin: 0;
+        font-size: clamp(2rem, 11vw, 6rem);
+        line-height: 0.98;
+        letter-spacing: -0.035em;
+      }
+      .prerender-shell__hero h1 span {
+        color: #c4a7ff;
+      }
+      .prerender-shell__headline,
+      .prerender-shell__description {
+        margin: 0;
+        color: #b7b7c2;
+        line-height: 1.6;
+      }
+      .prerender-shell__headline {
+        font-size: 0.875rem;
+      }
+      .prerender-shell__description {
+        max-width: 70ch;
+      }
+      .prerender-shell__cta {
+        margin-top: 0.5rem;
+        padding: 0 2rem;
+      }
+      @media (min-width: 768px) {
+        .prerender-shell__header,
+        .prerender-shell__hero {
+          max-width: 80rem;
+          margin: 0 auto;
+        }
+        .prerender-shell__hero {
+          flex-direction: row;
+          align-items: center;
+        }
+        .prerender-shell__hero-copy {
+          width: 60%;
+        }
+        .prerender-shell__description {
+          width: 40%;
+          text-align: right;
+        }
+      }
+    </style>
+
     <title>Task's Finance</title>
     <meta
       name="description"
@@ -41,7 +153,35 @@
     <meta name="twitter:image" content="/icone.png" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="prerender-shell" data-prerender-shell>
+        <header class="prerender-shell__header">
+          <a
+            class="prerender-shell__brand"
+            href="/"
+            aria-label="Task's Finance"
+          >
+            Task's <span>Finance</span>
+          </a>
+          <a class="prerender-shell__login" href="/login">Entrar</a>
+        </header>
+        <main class="prerender-shell__hero">
+          <div class="prerender-shell__hero-copy">
+            <h1>Task's <span>Finance</span></h1>
+            <p class="prerender-shell__headline">
+              Gerencie suas finanças de forma simples e eficiente.
+            </p>
+            <a class="prerender-shell__cta" href="/login">Começar agora</a>
+          </div>
+          <p class="prerender-shell__description">
+            O Task's Finance organiza suas receitas, despesas e tarefas
+            financeiras em um só lugar. Acompanhe seu saldo em tempo real,
+            consulte o histórico mensal e receba sugestões inteligentes para
+            melhorar sua saúde financeira.
+          </p>
+        </main>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

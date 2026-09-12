@@ -43,7 +43,9 @@ describe('pnpm-workspace.yaml', () => {
         '  workerd: true',
       ].join('\n')
     );
-    expect(yaml).not.toMatch(/^  (?!core-js|esbuild|workerd)[^:\n]+: true$/m);
+    expect(yaml).not.toMatch(
+      /^\s{2}(?!core-js|esbuild|workerd)[^:\n]+: true$/m
+    );
   });
 
   it('fixa versões transitivas com correções de segurança', () => {
@@ -94,5 +96,30 @@ describe('continuous integration', () => {
     expect(versionScript).toContain('VERCEL_GIT_COMMIT_SHA');
     expect(versionScript).toContain('VERCEL_GIT_COMMIT_MESSAGE');
     expect(versionScript).toContain('VERCEL_GIT_COMMIT_REF');
+  });
+});
+
+describe('Vercel frontend routing and security headers', () => {
+  const vercelConfig = JSON.parse(
+    readFileSync(resolve(rootDir, 'vercel.json'), 'utf-8')
+  );
+
+  it('uses the supported SPA rewrite instead of legacy routes', () => {
+    expect(vercelConfig.routes).toBeUndefined();
+    expect(vercelConfig.rewrites).toContainEqual({
+      source: '/(.*)',
+      destination: '/index.html',
+    });
+  });
+
+  it('ships an enforcing content security policy', () => {
+    const globalHeaders = vercelConfig.headers.find(
+      (entry: { source: string }) => entry.source === '/(.*)'
+    );
+    expect(globalHeaders?.headers).toContainEqual(
+      expect.objectContaining({
+        key: 'Content-Security-Policy',
+      })
+    );
   });
 });
