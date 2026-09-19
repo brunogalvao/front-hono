@@ -4,6 +4,18 @@
   "analyze": "Analisar",
   "analyzing": "Analisando...",
   "newAnalysis": "Nova análise",
+  "progress": {
+    "preparing": "Preparando seus dados financeiros...",
+    "generating": "A IA está elaborando sua análise...",
+    "takingLonger": "A análise está levando um pouco mais de tempo, mas continua em andamento..."
+  },
+  "errors": {
+    "session": "Sua sessão expirou. Entre novamente para gerar a análise.",
+    "service": "O serviço de IA está indisponível no momento. Tente novamente em instantes.",
+    "stream": "Não foi possível receber a análise. Tente novamente.",
+    "timeout": "A análise ficou mais de 45 segundos sem responder. Tente novamente.",
+    "generic": "Não foi possível gerar a análise agora. Tente novamente mais tarde."
+  },
   "disclaimer": "Esta análise é gerada por inteligência artificial e tem caráter informativo. Consulte um profissional financeiro certificado para decisões importantes.",
   "emptyTitle": "Análise financeira com IA",
   "emptyDescription": "Selecione o período e clique em \"Analisar\" para receber uma análise personalizada das suas finanças.",

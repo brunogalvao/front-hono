@@ -215,7 +215,11 @@ Use linguagem acessível, seja direto e prático. Não repita os dados brutos �
       },
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 2048, temperature: 0.7 },
+        generationConfig: {
+          maxOutputTokens: 1536,
+          temperature: 0.7,
+          thinkingConfig: { thinkingBudget: 0 },
+        },
       }),
     });
 

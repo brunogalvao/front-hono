@@ -20,6 +20,22 @@ import TituloPage from '@/components/TituloPage';
 import { useFinancialAdvisor } from '@/hooks/useFinancialAdvisor';
 import { getCurrentMonth, getCurrentYear } from '@/utils/date';
 import { getNomeMes } from '@/model/mes.enum';
+import type { FinancialAdvisorErrorCode } from '@/hooks/useFinancialAdvisor';
+
+const ERROR_TRANSLATION_KEYS: Record<
+  FinancialAdvisorErrorCode,
+  | 'errors.session'
+  | 'errors.service'
+  | 'errors.stream'
+  | 'errors.timeout'
+  | 'errors.generic'
+> = {
+  session: 'errors.session',
+  service: 'errors.service',
+  stream: 'errors.stream',
+  timeout: 'errors.timeout',
+  generic: 'errors.generic',
+};
 
 const KEYWORDS_POSITIVE = [
   'superávit',
@@ -194,7 +210,8 @@ function QuotaExceededAlert({ retrySeconds }: { retrySeconds: number | null }) {
           <>
             {t('quota.availableAt')}{' '}
             <span className="font-semibold tabular-nums">{availableAt}</span> —
-            {t('quota.remaining')} <span className="tabular-nums">{countdownStr}</span>.
+            {t('quota.remaining')}{' '}
+            <span className="tabular-nums">{countdownStr}</span>.
           </>
         ) : (
           t('quota.tryAgain')
@@ -230,13 +247,33 @@ export function FinancialAdvisor() {
   const { t } = useTranslation('advisor');
   const [month, setMonth] = useState(getCurrentMonth());
   const [year, setYear] = useState(getCurrentYear());
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const { analysis, isLoading, error, retrySeconds, analyzeFinances, reset } =
     useFinancialAdvisor();
 
   const hasAnalysis = analysis.length > 0;
   const sections = hasAnalysis ? parseAnalysisSections(analysis) : null;
-  const isStreaming = isLoading && hasAnalysis;
   const showSkeleton = isLoading && !hasAnalysis;
+  const progressKey =
+    elapsedSeconds < 5
+      ? 'progress.preparing'
+      : elapsedSeconds < 15
+        ? 'progress.generating'
+        : 'progress.takingLonger';
+
+  useEffect(() => {
+    if (!isLoading) {
+      setElapsedSeconds(0);
+      return;
+    }
+
+    const startedAt = Date.now();
+    const timer = setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isLoading]);
 
   const handleAnalyze = () => {
     analyzeFinances({ month, year });
@@ -254,10 +291,7 @@ export function FinancialAdvisor() {
 
   return (
     <div className="space-y-6">
-      <TituloPage
-        titulo={t('title')}
-        subtitulo={t('subtitle')}
-      />
+      <TituloPage titulo={t('title')} subtitulo={t('subtitle')} />
 
       {/* Controles */}
       <Card>
@@ -305,8 +339,21 @@ export function FinancialAdvisor() {
       {error && (
         <Alert variant="destructive">
           <AlertTriangle className="size-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>
+            {t(ERROR_TRANSLATION_KEYS[error])}
+          </AlertDescription>
         </Alert>
+      )}
+
+      {isLoading && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="text-muted-foreground flex items-center gap-2 text-sm"
+        >
+          <Bot className="text-primary size-4 animate-pulse" />
+          <span>{t(progressKey)}</span>
+        </div>
       )}
 
       {/* Skeleton inicial */}
@@ -315,13 +362,6 @@ export function FinancialAdvisor() {
       {/* Análise em streaming ou completa */}
       {hasAnalysis && sections && (
         <div className="space-y-4">
-          {isStreaming && (
-            <div className="text-muted-foreground flex items-center gap-2 text-sm">
-              <Bot className="size-4 animate-pulse" />
-              <span>{t('analyzing')}</span>
-            </div>
-          )}
-
           {sections.diagnostico && (
             <SectionCard
               title={t('sections.diagnosis')}
@@ -356,7 +396,7 @@ export function FinancialAdvisor() {
             />
           )}
 
-          {!isStreaming && (
+          {!isLoading && (
             <p className="text-muted-foreground text-center text-xs">
               {t('disclaimer')}
             </p>
