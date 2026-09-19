@@ -24,6 +24,9 @@
       "icon": "Icon",
       "create": "Create"
     },
+    "validation": {
+      "nameRequired": "The name is required."
+    },
     "delete": {
       "title": "Delete category?",
       "description": "Transactions with this category will become uncategorized."

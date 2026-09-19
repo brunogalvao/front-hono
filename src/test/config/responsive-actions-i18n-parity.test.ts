@@ -12,6 +12,36 @@ import enIncome from '@/locales/en/income.json';
 import ptHistory from '@/locales/pt-BR/history.json';
 import enHistory from '@/locales/en/history.json';
 
+const ptLocales = import.meta.glob<Record<string, unknown>>(
+  '../../locales/pt-BR/*.json',
+  { eager: true, import: 'default' }
+);
+const enLocales = import.meta.glob<Record<string, unknown>>(
+  '../../locales/en/*.json',
+  { eager: true, import: 'default' }
+);
+
+function namespaceFromPath(path: string): string {
+  return (
+    path
+      .split('/')
+      .at(-1)
+      ?.replace(/\.json$/, '') ?? path
+  );
+}
+
+function byNamespace(locales: Record<string, Record<string, unknown>>) {
+  return Object.fromEntries(
+    Object.entries(locales).map(([path, value]) => [
+      namespaceFromPath(path),
+      value,
+    ])
+  );
+}
+
+const ptByNamespace = byNamespace(ptLocales);
+const enByNamespace = byNamespace(enLocales);
+
 function flatten(value: Record<string, unknown>, prefix = ''): string[] {
   return Object.entries(value).flatMap(([key, nested]) => {
     const path = prefix ? `${prefix}.${key}` : key;
@@ -21,7 +51,46 @@ function flatten(value: Record<string, unknown>, prefix = ''): string[] {
   });
 }
 
+function flattenValues(
+  value: Record<string, unknown>,
+  prefix = ''
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(value).flatMap(([key, nested]) => {
+      const path = prefix ? `${prefix}.${key}` : key;
+      return nested && typeof nested === 'object' && !Array.isArray(nested)
+        ? Object.entries(flattenValues(nested as Record<string, unknown>, path))
+        : [[path, nested]];
+    })
+  );
+}
+
+function placeholders(value: unknown): string[] {
+  if (typeof value !== 'string') return [];
+  return [...value.matchAll(/{{\s*([^},\s]+)[^}]*}}/g)]
+    .map((match) => match[1])
+    .sort();
+}
+
 describe('responsive action i18n parity', () => {
+  it('keeps every namespace and key aligned between pt-BR and en', () => {
+    expect(Object.keys(ptByNamespace).sort()).toEqual(
+      Object.keys(enByNamespace).sort()
+    );
+
+    for (const namespace of Object.keys(ptByNamespace)) {
+      const pt = flattenValues(ptByNamespace[namespace]);
+      const en = flattenValues(enByNamespace[namespace]);
+
+      expect(Object.keys(pt).sort(), namespace).toEqual(Object.keys(en).sort());
+      for (const key of Object.keys(pt)) {
+        expect(placeholders(pt[key]), `${namespace}:${key}`).toEqual(
+          placeholders(en[key])
+        );
+      }
+    }
+  });
+
   it.each([
     ['transactions', ptTransactions, enTransactions],
     ['installments', ptInstallments, enInstallments],

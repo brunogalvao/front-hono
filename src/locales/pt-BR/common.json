@@ -61,6 +61,11 @@
   },
   "previousYear": "Ano anterior",
   "nextYear": "Próximo ano",
+  "sidebar": {
+    "title": "Menu lateral",
+    "description": "Exibe o menu lateral no celular.",
+    "toggle": "Alternar menu lateral"
+  },
   "errors": {
     "unauthenticated": "Usuário não autenticado.",
     "generic": "Ocorreu um erro. Tente novamente.",

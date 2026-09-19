@@ -24,6 +24,11 @@
     "saving": "Saving...",
     "create": "Create"
   },
+  "validation": {
+    "descriptionRequired": "The description is required.",
+    "amountPositive": "The amount must be greater than zero.",
+    "startDateRequired": "The start date is required."
+  },
   "table": {
     "empty": "No recurring expenses",
     "emptyHint": "Add a recurring expense to get started.",

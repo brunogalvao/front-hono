@@ -3,6 +3,57 @@
   "subtitle": "Manage your financial groups",
   "createGroup": "Create Group",
   "groupName": "Group Name",
+  "superAdmin": "Super Admin",
+  "currentUser": "you",
+  "userFallback": "User",
+  "accessReleased": "Granted access",
+  "pendingInvite": "Pending invitation",
+  "inviteDates": "Sent on {{createdAt}}. Expires on {{expiresAt}}.",
+  "revoke": "Revoke",
+  "inviteAccess": "Access granted after accepting the invitation",
+  "create": {
+    "title": "Create a new group",
+    "name": "Group name",
+    "namePlaceholder": "E.g.: Family finances",
+    "type": "Type",
+    "typePlaceholder": "Select a type",
+    "shared": "Shared",
+    "personal": "Personal",
+    "description": "Shared groups let you invite people and define each member's access.",
+    "submitting": "Creating group",
+    "submit": "Create group",
+    "open": "Create group",
+    "close": "Close form"
+  },
+  "invite": {
+    "title": "Invite a new member",
+    "name": "Name",
+    "namePlaceholder": "Full name",
+    "phone": "Phone",
+    "phonePlaceholder": "(00) 00000-0000",
+    "email": "Email",
+    "emailPlaceholder": "name@example.com",
+    "access": "Define access for this invitation",
+    "submitting": "Sending",
+    "submit": "Send invitation"
+  },
+  "selectorPlaceholder": "Select a group",
+  "addPerson": "Add person",
+  "groupSummary": "Type: {{type}} • Your role: {{role}}",
+  "noAdminPermission": "No administration permission in this group",
+  "memberOnlyDescription": "You belong to this group as a member. Only the owner can invite people, remove members, and change access.",
+  "pendingCount_one": "{{count}} pending invitation",
+  "pendingCount_other": "{{count}} pending invitations",
+  "memberCount_one": "{{count}} member",
+  "memberCount_other": "{{count}} members",
+  "noPendingInvites": "There are no pending invitations.",
+  "noMembersInGroup": "No members were found in this group.",
+  "removeDialog": {
+    "title": "Remove member",
+    "description": "Are you sure you want to remove {{name}} from the group? This person will lose access to shared expenses and income.",
+    "cancel": "Cancel",
+    "confirm": "Remove"
+  },
   "members": "Members",
   "inviteMember": "Invite Member",
   "pendingInvites": "Pending Invites",
@@ -10,9 +61,13 @@
   "noMembers": "No members found.",
   "access": {
     "expenses": "Expenses",
+    "expensesDescription": "Allows viewing and managing expenses.",
     "income": "Income",
+    "incomeDescription": "Allows viewing and managing income.",
     "installments": "Installments",
-    "advisor": "AI Advisor"
+    "installmentsDescription": "Allows tracking and editing installments.",
+    "advisor": "AI Advisor",
+    "advisorDescription": "Allows using financial advisory features."
   },
   "roles": {
     "owner": "Owner",
@@ -26,6 +81,16 @@
     "joined": "Welcome to the group!",
     "joinError": "Error joining group.",
     "removed": "Member removed successfully.",
-    "removeError": "Error removing member."
+    "removeError": "Error removing member.",
+    "memberAccessUpdated": "Member access updated.",
+    "inviteAccessUpdated": "Invitation access updated.",
+    "inviteRevoked": "Invitation for {{email}} revoked.",
+    "genericError": "The operation could not be completed. Please try again."
+  },
+  "validation": {
+    "nameRequired": "The name is required.",
+    "emailInvalid": "Enter a valid email address.",
+    "phoneInvalid": "The phone number must use the format (99) 99999-9999.",
+    "groupNameRequired": "The group name is required."
   }
 }

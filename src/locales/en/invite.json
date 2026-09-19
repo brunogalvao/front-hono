@@ -38,6 +38,9 @@
     "resend": "Resend",
     "cancel": "Cancel invitation"
   },
+  "validation": {
+    "emailInvalid": "Enter a valid email address."
+  },
   "mutation": {
     "sent": "Invitation sent securely.",
     "delivery_failed": "The invitation could not be delivered. Try resending it.",

@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
 import { isSuperuser } from '@/lib/permissions';
 import { useWorkspace } from '@/context/WorkspaceContext';
+import { useTranslation } from 'react-i18next';
 
 function useCurrentUserId() {
   return useQuery({
@@ -18,6 +19,7 @@ function useCurrentUserId() {
 }
 
 export function useSuperAdminGuard() {
+  const { t } = useTranslation('nav');
   const navigate = useNavigate();
   const { activeWorkspace } = useWorkspace();
   const { data: currentUserId, isLoading: isLoadingUser } = useCurrentUserId();
@@ -33,10 +35,10 @@ export function useSuperAdminGuard() {
   useEffect(() => {
     if (isLoading) return;
     if (!isAllowed) {
-      toast.error('Acesso restrito ao super admin');
+      toast.error(t('superAdminOnly'));
       navigate({ to: '/admin/dashboard' });
     }
-  }, [isLoading, isAllowed, navigate]);
+  }, [isLoading, isAllowed, navigate, t]);
 
   return { isAllowed, isLoading };
 }

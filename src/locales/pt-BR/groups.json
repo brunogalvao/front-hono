@@ -3,6 +3,57 @@
   "subtitle": "Gerencie seus grupos financeiros",
   "createGroup": "Criar Grupo",
   "groupName": "Nome do Grupo",
+  "superAdmin": "Super Admin",
+  "currentUser": "você",
+  "userFallback": "Usuário",
+  "accessReleased": "Acessos liberados",
+  "pendingInvite": "Convite pendente",
+  "inviteDates": "Enviado em {{createdAt}}. Expira em {{expiresAt}}.",
+  "revoke": "Revogar",
+  "inviteAccess": "Acessos quando aceitar o convite",
+  "create": {
+    "title": "Criar novo grupo",
+    "name": "Nome do grupo",
+    "namePlaceholder": "Ex.: Financeiro da família",
+    "type": "Tipo",
+    "typePlaceholder": "Selecione o tipo",
+    "shared": "Compartilhado",
+    "personal": "Pessoal",
+    "description": "Grupos compartilhados permitem convidar pessoas e definir os acessos de cada membro.",
+    "submitting": "Criando grupo",
+    "submit": "Criar grupo",
+    "open": "Criar grupo",
+    "close": "Fechar criação"
+  },
+  "invite": {
+    "title": "Convidar novo membro",
+    "name": "Nome",
+    "namePlaceholder": "Nome completo",
+    "phone": "Telefone",
+    "phonePlaceholder": "(00) 00000-0000",
+    "email": "E-mail",
+    "emailPlaceholder": "nome@exemplo.com",
+    "access": "Defina os acessos desse convite",
+    "submitting": "Enviando",
+    "submit": "Enviar convite"
+  },
+  "selectorPlaceholder": "Selecione um grupo",
+  "addPerson": "Adicionar pessoa",
+  "groupSummary": "Tipo: {{type}} • Seu papel: {{role}}",
+  "noAdminPermission": "Sem permissão de administração neste grupo",
+  "memberOnlyDescription": "Você faz parte deste grupo como membro. Apenas o proprietário pode convidar pessoas, remover membros e alterar acessos.",
+  "pendingCount_one": "{{count}} convite pendente",
+  "pendingCount_other": "{{count}} convites pendentes",
+  "memberCount_one": "{{count}} membro",
+  "memberCount_other": "{{count}} membros",
+  "noPendingInvites": "Nenhum convite pendente no momento.",
+  "noMembersInGroup": "Nenhum membro foi encontrado neste grupo.",
+  "removeDialog": {
+    "title": "Remover membro",
+    "description": "Tem certeza que deseja remover {{name}} do grupo? Essa pessoa perderá o acesso às despesas e rendimentos compartilhados.",
+    "cancel": "Cancelar",
+    "confirm": "Remover"
+  },
   "members": "Membros",
   "inviteMember": "Convidar Membro",
   "pendingInvites": "Convites Pendentes",
@@ -10,9 +61,13 @@
   "noMembers": "Nenhum membro encontrado.",
   "access": {
     "expenses": "Despesas",
+    "expensesDescription": "Permite visualizar e gerenciar despesas.",
     "income": "Rendimentos",
+    "incomeDescription": "Permite visualizar e gerenciar rendimentos.",
     "installments": "Compras a Prazo",
-    "advisor": "Consultor IA"
+    "installmentsDescription": "Permite acompanhar e editar parcelas.",
+    "advisor": "Consultor IA",
+    "advisorDescription": "Permite usar os recursos de consultoria financeira."
   },
   "roles": {
     "owner": "Proprietário",
@@ -26,6 +81,16 @@
     "joined": "Bem-vindo ao grupo!",
     "joinError": "Erro ao entrar no grupo.",
     "removed": "Membro removido com sucesso.",
-    "removeError": "Erro ao remover membro."
+    "removeError": "Erro ao remover membro.",
+    "memberAccessUpdated": "Acesso do membro atualizado.",
+    "inviteAccessUpdated": "Acesso do convite atualizado.",
+    "inviteRevoked": "Convite para {{email}} revogado.",
+    "genericError": "Não foi possível concluir a operação. Tente novamente."
+  },
+  "validation": {
+    "nameRequired": "O nome é obrigatório.",
+    "emailInvalid": "Informe um e-mail válido.",
+    "phoneInvalid": "O telefone deve estar no formato (99) 99999-9999.",
+    "groupNameRequired": "O nome do grupo é obrigatório."
   }
 }

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -38,26 +38,34 @@ import {
 } from '@/hooks/useInstallments';
 import { toast } from 'sonner';
 
-const createSchema = z.object({
-  description: z.string().min(1, 'Descrição obrigatória'),
-  total_amount: z.coerce.number().positive('Valor deve ser maior que zero'),
-  total_installments: z.coerce.number().int().min(2, 'Mínimo 2 parcelas'),
-  first_installment_date: z.string().min(1, 'Data da 1ª parcela obrigatória'),
-  category_id: z.string().optional().nullable(),
-});
+interface ValidationMessages {
+  descriptionRequired: string;
+  amountPositive: string;
+  minimumTwo: string;
+  minimumOne: string;
+  firstDateRequired: string;
+}
 
-const editSchema = z.object({
-  description: z.string().min(1, 'Descrição obrigatória'),
-  category_id: z.string().optional().nullable(),
-  installment_amount: z.coerce
-    .number()
-    .positive('Valor deve ser maior que zero'),
-  total_installments: z.coerce.number().int().min(1, 'Mínimo 1 parcela'),
-  status: z.enum(['active', 'completed', 'cancelled']),
-});
+const buildCreateSchema = (messages: ValidationMessages) =>
+  z.object({
+    description: z.string().min(1, messages.descriptionRequired),
+    total_amount: z.coerce.number().positive(messages.amountPositive),
+    total_installments: z.coerce.number().int().min(2, messages.minimumTwo),
+    first_installment_date: z.string().min(1, messages.firstDateRequired),
+    category_id: z.string().optional().nullable(),
+  });
 
-type CreateValues = z.infer<typeof createSchema>;
-type EditValues = z.infer<typeof editSchema>;
+const buildEditSchema = (messages: ValidationMessages) =>
+  z.object({
+    description: z.string().min(1, messages.descriptionRequired),
+    category_id: z.string().optional().nullable(),
+    installment_amount: z.coerce.number().positive(messages.amountPositive),
+    total_installments: z.coerce.number().int().min(1, messages.minimumOne),
+    status: z.enum(['active', 'completed', 'cancelled']),
+  });
+
+type CreateValues = z.infer<ReturnType<typeof buildCreateSchema>>;
+type EditValues = z.infer<ReturnType<typeof buildEditSchema>>;
 
 interface InstallmentFormCreateProps {
   open: boolean;
@@ -86,10 +94,28 @@ export function InstallmentForm({
   mode = 'create',
   installment,
 }: InstallmentFormProps) {
-  const { t } = useTranslation(['installments', 'common']);
+  const { t, i18n } = useTranslation(['installments', 'common']);
   const { activeWorkspaceId } = useWorkspace();
   const { data: categories = [] } = useCategories(activeWorkspaceId);
   const isEdit = mode === 'edit';
+  const validationMessages = useMemo<ValidationMessages>(
+    () => ({
+      descriptionRequired: t('validation.descriptionRequired'),
+      amountPositive: t('validation.amountPositive'),
+      minimumTwo: t('validation.minimumTwo'),
+      minimumOne: t('validation.minimumOne'),
+      firstDateRequired: t('validation.firstDateRequired'),
+    }),
+    [t]
+  );
+  const createSchema = useMemo(
+    () => buildCreateSchema(validationMessages),
+    [validationMessages]
+  );
+  const editSchema = useMemo(
+    () => buildEditSchema(validationMessages),
+    [validationMessages]
+  );
 
   const createForm = useForm<CreateValues>({
     resolver: zodResolver(createSchema),
@@ -137,7 +163,7 @@ export function InstallmentForm({
   const expenseCategories = categories.filter((c) => c.type === 'despesa');
 
   const formatBRL = (v: number) =>
-    new Intl.NumberFormat('pt-BR', {
+    new Intl.NumberFormat(i18n.resolvedLanguage === 'en' ? 'en-US' : 'pt-BR', {
       style: 'currency',
       currency: 'BRL',
     }).format(v);
@@ -155,7 +181,8 @@ export function InstallmentForm({
       });
       createForm.reset();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('toast.saveError'));
+      console.error('Installment creation failed', err);
+      toast.error(t('toast.saveError'));
     }
   };
 
@@ -170,7 +197,8 @@ export function InstallmentForm({
       });
       onOpenChange(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('toast.saveError'));
+      console.error('Installment update failed', err);
+      toast.error(t('toast.saveError'));
     }
   };
 

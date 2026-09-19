@@ -24,6 +24,11 @@
     "saving": "Salvando...",
     "create": "Criar"
   },
+  "validation": {
+    "descriptionRequired": "A descrição é obrigatória.",
+    "amountPositive": "O valor deve ser maior que zero.",
+    "startDateRequired": "A data de início é obrigatória."
+  },
   "table": {
     "empty": "Nenhuma despesa recorrente",
     "emptyHint": "Adicione uma recorrência para começar.",

@@ -53,6 +53,12 @@ const KEYWORDS_POSITIVE = [
   'patrimônio',
   'investimento',
   'rentabilidade',
+  'surplus',
+  'positive',
+  'excellent',
+  'emergency fund',
+  'investment',
+  'return',
 ];
 
 const KEYWORDS_WARNING = [
@@ -72,6 +78,16 @@ const KEYWORDS_WARNING = [
   'comprometida',
   'excesso',
   'excessivo',
+  'deficit',
+  'negative',
+  'attention',
+  'warning',
+  'reduce',
+  'eliminate',
+  'cut',
+  'debt',
+  'indebtedness',
+  'excessive',
 ];
 
 function highlightKeywords(text: string): string {
@@ -180,7 +196,7 @@ function QuotaExceededAlert({ retrySeconds }: { retrySeconds: number | null }) {
   const [countdown, setCountdown] = useState(initialSeconds);
   const availableAt = new Date(
     Date.now() + initialSeconds * 1000
-  ).toLocaleTimeString(i18n.language === 'en' ? 'en-US' : 'pt-BR', {
+  ).toLocaleTimeString(i18n.resolvedLanguage === 'en' ? 'en-US' : 'pt-BR', {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -227,13 +243,13 @@ function parseAnalysisSections(analysis: string): {
   investimento: string;
 } {
   const section1Match = analysis.match(
-    /##\s*1\.\s*Diagnóstico do Período([\s\S]*?)(?=##\s*2\.|$)/i
+    /##\s*1\.\s*(?:Diagnóstico do Período|Period Diagnosis)([\s\S]*?)(?=##\s*2\.|$)/i
   );
   const section2Match = analysis.match(
-    /##\s*2\.\s*Alertas e Sugestões de Corte([\s\S]*?)(?=##\s*3\.|$)/i
+    /##\s*2\.\s*(?:Alertas e Sugestões de Corte|Alerts and Cut Suggestions)([\s\S]*?)(?=##\s*3\.|$)/i
   );
   const section3Match = analysis.match(
-    /##\s*3\.\s*Recomendação de Investimento([\s\S]*?)$/i
+    /##\s*3\.\s*(?:Recomendação de Investimento|Investment Recommendation)([\s\S]*?)$/i
   );
 
   return {

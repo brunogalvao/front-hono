@@ -16,8 +16,10 @@ import {
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { useWorkspaces } from '@/hooks/useWorkspaces';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export function WorkspaceSwitcher() {
+  const { t } = useTranslation('nav');
   const { isMobile } = useSidebar();
   const { activeWorkspace, workspaces, switchWorkspace } = useWorkspace();
   useWorkspaces(); // loads workspaces into context
@@ -37,9 +39,13 @@ export function WorkspaceSwitcher() {
                 {activeWorkspace.name.charAt(0).toUpperCase()}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{activeWorkspace.name}</span>
+                <span className="truncate font-semibold">
+                  {activeWorkspace.name}
+                </span>
                 <span className="text-muted-foreground truncate text-xs capitalize">
-                  {activeWorkspace.role}
+                  {t(`roles.${activeWorkspace.role}`, {
+                    defaultValue: activeWorkspace.role,
+                  })}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
@@ -52,7 +58,7 @@ export function WorkspaceSwitcher() {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Workspaces
+              {t('workspaces')}
             </DropdownMenuLabel>
             {workspaces.map((ws) => (
               <DropdownMenuItem
@@ -60,14 +66,17 @@ export function WorkspaceSwitcher() {
                 onClick={() => switchWorkspace(ws.id)}
                 className={cn(
                   'gap-2 p-2',
-                  ws.id === activeWorkspace.id && 'bg-accent text-accent-foreground',
+                  ws.id === activeWorkspace.id &&
+                    'bg-accent text-accent-foreground'
                 )}
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border text-xs font-bold">
                   {ws.name.charAt(0).toUpperCase()}
                 </div>
                 <span className="flex-1 truncate">{ws.name}</span>
-                <span className="text-muted-foreground text-xs capitalize">{ws.role}</span>
+                <span className="text-muted-foreground text-xs capitalize">
+                  {t(`roles.${ws.role}`, { defaultValue: ws.role })}
+                </span>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
@@ -75,7 +84,9 @@ export function WorkspaceSwitcher() {
               <div className="bg-background flex size-6 items-center justify-center rounded-md border">
                 <Plus className="size-4" />
               </div>
-              <div className="text-muted-foreground font-medium">Novo workspace</div>
+              <div className="text-muted-foreground font-medium">
+                {t('newWorkspace')}
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

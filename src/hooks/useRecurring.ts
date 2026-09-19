@@ -5,7 +5,9 @@ import type { RecurringExpense, RecurringInput } from '@/model/recurring.model';
 
 export type { RecurringExpense, RecurringInput };
 
-async function fetchRecurring(workspaceId: string): Promise<RecurringExpense[]> {
+async function fetchRecurring(
+  workspaceId: string
+): Promise<RecurringExpense[]> {
   const { data, error } = await supabase
     .from('recurring_expenses')
     .select('*, categories(id, name, icon)')
@@ -28,7 +30,9 @@ export function useRecurring(workspaceId: string | null) {
 
   const create = useMutation({
     mutationFn: async (input: RecurringInput) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       const { data, error } = await supabase
         .from('recurring_expenses')
         .insert({ ...input, created_by: user!.id })
@@ -48,7 +52,13 @@ export function useRecurring(workspaceId: string | null) {
   });
 
   const toggleActive = useMutation({
-    mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
+    mutationFn: async ({
+      id,
+      is_active,
+    }: {
+      id: string;
+      is_active: boolean;
+    }) => {
       const { error } = await supabase
         .from('recurring_expenses')
         .update({ is_active, updated_at: new Date().toISOString() })
@@ -59,14 +69,19 @@ export function useRecurring(workspaceId: string | null) {
   });
 
   const update = useMutation({
-    mutationFn: async ({ id, ...input }: Partial<RecurringInput> & { id: string }) => {
+    mutationFn: async ({
+      id,
+      ...input
+    }: Partial<RecurringInput> & { id: string }) => {
       const { data, error } = await supabase
         .from('recurring_expenses')
         .update({ ...input, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select();
       if (error) throw error;
-      if (!data || data.length === 0) throw new Error('Recorrência não encontrada ou sem permissão para editar.');
+      if (!data || data.length === 0) {
+        throw new Error('RECURRING_NOT_FOUND');
+      }
 
       // Propaga description para todas as transações vinculadas (renomear é cosmético)
       if (input.description !== undefined) {
@@ -80,7 +95,8 @@ export function useRecurring(workspaceId: string | null) {
       const today = new Date().toISOString().split('T')[0];
       const futureFields: Record<string, unknown> = {};
       if (input.amount !== undefined) futureFields.amount = input.amount;
-      if (input.category_id !== undefined) futureFields.category_id = input.category_id;
+      if (input.category_id !== undefined)
+        futureFields.category_id = input.category_id;
       if (Object.keys(futureFields).length > 0) {
         await supabase
           .from('transactions')
@@ -99,7 +115,10 @@ export function useRecurring(workspaceId: string | null) {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('recurring_expenses').delete().eq('id', id);
+      const { error } = await supabase
+        .from('recurring_expenses')
+        .delete()
+        .eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qKey }),

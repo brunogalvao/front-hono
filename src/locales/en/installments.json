@@ -40,6 +40,13 @@
     "saving": "Saving...",
     "create": "Create"
   },
+  "validation": {
+    "descriptionRequired": "The description is required.",
+    "amountPositive": "The amount must be greater than zero.",
+    "minimumTwo": "Enter at least 2 installments.",
+    "minimumOne": "Enter at least 1 installment.",
+    "firstDateRequired": "The first installment date is required."
+  },
   "payoff": {
     "title": "Pay off installment early?",
     "descOne": "<bold>{{count}}</bold> pending installment will be paid off — {{amount}} total.",

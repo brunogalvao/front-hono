@@ -3,6 +3,8 @@
   "name": "Name",
   "phone": "Phone",
   "avatar": "Avatar",
+  "userFallback": "User",
+  "email": "Email",
   "save": "Save changes",
   "changePhotoTooltip": "Change photo",
   "imageSelected": "New photo selected — save to apply.",

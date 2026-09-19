@@ -38,6 +38,32 @@ const Dashboard = () => {
   );
 
   const subtitulo = `${getNomeMes(getCurrentMonth())} ${getCurrentYear()}`;
+  const percentualGasto = iaData?.data?.percentualGasto ?? 0;
+  const savingTipKeys =
+    percentualGasto < 50
+      ? ([
+          'tips.excellent.control',
+          'tips.excellent.investments',
+          'tips.excellent.emergencyFund',
+        ] as const)
+      : percentualGasto < 70
+        ? ([
+            'tips.good.control',
+            'tips.good.review',
+            'tips.good.goals',
+          ] as const)
+        : percentualGasto < 90
+          ? ([
+              'tips.attention.control',
+              'tips.attention.cut',
+              'tips.attention.budget',
+            ] as const)
+          : ([
+              'tips.critical.control',
+              'tips.critical.cut',
+              'tips.critical.income',
+              'tips.critical.debt',
+            ] as const);
 
   return (
     <div className="space-y-6">
@@ -57,12 +83,12 @@ const Dashboard = () => {
       {activeWorkspaceId && (
         <div className="grid gap-4 md:grid-cols-3">
           <SummaryCard
-            title="Workspace"
+            title={t('workspaceSummary')}
             summary={workspaceSummary.data}
             isLoading={workspaceSummary.isLoading}
           />
           <SummaryCard
-            title="Meus gastos"
+            title={t('personalSummary')}
             summary={individualSummary.data}
             isLoading={individualSummary.isLoading}
           />
@@ -83,8 +109,7 @@ const Dashboard = () => {
       {shouldShowSkeleton ? (
         <TipsSkeleton />
       ) : (
-        iaData?.data?.dicasEconomia &&
-        iaData.data.dicasEconomia.length > 0 && (
+        iaData?.data && (
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center justify-between gap-2 text-lg">
@@ -96,10 +121,10 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="flex flex-col gap-y-6">
               <ul className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                {iaData.data.dicasEconomia.map((dica, index) => (
-                  <li key={index} className="flex items-start gap-2">
+                {savingTipKeys.map((key) => (
+                  <li key={key} className="flex items-start gap-2">
                     <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-500" />
-                    <span className="text-sm">{dica}</span>
+                    <span className="text-sm">{t(key)}</span>
                   </li>
                 ))}
               </ul>
@@ -109,7 +134,7 @@ const Dashboard = () => {
                     <Sparkles />
                     {t('advisorCta')}
                   </div>
-                  <div className="text-sm font-light text-muted-foreground group-hover:text-white">
+                  <div className="text-muted-foreground text-sm font-light group-hover:text-white">
                     {t('advisorDescription')}
                   </div>
                 </div>
@@ -121,13 +146,18 @@ const Dashboard = () => {
 
       {/* Análise da IA */}
       {shouldShowSkeleton ? (
-        <div className={`grid grid-cols-1 gap-4 ${!activeWorkspaceId ? 'md:grid-cols-[30%_40%_30%]' : 'md:grid-cols-2'}`}>
+        <div
+          className={`grid grid-cols-1 gap-4 ${!activeWorkspaceId ? 'md:grid-cols-[30%_40%_30%]' : 'md:grid-cols-2'}`}
+        >
           <StatusSkeleton />
           <SummarySkeleton />
           {!activeWorkspaceId && <DollarConversionSkeleton />}
         </div>
       ) : iaData?.data ? (
-        <IARecommendations data={iaData.data} showDollarCard={!activeWorkspaceId} />
+        <IARecommendations
+          data={iaData.data}
+          showDollarCard={!activeWorkspaceId}
+        />
       ) : null}
     </div>
   );

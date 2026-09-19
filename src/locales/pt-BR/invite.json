@@ -38,6 +38,9 @@
     "resend": "Reenviar",
     "cancel": "Cancelar convite"
   },
+  "validation": {
+    "emailInvalid": "Informe um e-mail válido."
+  },
   "mutation": {
     "sent": "Convite enviado com segurança.",
     "delivery_failed": "Não foi possível entregar o convite. Tente reenviar.",

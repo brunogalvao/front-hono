@@ -18,6 +18,7 @@
     "confirm": "Sim, excluir minha conta",
     "deleting": "Excluindo..."
   },
+  "blockedByWorkspace": "Você administra o workspace \"{{workspace}}\", que possui outros membros. Transfira a titularidade antes de excluir sua conta.",
   "toast": {
     "exported": "Dados exportados com sucesso.",
     "exportError": "Erro ao exportar dados.",

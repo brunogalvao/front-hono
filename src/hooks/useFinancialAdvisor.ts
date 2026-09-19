@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import i18n from '@/lib/i18n';
 
 const ADVISOR_INACTIVITY_TIMEOUT_MS = 45_000;
 
@@ -71,7 +72,10 @@ export function useFinancialAdvisor(): FinancialAdvisorState {
               apikey: supabaseAnonKey,
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ period }),
+            body: JSON.stringify({
+              period,
+              locale: i18n.resolvedLanguage === 'en' ? 'en' : 'pt-BR',
+            }),
             signal: controller.signal,
           }
         );

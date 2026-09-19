@@ -1,6 +1,72 @@
 {
   "title": "Overview",
+  "workspaceSummary": "Workspace",
+  "personalSummary": "My expenses",
+  "summary": {
+    "income": "Income",
+    "expenses": "Expenses",
+    "balance": "Balance"
+  },
+  "chart": {
+    "title": "Financial Overview {{year}}",
+    "income": "Income",
+    "expenses": "Expenses",
+    "pending": "Pending",
+    "recurring": "Recurring",
+    "available": "Available"
+  },
+  "financialStatus": {
+    "title": "Financial Status",
+    "spent": "Spent",
+    "available": "Available",
+    "result": "Result",
+    "usdEquivalent": "Equivalent in US dollars (USD)",
+    "monthlySummary": "Monthly Summary",
+    "totalIncome": "Total Income",
+    "completedExpenses": "Completed Expenses",
+    "pending": "pending",
+    "remaining": "Remaining This Month",
+    "excellent": "Excellent",
+    "excellentMessage": "Your financial control is excellent! Keep it up.",
+    "good": "Good",
+    "goodMessage": "Your finances are under control, with some room for improvement.",
+    "attention": "Attention",
+    "attentionMessage": "Attention: you are spending a large portion of your income.",
+    "critical": "Critical",
+    "criticalMessage": "ALERT: Your financial situation is critical!"
+  },
+  "dollar": {
+    "title": "US Dollar Conversion",
+    "unavailable": "API unavailable",
+    "unavailableHint": "Please try again in a few moments.",
+    "currentRate": "Current rate:",
+    "availableAmount": "Available amount:",
+    "conversionHint": "You can convert {{usd}} using the available amount of {{available}} at an exchange rate of {{rate}}."
+  },
   "savingTips": "Saving Tips",
+  "tips": {
+    "excellent": {
+      "control": "Excellent financial control! Keep it up.",
+      "investments": "Consider increasing your investments.",
+      "emergencyFund": "Maintain an emergency fund."
+    },
+    "good": {
+      "control": "Your finances are under control, with some room for improvement.",
+      "review": "Review unnecessary expenses.",
+      "goals": "Set monthly savings goals."
+    },
+    "attention": {
+      "control": "Attention: you are spending a large portion of your income.",
+      "cut": "Cut non-essential expenses urgently.",
+      "budget": "Create a detailed budget."
+    },
+    "critical": {
+      "control": "ALERT: Your financial situation is critical!",
+      "cut": "Cut all non-essential expenses.",
+      "income": "Look for additional sources of income.",
+      "debt": "Consider renegotiating your debts."
+    }
+  },
   "advisorCta": "AI Advisor",
   "advisorDescription": "Access the AI Advisor to receive personalized saving tips."
 }

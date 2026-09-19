@@ -25,8 +25,10 @@ import { AnimatedThemeToggle } from '@/components/theme-toggle-animated';
 import { AnimatedLanguageToggle } from '@/components/language-toggle-animated';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useWorkspace } from '@/context/WorkspaceContext';
+import { useTranslation } from 'react-i18next';
 
 export function SidebarUser() {
+  const { t } = useTranslation('nav');
   const [fetchedProfile, setFetchedProfile] = useState<UserProfile | null>(
     null
   );
@@ -143,7 +145,7 @@ export function SidebarUser() {
                 }
               >
                 <Bell className="size-4" />
-                <span>Notificações</span>
+                <span>{t('notifications')}</span>
                 {notifCount > 0 && (
                   <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                     {notifCount > 9 ? '9+' : notifCount}
@@ -174,7 +176,7 @@ export function SidebarUser() {
               className="text-red-500 focus:text-red-500"
             >
               <LogOut className="size-4" />
-              <span>Sair</span>
+              <span>{t('logout')}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

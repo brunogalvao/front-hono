@@ -61,6 +61,11 @@
   },
   "previousYear": "Previous year",
   "nextYear": "Next year",
+  "sidebar": {
+    "title": "Sidebar",
+    "description": "Displays the mobile sidebar.",
+    "toggle": "Toggle sidebar"
+  },
   "errors": {
     "unauthenticated": "User not authenticated.",
     "generic": "An error occurred. Please try again.",

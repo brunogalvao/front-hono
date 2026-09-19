@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
 import type { AppUser, AppUserProfile } from '@/model/user.model';
 import type { WorkspaceRole } from '@/model/workspace.model';
+import i18n from '@/lib/i18n';
 
 export type { AppUser };
 
@@ -60,7 +61,10 @@ async function fetchAllAppUsers(
     .sort((a, b) => {
       const aLabel = a.profile.full_name ?? a.profile.email;
       const bLabel = b.profile.full_name ?? b.profile.email;
-      return aLabel.localeCompare(bLabel, 'pt-BR');
+      return aLabel.localeCompare(
+        bLabel,
+        i18n.resolvedLanguage === 'en' ? 'en-US' : 'pt-BR'
+      );
     });
 
   return { users, total: count ?? 0 };

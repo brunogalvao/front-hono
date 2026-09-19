@@ -8,7 +8,7 @@ export const formatToBRL = (value: number | string): string => {
   const number = typeof value === 'string' ? Number(value) : value;
   if (isNaN(number)) return i18n.t('common:currency.invalidValue');
 
-  const locale = i18n.language === 'en' ? 'en-US' : 'pt-BR';
+  const locale = i18n.resolvedLanguage === 'en' ? 'en-US' : 'pt-BR';
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: 'BRL',
@@ -31,6 +31,6 @@ export const formatNumber = (value: number | string): string => {
   const number = typeof value === 'string' ? Number(value) : value;
   if (isNaN(number)) return i18n.t('common:currency.invalidValue');
 
-  const locale = i18n.language === 'en' ? 'en-US' : 'pt-BR';
+  const locale = i18n.resolvedLanguage === 'en' ? 'en-US' : 'pt-BR';
   return new Intl.NumberFormat(locale).format(number);
 };

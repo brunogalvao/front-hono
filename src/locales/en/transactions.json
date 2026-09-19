@@ -33,6 +33,10 @@
     "saving": "Saving...",
     "create": "Create"
   },
+  "validation": {
+    "amountPositive": "The amount must be greater than zero.",
+    "dateRequired": "The date is required."
+  },
   "table": {
     "filterByCategory": "Filter by category",
     "allCategories": "All categories",

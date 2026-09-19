@@ -33,6 +33,10 @@
     "saving": "Salvando...",
     "create": "Criar"
   },
+  "validation": {
+    "amountPositive": "O valor deve ser maior que zero.",
+    "dateRequired": "A data é obrigatória."
+  },
   "table": {
     "filterByCategory": "Filtrar por categoria",
     "allCategories": "Todas as categorias",

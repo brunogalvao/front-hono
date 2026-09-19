@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { z } from 'zod';
@@ -47,13 +47,14 @@ import { queryKeys } from '@/lib/query-keys';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { toast } from 'sonner';
 
-const schema = z.object({
-  name: z.string().min(1, 'Nome obrigatório').max(50),
-  type: z.enum(['receita', 'despesa'] as const),
-  icon: z.string().nullable().optional(),
-});
+const buildSchema = (nameRequired: string) =>
+  z.object({
+    name: z.string().min(1, nameRequired).max(50),
+    type: z.enum(['receita', 'despesa'] as const),
+    icon: z.string().nullable().optional(),
+  });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 export function CategoryManager() {
   const { t } = useTranslation(['workspace', 'common']);
@@ -61,6 +62,10 @@ export function CategoryManager() {
   const { data: categories = [] } = useCategories(activeWorkspaceId);
   const queryClient = useQueryClient();
   const qKey = queryKeys.categories.list(activeWorkspaceId ?? '');
+  const schema = useMemo(
+    () => buildSchema(t('category.validation.nameRequired')),
+    [t]
+  );
 
   const [formOpen, setFormOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Category | null>(null);
@@ -131,9 +136,8 @@ export function CategoryManager() {
       }
       setFormOpen(false);
     } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : t('category.toast.saveError')
-      );
+      console.error('Category save failed', err);
+      toast.error(t('category.toast.saveError'));
     }
   };
 

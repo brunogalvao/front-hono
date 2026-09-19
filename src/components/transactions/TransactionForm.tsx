@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -34,16 +34,20 @@ import { useWorkspace } from '@/context/WorkspaceContext';
 import type { Transaction, TransactionInput } from '@/hooks/useTransactions';
 import { toast } from 'sonner';
 
-const schema = z.object({
-  type: z.enum(['receita', 'despesa']),
-  status: z.enum(['pago', 'pendente', 'recebido']),
-  amount: z.coerce.number().positive('Valor deve ser maior que zero'),
-  date: z.string().min(1, 'Data obrigatória'),
-  category_id: z.string().optional().nullable(),
-  description: z.string().optional().nullable(),
-});
+const createSchema = (messages: {
+  amountPositive: string;
+  dateRequired: string;
+}) =>
+  z.object({
+    type: z.enum(['receita', 'despesa']),
+    status: z.enum(['pago', 'pendente', 'recebido']),
+    amount: z.coerce.number().positive(messages.amountPositive),
+    date: z.string().min(1, messages.dateRequired),
+    category_id: z.string().optional().nullable(),
+    description: z.string().optional().nullable(),
+  });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof createSchema>>;
 
 interface TransactionFormProps {
   open: boolean;
@@ -64,6 +68,14 @@ export function TransactionForm({
   const { activeWorkspaceId } = useWorkspace();
   const { data: categories = [] } = useCategories(activeWorkspaceId);
   const [submitting, setSubmitting] = useState(false);
+  const schema = useMemo(
+    () =>
+      createSchema({
+        amountPositive: t('validation.amountPositive'),
+        dateRequired: t('validation.dateRequired'),
+      }),
+    [t]
+  );
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -129,7 +141,8 @@ export function TransactionForm({
       );
       onOpenChange(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('toast.saveError'));
+      console.error('Transaction save failed', err);
+      toast.error(t('toast.saveError'));
     } finally {
       setSubmitting(false);
     }

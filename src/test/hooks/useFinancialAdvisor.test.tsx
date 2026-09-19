@@ -2,6 +2,7 @@ import React from 'react';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import i18n from '@/lib/i18n';
 
 const { mockGetSession } = vi.hoisted(() => ({
   mockGetSession: vi.fn(),
@@ -23,15 +24,35 @@ function makeWrapper() {
 }
 
 describe('useFinancialAdvisor', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.restoreAllMocks();
+    await i18n.changeLanguage('pt-BR');
     mockGetSession.mockResolvedValue({
       data: { session: { access_token: 'user-token' } },
       error: null,
     });
   });
 
-  it('envia somente o período e atualiza a análise durante o streaming', async () => {
+  it('envia inglês quando esse é o idioma ativo', async () => {
+    await i18n.changeLanguage('en');
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('ok')));
+
+    const { result } = renderHook(() => useFinancialAdvisor(), {
+      wrapper: makeWrapper(),
+    });
+
+    act(() => result.current.analyzeFinances({ month: 9, year: 2026 }));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    const fetchMock = vi.mocked(fetch);
+    const request = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    expect(JSON.parse(String(request.body))).toEqual({
+      period: { month: 9, year: 2026 },
+      locale: 'en',
+    });
+  });
+
+  it('envia o período e o idioma e atualiza a análise durante o streaming', async () => {
     const encoder = new TextEncoder();
     const response = new Response(
       new ReadableStream({
@@ -58,6 +79,7 @@ describe('useFinancialAdvisor', () => {
     const request = fetchMock.mock.calls[0]?.[1] as RequestInit;
     expect(JSON.parse(String(request.body))).toEqual({
       period: { month: 9, year: 2026 },
+      locale: 'pt-BR',
     });
     expect(request.signal).toBeInstanceOf(AbortSignal);
   });

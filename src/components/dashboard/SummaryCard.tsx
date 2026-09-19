@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { DashboardSummary } from '@/hooks/useDashboard';
 import { cn } from '@/lib/utils';
+import { formatToBRL } from '@/utils/format';
+import { useTranslation } from 'react-i18next';
 
 interface SummaryCardProps {
   title: string;
@@ -10,16 +12,18 @@ interface SummaryCardProps {
   isLoading?: boolean;
 }
 
-const formatBRL = (v: number) =>
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
-
 export function SummaryCard({ title, summary, isLoading }: SummaryCardProps) {
+  const { t } = useTranslation('dashboard');
   if (isLoading || !summary) {
     return (
       <Card>
-        <CardHeader><CardTitle className="text-base">{title}</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-base">{title}</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-3">
-          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-8 w-full" />
+          ))}
         </CardContent>
       </Card>
     );
@@ -34,28 +38,37 @@ export function SummaryCard({ title, summary, isLoading }: SummaryCardProps) {
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
             <TrendingUp className="h-4 w-4 text-green-500" />
-            Receitas
+            {t('summary.income')}
           </div>
-          <span className="font-semibold text-green-600">{formatBRL(total_receitas)}</span>
+          <span className="font-semibold text-green-600">
+            {formatToBRL(total_receitas)}
+          </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
             <TrendingDown className="h-4 w-4 text-red-500" />
-            Despesas
+            {t('summary.expenses')}
           </div>
-          <span className="font-semibold text-red-500">{formatBRL(total_despesas)}</span>
+          <span className="font-semibold text-red-500">
+            {formatToBRL(total_despesas)}
+          </span>
         </div>
 
-        <div className="border-t pt-3 flex items-center justify-between">
+        <div className="flex items-center justify-between border-t pt-3">
           <div className="flex items-center gap-2 text-sm font-medium">
             <Wallet className="h-4 w-4" />
-            Saldo
+            {t('summary.balance')}
           </div>
-          <span className={cn('font-bold text-lg tabular-nums', saldo >= 0 ? 'text-green-600' : 'text-red-500')}>
-            {formatBRL(saldo)}
+          <span
+            className={cn(
+              'text-lg font-bold tabular-nums',
+              saldo >= 0 ? 'text-green-600' : 'text-red-500'
+            )}
+          >
+            {formatToBRL(saldo)}
           </span>
         </div>
       </CardContent>

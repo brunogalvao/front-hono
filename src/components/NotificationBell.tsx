@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatToBRL } from '@/utils/format';
 import { getNomeMes } from '@/model/mes.enum';
+import { useTranslation } from 'react-i18next';
 
 const MAX_VISIBLE_ITEMS = 6;
 
@@ -23,6 +24,7 @@ function getTransactionPeriod(transaction: Transaction) {
 }
 
 export function NotificationBell() {
+  const { t } = useTranslation('nav');
   const navigate = useNavigate();
   const { activeWorkspaceId } = useWorkspace();
   const [open, setOpen] = useState(false);
@@ -84,8 +86,8 @@ export function NotificationBell() {
           className="relative rounded-full"
           aria-label={
             count > 0
-              ? `Pendências financeiras: ${count}`
-              : 'Nenhuma pendência financeira'
+              ? t('notificationCenter.ariaWithCount', { count })
+              : t('notificationCenter.ariaEmpty')
           }
         >
           <Bell className={count > 0 ? 'text-amber-500' : undefined} />
@@ -102,7 +104,7 @@ export function NotificationBell() {
 
       <PopoverContent align="end" className="w-80 p-0">
         <div className="flex flex-col gap-1 p-4">
-          <p className="font-semibold">Pendências financeiras</p>
+          <p className="font-semibold">{t('notificationCenter.title')}</p>
           <p className="text-muted-foreground text-xs">
             {getNomeMes(month)} {year}
           </p>
@@ -111,12 +113,12 @@ export function NotificationBell() {
 
         {!activeWorkspaceId ? (
           <p className="text-muted-foreground p-4 text-sm">
-            Selecione um workspace para visualizar as pendências.
+            {t('notificationCenter.selectWorkspace')}
           </p>
         ) : isLoading ? (
           <div
             className="flex flex-col gap-3 p-4"
-            aria-label="Carregando pendências"
+            aria-label={t('notificationCenter.loading')}
           >
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
@@ -124,14 +126,16 @@ export function NotificationBell() {
           </div>
         ) : isError ? (
           <p className="text-destructive p-4 text-sm" role="alert">
-            Não foi possível carregar as pendências.
+            {t('notificationCenter.loadError')}
           </p>
         ) : count === 0 ? (
           <div className="flex flex-col items-center gap-2 p-6 text-center">
             <CalendarClock className="text-muted-foreground size-5" />
-            <p className="text-sm font-medium">Tudo em dia</p>
+            <p className="text-sm font-medium">
+              {t('notificationCenter.allClear')}
+            </p>
             <p className="text-muted-foreground text-xs">
-              Não há despesas pendentes neste mês.
+              {t('notificationCenter.empty')}
             </p>
           </div>
         ) : (
@@ -147,10 +151,12 @@ export function NotificationBell() {
                   >
                     <span className="flex min-w-0 flex-col items-start">
                       <span className="max-w-44 truncate font-medium">
-                        {transaction.description || 'Despesa sem descrição'}
+                        {transaction.description ||
+                          t('notificationCenter.noDescription')}
                       </span>
                       <span className="text-muted-foreground text-xs">
-                        {transaction.categories?.name || 'Sem categoria'}
+                        {transaction.categories?.name ||
+                          t('notificationCenter.noCategory')}
                       </span>
                     </span>
                     <span className="shrink-0 font-semibold text-amber-600">
@@ -163,7 +169,9 @@ export function NotificationBell() {
             <Separator />
             <div className="flex flex-col gap-2 p-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Total pendente</span>
+                <span className="text-muted-foreground">
+                  {t('notificationCenter.pendingTotal')}
+                </span>
                 <span className="font-semibold">
                   {formatToBRL(totalPendente)}
                 </span>
@@ -174,7 +182,7 @@ export function NotificationBell() {
                 size="sm"
                 onClick={openAllPending}
               >
-                Ver todas as pendências
+                {t('notificationCenter.viewAll')}
               </Button>
             </div>
           </>

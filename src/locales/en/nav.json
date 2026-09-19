@@ -1,12 +1,46 @@
 {
   "dashboard": "Dashboard",
+  "transactions": "Transactions",
+  "recurring": "Recurring expenses",
   "expenses": "Expenses",
   "income": "Income",
   "installments": "Installments",
   "history": "History",
   "advisor": "AI Advisor",
+  "insights": "AI Insights",
   "groups": "Group",
+  "settings": "Settings",
+  "permissions": "Permissions",
+  "members": "Members",
+  "mySpace": "My Space",
   "profile": "Profile",
+  "account": "My Account",
+  "notifications": "Notifications",
+  "notificationCenter": {
+    "ariaWithCount": "Financial pending items: {{count}}",
+    "ariaEmpty": "No financial pending items",
+    "title": "Financial pending items",
+    "selectWorkspace": "Select a workspace to view pending items.",
+    "loading": "Loading pending items",
+    "loadError": "Pending items could not be loaded.",
+    "allClear": "All caught up",
+    "empty": "There are no pending expenses this month.",
+    "noDescription": "Expense without description",
+    "noCategory": "Uncategorized",
+    "pendingTotal": "Pending total",
+    "viewAll": "View all pending items"
+  },
+  "workspaces": "Workspaces",
+  "newWorkspace": "New workspace",
+  "roles": {
+    "owner": "Owner",
+    "administrador": "Administrator",
+    "operador": "Operator",
+    "visualizador": "Viewer",
+    "member": "Member"
+  },
   "logout": "Sign out",
-  "loggingOut": "Signing out"
+  "loggingOut": "Signing out",
+  "sessionExpired": "Your session has expired. Sign in again.",
+  "superAdminOnly": "Access restricted to the super administrator."
 }

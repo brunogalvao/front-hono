@@ -29,7 +29,6 @@ import {
   useUpdateMemberAccess,
 } from '@/hooks/use-groups';
 import { useCurrentUser } from '@/hooks/use-user-profile';
-import { phoneSchema } from '@/model/phone.model';
 import type { GroupAccess } from '@/service/groups/groupAccess';
 import { defaultGroupAccess } from '@/service/groups/groupAccess';
 import type { GroupInvite } from '@/service/groups/getGroupInvites';
@@ -71,62 +70,85 @@ type AccessKey = keyof GroupAccess;
 
 const ACCESS_OPTIONS: Array<{
   key: AccessKey;
-  label: string;
-  description: string;
+  labelKey:
+    | 'access.expenses'
+    | 'access.income'
+    | 'access.installments'
+    | 'access.advisor';
+  descriptionKey:
+    | 'access.expensesDescription'
+    | 'access.incomeDescription'
+    | 'access.installmentsDescription'
+    | 'access.advisorDescription';
   icon: string;
 }> = [
   {
     key: 'access_expenses',
-    label: 'Despesas',
-    description: 'Permite visualizar e gerenciar despesas.',
+    labelKey: 'access.expenses',
+    descriptionKey: 'access.expensesDescription',
     icon: '💸',
   },
   {
     key: 'access_incomes',
-    label: 'Rendimentos',
-    description: 'Permite visualizar e gerenciar rendimentos.',
+    labelKey: 'access.income',
+    descriptionKey: 'access.incomeDescription',
     icon: '💰',
   },
   {
     key: 'access_installments',
-    label: 'Compras a prazo',
-    description: 'Permite acompanhar e editar parcelas.',
+    labelKey: 'access.installments',
+    descriptionKey: 'access.installmentsDescription',
     icon: '🛒',
   },
   {
     key: 'access_advisor',
-    label: 'Consultor IA',
-    description: 'Permite usar os recursos de consultoria financeira.',
+    labelKey: 'access.advisor',
+    descriptionKey: 'access.advisorDescription',
     icon: '🤖',
   },
 ];
 
-const inviteSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório'),
-  email: z.string().email('E-mail inválido'),
-  phone: phoneSchema.optional().or(z.literal('')),
-  access_expenses: z.boolean(),
-  access_incomes: z.boolean(),
-  access_installments: z.boolean(),
-  access_advisor: z.boolean(),
-});
+interface GroupValidationMessages {
+  nameRequired: string;
+  emailInvalid: string;
+  phoneInvalid: string;
+  groupNameRequired: string;
+}
 
-const createGroupSchema = z.object({
-  name: z.string().min(1, 'Nome do grupo é obrigatório'),
-  type: z.enum(['personal', 'shared']),
-});
+const buildInviteSchema = (messages: GroupValidationMessages) =>
+  z.object({
+    name: z.string().min(1, messages.nameRequired),
+    email: z.string().email(messages.emailInvalid),
+    phone: z
+      .string()
+      .regex(/^\(\d{2}\) \d{5}-\d{4}$/, messages.phoneInvalid)
+      .optional()
+      .or(z.literal('')),
+    access_expenses: z.boolean(),
+    access_incomes: z.boolean(),
+    access_installments: z.boolean(),
+    access_advisor: z.boolean(),
+  });
+
+const buildCreateGroupSchema = (messages: GroupValidationMessages) =>
+  z.object({
+    name: z.string().min(1, messages.groupNameRequired),
+    type: z.enum(['personal', 'shared']),
+  });
 
 const SUPER_ADMIN_EMAIL = 'bruno_galvao@outlook.com';
 
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString('pt-BR');
+function formatDate(date: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, { timeZone: 'UTC' }).format(
+    new Date(date)
+  );
 }
 
 function MemberSkeleton() {
   return (
     <Card className="border-border/50">
       <CardContent className="flex items-start gap-4 pt-5">
-        <Skeleton className="size-12 rounded-full flex-shrink-0" />
+        <Skeleton className="size-12 flex-shrink-0 rounded-full" />
         <div className="flex-1 space-y-3">
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-3 w-48" />
@@ -154,6 +176,7 @@ function AccessManager({
   busyKey = null,
   onToggle,
 }: AccessManagerProps) {
+  const { t } = useTranslation('groups');
   return (
     <div className="grid gap-2 md:grid-cols-2">
       {ACCESS_OPTIONS.map((option) => {
@@ -163,18 +186,22 @@ function AccessManager({
         return (
           <div
             key={option.key}
-            className="flex items-center justify-between gap-3 rounded-lg border border-border/60 px-3 py-2"
+            className="border-border/60 flex items-center justify-between gap-3 rounded-lg border px-3 py-2"
           >
             <div className="min-w-0">
               <p className="text-sm font-medium">
                 <span className="mr-1">{option.icon}</span>
-                {option.label}
+                {t(option.labelKey)}
               </p>
-              <p className="text-xs text-muted-foreground">{option.description}</p>
+              <p className="text-muted-foreground text-xs">
+                {t(option.descriptionKey)}
+              </p>
             </div>
 
             <div className="flex items-center gap-2">
-              {isBusy && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
+              {isBusy && (
+                <Loader2 className="text-muted-foreground size-4 animate-spin" />
+              )}
               <Switch
                 checked={checked}
                 disabled={disabled || isBusy || !onToggle}
@@ -205,7 +232,9 @@ function MemberCard({
   onRemove,
   onAccessChange,
 }: MemberCardProps) {
-  const name = member.display_name || member.email?.split('@')[0] || 'Usuário';
+  const { t } = useTranslation('groups');
+  const name =
+    member.display_name || member.email?.split('@')[0] || t('userFallback');
   const initials = getInitials(name);
   const isOwner = member.role === 'owner';
   const access: GroupAccess = {
@@ -220,33 +249,35 @@ function MemberCard({
       <CardContent className="space-y-4 pt-5">
         <div className="flex items-start gap-4">
           <Avatar className="size-12 flex-shrink-0">
-            {member.avatar_url && <AvatarImage src={member.avatar_url} alt={name} />}
-            <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
+            {member.avatar_url && (
+              <AvatarImage src={member.avatar_url} alt={name} />
+            )}
+            <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
               {initials}
             </AvatarFallback>
           </Avatar>
 
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-sm truncate">{name}</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="truncate text-sm font-semibold">{name}</span>
               {isCurrentUser && (
-                <Badge variant="outline" className="text-xs px-1.5 py-0">
-                  você
+                <Badge variant="outline" className="px-1.5 py-0 text-xs">
+                  {t('currentUser')}
                 </Badge>
               )}
               <Badge
-                className={`text-xs px-2 py-0.5 ${
+                className={`px-2 py-0.5 text-xs ${
                   isOwner
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted text-muted-foreground'
                 }`}
               >
-                {isOwner ? 'Owner' : 'Membro'}
+                {isOwner ? t('roles.owner') : t('roles.member')}
               </Badge>
             </div>
 
             {member.email && (
-              <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+              <p className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
                 <Mail className="size-3" />
                 {member.email}
               </p>
@@ -266,15 +297,17 @@ function MemberCard({
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-2 text-xs tracking-wide uppercase">
             <Settings2 className="size-3.5" />
-            Acessos liberados
+            {t('accessReleased')}
           </div>
           <AccessManager
             access={access}
             busyKey={busyKey}
             disabled={!currentUserIsOwner || isCurrentUser || isOwner}
-            onToggle={(key, value) => onAccessChange(member.user_id, key, value)}
+            onToggle={(key, value) =>
+              onAccessChange(member.user_id, key, value)
+            }
           />
         </div>
       </CardContent>
@@ -297,6 +330,8 @@ function InviteCard({
   onAccessChange,
   onRevoke,
 }: InviteCardProps) {
+  const { t, i18n } = useTranslation('groups');
+  const dateLocale = i18n.resolvedLanguage === 'en' ? 'en-US' : 'pt-BR';
   const access: GroupAccess = {
     access_expenses: invite.access_expenses,
     access_incomes: invite.access_incomes,
@@ -309,19 +344,24 @@ function InviteCard({
       <CardContent className="space-y-4 pt-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-sm">{invite.name || invite.email}</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold">
+                {invite.name || invite.email}
+              </span>
               <Badge variant="outline" className="text-xs">
-                Convite pendente
+                {t('pendingInvite')}
               </Badge>
             </div>
-            <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+            <p className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
               <Mail className="size-3" />
               {invite.email}
             </p>
-            <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+            <p className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
               <Clock3 className="size-3" />
-              Enviado em {formatDate(invite.created_at)}. Expira em {formatDate(invite.expires_at)}.
+              {t('inviteDates', {
+                createdAt: formatDate(invite.created_at, dateLocale),
+                expiresAt: formatDate(invite.expires_at, dateLocale),
+              })}
             </p>
           </div>
 
@@ -332,14 +372,18 @@ function InviteCard({
             disabled={isRevoking}
             onClick={() => onRevoke(invite.id, invite.email)}
           >
-            {isRevoking ? <Loader2 className="size-4 animate-spin" /> : 'Revogar'}
+            {isRevoking ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              t('revoke')
+            )}
           </Button>
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-2 text-xs tracking-wide uppercase">
             <Settings2 className="size-3.5" />
-            Acessos quando aceitar o convite
+            {t('inviteAccess')}
           </div>
           <AccessManager
             access={access}
@@ -362,7 +406,21 @@ interface CreateGroupFormProps {
 }
 
 function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
+  const { t } = useTranslation('groups');
   const createGroupMutation = useCreateGroup();
+  const validationMessages = useMemo<GroupValidationMessages>(
+    () => ({
+      nameRequired: t('validation.nameRequired'),
+      emailInvalid: t('validation.emailInvalid'),
+      phoneInvalid: t('validation.phoneInvalid'),
+      groupNameRequired: t('validation.groupNameRequired'),
+    }),
+    [t]
+  );
+  const createGroupSchema = useMemo(
+    () => buildCreateGroupSchema(validationMessages),
+    [validationMessages]
+  );
   const [form, setForm] = useState({
     name: '',
     type: 'shared' as 'personal' | 'shared',
@@ -376,35 +434,40 @@ function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
     }
 
     createGroupMutation.mutate(result.data, {
-        onSuccess: (group) => {
-          toast.success('Grupo criado com sucesso!');
-          setForm({ name: '', type: 'shared' });
-          onSuccess(group.id);
-        },
-      onError: (err: Error) => toast.error(err.message),
+      onSuccess: (group) => {
+        toast.success(t('toast.created'));
+        setForm({ name: '', type: 'shared' });
+        onSuccess(group.id);
+      },
+      onError: (err: Error) => {
+        console.error('Group creation failed', err);
+        toast.error(t('toast.createError'));
+      },
     });
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Criar novo grupo</CardTitle>
+        <CardTitle className="text-base">{t('create.title')}</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="group-name">Nome do grupo</Label>
+            <Label htmlFor="group-name">{t('create.name')}</Label>
             <Input
               id="group-name"
               value={form.name}
-              onChange={(e) => setForm((previous) => ({ ...previous, name: e.target.value }))}
-              placeholder="Ex.: Financeiro da família"
+              onChange={(e) =>
+                setForm((previous) => ({ ...previous, name: e.target.value }))
+              }
+              placeholder={t('create.namePlaceholder')}
             />
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="group-type">Tipo</Label>
+            <Label htmlFor="group-type">{t('create.type')}</Label>
             <Select
               value={form.type}
               onValueChange={(value: 'personal' | 'shared') =>
@@ -412,18 +475,18 @@ function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
               }
             >
               <SelectTrigger id="group-type" className="w-full">
-                <SelectValue placeholder="Selecione o tipo" />
+                <SelectValue placeholder={t('create.typePlaceholder')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="shared">Compartilhado</SelectItem>
-                <SelectItem value="personal">Pessoal</SelectItem>
+                <SelectItem value="shared">{t('create.shared')}</SelectItem>
+                <SelectItem value="personal">{t('create.personal')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
 
-        <p className="text-sm text-muted-foreground">
-          Grupos compartilhados permitem convidar pessoas e definir os acessos de cada membro.
+        <p className="text-muted-foreground text-sm">
+          {t('create.description')}
         </p>
       </CardContent>
 
@@ -432,10 +495,10 @@ function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
           {createGroupMutation.isPending ? (
             <>
               <Loader2 className="mr-2 size-4 animate-spin" />
-              Criando grupo
+              {t('create.submitting')}
             </>
           ) : (
-            'Criar grupo'
+            t('create.submit')
           )}
         </Button>
       </CardFooter>
@@ -444,7 +507,21 @@ function CreateGroupForm({ onSuccess }: CreateGroupFormProps) {
 }
 
 function InviteForm({ groupId, onSuccess }: InviteFormProps) {
+  const { t } = useTranslation('groups');
   const inviteMutation = useInviteMember(groupId);
+  const validationMessages = useMemo<GroupValidationMessages>(
+    () => ({
+      nameRequired: t('validation.nameRequired'),
+      emailInvalid: t('validation.emailInvalid'),
+      phoneInvalid: t('validation.phoneInvalid'),
+      groupNameRequired: t('validation.groupNameRequired'),
+    }),
+    [t]
+  );
+  const inviteSchema = useMemo(
+    () => buildInviteSchema(validationMessages),
+    [validationMessages]
+  );
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -471,11 +548,14 @@ function InviteForm({ groupId, onSuccess }: InviteFormProps) {
       },
       {
         onSuccess: () => {
-          toast.success('Convite enviado com sucesso!');
+          toast.success(t('toast.invited'));
           setForm({ name: '', email: '', phone: '', ...defaultGroupAccess });
           onSuccess();
         },
-        onError: (err: Error) => toast.error(err.message),
+        onError: (err: Error) => {
+          console.error('Group invitation failed', err);
+          toast.error(t('toast.inviteError'));
+        },
       }
     );
   }
@@ -483,51 +563,58 @@ function InviteForm({ groupId, onSuccess }: InviteFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Convidar novo membro</CardTitle>
+        <CardTitle className="text-base">{t('invite.title')}</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="invite-name">Nome</Label>
+            <Label htmlFor="invite-name">{t('invite.name')}</Label>
             <Input
               id="invite-name"
               value={form.name}
-              onChange={(e) => setForm((previous) => ({ ...previous, name: e.target.value }))}
-              placeholder="Nome completo"
+              onChange={(e) =>
+                setForm((previous) => ({ ...previous, name: e.target.value }))
+              }
+              placeholder={t('invite.namePlaceholder')}
             />
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="invite-phone">Telefone</Label>
+            <Label htmlFor="invite-phone">{t('invite.phone')}</Label>
             <PatternFormat
               id="invite-phone"
               value={form.phone}
               onValueChange={(value) =>
-                setForm((previous) => ({ ...previous, phone: value.formattedValue }))
+                setForm((previous) => ({
+                  ...previous,
+                  phone: value.formattedValue,
+                }))
               }
               format="(##) #####-####"
               mask="_"
               customInput={Input}
-              placeholder="(00) 00000-0000"
+              placeholder={t('invite.phonePlaceholder')}
             />
           </div>
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="invite-email">E-mail</Label>
+          <Label htmlFor="invite-email">{t('invite.email')}</Label>
           <Input
             id="invite-email"
             type="email"
             value={form.email}
-            onChange={(e) => setForm((previous) => ({ ...previous, email: e.target.value }))}
-            placeholder="nome@exemplo.com"
+            onChange={(e) =>
+              setForm((previous) => ({ ...previous, email: e.target.value }))
+            }
+            placeholder={t('invite.emailPlaceholder')}
             onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
           />
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm font-medium">Defina os acessos desse convite</p>
+          <p className="text-sm font-medium">{t('invite.access')}</p>
           <AccessManager
             access={form}
             onToggle={(key, value) =>
@@ -547,12 +634,12 @@ function InviteForm({ groupId, onSuccess }: InviteFormProps) {
             <div className="flex items-center gap-3 px-8">
               {inviteMutation.isPending ? (
                 <>
-                  Enviando
+                  {t('invite.submitting')}
                   <Loader2 className="size-4 animate-spin" />
                 </>
               ) : (
                 <>
-                  Enviar convite
+                  {t('invite.submit')}
                   <SendIcon className="size-4" />
                 </>
               )}
@@ -571,13 +658,20 @@ export default function Groups() {
   const [selectedGroupId, setSelectedGroupId] = useState('');
   const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
   const [showInviteForm, setShowInviteForm] = useState(false);
-  const [removeTarget, setRemoveTarget] = useState<{ id: string; name: string } | null>(null);
-  const [memberBusy, setMemberBusy] = useState<Record<string, AccessKey | null>>({});
-  const [inviteBusy, setInviteBusy] = useState<Record<string, AccessKey | null>>({});
+  const [removeTarget, setRemoveTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [memberBusy, setMemberBusy] = useState<
+    Record<string, AccessKey | null>
+  >({});
+  const [inviteBusy, setInviteBusy] = useState<
+    Record<string, AccessKey | null>
+  >({});
   const [revokingInviteId, setRevokingInviteId] = useState<string | null>(null);
 
   const isSuperAdmin = currentUser?.email === SUPER_ADMIN_EMAIL;
-  const availableGroups = groups ?? [];
+  const availableGroups = useMemo(() => groups ?? [], [groups]);
 
   useEffect(() => {
     if (!availableGroups.length) {
@@ -585,7 +679,9 @@ export default function Groups() {
       return;
     }
 
-    const hasSelected = availableGroups.some((group) => group.id === selectedGroupId);
+    const hasSelected = availableGroups.some(
+      (group) => group.id === selectedGroupId
+    );
     if (hasSelected) return;
 
     const ownerGroup = availableGroups.find((group) => group.role === 'owner');
@@ -599,7 +695,8 @@ export default function Groups() {
   const activeGroupId = activeGroup?.id ?? '';
   const currentUserIsOwner = activeGroup?.role === 'owner';
 
-  const { data: members, isLoading: loadingMembers } = useGroupMembers(activeGroupId);
+  const { data: members, isLoading: loadingMembers } =
+    useGroupMembers(activeGroupId);
   const { data: invites, isLoading: loadingInvites } = useGroupInvites(
     currentUserIsOwner ? activeGroupId : undefined
   );
@@ -623,18 +720,28 @@ export default function Groups() {
         toast.success(t('toast.removed'));
         setRemoveTarget(null);
       },
-      onError: (err: Error) => toast.error(err.message),
+      onError: (err: Error) => {
+        console.error('Group member removal failed', err);
+        toast.error(t('toast.removeError'));
+      },
     });
   }
 
-  function handleMemberAccessChange(userId: string, key: AccessKey, value: boolean) {
+  function handleMemberAccessChange(
+    userId: string,
+    key: AccessKey,
+    value: boolean
+  ) {
     setMemberBusy((previous) => ({ ...previous, [userId]: key }));
 
     updateMemberAccessMutation.mutate(
       { userId, access: { [key]: value } },
       {
-        onSuccess: () => toast.success('Acesso do membro atualizado.'),
-        onError: (err: Error) => toast.error(err.message),
+        onSuccess: () => toast.success(t('toast.memberAccessUpdated')),
+        onError: (err: Error) => {
+          console.error('Group member access update failed', err);
+          toast.error(t('toast.genericError'));
+        },
         onSettled: () => {
           setMemberBusy((previous) => ({ ...previous, [userId]: null }));
         },
@@ -642,14 +749,21 @@ export default function Groups() {
     );
   }
 
-  function handleInviteAccessChange(inviteId: string, key: AccessKey, value: boolean) {
+  function handleInviteAccessChange(
+    inviteId: string,
+    key: AccessKey,
+    value: boolean
+  ) {
     setInviteBusy((previous) => ({ ...previous, [inviteId]: key }));
 
     updateInviteAccessMutation.mutate(
       { inviteId, access: { [key]: value } },
       {
-        onSuccess: () => toast.success('Acesso do convite atualizado.'),
-        onError: (err: Error) => toast.error(err.message),
+        onSuccess: () => toast.success(t('toast.inviteAccessUpdated')),
+        onError: (err: Error) => {
+          console.error('Group invitation access update failed', err);
+          toast.error(t('toast.genericError'));
+        },
         onSettled: () => {
           setInviteBusy((previous) => ({ ...previous, [inviteId]: null }));
         },
@@ -661,15 +775,18 @@ export default function Groups() {
     setRevokingInviteId(inviteId);
 
     revokeInviteMutation.mutate(inviteId, {
-      onSuccess: () => toast.success(`Convite para ${email} foi revogado.`),
-      onError: (err: Error) => toast.error(err.message),
+      onSuccess: () => toast.success(t('toast.inviteRevoked', { email })),
+      onError: (err: Error) => {
+        console.error('Group invitation revoke failed', err);
+        toast.error(t('toast.genericError'));
+      },
       onSettled: () => setRevokingInviteId(null),
     });
   }
 
   if (loadingGroups) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="space-y-4 p-6">
         <Skeleton className="h-7 w-40" />
         <MemberSkeleton />
         <MemberSkeleton />
@@ -680,14 +797,12 @@ export default function Groups() {
   if (!activeGroup) {
     return (
       <div className="mx-auto w-full space-y-6">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="space-y-2">
             <TituloPage titulo={t('title')} />
-            <p className="text-sm text-muted-foreground">
-              {t('subtitle')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
           </div>
-          {isSuperAdmin && <Badge>Super Admin</Badge>}
+          {isSuperAdmin && <Badge>{t('superAdmin')}</Badge>}
         </div>
 
         <CreateGroupForm
@@ -702,26 +817,27 @@ export default function Groups() {
 
   return (
     <div className="mx-auto w-full space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-2">
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex flex-wrap items-center gap-2">
             <TituloPage titulo={t('title')} />
-            {isSuperAdmin && <Badge>Super Admin</Badge>}
+            {isSuperAdmin && <Badge>{t('superAdmin')}</Badge>}
           </div>
-          <p className="text-sm text-muted-foreground">
-            {t('subtitle')}
-          </p>
+          <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex flex-wrap items-center gap-2">
           <Select value={activeGroupId} onValueChange={setSelectedGroupId}>
             <SelectTrigger className="min-w-64">
-              <SelectValue placeholder="Selecione um grupo" />
+              <SelectValue placeholder={t('selectorPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
               {availableGroups.map((group) => (
                 <SelectItem key={group.id} value={group.id}>
-                  {group.name} {group.role === 'owner' ? '• owner' : '• membro'}
+                  {group.name} •{' '}
+                  {group.role === 'owner'
+                    ? t('roles.owner')
+                    : t('roles.member')}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -732,13 +848,17 @@ export default function Groups() {
             onClick={() => setShowCreateGroupForm((previous) => !previous)}
             size="sm"
           >
-            {showCreateGroupForm ? 'Fechar criação' : 'Criar grupo'}
+            {showCreateGroupForm ? t('create.close') : t('create.open')}
           </Button>
 
           {currentUserIsOwner && !showInviteForm && (
-            <Button onClick={() => setShowInviteForm(true)} className="gap-2" size="sm">
+            <Button
+              onClick={() => setShowInviteForm(true)}
+              className="gap-2"
+              size="sm"
+            >
               <UserPlus className="size-4" />
-              Adicionar pessoa
+              {t('addPerson')}
             </Button>
           )}
         </div>
@@ -748,13 +868,18 @@ export default function Groups() {
         <CardContent className="flex flex-col gap-2 py-5 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="font-medium">{activeGroup.name}</p>
-            <p className="text-sm text-muted-foreground">
-              Tipo: {activeGroup.type === 'shared' ? 'Compartilhado' : 'Pessoal'} • Seu papel:{' '}
-              {currentUserIsOwner ? 'Owner' : 'Membro'}
+            <p className="text-muted-foreground text-sm">
+              {t('groupSummary', {
+                type:
+                  activeGroup.type === 'shared'
+                    ? t('create.shared')
+                    : t('create.personal'),
+                role: currentUserIsOwner ? t('roles.owner') : t('roles.member'),
+              })}
             </p>
           </div>
           {!currentUserIsOwner && (
-            <Badge variant="outline">Sem permissão de administração neste grupo</Badge>
+            <Badge variant="outline">{t('noAdminPermission')}</Badge>
           )}
         </CardContent>
       </Card>
@@ -770,24 +895,24 @@ export default function Groups() {
 
       {!currentUserIsOwner && (
         <Card className="border-border/50">
-          <CardContent className="py-4 text-sm text-muted-foreground">
-            Você faz parte deste grupo como membro. Apenas o owner pode convidar pessoas, remover membros
-            e alterar acessos.
+          <CardContent className="text-muted-foreground py-4 text-sm">
+            {t('memberOnlyDescription')}
           </CardContent>
         </Card>
       )}
 
       {currentUserIsOwner && showInviteForm && (
-        <InviteForm groupId={activeGroupId} onSuccess={() => setShowInviteForm(false)} />
+        <InviteForm
+          groupId={activeGroupId}
+          onSuccess={() => setShowInviteForm(false)}
+        />
       )}
 
       {currentUserIsOwner && (
         <section className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
             <Clock3 className="size-4" />
-            <span>
-              {invites?.length ?? 0} {invites?.length === 1 ? 'convite pendente' : 'convites pendentes'}
-            </span>
+            <span>{t('pendingCount', { count: invites?.length ?? 0 })}</span>
           </div>
 
           {loadingInvites ? (
@@ -808,8 +933,8 @@ export default function Groups() {
             ))
           ) : (
             <Card className="border-border/50">
-              <CardContent className="py-6 text-sm text-muted-foreground">
-                Nenhum convite pendente no momento.
+              <CardContent className="text-muted-foreground py-6 text-sm">
+                {t('noPendingInvites')}
               </CardContent>
             </Card>
           )}
@@ -817,9 +942,9 @@ export default function Groups() {
       )}
 
       <section className="space-y-3">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="text-muted-foreground flex items-center gap-2 text-sm">
           <Users className="size-4" />
-          <span>{members?.length ?? 0} {members?.length === 1 ? 'membro' : 'membros'}</span>
+          <span>{t('memberCount', { count: members?.length ?? 0 })}</span>
         </div>
 
         {loadingMembers ? (
@@ -841,29 +966,33 @@ export default function Groups() {
           ))
         ) : (
           <Card className="border-border/50">
-            <CardContent className="py-6 text-sm text-muted-foreground">
-              Nenhum membro foi encontrado neste grupo.
+            <CardContent className="text-muted-foreground py-6 text-sm">
+              {t('noMembersInGroup')}
             </CardContent>
           </Card>
         )}
       </section>
 
-      <AlertDialog open={!!removeTarget} onOpenChange={(open) => !open && setRemoveTarget(null)}>
+      <AlertDialog
+        open={!!removeTarget}
+        onOpenChange={(open) => !open && setRemoveTarget(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remover membro</AlertDialogTitle>
+            <AlertDialogTitle>{t('removeDialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja remover <strong>{removeTarget?.name}</strong> do grupo?
-              Ele perderá o acesso às despesas e rendimentos compartilhados.
+              {t('removeDialog.description', {
+                name: removeTarget?.name ?? '',
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('removeDialog.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleRemoveConfirm}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Remover
+              {t('removeDialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

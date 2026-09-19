@@ -18,6 +18,7 @@
     "confirm": "Yes, delete my account",
     "deleting": "Deleting..."
   },
+  "blockedByWorkspace": "You administer the workspace \"{{workspace}}\", which has other members. Transfer ownership before deleting your account.",
   "toast": {
     "exported": "Data exported successfully.",
     "exportError": "Error exporting data.",

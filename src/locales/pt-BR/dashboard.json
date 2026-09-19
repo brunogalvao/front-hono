@@ -1,6 +1,72 @@
 {
   "title": "Visão Geral",
+  "workspaceSummary": "Workspace",
+  "personalSummary": "Meus gastos",
+  "summary": {
+    "income": "Receitas",
+    "expenses": "Despesas",
+    "balance": "Saldo"
+  },
+  "chart": {
+    "title": "Evolução Financeira {{year}}",
+    "income": "Rendimento",
+    "expenses": "Despesas",
+    "pending": "Pendentes",
+    "recurring": "Recorrente",
+    "available": "Disponível"
+  },
+  "financialStatus": {
+    "title": "Status Financeiro",
+    "spent": "Gasto",
+    "available": "Disponível",
+    "result": "Resultado",
+    "usdEquivalent": "Equivalente em dólar (USD)",
+    "monthlySummary": "Resumo do Mês",
+    "totalIncome": "Rendimento Total",
+    "completedExpenses": "Gastos Realizados",
+    "pending": "pendente",
+    "remaining": "Sobrou no Mês",
+    "excellent": "Excelente",
+    "excellentMessage": "Seu controle financeiro está excelente! Continue assim.",
+    "good": "Bom",
+    "goodMessage": "Bom controle financeiro, mas há espaço para melhorar.",
+    "attention": "Atenção",
+    "attentionMessage": "Atenção: você está gastando muito da sua renda.",
+    "critical": "Crítico",
+    "criticalMessage": "ALERTA: Situação financeira crítica!"
+  },
+  "dollar": {
+    "title": "Conversão em Dólar",
+    "unavailable": "API indisponível",
+    "unavailableHint": "Tente novamente em alguns instantes.",
+    "currentRate": "Cotação atual:",
+    "availableAmount": "Valor livre:",
+    "conversionHint": "Você pode converter {{usd}} com o valor livre de {{available}} na cotação de {{rate}}."
+  },
   "savingTips": "Dicas de Economia",
+  "tips": {
+    "excellent": {
+      "control": "Excelente controle financeiro! Continue assim.",
+      "investments": "Considere aumentar seus investimentos.",
+      "emergencyFund": "Mantenha uma reserva de emergência."
+    },
+    "good": {
+      "control": "Bom controle financeiro, mas há espaço para melhorar.",
+      "review": "Revise gastos desnecessários.",
+      "goals": "Estabeleça metas de economia mensais."
+    },
+    "attention": {
+      "control": "Atenção: você está gastando muito da sua renda.",
+      "cut": "Corte gastos supérfluos urgentemente.",
+      "budget": "Crie um orçamento detalhado."
+    },
+    "critical": {
+      "control": "ALERTA: situação financeira crítica!",
+      "cut": "Corte todos os gastos não essenciais.",
+      "income": "Busque fontes de renda extra.",
+      "debt": "Considere renegociar dívidas."
+    }
+  },
   "advisorCta": "Consultor IA",
   "advisorDescription": "Acesse o Consultor de IA para receber dicas personalizadas de economia."
 }

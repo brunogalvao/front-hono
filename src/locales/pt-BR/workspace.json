@@ -24,6 +24,9 @@
       "icon": "Ícone",
       "create": "Criar"
     },
+    "validation": {
+      "nameRequired": "O nome é obrigatório."
+    },
     "delete": {
       "title": "Excluir categoria?",
       "description": "Transações com esta categoria ficarão sem categoria."

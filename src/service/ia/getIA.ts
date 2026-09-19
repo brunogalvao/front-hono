@@ -3,43 +3,17 @@ import type { IASimplificada, IAResponse } from '@/model/ia.model';
 
 export type { IASimplificada, IAResponse };
 
-function gerarDicasEconomia(percentualGasto: number): string[] {
-  if (percentualGasto < 50) {
-    return [
-      'Excelente controle financeiro! Continue assim.',
-      'Considere aumentar seus investimentos.',
-      'Mantenha uma reserva de emergência.',
-    ];
-  } else if (percentualGasto < 70) {
-    return [
-      'Bom controle financeiro, mas há espaço para melhorar.',
-      'Revise gastos desnecessários.',
-      'Estabeleça metas de economia mensais.',
-    ];
-  } else if (percentualGasto < 90) {
-    return [
-      'Atenção: você está gastando muito da sua renda.',
-      'Corte gastos supérfluos urgentemente.',
-      'Crie um orçamento detalhado.',
-    ];
-  } else {
-    return [
-      'ALERTA: situação financeira crítica!',
-      'Corte todos os gastos não essenciais.',
-      'Busque fontes de renda extra.',
-      'Considere renegociar dívidas.',
-    ];
-  }
-}
-
 export async function getIA(): Promise<IAResponse> {
   const mesAtual = new Date().getMonth() + 1;
   const anoAtual = new Date().getFullYear();
 
-  const raw = await fetchWithAuth<Record<string, number>>('/api/ia/analise-investimento', {
-    method: 'POST',
-    body: JSON.stringify({ mes: mesAtual, ano: anoAtual }),
-  });
+  const raw = await fetchWithAuth<Record<string, number>>(
+    '/api/ia/analise-investimento',
+    {
+      method: 'POST',
+      body: JSON.stringify({ mes: mesAtual, ano: anoAtual }),
+    }
+  );
 
   return {
     success: true,
@@ -50,7 +24,6 @@ export async function getIA(): Promise<IAResponse> {
       rendimentoMes: raw.rendimentoMes ?? 0,
       percentualDisponivel: Math.round(raw.percentualDisponivel ?? 0),
       percentualGasto: Math.round(raw.percentualGasto ?? 0),
-      dicasEconomia: gerarDicasEconomia(raw.percentualGasto ?? 0),
       resultadoLiquido: raw.resultadoLiquido ?? 0,
       valorLivre: raw.valorLivre ?? 0,
       cotacaoDolar: raw.cotacaoDolar > 0 ? raw.cotacaoDolar : 5.25,

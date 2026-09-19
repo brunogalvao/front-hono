@@ -23,9 +23,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { period } = (await req.json()) as {
+    const { period, locale: requestedLocale } = (await req.json()) as {
       period: { month: number; year: number };
+      locale?: 'pt-BR' | 'en';
     };
+    const locale = requestedLocale === 'en' ? 'en' : 'pt-BR';
+    const isEnglish = locale === 'en';
 
     if (
       !Number.isInteger(period?.month) ||
@@ -134,57 +137,104 @@ Deno.serve(async (req) => {
     );
     const maiorCategoria = categoriaOrdenada[0];
 
-    const meses = [
-      'Janeiro',
-      'Fevereiro',
-      'Março',
-      'Abril',
-      'Maio',
-      'Junho',
-      'Julho',
-      'Agosto',
-      'Setembro',
-      'Outubro',
-      'Novembro',
-      'Dezembro',
-    ];
-    const nomeMes = meses[period.month - 1] ?? String(period.month);
+    const nomeMes = new Intl.DateTimeFormat(isEnglish ? 'en-US' : 'pt-BR', {
+      month: 'long',
+      timeZone: 'UTC',
+    }).format(new Date(Date.UTC(period.year, period.month - 1, 1)));
 
     const formatBRL = (v: number) =>
-      v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      v.toLocaleString(isEnglish ? 'en-US' : 'pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      });
 
-    const prompt = `Você é um consultor financeiro pessoal especializado no mercado brasileiro. Analise os dados financeiros abaixo e forneça uma análise completa em português.
+    const noCategory = isEnglish ? 'Uncategorized' : 'Sem categoria';
+    const none = isEnglish ? '- None' : '- Nenhuma';
+    const incomeLines =
+      incomes && incomes.length > 0
+        ? incomes
+            .map(
+              (income) =>
+                `- ${income.descricao || (isEnglish ? 'Income' : 'Rendimento')}: ${formatBRL(income.valor)}`
+            )
+            .join('\n')
+        : isEnglish
+          ? '- No income recorded'
+          : '- Nenhum rendimento registrado';
+    const expenseLines = (items: typeof despesasPagas) =>
+      items
+        .map(
+          (task) =>
+            `- ${task.title} (${task.type || noCategory}): ${formatBRL(task.price ?? 0)}`
+        )
+        .join('\n') || none;
+    const categoryLines =
+      categoriaOrdenada
+        .map(([category, value]) => `- ${category}: ${formatBRL(value)}`)
+        .join('\n') || (isEnglish ? '- No data' : '- Sem dados');
+
+    const prompt = isEnglish
+      ? `You are a personal financial advisor specializing in the Brazilian market. Analyze the financial data below and provide the complete analysis in English.
+
+## Financial Data — ${nomeMes}/${period.year}
+
+### Income
+${incomeLines}
+**Total income: ${formatBRL(totalRendimentos)}**
+
+### Expenses
+**Paid:** ${formatBRL(totalDespesasPagas)}
+${expenseLines(despesasPagas)}
+
+**Pending:** ${formatBRL(totalDespesasPendentes)}
+${expenseLines(despesasPendentes)}
+
+**Recurring:** ${formatBRL(totalDespesasFixas)}
+${expenseLines(despesasFixas)}
+
+**Total expenses: ${formatBRL(totalDespesas)}**
+**Monthly balance: ${formatBRL(saldoLiquido)}**
+
+### Spending by category
+${categoryLines}
+${maiorCategoria ? `**Largest spending category: ${maiorCategoria[0]} (${formatBRL(maiorCategoria[1])})**` : ''}
+
+Provide an analysis with exactly three sections using these headings:
+
+## 1. Period Diagnosis
+Clearly summarize income versus expenses, the resulting balance, the largest spending category, and the month's overall financial health.
+
+## 2. Alerts and Cut Suggestions
+Identify problematic patterns and expenses that could be reduced or eliminated. Be specific and use the supplied data.
+
+## 3. Investment Recommendation
+${saldoLiquido > 0 ? `With a positive balance of ${formatBRL(saldoLiquido)}, suggest investments suitable for the Brazilian market, considering different risk profiles.` : `With a non-positive balance of ${formatBRL(saldoLiquido)}, focus on restoring balance, reducing debt, and building an emergency fund.`}
+
+Use accessible language and be direct and practical. Interpret the data instead of repeating it.`
+      : `Você é um consultor financeiro pessoal especializado no mercado brasileiro. Analise os dados financeiros abaixo e forneça uma análise completa em português.
 
 ## Dados Financeiros — ${nomeMes}/${period.year}
 
 ### Rendimentos
-${
-  incomes && incomes.length > 0
-    ? incomes
-        .map((i) => `- ${i.descricao || 'Rendimento'}: ${formatBRL(i.valor)}`)
-        .join('\n')
-    : '- Nenhum rendimento registrado'
-}
+${incomeLines}
 **Total de rendimentos: ${formatBRL(totalRendimentos)}**
 
 ### Despesas
 **Pagas:** ${formatBRL(totalDespesasPagas)}
-${despesasPagas.map((t) => `- ${t.title} (${t.type || 'Sem categoria'}): ${formatBRL(t.price ?? 0)}`).join('\n') || '- Nenhuma'}
+${expenseLines(despesasPagas)}
 
 **Pendentes:** ${formatBRL(totalDespesasPendentes)}
-${despesasPendentes.map((t) => `- ${t.title} (${t.type || 'Sem categoria'}): ${formatBRL(t.price ?? 0)}`).join('\n') || '- Nenhuma'}
+${expenseLines(despesasPendentes)}
 
 **Fixas:** ${formatBRL(totalDespesasFixas)}
-${despesasFixas.map((t) => `- ${t.title} (${t.type || 'Sem categoria'}): ${formatBRL(t.price ?? 0)}`).join('\n') || '- Nenhuma'}
+${expenseLines(despesasFixas)}
 
 **Total de despesas: ${formatBRL(totalDespesas)}**
 **Saldo do mês: ${formatBRL(saldoLiquido)}**
 
 ### Gastos por categoria
-${categoriaOrdenada.map(([cat, val]) => `- ${cat}: ${formatBRL(val)}`).join('\n') || '- Sem dados'}
+${categoryLines}
 ${maiorCategoria ? `**Maior categoria de gasto: ${maiorCategoria[0]} (${formatBRL(maiorCategoria[1])})**` : ''}
-
----
 
 Forneça uma análise estruturada com exatamente 3 seções, usando os títulos abaixo:
 
@@ -195,11 +245,7 @@ Faça um resumo claro de receitas x despesas, o saldo resultante, qual foi a mai
 Identifique comportamentos problemáticos, gastos que podem ser reduzidos ou eliminados. Seja específico com base nos dados fornecidos.
 
 ## 3. Recomendação de Investimento
-${
-  saldoLiquido > 0
-    ? `Com saldo positivo de ${formatBRL(saldoLiquido)}, sugira estratégias de investimento adequadas ao contexto brasileiro: Tesouro Direto, CDB, LCI/LCA, FIIs, ações. Considere diferentes perfis de risco.`
-    : `Com saldo negativo ou zerado de ${formatBRL(saldoLiquido)}, foque em estratégias de equilíbrio financeiro: como zerar dívidas, criar reserva de emergência e recuperar o orçamento.`
-}
+${saldoLiquido > 0 ? `Com saldo positivo de ${formatBRL(saldoLiquido)}, sugira estratégias de investimento adequadas ao contexto brasileiro: Tesouro Direto, CDB, LCI/LCA, FIIs, ações. Considere diferentes perfis de risco.` : `Com saldo negativo ou zerado de ${formatBRL(saldoLiquido)}, foque em estratégias de equilíbrio financeiro: como zerar dívidas, criar reserva de emergência e recuperar o orçamento.`}
 
 Use linguagem acessível, seja direto e prático. Não repita os dados brutos — interprete-os.`;
 

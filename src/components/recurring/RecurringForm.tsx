@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -33,16 +33,21 @@ import { useWorkspace } from '@/context/WorkspaceContext';
 import type { RecurringExpense, RecurringInput } from '@/hooks/useRecurring';
 import { toast } from 'sonner';
 
-const schema = z.object({
-  description: z.string().min(1, 'Descrição obrigatória'),
-  amount: z.coerce.number().positive('Valor deve ser maior que zero'),
-  frequency: z.enum(['monthly', 'weekly', 'yearly']),
-  start_date: z.string().min(1, 'Data de início obrigatória'),
-  end_date: z.string().optional().nullable(),
-  category_id: z.string().optional().nullable(),
-});
+const createSchema = (messages: {
+  descriptionRequired: string;
+  amountPositive: string;
+  startDateRequired: string;
+}) =>
+  z.object({
+    description: z.string().min(1, messages.descriptionRequired),
+    amount: z.coerce.number().positive(messages.amountPositive),
+    frequency: z.enum(['monthly', 'weekly', 'yearly']),
+    start_date: z.string().min(1, messages.startDateRequired),
+    end_date: z.string().optional().nullable(),
+    category_id: z.string().optional().nullable(),
+  });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof createSchema>>;
 
 interface RecurringFormProps {
   open: boolean;
@@ -64,6 +69,15 @@ export function RecurringForm({
   const { data: categories = [] } = useCategories(activeWorkspaceId);
   const [submitting, setSubmitting] = useState(false);
   const FREQ_KEYS = ['monthly', 'weekly', 'yearly'] as const;
+  const schema = useMemo(
+    () =>
+      createSchema({
+        descriptionRequired: t('validation.descriptionRequired'),
+        amountPositive: t('validation.amountPositive'),
+        startDateRequired: t('validation.startDateRequired'),
+      }),
+    [t]
+  );
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -119,7 +133,8 @@ export function RecurringForm({
       );
       onOpenChange(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('toast.saveError'));
+      console.error('Recurring expense save failed', err);
+      toast.error(t('toast.saveError'));
     } finally {
       setSubmitting(false);
     }

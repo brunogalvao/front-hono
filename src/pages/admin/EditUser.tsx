@@ -81,7 +81,11 @@ const EditUser = () => {
   useEffect(() => {
     if (user) {
       setFormData({
-        name: user.user_metadata?.displayName ?? user.user_metadata?.full_name ?? user.user_metadata?.name ?? '',
+        name:
+          user.user_metadata?.displayName ??
+          user.user_metadata?.full_name ??
+          user.user_metadata?.name ??
+          '',
         avatarUrl: user.user_metadata?.avatar_url ?? '',
         phone: user.user_metadata?.phone ?? '',
       });
@@ -92,7 +96,7 @@ const EditUser = () => {
   const handleUpdate = () => {
     const result = schema.safeParse({ phone: formData.phone });
     if (!result.success) {
-      toast.error(result.error.format().phone?._errors?.[0] || t('toast.phoneInvalid'));
+      toast.error(t('toast.phoneInvalid'));
       return;
     }
     if (!user) {
@@ -130,7 +134,7 @@ const EditUser = () => {
         onError: () => {
           toast.error(t('toast.updateError'), { duration: 5000 });
         },
-      },
+      }
     );
   };
 
@@ -160,7 +164,10 @@ const EditUser = () => {
     setCrop({ x: 0, y: 0 });
   };
 
-  const getCroppedBlob = async (imageSrc: string, pixelCrop: Area): Promise<Blob> => {
+  const getCroppedBlob = async (
+    imageSrc: string,
+    pixelCrop: Area
+  ): Promise<Blob> => {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const image = new Image();
       image.onload = () => resolve(image);
@@ -173,7 +180,17 @@ const EditUser = () => {
     canvas.height = pixelCrop.height;
     const ctx = canvas.getContext('2d')!;
 
-    ctx.drawImage(img, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, pixelCrop.width, pixelCrop.height);
+    ctx.drawImage(
+      img,
+      pixelCrop.x,
+      pixelCrop.y,
+      pixelCrop.width,
+      pixelCrop.height,
+      0,
+      0,
+      pixelCrop.width,
+      pixelCrop.height
+    );
 
     return new Promise((resolve, reject) => {
       canvas.toBlob((blob) => {
@@ -201,7 +218,10 @@ const EditUser = () => {
         {/* Avatar clicável */}
         <div className="relative">
           <Avatar className="h-24 w-24">
-            <AvatarImage src={preview ?? formData.avatarUrl} alt="Avatar" />
+            <AvatarImage
+              src={preview ?? formData.avatarUrl}
+              alt={t('avatar')}
+            />
             <AvatarFallback className="text-lg">
               {getInitials(formData.name || user?.email || '')}
             </AvatarFallback>
@@ -235,7 +255,7 @@ const EditUser = () => {
         {/* Info do arquivo selecionado */}
         <div className="flex flex-col gap-1">
           <p className="text-sm font-medium">
-            {formData.name || user?.email || 'Usuário'}
+            {formData.name || user?.email || t('userFallback')}
           </p>
           <p className="text-muted-foreground text-xs">{user?.email}</p>
           {preview && (
@@ -254,7 +274,12 @@ const EditUser = () => {
       </div>
 
       {/* Crop Dialog */}
-      <Dialog open={!!cropSrc} onOpenChange={(open) => { if (!open) clearCrop(); }}>
+      <Dialog
+        open={!!cropSrc}
+        onOpenChange={(open) => {
+          if (!open) clearCrop();
+        }}
+      >
         <DialogContent className="max-w-md" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>{t('cropTitle')}</DialogTitle>
@@ -277,7 +302,9 @@ const EditUser = () => {
           </div>
 
           <div className="flex flex-col gap-2 px-1">
-            <Label className="text-muted-foreground text-xs">{t('zoomLabel')}</Label>
+            <Label className="text-muted-foreground text-xs">
+              {t('zoomLabel')}
+            </Label>
             <Slider
               min={1}
               max={3}
@@ -291,9 +318,7 @@ const EditUser = () => {
             <Button variant="outline" onClick={clearCrop}>
               {t('common:cancel')}
             </Button>
-            <Button onClick={handleCropConfirm}>
-              {t('applyCrop')}
-            </Button>
+            <Button onClick={handleCropConfirm}>{t('applyCrop')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -325,12 +350,16 @@ const EditUser = () => {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 placeholder={t('namePlaceholder')}
                 disabled={provider !== 'email'}
               />
               {provider !== 'email' && (
-                <p className="text-muted-foreground text-xs">{t('nameDisabledHint')}</p>
+                <p className="text-muted-foreground text-xs">
+                  {t('nameDisabledHint')}
+                </p>
               )}
             </div>
 
@@ -339,7 +368,12 @@ const EditUser = () => {
               <PatternFormat
                 id="phone"
                 value={formData.phone}
-                onValueChange={(values) => setFormData((prev) => ({ ...prev, phone: values.formattedValue }))}
+                onValueChange={(values) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    phone: values.formattedValue,
+                  }))
+                }
                 format="(##) #####-####"
                 mask="_"
                 customInput={Input}
@@ -349,21 +383,29 @@ const EditUser = () => {
 
           <div className="flex flex-row items-end gap-3">
             <div className="flex w-full flex-col gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input value={user?.email || ''} disabled />
-              <p className="text-muted-foreground text-xs">{t('emailDisabledHint')}</p>
+              <p className="text-muted-foreground text-xs">
+                {t('emailDisabledHint')}
+              </p>
             </div>
           </div>
 
           <ResetPassword provider={provider} />
           {provider !== 'email' && (
-            <p className="text-muted-foreground text-xs">{t('passwordOAuthHint')}</p>
+            <p className="text-muted-foreground text-xs">
+              {t('passwordOAuthHint')}
+            </p>
           )}
         </CardContent>
 
         <CardFooter className="flex justify-end">
           <AnimateIcon animateOnHover>
-            <LiquidButton className="text-white" onClick={handleUpdate} disabled={updateProfile.isPending}>
+            <LiquidButton
+              className="text-white"
+              onClick={handleUpdate}
+              disabled={updateProfile.isPending}
+            >
               <div className="flex flex-row items-center gap-3 px-12">
                 {updateProfile.isPending ? (
                   <>

@@ -1,16 +1,22 @@
 import { forwardRef, useState, useEffect, useRef } from 'react';
 import type { ComponentProps } from 'react';
 import { Input } from './input';
+import { useTranslation } from 'react-i18next';
 
-interface CurrencyInputProps extends Omit<ComponentProps<typeof Input>, 'value' | 'onChange' | 'type'> {
+interface CurrencyInputProps extends Omit<
+  ComponentProps<typeof Input>,
+  'value' | 'onChange' | 'type'
+> {
   value: number;
   onChange: (value: number) => void;
 }
 
 export const CurrencyInput = forwardRef<HTMLInputElement, CurrencyInputProps>(
   ({ value, onChange, ...props }, ref) => {
+    const { i18n } = useTranslation();
+    const locale = i18n.resolvedLanguage === 'en' ? 'en-US' : 'pt-BR';
     const [digits, setDigits] = useState(() =>
-      value > 0 ? Math.round(value * 100).toString() : '',
+      value > 0 ? Math.round(value * 100).toString() : ''
     );
     const prevValueRef = useRef(value);
 
@@ -22,7 +28,7 @@ export const CurrencyInput = forwardRef<HTMLInputElement, CurrencyInputProps>(
     }, [value]);
 
     const display = digits
-      ? (parseInt(digits, 10) / 100).toLocaleString('pt-BR', {
+      ? (parseInt(digits, 10) / 100).toLocaleString(locale, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })
@@ -41,10 +47,10 @@ export const CurrencyInput = forwardRef<HTMLInputElement, CurrencyInputProps>(
         inputMode="numeric"
         value={display}
         onChange={handleChange}
-        placeholder="0,00"
+        placeholder={locale === 'en-US' ? '0.00' : '0,00'}
         {...props}
       />
     );
-  },
+  }
 );
 CurrencyInput.displayName = 'CurrencyInput';

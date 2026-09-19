@@ -2,26 +2,34 @@ import { createClient } from 'npm:@supabase/supabase-js@2.112.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, apikey, content-type',
 };
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method === 'OPTIONS')
+    return new Response('ok', { headers: corsHeaders });
 
   try {
     const authHeader = req.headers.get('Authorization');
     const userClient = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader! } } },
+      { global: { headers: { Authorization: authHeader! } } }
     );
 
-    const { data: { user } } = await userClient.auth.getUser();
-    if (!user) return new Response(JSON.stringify({ error: 'Não autorizado' }), { status: 401, headers: corsHeaders });
+    const {
+      data: { user },
+    } = await userClient.auth.getUser();
+    if (!user)
+      return new Response(JSON.stringify({ error: 'Não autorizado' }), {
+        status: 401,
+        headers: corsHeaders,
+      });
 
     const serviceClient = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
     // Check if user is superuser of any workspace with other members
@@ -41,10 +49,15 @@ Deno.serve(async (req) => {
         if (count && count > 0) {
           return new Response(
             JSON.stringify({
-              error: `Você é Superusuário do workspace "${ws.name}" que possui outros membros. Transfira a titularidade antes de excluir sua conta.`,
+              error: 'WORKSPACE_HAS_MEMBERS',
+              error_code: 'WORKSPACE_HAS_MEMBERS',
               blocked_by_workspace: ws.id,
+              workspace_name: ws.name,
             }),
-            { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+            {
+              status: 422,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
           );
         }
       }

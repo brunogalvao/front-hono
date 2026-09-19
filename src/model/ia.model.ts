@@ -5,7 +5,6 @@ export interface IASimplificada {
   rendimentoMes: number;
   percentualDisponivel: number;
   percentualGasto: number;
-  dicasEconomia: string[];
   resultadoLiquido: number;
   valorLivre: number;
   cotacaoDolar: number;

@@ -2,8 +2,10 @@ import { useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
+import { useTranslation } from 'react-i18next';
 
 export function useSessionGuard() {
+  const { t } = useTranslation('nav');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -13,7 +15,7 @@ export function useSessionGuard() {
       const { data, error } = await supabase.auth.getUser();
 
       if (error || !data.user) {
-        toast.error('Sessão expirada. Faça login novamente.');
+        toast.error(t('sessionExpired'));
         navigate({ to: '/login' });
       }
     };
@@ -28,5 +30,5 @@ export function useSessionGuard() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('online', handleOnline);
     };
-  }, [navigate]);
+  }, [navigate, t]);
 }

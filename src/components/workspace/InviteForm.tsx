@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -24,12 +24,13 @@ import type { WorkspaceRole } from '@/context/WorkspaceContext';
 import type { InviteMutationResult } from '@/model/invite.model';
 import { toast } from 'sonner';
 
-const schema = z.object({
-  email: z.string().trim().toLowerCase().email('E-mail inválido'),
-  role: z.enum(['administrador', 'operador', 'visualizador'] as const),
-});
+const buildSchema = (emailInvalid: string) =>
+  z.object({
+    email: z.string().trim().toLowerCase().email(emailInvalid),
+    role: z.enum(['administrador', 'operador', 'visualizador'] as const),
+  });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 interface InviteFormProps {
   onInvite: (
@@ -41,6 +42,7 @@ interface InviteFormProps {
 export function InviteForm({ onInvite }: InviteFormProps) {
   const { t } = useTranslation('invite');
   const [submitting, setSubmitting] = useState(false);
+  const schema = useMemo(() => buildSchema(t('validation.emailInvalid')), [t]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),

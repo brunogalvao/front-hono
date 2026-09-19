@@ -2,13 +2,24 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from '@tanstack/react-router';
 import { Download, Trash2, AlertTriangle } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel,
-  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
-  AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -24,9 +35,12 @@ export default function AccountSettingsPage() {
   const handleExport = async () => {
     setExporting(true);
     try {
-      const { data, error } = await supabase.functions.invoke('export-user-data');
+      const { data, error } =
+        await supabase.functions.invoke('export-user-data');
       if (error) throw error;
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json',
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -35,7 +49,8 @@ export default function AccountSettingsPage() {
       URL.revokeObjectURL(url);
       toast.success(t('toast.exported'));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('toast.exportError'));
+      console.error('Account data export failed', err);
+      toast.error(t('toast.exportError'));
     } finally {
       setExporting(false);
     }
@@ -47,17 +62,24 @@ export default function AccountSettingsPage() {
       const { data, error } = await supabase.functions.invoke('delete-account');
       if (error) throw error;
 
-      if (data?.error) {
-        setBlockMessage(data.error);
+      if (data?.error_code === 'WORKSPACE_HAS_MEMBERS') {
+        setBlockMessage(
+          t('blockedByWorkspace', {
+            workspace: data.workspace_name ?? '',
+          })
+        );
         setDeleteOpen(false);
         return;
       }
+
+      if (data?.error) throw new Error('DELETE_ACCOUNT_FAILED');
 
       await supabase.auth.signOut();
       toast.success(t('toast.deleted'));
       navigate({ to: '/login' });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('toast.deleteError'));
+      console.error('Account deletion failed', err);
+      toast.error(t('toast.deleteError'));
     } finally {
       setDeleting(false);
     }
@@ -76,9 +98,7 @@ export default function AccountSettingsPage() {
             <Download className="h-4 w-4" />
             {t('export.title')}
           </CardTitle>
-          <CardDescription>
-            {t('export.description')}
-          </CardDescription>
+          <CardDescription>{t('export.description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={handleExport} disabled={exporting} variant="outline">
@@ -92,21 +112,19 @@ export default function AccountSettingsPage() {
       {blockMessage && (
         <Card className="border-destructive">
           <CardContent className="flex items-start gap-3 p-4">
-            <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 shrink-0" />
-            <p className="text-sm text-destructive">{blockMessage}</p>
+            <AlertTriangle className="text-destructive mt-0.5 h-5 w-5 shrink-0" />
+            <p className="text-destructive text-sm">{blockMessage}</p>
           </CardContent>
         </Card>
       )}
 
       <Card className="border-destructive/30">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base text-destructive">
+          <CardTitle className="text-destructive flex items-center gap-2 text-base">
             <Trash2 className="h-4 w-4" />
             {t('danger.title')}
           </CardTitle>
-          <CardDescription>
-            {t('danger.description')}
-          </CardDescription>
+          <CardDescription>{t('danger.description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Button

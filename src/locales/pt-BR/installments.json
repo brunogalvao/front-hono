@@ -40,6 +40,13 @@
     "saving": "Salvando...",
     "create": "Criar"
   },
+  "validation": {
+    "descriptionRequired": "A descrição é obrigatória.",
+    "amountPositive": "O valor deve ser maior que zero.",
+    "minimumTwo": "Informe pelo menos 2 parcelas.",
+    "minimumOne": "Informe pelo menos 1 parcela.",
+    "firstDateRequired": "A data da primeira parcela é obrigatória."
+  },
   "payoff": {
     "title": "Quitar parcelamento antecipadamente?",
     "descOne": "<bold>{{count}}</bold> parcela pendente será quitada — {{amount}} total.",
