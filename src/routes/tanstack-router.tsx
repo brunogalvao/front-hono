@@ -39,9 +39,6 @@ const TransactionsPage = lazyRouteComponent(
 const RecurringPage = lazyRouteComponent(
   () => import('@/pages/admin/RecurringPage')
 );
-const InsightsPage = lazyRouteComponent(
-  () => import('@/pages/admin/InsightsPage')
-);
 const InstallmentsPage = lazyRouteComponent(
   () => import('@/pages/admin/InstallmentsPage')
 );
@@ -206,7 +203,9 @@ const recurringRoute = createRoute({
 const insightsRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: '/insights',
-  component: InsightsPage,
+  beforeLoad: () => {
+    throw redirect({ to: '/admin/advisor', replace: true });
+  },
 });
 
 const workspaceSettingsRoute = createRoute({

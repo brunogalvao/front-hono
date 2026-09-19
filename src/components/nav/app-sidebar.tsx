@@ -46,7 +46,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       : []),
     {
       title: t('insights'),
-      url: '/admin/insights',
+      url: '/admin/advisor',
       icon: 'advisor' as const,
     },
     ...(can('settings', 'read')
