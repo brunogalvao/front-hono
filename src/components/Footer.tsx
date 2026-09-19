@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Logo } from '@/components/Logo';
+import { OPEN_COOKIE_SETTINGS_EVENT } from '@/components/CookieConsent';
 
 const AIVISION_LOGO_URL =
   'https://assets.aivision.app.br/aivision/logo-aivision-branca.svg';
@@ -50,9 +51,18 @@ const Footer = () => {
       </div>
 
       <div className="flex justify-center">
-        <small className="w-full text-center text-xs leading-relaxed text-zinc-300 sm:text-sm">
-          {t('footer.copyright')}
-        </small>
+        <div className="flex w-full flex-col items-center gap-2 text-center text-xs leading-relaxed text-zinc-300 sm:text-sm">
+          <small>{t('footer.copyright')}</small>
+          <button
+            type="button"
+            className="min-h-6 rounded-sm underline underline-offset-4 hover:text-white focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:outline-none"
+            onClick={() =>
+              window.dispatchEvent(new Event(OPEN_COOKIE_SETTINGS_EVENT))
+            }
+          >
+            {t('footer.manageCookies')}
+          </button>
+        </div>
       </div>
     </footer>
   );

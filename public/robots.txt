@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /invite/
+
+Sitemap: https://finance.aivision.app.br/sitemap.xml

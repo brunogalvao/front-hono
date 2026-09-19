@@ -5462,6 +5462,7 @@
         "npm:@radix-ui/react-slot@^1.2.4",
         "npm:@radix-ui/react-switch@^1.2.6",
         "npm:@radix-ui/react-tooltip@^1.2.8",
+        "npm:@sentry/react@^10.74.0",
         "npm:@storybook/addon-a11y@^10.2.19",
         "npm:@storybook/addon-docs@^10.2.19",
         "npm:@storybook/addon-onboarding@^10.2.19",

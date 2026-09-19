@@ -1,0 +1,15 @@
+# Task's Finance
+
+> Aplicativo web de gestão financeira pessoal para organizar receitas, despesas, parcelamentos, tarefas e insights financeiros.
+
+## Páginas públicas
+
+- [Página inicial](https://finance.aivision.app.br/): apresentação dos recursos do Task's Finance.
+- [Privacidade](https://finance.aivision.app.br/privacidade): informações sobre armazenamento essencial, métricas e preferências.
+
+## Acesso
+
+- [Entrar](https://finance.aivision.app.br/login): autenticação de usuários existentes.
+- [Criar conta](https://finance.aivision.app.br/register): cadastro de novos usuários.
+
+As áreas de dados financeiros exigem autenticação e não devem ser indexadas.

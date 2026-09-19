@@ -1,0 +1,42 @@
+name: Uptime Monitor
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uptime-monitor
+  cancel-in-progress: true
+
+jobs:
+  health-check:
+    name: Check ${{ matrix.service.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - name: frontend
+            url: https://finance.aivision.app.br/
+          - name: api
+            url: https://api.aivision.app.br/api/ping
+
+    steps:
+      - name: Request public health endpoint
+        run: >-
+          curl
+          --fail
+          --silent
+          --show-error
+          --location
+          --retry 3
+          --retry-all-errors
+          --connect-timeout 10
+          --max-time 30
+          --user-agent "ai-vision-uptime-monitor/1.0"
+          "${{ matrix.service.url }}"

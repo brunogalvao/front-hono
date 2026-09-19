@@ -65,5 +65,57 @@
     "unauthenticated": "Usuário não autenticado.",
     "generic": "Ocorreu um erro. Tente novamente.",
     "connectionError": "Erro de conexão. Verifique sua internet."
+  },
+  "seo": {
+    "appTitle": "Task's Finance — Gestão financeira inteligente",
+    "description": "Organize receitas, despesas, parcelamentos e tarefas financeiras em um só lugar, com análise inteligente por IA.",
+    "privacyTitle": "Privacidade e cookies — Task's Finance",
+    "privacyDescription": "Entenda como o Task's Finance utiliza armazenamento essencial, métricas opcionais e monitoramento de erros.",
+    "notFoundTitle": "Página não encontrada — Task's Finance"
+  },
+  "cookies": {
+    "title": "Sua privacidade importa",
+    "description": "Usamos armazenamento essencial para o funcionamento do aplicativo. Com sua autorização, usamos métricas anônimas para melhorar a experiência.",
+    "privacyLink": "Saiba como tratamos esses dados",
+    "reject": "Usar apenas o essencial",
+    "accept": "Aceitar métricas"
+  },
+  "statusPages": {
+    "home": "Ir para o início",
+    "back": "Voltar",
+    "notFound": {
+      "title": "Esta página não foi encontrada",
+      "description": "O endereço pode estar incorreto ou a página pode ter sido movida. Você pode voltar ou continuar pela página inicial."
+    },
+    "error": {
+      "title": "Não foi possível carregar esta página",
+      "description": "Encontramos um erro inesperado. Tente novamente; se o problema continuar, volte para a página inicial.",
+      "retry": "Tentar novamente"
+    }
+  },
+  "privacy": {
+    "eyebrow": "Privacidade",
+    "title": "Dados e preferências",
+    "introduction": "Esta página resume como o Task's Finance utiliza dados técnicos para operar com segurança e melhorar o produto.",
+    "sections": {
+      "essential": {
+        "title": "Armazenamento essencial",
+        "description": "Preferências de idioma, tema, sessão e interface podem ser armazenadas no dispositivo para que recursos solicitados funcionem corretamente."
+      },
+      "analytics": {
+        "title": "Métricas opcionais",
+        "description": "O Google Analytics somente é carregado depois da sua autorização. As métricas ajudam a entender navegação e desempenho, sem ativar personalização de anúncios."
+      },
+      "errors": {
+        "title": "Monitoramento de erros",
+        "description": "Quando configurado, o monitoramento registra falhas técnicas sem enviar dados pessoais por padrão, ajudando a diagnosticar indisponibilidades."
+      },
+      "control": {
+        "title": "Você está no controle",
+        "description": "Você pode recusar métricas opcionais ou alterar sua escolha a qualquer momento usando o controle abaixo."
+      }
+    },
+    "back": "Voltar ao início",
+    "manage": "Gerenciar preferências"
   }
 }

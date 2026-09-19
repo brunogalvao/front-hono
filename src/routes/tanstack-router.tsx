@@ -7,6 +7,9 @@ import {
   redirect,
 } from '@tanstack/react-router';
 import Home from '@/pages/Home';
+import AppErrorPage from '@/pages/AppErrorPage';
+import { CookieConsent } from '@/components/CookieConsent';
+import { RouteMetadata } from '@/components/RouteMetadata';
 
 const Login = lazyRouteComponent(() => import('@/pages/Login'));
 const Admin = lazyRouteComponent(() => import('@/pages/Admin'));
@@ -51,14 +54,20 @@ const PermissionsPage = lazyRouteComponent(
 const AccountSettingsPage = lazyRouteComponent(
   () => import('@/pages/admin/AccountSettingsPage')
 );
+const PrivacyPage = lazyRouteComponent(() => import('@/pages/PrivacyPage'));
+const NotFoundPage = lazyRouteComponent(() => import('@/pages/NotFoundPage'));
 
 // Root Route
 const rootRoute = createRootRoute({
   component: () => (
-    <div>
+    <>
+      <RouteMetadata />
       <Outlet />
-    </div>
+      <CookieConsent />
+    </>
   ),
+  errorComponent: AppErrorPage,
+  notFoundComponent: NotFoundPage,
 });
 
 // Public Routes
@@ -81,6 +90,12 @@ const registerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/register',
   component: RegisterPage,
+});
+
+const privacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/privacidade',
+  component: PrivacyPage,
 });
 
 // Admin Routes
@@ -259,18 +274,12 @@ const workspaceInviteLandingRoute = createRoute({
   }),
 });
 
-// Catch-all route
-const catchAllRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '*',
-  component: Login,
-});
-
 // Route Tree
 const routeTree = rootRoute.addChildren([
   homeRoute,
   loginRoute,
   registerRoute,
+  privacyRoute,
   inviteRoute,
   authCallbackRoute,
   resetPasswordRoute,
@@ -292,7 +301,6 @@ const routeTree = rootRoute.addChildren([
     accountSettingsRoute,
     permissionsRoute,
   ]),
-  catchAllRoute,
 ]);
 
 // Router

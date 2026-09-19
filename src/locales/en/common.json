@@ -65,5 +65,57 @@
     "unauthenticated": "User not authenticated.",
     "generic": "An error occurred. Please try again.",
     "connectionError": "Connection error. Check your internet."
+  },
+  "seo": {
+    "appTitle": "Task's Finance — Smart financial management",
+    "description": "Organize income, expenses, installments and financial tasks in one place, with intelligent AI analysis.",
+    "privacyTitle": "Privacy and cookies — Task's Finance",
+    "privacyDescription": "Learn how Task's Finance uses essential storage, optional metrics and error monitoring.",
+    "notFoundTitle": "Page not found — Task's Finance"
+  },
+  "cookies": {
+    "title": "Your privacy matters",
+    "description": "We use essential storage for the application to work. With your permission, we use anonymous metrics to improve the experience.",
+    "privacyLink": "Learn how we handle this data",
+    "reject": "Use essentials only",
+    "accept": "Accept metrics"
+  },
+  "statusPages": {
+    "home": "Go to home",
+    "back": "Go back",
+    "notFound": {
+      "title": "This page could not be found",
+      "description": "The address may be incorrect or the page may have moved. You can go back or continue from the home page."
+    },
+    "error": {
+      "title": "This page could not be loaded",
+      "description": "We encountered an unexpected error. Try again; if the problem continues, return to the home page.",
+      "retry": "Try again"
+    }
+  },
+  "privacy": {
+    "eyebrow": "Privacy",
+    "title": "Data and preferences",
+    "introduction": "This page summarizes how Task's Finance uses technical data to operate securely and improve the product.",
+    "sections": {
+      "essential": {
+        "title": "Essential storage",
+        "description": "Language, theme, session and interface preferences may be stored on the device so requested features work correctly."
+      },
+      "analytics": {
+        "title": "Optional metrics",
+        "description": "Google Analytics is only loaded after your authorization. Metrics help us understand navigation and performance without enabling ad personalization."
+      },
+      "errors": {
+        "title": "Error monitoring",
+        "description": "When configured, monitoring records technical failures without sending personal data by default, helping diagnose outages."
+      },
+      "control": {
+        "title": "You are in control",
+        "description": "You can decline optional metrics or change your choice at any time using the control below."
+      }
+    },
+    "back": "Back to home",
+    "manage": "Manage preferences"
   }
 }
