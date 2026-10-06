@@ -12,10 +12,28 @@
     <link rel="canonical" href="https://finance.aivision.app.br/" />
 
     <style>
+      :root {
+        --prerender-background: #111116;
+        --prerender-foreground: #fafafa;
+        --prerender-muted-foreground: #b7b7c2;
+        --prerender-primary: #7c3aed;
+        --prerender-primary-foreground: #ffffff;
+        --prerender-primary-text: #c4a7ff;
+        --prerender-border: rgb(255 255 255 / 10%);
+      }
+      :root.light {
+        --prerender-background: #ffffff;
+        --prerender-foreground: #18181b;
+        --prerender-muted-foreground: #52525b;
+        --prerender-primary: #6d28d9;
+        --prerender-primary-foreground: #ffffff;
+        --prerender-primary-text: #6d28d9;
+        --prerender-border: #e4e4e7;
+      }
       body {
         margin: 0;
-        background: #111116;
-        color: #fafafa;
+        background: var(--prerender-background);
+        color: var(--prerender-foreground);
         font-family:
           ui-sans-serif,
           system-ui,
@@ -26,7 +44,7 @@
       }
       .prerender-shell {
         min-height: 100vh;
-        background: #111116;
+        background: var(--prerender-background);
       }
       .prerender-shell__header {
         display: flex;
@@ -35,15 +53,15 @@
         justify-content: space-between;
         gap: 1rem;
         padding: 0 1rem;
-        border-bottom: 1px solid rgb(255 255 255 / 10%);
+        border-bottom: 1px solid var(--prerender-border);
       }
       .prerender-shell__brand {
-        color: #fafafa;
+        color: var(--prerender-foreground);
         font-weight: 700;
         text-decoration: none;
       }
       .prerender-shell__brand span {
-        color: #c4a7ff;
+        color: var(--prerender-primary-text);
       }
       .prerender-shell__login,
       .prerender-shell__cta {
@@ -52,8 +70,8 @@
         align-items: center;
         justify-content: center;
         border-radius: 999px;
-        background: #7c3aed;
-        color: #fff;
+        background: var(--prerender-primary);
+        color: var(--prerender-primary-foreground);
         font-size: 0.875rem;
         font-weight: 600;
         text-decoration: none;
@@ -85,12 +103,12 @@
         letter-spacing: -0.035em;
       }
       .prerender-shell__hero h1 span {
-        color: #c4a7ff;
+        color: var(--prerender-primary-text);
       }
       .prerender-shell__headline,
       .prerender-shell__description {
         margin: 0;
-        color: #b7b7c2;
+        color: var(--prerender-muted-foreground);
         line-height: 1.6;
       }
       .prerender-shell__headline {

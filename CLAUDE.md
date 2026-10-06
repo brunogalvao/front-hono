@@ -13,14 +13,14 @@ Guidelines for translating Figma designs into production code in this project.
 ```css
 /* Light theme (default) */
 :root {
-  --primary: oklch(0.606 0.25 292.717);        /* Purple */
+  --primary: oklch(0.52 0.25 292.717);         /* Purple */
   --primary-foreground: oklch(0.985 0 0);
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.606 0.25 292.717);
+  --ring: oklch(0.52 0.25 292.717);
   /* Semantic: secondary, muted, accent, card, popover, sidebar-* */
   /* Data viz: --chart-1 through --chart-5 */
 }
@@ -347,7 +347,7 @@ Cores têm **significado fixo** — nunca inverter:
 
 | Papel | Cor | Onde usar |
 |---|---|---|
-| Primary | Roxo `oklch(0.606 0.25 292.717)` | Ações principais, totais, badges de valor |
+| Primary | Roxo `oklch(0.52 0.25 292.717)` | Ações principais, totais, badges de valor |
 | Receita / positivo | `text-emerald-500` | Valores de entrada, checkmarks, saúde financeira |
 | Alerta / IA tips | `text-amber-500` | Dicas de economia, atenção, Consultor IA |
 | Despesa / destrutivo | `text-destructive` | Exclusão, gastos críticos |

@@ -1,4 +1,4 @@
-import { createClient, type Session } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -18,27 +18,24 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
-// Cache da sessão — atualizado em todo evento de auth
-let _cachedSession: Session | null = null;
-
-// Promise que resolve SOMENTE quando temos certeza que a sessão é válida
-// (SIGNED_IN ou TOKEN_REFRESHED) ou que não há sessão (SIGNED_OUT / INITIAL_SESSION sem sessão).
-let _resolveReady!: () => void;
-const _sessionReady = new Promise<void>((resolve) => {
-  _resolveReady = resolve;
-});
-
-supabase.auth.onAuthStateChange((_event, session) => {
-  _cachedSession = session;
-  _resolveReady();
-});
-
-// Retorna um access_token garantidamente válido
+// Obtém a sessão apenas para encaminhar o access token à API. A API valida o
+// token novamente; decisões de autorização no cliente usam getUser().
 export const getAuthToken = async (): Promise<string> => {
-  await _sessionReady;
-
-  const session = _cachedSession;
-  if (!session?.access_token) throw new Error('Usuário não autenticado.');
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+  if (error || !session?.access_token) {
+    throw new Error('Usuário não autenticado.');
+  }
 
   return session.access_token;
 };
+
+export async function getAuthenticatedUser() {
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  return error ? null : user;
+}

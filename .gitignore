@@ -82,3 +82,6 @@ src/version.json
 .wrangler/
 .dev.vars*
 !.dev.vars.example
+
+# Graphify local knowledge graph and cache
+graphify-out/

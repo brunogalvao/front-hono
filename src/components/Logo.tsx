@@ -1,4 +1,5 @@
 import logoSrc from '@/assets/logo.svg';
+import { cn } from '@/lib/utils';
 
 interface LogoProps {
   size?: number;
@@ -6,6 +7,7 @@ interface LogoProps {
   iconClassName?: string;
   showWordmark?: boolean;
   wordmarkClassName?: string;
+  accentClassName?: string;
 }
 
 const LOGO_ASPECT_RATIO = 293 / 238;
@@ -16,9 +18,10 @@ export function Logo({
   iconClassName = '',
   showWordmark = true,
   wordmarkClassName = '',
+  accentClassName = '',
 }: LogoProps) {
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
+    <div className={cn('flex items-center gap-2.5', className)}>
       <span className={iconClassName}>
         <img
           src={logoSrc}
@@ -30,9 +33,15 @@ export function Logo({
       </span>
       {showWordmark && (
         <span
-          className={`text-base leading-none font-bold tracking-tight ${wordmarkClassName}`}
+          className={cn(
+            'text-foreground text-base leading-none font-bold tracking-tight',
+            wordmarkClassName
+          )}
         >
-          Task's <span className="text-primary-text">Finance</span>
+          <span>Task&apos;s</span>{' '}
+          <span className={cn('text-primary-text', accentClassName)}>
+            Finance
+          </span>
         </span>
       )}
     </div>

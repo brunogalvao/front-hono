@@ -10,6 +10,7 @@ import Home from '@/pages/Home';
 import AppErrorPage from '@/pages/AppErrorPage';
 import { CookieConsent } from '@/components/CookieConsent';
 import { RouteMetadata } from '@/components/RouteMetadata';
+import { getAuthenticatedUser } from '@/lib/supabase';
 
 const Login = lazyRouteComponent(() => import('@/pages/Login'));
 const Admin = lazyRouteComponent(() => import('@/pages/Admin'));
@@ -99,6 +100,16 @@ const privacyRoute = createRoute({
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin',
+  beforeLoad: async ({ location }) => {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      throw redirect({
+        to: '/login',
+        search: { redirect: location.href },
+        replace: true,
+      });
+    }
+  },
   component: Admin,
 });
 

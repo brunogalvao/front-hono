@@ -139,3 +139,25 @@ export const queryKeys = {
 } as const;
 
 export type QueryKeys = typeof queryKeys;
+
+const WORKSPACE_SCOPED_ROOTS: ReadonlySet<string> = new Set([
+  queryKeys.workspaces.all[0],
+  queryKeys.transactions.all[0],
+  queryKeys.recurring.all[0],
+  queryKeys.installments.all[0],
+  queryKeys.dashboard.all[0],
+  queryKeys.insights.all[0],
+  queryKeys.categories.all[0],
+  queryKeys.appUsers.all[0],
+  queryKeys.permissions.all[0],
+]);
+
+export function isQueryForWorkspace(
+  queryKey: readonly unknown[],
+  workspaceId: string
+): boolean {
+  return (
+    WORKSPACE_SCOPED_ROOTS.has(String(queryKey[0])) &&
+    queryKey.some((part) => part === workspaceId)
+  );
+}

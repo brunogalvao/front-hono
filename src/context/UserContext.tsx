@@ -1,9 +1,15 @@
-import { createContext, useContext, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import type { UserProfile } from '@/model/user.model';
 
 interface UserContextType {
   profile: UserProfile | null;
-  setProfile: (profile: UserProfile) => void;
+  setProfile: Dispatch<SetStateAction<UserProfile | null>>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);

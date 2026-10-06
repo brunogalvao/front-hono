@@ -6,7 +6,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Outlet, useNavigate } from '@tanstack/react-router';
 import { LogOut } from '@/components/animate-ui/icons/log-out';
 import { Loader } from '@/components/animate-ui/icons/loader';
@@ -21,9 +21,8 @@ import { InvitePasswordSetupDialog } from '@/components/workspace/InvitePassword
 function Admin() {
   const { t } = useTranslation('nav');
   const navigate = useNavigate();
-  useSessionGuard();
+  const { sessionReady } = useSessionGuard();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [sessionReady, setSessionReady] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -40,28 +39,6 @@ function Admin() {
       setIsLoggingOut(false);
     }
   };
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setSessionReady(true);
-      } else {
-        navigate({ to: '/login' });
-      }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
-        navigate({ to: '/login' });
-      } else if (session) {
-        setSessionReady(true);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
 
   return (
     <WorkspaceProvider>

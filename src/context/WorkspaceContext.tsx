@@ -7,6 +7,7 @@ import {
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { WorkspaceRole, WorkspaceInfo } from '@/model/workspace.model';
+import { isQueryForWorkspace } from '@/lib/query-keys';
 
 export type { WorkspaceRole, WorkspaceInfo };
 
@@ -53,7 +54,9 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     (workspaceId: string) => {
       setActiveWorkspaceId(workspaceId);
       localStorage.setItem(STORAGE_KEY, workspaceId);
-      queryClient.invalidateQueries();
+      void queryClient.invalidateQueries({
+        predicate: (query) => isQueryForWorkspace(query.queryKey, workspaceId),
+      });
     },
     [queryClient]
   );
@@ -68,7 +71,9 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       });
       setActiveWorkspaceId(workspace.id);
       localStorage.setItem(STORAGE_KEY, workspace.id);
-      queryClient.invalidateQueries();
+      void queryClient.invalidateQueries({
+        predicate: (query) => isQueryForWorkspace(query.queryKey, workspace.id),
+      });
     },
     [queryClient]
   );
