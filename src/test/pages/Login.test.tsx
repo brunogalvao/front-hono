@@ -60,9 +60,7 @@ vi.mock('@/components/RegisterUserForm', () => ({
 }));
 
 vi.mock('@/components/ForgotPassword', () => ({
-  ForgotPassword: () => (
-    <button type="button">Esqueci minha senha</button>
-  ),
+  ForgotPassword: () => <button type="button">Esqueci minha senha</button>,
 }));
 
 describe('Login', () => {
@@ -126,9 +124,7 @@ describe('Login', () => {
     await userEvent.click(screen.getByRole('button', { name: /^entrar$/i }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Invalid login credentials')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Invalid login credentials')).toBeInTheDocument();
     });
   });
 
@@ -163,6 +159,27 @@ describe('Login', () => {
     });
   });
 
+  it('identifica apenas o GitHub durante o redirecionamento OAuth', async () => {
+    (supabase.auth.signInWithOAuth as Mock).mockReturnValue(
+      new Promise(() => undefined)
+    );
+    render(<Login />);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /entrar com github/i })
+    );
+
+    expect(
+      screen.getByRole('button', { name: /acessando com github/i })
+    ).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /entrar com google/i })
+    ).toBeDisabled();
+    expect(
+      screen.queryByRole('button', { name: /acessando com google/i })
+    ).not.toBeInTheDocument();
+  });
+
   it('chama signInWithOAuth com provider google', async () => {
     (supabase.auth.signInWithOAuth as Mock).mockResolvedValue({ error: null });
     render(<Login />);
@@ -176,5 +193,26 @@ describe('Login', () => {
         expect.objectContaining({ provider: 'google' })
       );
     });
+  });
+
+  it('identifica apenas o Google durante o redirecionamento OAuth', async () => {
+    (supabase.auth.signInWithOAuth as Mock).mockReturnValue(
+      new Promise(() => undefined)
+    );
+    render(<Login />);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /entrar com google/i })
+    );
+
+    expect(
+      screen.getByRole('button', { name: /acessando com google/i })
+    ).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /entrar com github/i })
+    ).toBeDisabled();
+    expect(
+      screen.queryByRole('button', { name: /acessando com github/i })
+    ).not.toBeInTheDocument();
   });
 });

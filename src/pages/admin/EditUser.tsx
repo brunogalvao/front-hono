@@ -37,6 +37,15 @@ import { toast } from 'sonner';
 import { useUser } from '@/hooks/useUser';
 import { ResetPassword } from '@/components/ResetPassword';
 import { useCurrentUser, useUpdateUserProfile } from '@/hooks/use-user-profile';
+import {
+  AVATAR_JPEG_QUALITY,
+  AVATAR_OUTPUT_SIZE,
+  AvatarError,
+  MAX_AVATAR_FILE_SIZE,
+  MAX_AVATAR_SOURCE_FILE_SIZE,
+  validateAvatarSourceFile,
+  type AvatarErrorCode,
+} from '@/service/uploadAvatarImage';
 
 const EditUser = () => {
   const { t } = useTranslation(['profile', 'common']);
@@ -58,6 +67,29 @@ const EditUser = () => {
   const schema = z.object({
     phone: phoneSchema,
   });
+
+  const avatarErrorKey = {
+    avatar_invalid_type: 'toast.imageTypeInvalid',
+    avatar_source_too_large: 'toast.imageTooLarge',
+    avatar_output_too_large: 'toast.imageOutputTooLarge',
+    avatar_upload_failed: 'toast.avatarUploadError',
+    avatar_profile_update_failed: 'toast.updateError',
+    avatar_persistence_not_confirmed: 'toast.avatarPersistenceError',
+    avatar_processing_failed: 'toast.imageProcessingError',
+  } as const satisfies Record<AvatarErrorCode, string>;
+
+  const showAvatarError = (error: unknown) => {
+    if (error instanceof AvatarError) {
+      toast.error(
+        t(avatarErrorKey[error.code], {
+          maxSizeMb: MAX_AVATAR_SOURCE_FILE_SIZE / 1024 / 1024,
+          outputMaxSizeMb: MAX_AVATAR_FILE_SIZE / 1024 / 1024,
+        })
+      );
+      return;
+    }
+    toast.error(t('toast.updateError'), { duration: 5000 });
+  };
 
   // Revoke all tracked blob URLs on unmount
   useEffect(() => {
@@ -115,24 +147,27 @@ const EditUser = () => {
         currentAvatarUrl: formData.avatarUrl,
       },
       {
-        onSuccess: ({ avatarUrl }) => {
+        onSuccess: ({ avatarUrl, user: updatedUser }) => {
           setFormData((prev) => ({ ...prev, avatarUrl }));
           revokeBlobUrl(preview);
           setPreview(null);
           setFile(null);
-          toast.success(t('toast.updated'), { duration: 5000 });
-          if (provider === 'email') {
-            setProfile({
-              name: formData.name,
-              email: user.email ?? '',
-              avatar_url: avatarUrl,
-              phone: formattedPhone,
-              displayName: formData.name,
-            });
-          }
+          toast.success(t(file ? 'toast.avatarUpdated' : 'toast.updated'), {
+            duration: 5000,
+          });
+          setProfile({
+            name:
+              updatedUser.user_metadata?.name ??
+              updatedUser.user_metadata?.displayName ??
+              '',
+            email: updatedUser.email ?? '',
+            avatar_url: updatedUser.user_metadata?.avatar_url ?? avatarUrl,
+            phone: updatedUser.user_metadata?.phone ?? formattedPhone,
+            displayName: updatedUser.user_metadata?.displayName ?? '',
+          });
         },
-        onError: () => {
-          toast.error(t('toast.updateError'), { duration: 5000 });
+        onError: (error) => {
+          showAvatarError(error);
         },
       }
     );
@@ -141,6 +176,13 @@ const EditUser = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0] || null;
     if (selected) {
+      try {
+        validateAvatarSourceFile(selected);
+      } catch (error) {
+        showAvatarError(error);
+        e.target.value = '';
+        return;
+      }
       revokeBlobUrl(cropSrc);
       setCropSrc(createBlobUrl(selected));
     }
@@ -176,8 +218,13 @@ const EditUser = () => {
     });
 
     const canvas = document.createElement('canvas');
-    canvas.width = pixelCrop.width;
-    canvas.height = pixelCrop.height;
+    const outputSize = Math.min(
+      AVATAR_OUTPUT_SIZE,
+      pixelCrop.width,
+      pixelCrop.height
+    );
+    canvas.width = outputSize;
+    canvas.height = outputSize;
     const ctx = canvas.getContext('2d')!;
 
     ctx.drawImage(
@@ -188,26 +235,40 @@ const EditUser = () => {
       pixelCrop.height,
       0,
       0,
-      pixelCrop.width,
-      pixelCrop.height
+      outputSize,
+      outputSize
     );
 
     return new Promise((resolve, reject) => {
-      canvas.toBlob((blob) => {
-        if (blob) resolve(blob);
-        else reject(new Error('Canvas is empty'));
-      }, 'image/jpeg');
+      canvas.toBlob(
+        (blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('Canvas is empty'));
+        },
+        'image/jpeg',
+        AVATAR_JPEG_QUALITY
+      );
     });
   };
 
   const handleCropConfirm = async () => {
     if (!cropSrc || !croppedAreaPixels) return;
-    const blob = await getCroppedBlob(cropSrc, croppedAreaPixels);
-    const croppedFile = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
-    setFile(croppedFile);
-    revokeBlobUrl(preview);
-    setPreview(createBlobUrl(blob));
-    clearCrop();
+    try {
+      const blob = await getCroppedBlob(cropSrc, croppedAreaPixels);
+      const croppedFile = new File([blob], 'avatar.jpg', {
+        type: 'image/jpeg',
+      });
+      setFile(croppedFile);
+      revokeBlobUrl(preview);
+      setPreview(createBlobUrl(blob));
+      clearCrop();
+    } catch (error) {
+      showAvatarError(
+        error instanceof AvatarError
+          ? error
+          : new AvatarError('avatar_processing_failed', error)
+      );
+    }
   };
 
   return (
@@ -246,7 +307,7 @@ const EditUser = () => {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
             className="hidden"
             onChange={handleFileChange}
           />
@@ -259,7 +320,13 @@ const EditUser = () => {
           </p>
           <p className="text-muted-foreground text-xs">{user?.email}</p>
           {preview && (
-            <p className="text-xs text-amber-500">{t('imageSelected')}</p>
+            <p
+              role="status"
+              aria-live="polite"
+              className="text-xs text-amber-500"
+            >
+              {t('imageSelected')}
+            </p>
           )}
           {provider === 'email' && !preview && (
             <button
@@ -269,6 +336,14 @@ const EditUser = () => {
             >
               {t('changePhotoLink')}
             </button>
+          )}
+          {provider === 'email' && (
+            <p className="text-muted-foreground max-w-md text-xs leading-relaxed">
+              {t('avatarGuidance', {
+                maxSizeMb: MAX_AVATAR_SOURCE_FILE_SIZE / 1024 / 1024,
+                outputSize: AVATAR_OUTPUT_SIZE,
+              })}
+            </p>
           )}
         </div>
       </div>
@@ -409,7 +484,7 @@ const EditUser = () => {
               <div className="flex flex-row items-center gap-3 px-12">
                 {updateProfile.isPending ? (
                   <>
-                    {t('common:loading')}
+                    {t(file ? 'savingAvatar' : 'common:loading')}
                     <Loader2 className="size-5 animate-spin" />
                   </>
                 ) : (

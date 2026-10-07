@@ -35,6 +35,8 @@ interface FormData {
   password: string;
 }
 
+type LoginMethod = 'email' | 'github' | 'google';
+
 function safeLoginRedirect(value: string | undefined): string {
   if (
     !value ||
@@ -61,7 +63,8 @@ function Login() {
   });
 
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loadingMethod, setLoadingMethod] = useState<LoginMethod | null>(null);
+  const isLoading = loadingMethod !== null;
   const [textoTab, setTextoTab] = useState<'login' | 'register'>('login');
   const textoAtual =
     textoTab === 'login'
@@ -75,7 +78,7 @@ function Login() {
 
   const handleEmailLogin = async () => {
     try {
-      setLoading(true);
+      setLoadingMethod('email');
       const { error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
@@ -89,13 +92,13 @@ function Login() {
         err instanceof Error ? err.message : t('auth:login.errors.generic')
       );
     } finally {
-      setLoading(false);
+      setLoadingMethod(null);
     }
   };
 
   const handleGithubLogin = async () => {
     try {
-      setLoading(true);
+      setLoadingMethod('github');
       // Persist redirect so AuthCallback can restore it after OAuth
       if (redirectTo !== '/admin/dashboard') {
         sessionStorage.setItem('postAuthRedirect', redirectTo);
@@ -112,13 +115,13 @@ function Login() {
       setError(
         err instanceof Error ? err.message : t('auth:login.errors.github')
       );
-      setLoading(false);
+      setLoadingMethod(null);
     }
   };
 
   const handleGoogleLogin = async () => {
     try {
-      setLoading(true);
+      setLoadingMethod('google');
       // Persist redirect so AuthCallback can restore it after OAuth
       if (redirectTo !== '/admin/dashboard') {
         sessionStorage.setItem('postAuthRedirect', redirectTo);
@@ -135,7 +138,7 @@ function Login() {
       setError(
         err instanceof Error ? err.message : t('auth:login.errors.google')
       );
-      setLoading(false);
+      setLoadingMethod(null);
     }
   };
 
@@ -201,9 +204,9 @@ function Login() {
                     variant="outline"
                     className="flex w-full cursor-pointer items-center gap-2 py-6"
                     onClick={handleGithubLogin}
-                    disabled={loading}
+                    disabled={isLoading}
                   >
-                    {loading ? (
+                    {loadingMethod === 'github' ? (
                       <>
                         <FaGithub /> {t('auth:login.withGithubLoading')}
                       </>
@@ -221,9 +224,9 @@ function Login() {
                     variant="outline"
                     className="flex w-full cursor-pointer items-center gap-2 py-6"
                     onClick={handleGoogleLogin}
-                    disabled={loading}
+                    disabled={isLoading}
                   >
-                    {loading ? (
+                    {loadingMethod === 'google' ? (
                       <>
                         <img
                           src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -285,9 +288,9 @@ function Login() {
                     <Button
                       type="submit"
                       className="w-full cursor-pointer py-6"
-                      disabled={loading}
+                      disabled={isLoading}
                     >
-                      {loading ? (
+                      {loadingMethod === 'email' ? (
                         <>
                           {t('auth:login.loading')}
                           <Loader />

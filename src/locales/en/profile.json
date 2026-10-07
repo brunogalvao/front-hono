@@ -7,8 +7,10 @@
   "email": "Email",
   "save": "Save changes",
   "changePhotoTooltip": "Change photo",
-  "imageSelected": "New photo selected — save to apply.",
+  "avatarGuidance": "JPEG, PNG, or WebP, up to {{maxSizeMb}} MB. The image will be cropped and optimized as a {{outputSize}}×{{outputSize}} px JPG.",
+  "imageSelected": "Preview ready. Click “Save changes” to upload the new photo.",
   "changePhotoLink": "Change profile photo",
+  "savingAvatar": "Uploading and saving your photo…",
   "cropTitle": "Crop photo",
   "zoomLabel": "Zoom",
   "applyCrop": "Apply crop",
@@ -21,7 +23,14 @@
   "passwordOAuthHint": "Password change not available for OAuth login.",
   "toast": {
     "updated": "Profile updated successfully!",
+    "avatarUpdated": "Profile photo updated and synchronized.",
     "updateError": "Error updating profile.",
-    "phoneInvalid": "Invalid phone number."
+    "avatarUploadError": "We couldn't upload the photo. Please try again.",
+    "avatarPersistenceError": "We couldn't complete the update. Your previous photo was kept.",
+    "imageProcessingError": "We couldn't process the image. Please choose another photo.",
+    "imageOutputTooLarge": "We couldn't optimize the image to the {{outputMaxSizeMb}} MB limit. Please choose another photo.",
+    "phoneInvalid": "Invalid phone number.",
+    "imageTypeInvalid": "Use a JPEG, PNG, or WebP image.",
+    "imageTooLarge": "The selected image must be no larger than {{maxSizeMb}} MB."
   }
 }

@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
-import { getUser } from '@/service/userService';
+import { mapAuthUserToProfile } from '@/service/userService';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { getInitials } from '@/utils/getInitials';
-import type { UserProfile } from '@/model/user.model';
 import { useUser } from '@/hooks/useUser';
+import { useCurrentUser } from '@/hooks/use-user-profile';
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -29,10 +28,8 @@ import { useTranslation } from 'react-i18next';
 
 export function SidebarUser() {
   const { t } = useTranslation('nav');
-  const [fetchedProfile, setFetchedProfile] = useState<UserProfile | null>(
-    null
-  );
   const { profile } = useUser();
+  const { data: user } = useCurrentUser();
   const navigate = useNavigate();
   const { activeWorkspaceId } = useWorkspace();
 
@@ -46,19 +43,7 @@ export function SidebarUser() {
     year
   );
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const userData = await getUser();
-        setFetchedProfile(userData);
-      } catch (error) {
-        console.error('Erro ao carregar perfil:', error);
-      }
-    };
-    load();
-  }, []);
-
-  const fullProfile = profile || fetchedProfile;
+  const fullProfile = user ? mapAuthUserToProfile(user) : profile;
   if (!fullProfile) return null;
 
   const displayName = fullProfile.displayName || fullProfile.name || '';

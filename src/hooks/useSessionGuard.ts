@@ -4,21 +4,25 @@ import { toast } from 'sonner';
 import { getAuthenticatedUser, supabase } from '@/lib/supabase';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@/context/UserContext';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/query-keys';
 
 export function useSessionGuard() {
   const { t } = useTranslation('nav');
   const navigate = useNavigate();
   const { setProfile } = useUser();
+  const queryClient = useQueryClient();
   const [sessionReady, setSessionReady] = useState(true);
 
   const redirectToLogin = useCallback(
     (showMessage: boolean) => {
       setSessionReady(false);
       setProfile(null);
+      queryClient.removeQueries({ queryKey: queryKeys.user.all });
       if (showMessage) toast.error(t('sessionExpired'));
       void navigate({ to: '/login' });
     },
-    [navigate, setProfile, t]
+    [navigate, queryClient, setProfile, t]
   );
 
   useEffect(() => {

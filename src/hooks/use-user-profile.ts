@@ -1,7 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
-import { uploadAvatarImage } from '@/service/uploadAvatarImage';
+import {
+  AvatarError,
+  getOwnedAvatarPath,
+  removeAvatarImage,
+  uploadAvatarImage,
+} from '@/service/uploadAvatarImage';
 
 export function useCurrentUser() {
   return useQuery({
@@ -33,17 +38,57 @@ export function useUpdateUserProfile() {
       currentAvatarUrl: string;
     }) => {
       let avatarUrl = currentAvatarUrl;
+      let uploadedPath: string | null = null;
       if (file) {
-        avatarUrl = await uploadAvatarImage(file, userId);
+        try {
+          const uploadedAvatar = await uploadAvatarImage(file, userId);
+          avatarUrl = uploadedAvatar.publicUrl;
+          uploadedPath = uploadedAvatar.path;
+        } catch (error) {
+          if (error instanceof AvatarError) throw error;
+          throw new AvatarError('avatar_upload_failed', error);
+        }
       }
-      const { error } = await supabase.auth.updateUser({
-        data: { displayName, phone, avatar_url: avatarUrl },
-      });
-      if (error) throw error;
-      return { avatarUrl };
+
+      try {
+        const { data, error } = await supabase.auth.updateUser({
+          data: { displayName, phone, avatar_url: avatarUrl },
+        });
+        if (error) {
+          throw new AvatarError(
+            file
+              ? 'avatar_persistence_not_confirmed'
+              : 'avatar_profile_update_failed',
+            error
+          );
+        }
+        if (!data.user || data.user.user_metadata?.avatar_url !== avatarUrl) {
+          throw new AvatarError('avatar_persistence_not_confirmed');
+        }
+
+        const previousAvatarPath = getOwnedAvatarPath(currentAvatarUrl, userId);
+        if (
+          uploadedPath &&
+          previousAvatarPath &&
+          previousAvatarPath !== uploadedPath
+        ) {
+          await removeAvatarImage(previousAvatarPath).catch(() => undefined);
+        }
+
+        return { avatarUrl, user: data.user };
+      } catch (error) {
+        if (uploadedPath) {
+          await removeAvatarImage(uploadedPath).catch(() => undefined);
+        }
+        throw error;
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.user.all });
+    onSuccess: ({ user }) => {
+      queryClient.setQueryData(queryKeys.user.profile, user);
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.user.all,
+        refetchType: 'inactive',
+      });
     },
   });
 }
