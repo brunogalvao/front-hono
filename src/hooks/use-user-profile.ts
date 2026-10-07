@@ -7,6 +7,17 @@ import {
   removeAvatarImage,
   uploadAvatarImage,
 } from '@/service/uploadAvatarImage';
+import type { User } from '@supabase/supabase-js';
+
+function withCanonicalAvatar(user: User, avatarUrl: string | null): User {
+  return {
+    ...user,
+    user_metadata: {
+      ...user.user_metadata,
+      avatar_url: avatarUrl ?? user.user_metadata?.avatar_url ?? '',
+    },
+  };
+}
 
 export function useCurrentUser() {
   return useQuery({
@@ -14,7 +25,16 @@ export function useCurrentUser() {
     queryFn: async () => {
       const { data, error } = await supabase.auth.getUser();
       if (error) throw error;
-      return data.user;
+      if (!data.user) return null;
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', data.user.id)
+        .maybeSingle();
+      if (profileError) throw profileError;
+
+      return withCanonicalAvatar(data.user, profile?.avatar_url ?? null);
     },
     staleTime: 1000 * 60 * 5,
   });
@@ -52,7 +72,7 @@ export function useUpdateUserProfile() {
 
       try {
         const { data, error } = await supabase.auth.updateUser({
-          data: { displayName, phone, avatar_url: avatarUrl },
+          data: { displayName, phone },
         });
         if (error) {
           throw new AvatarError(
@@ -62,8 +82,26 @@ export function useUpdateUserProfile() {
             error
           );
         }
-        if (!data.user || data.user.user_metadata?.avatar_url !== avatarUrl) {
-          throw new AvatarError('avatar_persistence_not_confirmed');
+        if (!data.user) {
+          throw new AvatarError('avatar_profile_update_failed');
+        }
+
+        if (uploadedPath) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .update({
+              avatar_url: avatarUrl,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', userId)
+            .select('avatar_url')
+            .single();
+          if (profileError || profile?.avatar_url !== avatarUrl) {
+            throw new AvatarError(
+              'avatar_persistence_not_confirmed',
+              profileError
+            );
+          }
         }
 
         const previousAvatarPath = getOwnedAvatarPath(currentAvatarUrl, userId);
@@ -75,7 +113,10 @@ export function useUpdateUserProfile() {
           await removeAvatarImage(previousAvatarPath).catch(() => undefined);
         }
 
-        return { avatarUrl, user: data.user };
+        return {
+          avatarUrl,
+          user: withCanonicalAvatar(data.user, avatarUrl),
+        };
       } catch (error) {
         if (uploadedPath) {
           await removeAvatarImage(uploadedPath).catch(() => undefined);

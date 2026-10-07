@@ -10,24 +10,49 @@ const {
   mockGetUser,
   mockNavigate,
   mockOnAuthStateChange,
+  mockProfileMaybeSingle,
+  mockProfileSingle,
+  mockProfileUpdate,
   mockRemoveAvatarImage,
   mockSetProfile,
   mockUpdateUser,
   mockUploadAvatarImage,
-} = vi.hoisted(() => ({
-  mockGetOwnedAvatarPath: vi.fn(),
-  mockGetUser: vi.fn(),
-  mockNavigate: vi.fn(),
-  mockOnAuthStateChange: vi.fn(),
-  mockRemoveAvatarImage: vi.fn(),
-  mockSetProfile: vi.fn(),
-  mockUpdateUser: vi.fn(),
-  mockUploadAvatarImage: vi.fn(),
-}));
+  mockFrom,
+} = vi.hoisted(() => {
+  const mockProfileMaybeSingle = vi.fn();
+  const mockProfileSingle = vi.fn();
+  const mockProfileUpdate = vi.fn();
+  const profileQuery = {
+    eq: vi.fn(),
+    maybeSingle: mockProfileMaybeSingle,
+    select: vi.fn(),
+    single: mockProfileSingle,
+    update: mockProfileUpdate,
+  };
+  profileQuery.eq.mockReturnValue(profileQuery);
+  profileQuery.select.mockReturnValue(profileQuery);
+  profileQuery.update.mockReturnValue(profileQuery);
+
+  return {
+    mockFrom: vi.fn(() => profileQuery),
+    mockGetOwnedAvatarPath: vi.fn(),
+    mockGetUser: vi.fn(),
+    mockNavigate: vi.fn(),
+    mockOnAuthStateChange: vi.fn(),
+    mockProfileMaybeSingle,
+    mockProfileSingle,
+    mockProfileUpdate,
+    mockRemoveAvatarImage: vi.fn(),
+    mockSetProfile: vi.fn(),
+    mockUpdateUser: vi.fn(),
+    mockUploadAvatarImage: vi.fn(),
+  };
+});
 
 vi.mock('@/lib/supabase', () => ({
   getAuthenticatedUser: vi.fn(),
   supabase: {
+    from: mockFrom,
     auth: {
       getUser: mockGetUser,
       onAuthStateChange: mockOnAuthStateChange,
@@ -63,10 +88,13 @@ const oldAvatar =
 const newAvatar =
   'https://project.supabase.co/storage/v1/object/public/avatars/user-123/new.jpg';
 
-function createUser(avatarUrl: string): User {
+function createUser(
+  avatarUrl: string,
+  provider: 'email' | 'github' = 'email'
+): User {
   return {
     id: 'user-123',
-    app_metadata: { provider: 'email' },
+    app_metadata: { provider },
     user_metadata: {
       displayName: 'Bruno',
       phone: '(11) 99999-9999',
@@ -90,6 +118,14 @@ describe('user profile avatar persistence', () => {
     mockOnAuthStateChange.mockReturnValue({
       data: { subscription: { unsubscribe: vi.fn() } },
     });
+    mockProfileMaybeSingle.mockResolvedValue({
+      data: { avatar_url: oldAvatar },
+      error: null,
+    });
+    mockProfileSingle.mockResolvedValue({
+      data: { avatar_url: newAvatar },
+      error: null,
+    });
     mockUploadAvatarImage.mockResolvedValue({
       path: 'user-123/new.jpg',
       publicUrl: newAvatar,
@@ -99,7 +135,7 @@ describe('user profile avatar persistence', () => {
   });
 
   it('confirms Auth persistence, updates the shared cache, then removes the old object', async () => {
-    const persistedUser = createUser(newAvatar);
+    const persistedUser = createUser(oldAvatar);
     mockUpdateUser.mockResolvedValue({
       data: { user: persistedUser },
       error: null,
@@ -128,11 +164,17 @@ describe('user profile avatar persistence', () => {
       data: {
         displayName: 'Bruno',
         phone: '(11) 99999-9999',
-        avatar_url: newAvatar,
       },
     });
-    expect(queryClient.getQueryData(queryKeys.user.profile)).toBe(
-      persistedUser
+    expect(mockProfileUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ avatar_url: newAvatar })
+    );
+    expect(
+      (queryClient.getQueryData(queryKeys.user.profile) as User).user_metadata
+        .avatar_url
+    ).toBe(newAvatar);
+    expect(mockUpdateUser.mock.invocationCallOrder[0]).toBeLessThan(
+      mockProfileUpdate.mock.invocationCallOrder[0]
     );
     expect(mockRemoveAvatarImage).toHaveBeenCalledWith('user-123/old.jpg');
     expect(mockUpdateUser.mock.invocationCallOrder[0]).toBeLessThan(
@@ -140,9 +182,13 @@ describe('user profile avatar persistence', () => {
     );
   });
 
-  it('rolls back the new object when Auth does not confirm the new URL', async () => {
+  it('rolls back the new object when profiles does not confirm the new URL', async () => {
     mockUpdateUser.mockResolvedValue({
       data: { user: createUser(oldAvatar) },
+      error: null,
+    });
+    mockProfileSingle.mockResolvedValue({
+      data: { avatar_url: oldAvatar },
       error: null,
     });
     const queryClient = new QueryClient({
@@ -170,10 +216,14 @@ describe('user profile avatar persistence', () => {
     expect(queryClient.getQueryData(queryKeys.user.profile)).toBeUndefined();
   });
 
-  it('reloads the server-confirmed avatar in a fresh login query', async () => {
-    const persistedUser = createUser(newAvatar);
+  it('keeps the canonical profile avatar after a fresh GitHub login', async () => {
+    const persistedUser = createUser(oldAvatar, 'github');
     mockGetUser.mockResolvedValue({
       data: { user: persistedUser },
+      error: null,
+    });
+    mockProfileMaybeSingle.mockResolvedValue({
+      data: { avatar_url: newAvatar },
       error: null,
     });
     const queryClient = new QueryClient({
@@ -216,9 +266,13 @@ describe('user profile avatar persistence', () => {
     expect(mockSetProfile).toHaveBeenCalledWith(null);
     guard.unmount();
 
-    const persistedUser = createUser(newAvatar);
+    const persistedUser = createUser(oldAvatar);
     mockGetUser.mockResolvedValue({
       data: { user: persistedUser },
+      error: null,
+    });
+    mockProfileMaybeSingle.mockResolvedValue({
+      data: { avatar_url: newAvatar },
       error: null,
     });
     const nextLogin = renderHook(() => useCurrentUser(), {

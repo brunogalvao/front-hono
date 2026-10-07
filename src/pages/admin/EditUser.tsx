@@ -288,21 +288,19 @@ const EditUser = () => {
             </AvatarFallback>
           </Avatar>
 
-          {provider === 'email' && (
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={updateProfile.isPending}
-              className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity hover:opacity-100 disabled:cursor-not-allowed"
-              title={t('changePhotoTooltip')}
-            >
-              {updateProfile.isPending ? (
-                <Loader2 className="h-6 w-6 animate-spin text-white" />
-              ) : (
-                <Camera className="h-6 w-6 text-white" />
-              )}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={updateProfile.isPending}
+            className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity hover:opacity-100 disabled:cursor-not-allowed"
+            title={t('changePhotoTooltip')}
+          >
+            {updateProfile.isPending ? (
+              <Loader2 className="h-6 w-6 animate-spin text-white" />
+            ) : (
+              <Camera className="h-6 w-6 text-white" />
+            )}
+          </button>
 
           <input
             ref={fileInputRef}
@@ -328,7 +326,7 @@ const EditUser = () => {
               {t('imageSelected')}
             </p>
           )}
-          {provider === 'email' && !preview && (
+          {!preview && (
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
@@ -337,14 +335,12 @@ const EditUser = () => {
               {t('changePhotoLink')}
             </button>
           )}
-          {provider === 'email' && (
-            <p className="text-muted-foreground max-w-md text-xs leading-relaxed">
-              {t('avatarGuidance', {
-                maxSizeMb: MAX_AVATAR_SOURCE_FILE_SIZE / 1024 / 1024,
-                outputSize: AVATAR_OUTPUT_SIZE,
-              })}
-            </p>
-          )}
+          <p className="text-muted-foreground max-w-md text-xs leading-relaxed">
+            {t('avatarGuidance', {
+              maxSizeMb: MAX_AVATAR_SOURCE_FILE_SIZE / 1024 / 1024,
+              outputSize: AVATAR_OUTPUT_SIZE,
+            })}
+          </p>
         </div>
       </div>
 
