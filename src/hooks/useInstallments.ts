@@ -1,7 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
-import type { Installment, InstallmentInput, InstallmentUpdateInput } from '@/model/installment.model';
+import { isMissingAuditRelation } from '@/lib/supabase-errors';
+import type {
+  Installment,
+  InstallmentInput,
+  InstallmentUpdateInput,
+} from '@/model/installment.model';
 
 export type { Installment, InstallmentInput, InstallmentUpdateInput };
 
@@ -25,16 +30,28 @@ export function calcInstallmentAmount(total: number, count: number) {
 
 // T004 — progresso calculado a partir das transactions reais
 async function fetchInstallments(workspaceId: string): Promise<Installment[]> {
-  const { data: items, error } = await supabase
-    .from('installments')
-    .select('*, categories(id, name)')
-    .eq('workspace_id', workspaceId)
-    .order('created_at', { ascending: false });
+  const runQuery = (selection: string) =>
+    supabase
+      .from('installments')
+      .select(selection)
+      .eq('workspace_id', workspaceId)
+      .order('created_at', { ascending: false });
+
+  let { data: items, error } = await runQuery(
+    '*, categories(id, name), creator:profiles!installments_created_by_fkey(id, full_name), editor:profiles!installments_updated_by_fkey(id, full_name)'
+  );
+
+  if (isMissingAuditRelation(error)) {
+    ({ data: items, error } = await runQuery(
+      '*, categories(id, name), creator:profiles!installments_created_by_fkey(id, full_name)'
+    ));
+  }
 
   if (error) throw error;
-  if (!items || items.length === 0) return [];
+  const typedItems = (items ?? []) as unknown as Installment[];
+  if (typedItems.length === 0) return [];
 
-  const ids = items.map((i) => i.id);
+  const ids = typedItems.map((i) => i.id);
 
   const { data: paidTx } = await supabase
     .from('transactions')
@@ -45,13 +62,17 @@ async function fetchInstallments(workspaceId: string): Promise<Installment[]> {
 
   const paidMap = (paidTx ?? []).reduce(
     (acc, t) => {
-      if (t.installment_id) acc[t.installment_id] = (acc[t.installment_id] ?? 0) + 1;
+      if (t.installment_id)
+        acc[t.installment_id] = (acc[t.installment_id] ?? 0) + 1;
       return acc;
     },
-    {} as Record<string, number>,
+    {} as Record<string, number>
   );
 
-  return items.map((i) => ({ ...i, paid_installments: paidMap[i.id] ?? 0 })) as Installment[];
+  return typedItems.map((i) => ({
+    ...i,
+    paid_installments: paidMap[i.id] ?? 0,
+  }));
 }
 
 export function useInstallments(workspaceId: string | null) {
@@ -72,35 +93,47 @@ export function useInstallments(workspaceId: string | null) {
       } = await supabase.auth.getUser();
       const { installment_amount, remainder_amount } = calcInstallmentAmount(
         input.total_amount,
-        input.total_installments,
+        input.total_installments
       );
 
       const { data: inst, error } = await supabase
         .from('installments')
-        .insert({ ...input, created_by: user!.id, installment_amount, remainder_amount })
+        .insert({
+          ...input,
+          created_by: user!.id,
+          installment_amount,
+          remainder_amount,
+        })
         .select()
         .single();
       if (error) throw error;
 
-      const transactions = Array.from({ length: input.total_installments }, (_, i) => {
-        const num = i + 1;
-        const isLast = num === input.total_installments;
-        return {
-          workspace_id: input.workspace_id,
-          category_id: input.category_id ?? null,
-          created_by: user!.id,
-          description: input.description,
-          type: 'despesa' as const,
-          origin: 'installment' as const,
-          status: 'pendente' as const,
-          installment_id: inst.id,
-          installment_number: num,
-          amount: isLast ? installment_amount + remainder_amount : installment_amount,
-          date: addMonths(input.first_installment_date, i),
-        };
-      });
+      const transactions = Array.from(
+        { length: input.total_installments },
+        (_, i) => {
+          const num = i + 1;
+          const isLast = num === input.total_installments;
+          return {
+            workspace_id: input.workspace_id,
+            category_id: input.category_id ?? null,
+            created_by: user!.id,
+            description: input.description,
+            type: 'despesa' as const,
+            origin: 'installment' as const,
+            status: 'pendente' as const,
+            installment_id: inst.id,
+            installment_number: num,
+            amount: isLast
+              ? installment_amount + remainder_amount
+              : installment_amount,
+            date: addMonths(input.first_installment_date, i),
+          };
+        }
+      );
 
-      const { error: txError } = await supabase.from('transactions').insert(transactions);
+      const { error: txError } = await supabase
+        .from('transactions')
+        .insert(transactions);
       if (txError) throw txError;
 
       return inst;
@@ -117,14 +150,14 @@ export function useInstallments(workspaceId: string | null) {
     mutationFn: async (id: string) => {
       const { error: txError } = await supabase
         .from('transactions')
-        .update({ status: 'pago', updated_at: new Date().toISOString() })
+        .update({ status: 'pago' })
         .eq('installment_id', id)
         .eq('status', 'pendente');
       if (txError) throw txError;
 
       const { error } = await supabase
         .from('installments')
-        .update({ status: 'completed', updated_at: new Date().toISOString() })
+        .update({ status: 'completed' })
         .eq('id', id);
       if (error) throw error;
     },
@@ -136,19 +169,27 @@ export function useInstallments(workspaceId: string | null) {
   });
 
   const update = useMutation({
-    mutationFn: async ({ id, ...input }: InstallmentUpdateInput & { id: string }) => {
+    mutationFn: async ({
+      id,
+      ...input
+    }: InstallmentUpdateInput & { id: string }) => {
       const { error } = await supabase
         .from('installments')
-        .update({ ...input, updated_at: new Date().toISOString() })
+        .update(input)
         .eq('id', id);
       if (error) throw error;
 
       // Propaga description e category_id para todas as transações vinculadas
       const txAllFields: Record<string, unknown> = {};
-      if (input.description !== undefined) txAllFields.description = input.description;
-      if (input.category_id !== undefined) txAllFields.category_id = input.category_id;
+      if (input.description !== undefined)
+        txAllFields.description = input.description;
+      if (input.category_id !== undefined)
+        txAllFields.category_id = input.category_id;
       if (Object.keys(txAllFields).length > 0) {
-        await supabase.from('transactions').update(txAllFields).eq('installment_id', id);
+        await supabase
+          .from('transactions')
+          .update(txAllFields)
+          .eq('installment_id', id);
       }
 
       // Propaga installment_amount apenas para parcelas pendentes
@@ -175,7 +216,10 @@ export function useInstallments(workspaceId: string | null) {
         .eq('installment_id', id);
       if (txError) throw txError;
 
-      const { error } = await supabase.from('installments').delete().eq('id', id);
+      const { error } = await supabase
+        .from('installments')
+        .delete()
+        .eq('id', id);
       if (error) throw error;
     },
     // T009 — invalida também o cache de transactions

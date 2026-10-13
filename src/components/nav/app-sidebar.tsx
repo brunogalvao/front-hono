@@ -12,7 +12,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { useTranslation } from 'react-i18next';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { can, isSuperAdmin } = usePermissions();
+  const { can } = usePermissions();
   const { t } = useTranslation('nav');
 
   const navItems: NavItem[] = [
@@ -62,7 +62,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ...(can('members', 'read')
       ? [
           {
-            title: isSuperAdmin ? t('permissions') : t('members'),
+            title: t('membersAccess'),
             url: '/admin/settings/members',
             icon: 'shield' as const,
           },

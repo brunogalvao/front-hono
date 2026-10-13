@@ -22,6 +22,7 @@ import { useWorkspaceMembers } from '@/hooks/useWorkspaceMembers';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
+import { Clock3, ShieldCheck, UserPlus, Users } from 'lucide-react';
 
 const USERS_PAGE_SIZE = 10;
 
@@ -51,6 +52,9 @@ export default function PermissionsPage() {
     useWorkspaceMembers(activeWorkspace?.id ?? null);
 
   const canManageMembers = can('members', 'read');
+  const canInviteMembers = can('members', 'create');
+  const canUpdateMembers = can('members', 'update');
+  const canDeleteMembers = can('members', 'delete');
   const users = usersResult?.users;
   const usersTotal = usersResult?.total ?? 0;
   const usersPageCount = Math.ceil(usersTotal / USERS_PAGE_SIZE);
@@ -120,20 +124,96 @@ export default function PermissionsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {isSuperAdmin ? t('page.titleSuperAdmin') : t('page.titleAdmin')}
-        </h1>
+        <h1 className="text-2xl font-bold tracking-tight">{t('page.title')}</h1>
         <p className="text-muted-foreground text-sm">
           {isSuperAdmin
-            ? t('page.subtitleSuperAdmin')
-            : t('page.subtitleAdmin')}
+            ? t('page.subtitleSuperAdmin', { workspace: activeWorkspace.name })
+            : t('page.subtitleAdmin', { workspace: activeWorkspace.name })}
         </p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Users className="text-primary size-5" />
+            {t('allUsers.title')}
+          </CardTitle>
+          <CardDescription>{t('allUsers.description')}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {canInviteMembers && (
+            <>
+              <section className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <UserPlus className="size-4" aria-hidden="true" />
+                  <p className="text-sm font-medium">
+                    {t('allUsers.inviteByEmail')}
+                  </p>
+                </div>
+                <p className="text-muted-foreground text-xs">
+                  {t('allUsers.inviteDescription')}
+                </p>
+                <InviteForm onInvite={handleInvite} />
+              </section>
+
+              <Separator />
+            </>
+          )}
+
+          <section className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Users className="size-4" aria-hidden="true" />
+              <p className="text-sm font-medium">
+                {t('allUsers.memberCount', { count: usersTotal })}
+              </p>
+            </div>
+            <AllUsersTable
+              users={users}
+              isLoading={isUsersLoading}
+              currentUserId={currentUserId ?? ''}
+              workspaceId={activeWorkspace.id}
+              isSuperAdmin={isSuperAdmin}
+              canCreateMembers={canInviteMembers}
+              canUpdateMembers={canUpdateMembers}
+              canDeleteMembers={canDeleteMembers}
+              pendingInvites={pendingInvites.data ?? []}
+              busyInviteId={busyInviteId}
+              onResendInvite={handleResend}
+              onCancelInvite={handleCancel}
+              page={usersPage}
+              pageCount={usersPageCount}
+              total={usersTotal}
+              onPageChange={setUsersPage}
+            />
+          </section>
+
+          <Separator />
+
+          <section className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Clock3 className="size-4" aria-hidden="true" />
+              <p className="text-sm font-medium">{t('invite:list.title')}</p>
+            </div>
+            <PendingInviteList
+              invites={pendingInvites.data ?? []}
+              isLoading={pendingInvites.isLoading}
+              busyInviteId={busyInviteId}
+              onResend={handleResend}
+              onCancel={handleCancel}
+              canResend={canInviteMembers}
+              canCancel={canDeleteMembers}
+            />
+          </section>
+        </CardContent>
+      </Card>
 
       {isSuperAdmin && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{t('matrix.title')}</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <ShieldCheck className="text-primary size-5" />
+              {t('matrix.title')}
+            </CardTitle>
             <CardDescription>{t('matrix.description')}</CardDescription>
           </CardHeader>
           <CardContent>
@@ -144,52 +224,6 @@ export default function PermissionsPage() {
           </CardContent>
         </Card>
       )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t('allUsers.title')}</CardTitle>
-          <CardDescription>{t('allUsers.description')}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <AllUsersTable
-            users={users}
-            isLoading={isUsersLoading}
-            currentUserId={currentUserId ?? ''}
-            workspaceId={activeWorkspace.id}
-            isSuperAdmin={isSuperAdmin}
-            pendingInvites={pendingInvites.data ?? []}
-            busyInviteId={busyInviteId}
-            onResendInvite={handleResend}
-            onCancelInvite={handleCancel}
-            page={usersPage}
-            pageCount={usersPageCount}
-            total={usersTotal}
-            onPageChange={setUsersPage}
-          />
-
-          <Separator />
-
-          <div>
-            <p className="mb-0 text-sm font-medium">
-              {t('allUsers.inviteByEmail')}
-            </p>
-            <InviteForm onInvite={handleInvite} />
-          </div>
-
-          <Separator />
-
-          <div className="space-y-3">
-            <p className="text-sm font-medium">{t('invite:list.title')}</p>
-            <PendingInviteList
-              invites={pendingInvites.data ?? []}
-              isLoading={pendingInvites.isLoading}
-              busyInviteId={busyInviteId}
-              onResend={handleResend}
-              onCancel={handleCancel}
-            />
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

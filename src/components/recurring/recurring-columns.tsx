@@ -20,9 +20,11 @@ import { cn } from '@/lib/utils';
 import { formatToBRL } from '@/utils/format';
 import { CategoryIcon } from '@/lib/category-icons';
 import type { RecurringExpense } from '@/hooks/useRecurring';
+import { RecordAuditMeta } from '@/components/RecordAuditMeta';
 
 interface ColumnOpts {
-  canAct: boolean;
+  canUpdate: boolean;
+  canDelete: boolean;
   onEdit: (item: RecurringExpense) => void;
   onDelete: (id: string) => void;
   onToggle: (id: string, current: boolean) => void;
@@ -33,11 +35,15 @@ export function RecurringActionsCell({
   onEdit,
   onDelete,
   onToggle,
+  canUpdate,
+  canDelete,
 }: {
   item: RecurringExpense;
   onEdit: (item: RecurringExpense) => void;
   onDelete: (id: string) => void;
   onToggle: (id: string, current: boolean) => void;
+  canUpdate: boolean;
+  canDelete: boolean;
 }) {
   const { t } = useTranslation(['recurring', 'common']);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -45,31 +51,37 @@ export function RecurringActionsCell({
   return (
     <>
       <div className="flex items-center gap-1">
-        <div className="flex size-11 items-center justify-center md:size-8">
-          <Switch
-            checked={item.is_active}
-            onCheckedChange={() => onToggle(item.id, item.is_active)}
-            aria-label={t('actions.toggleAria')}
-          />
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-11 md:size-8"
-          aria-label={t('common:edit')}
-          onClick={() => onEdit(item)}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-destructive hover:text-destructive size-11 md:size-8"
-          aria-label={t('common:delete')}
-          onClick={() => setDeleteOpen(true)}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        {canUpdate && (
+          <div className="flex size-11 items-center justify-center md:size-8">
+            <Switch
+              checked={item.is_active}
+              onCheckedChange={() => onToggle(item.id, item.is_active)}
+              aria-label={t('actions.toggleAria')}
+            />
+          </div>
+        )}
+        {canUpdate && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-11 md:size-8"
+            aria-label={t('common:edit')}
+            onClick={() => onEdit(item)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+        )}
+        {canDelete && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-destructive hover:text-destructive size-11 md:size-8"
+            aria-label={t('common:delete')}
+            onClick={() => setDeleteOpen(true)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
@@ -136,6 +148,13 @@ export function getRecurringColumns(
                 {categories.name}
               </span>
             )}
+            <RecordAuditMeta
+              creator={row.original.creator}
+              editor={row.original.editor}
+              createdAt={row.original.created_at}
+              updatedAt={row.original.updated_at}
+              className="mt-1"
+            />
           </div>
         );
       },
@@ -180,7 +199,7 @@ export function getRecurringColumns(
         );
       },
     },
-    ...(opts.canAct
+    ...(opts.canUpdate || opts.canDelete
       ? [
           {
             id: 'actions',
@@ -192,6 +211,8 @@ export function getRecurringColumns(
                 onEdit={opts.onEdit}
                 onDelete={opts.onDelete}
                 onToggle={opts.onToggle}
+                canUpdate={opts.canUpdate}
+                canDelete={opts.canDelete}
               />
             ),
           } satisfies ColumnDef<RecurringExpense>,

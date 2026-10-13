@@ -2,12 +2,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getIA } from '@/service/ia/getIA';
 import { queryKeys } from '@/lib/query-keys';
 
-export function useIA() {
+export function useIA(month: number, year: number, workspaceId: string | null) {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: queryKeys.ia.all,
-    queryFn: () => getIA(),
+    queryKey: queryKeys.ia.analysis(workspaceId ?? '', month, year),
+    queryFn: () => getIA({ month, year, workspaceId }),
     staleTime: 0,
     gcTime: 0,
     refetchOnWindowFocus: false,

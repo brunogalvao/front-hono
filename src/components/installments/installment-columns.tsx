@@ -19,9 +19,11 @@ import {
 import { cn } from '@/lib/utils';
 import { formatToBRL } from '@/utils/format';
 import type { Installment } from '@/hooks/useInstallments';
+import { RecordAuditMeta } from '@/components/RecordAuditMeta';
 
 interface ColumnOpts {
-  canAct: boolean;
+  canUpdate: boolean;
+  canDelete: boolean;
   onEdit: (item: Installment) => void;
   onPayoff: (item: Installment) => void;
   onDelete: (id: string) => void;
@@ -32,11 +34,15 @@ export function InstallmentActionsCell({
   onEdit,
   onPayoff,
   onDelete,
+  canUpdate,
+  canDelete,
 }: {
   item: Installment;
   onEdit: (item: Installment) => void;
   onPayoff: (item: Installment) => void;
   onDelete: (id: string) => void;
+  canUpdate: boolean;
+  canDelete: boolean;
 }) {
   const { t } = useTranslation(['installments', 'common']);
   const [payoffOpen, setPayoffOpen] = useState(false);
@@ -48,33 +54,39 @@ export function InstallmentActionsCell({
   return (
     <>
       <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-11 md:size-8"
-          aria-label={t('common:edit')}
-          onClick={() => onEdit(item)}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="min-h-11 gap-1 text-xs md:min-h-8"
-          onClick={() => setPayoffOpen(true)}
-        >
-          <CheckCircle className="h-3 w-3" />
-          {t('payoffEarly')}
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-destructive hover:text-destructive min-h-11 gap-1 text-xs md:min-h-8"
-          onClick={() => setDeleteOpen(true)}
-        >
-          <Trash2 className="h-3 w-3" />
-          {t('deleteSeries')}
-        </Button>
+        {canUpdate && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-11 md:size-8"
+            aria-label={t('common:edit')}
+            onClick={() => onEdit(item)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+        )}
+        {canUpdate && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="min-h-11 gap-1 text-xs md:min-h-8"
+            onClick={() => setPayoffOpen(true)}
+          >
+            <CheckCircle className="h-3 w-3" />
+            {t('payoffEarly')}
+          </Button>
+        )}
+        {canDelete && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-destructive hover:text-destructive min-h-11 gap-1 text-xs md:min-h-8"
+            onClick={() => setDeleteOpen(true)}
+          >
+            <Trash2 className="h-3 w-3" />
+            {t('deleteSeries')}
+          </Button>
+        )}
       </div>
 
       <AlertDialog open={payoffOpen} onOpenChange={setPayoffOpen}>
@@ -196,6 +208,13 @@ export function getInstallmentColumns(
                 {categories.name}
               </span>
             )}
+            <RecordAuditMeta
+              creator={row.original.creator}
+              editor={row.original.editor}
+              createdAt={row.original.created_at}
+              updatedAt={row.original.updated_at}
+              className="mt-1"
+            />
           </div>
         );
       },
@@ -258,7 +277,7 @@ export function getInstallmentColumns(
         );
       },
     },
-    ...(opts.canAct
+    ...(opts.canUpdate || opts.canDelete
       ? [
           {
             id: 'actions',
@@ -272,6 +291,8 @@ export function getInstallmentColumns(
                   onEdit={opts.onEdit}
                   onPayoff={opts.onPayoff}
                   onDelete={opts.onDelete}
+                  canUpdate={opts.canUpdate}
+                  canDelete={opts.canDelete}
                 />
               );
             },

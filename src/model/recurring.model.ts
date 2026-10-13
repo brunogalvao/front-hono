@@ -3,6 +3,7 @@ export interface RecurringExpense {
   workspace_id: string;
   category_id: string | null;
   created_by: string;
+  updated_by: string | null;
   description: string;
   amount: number;
   frequency: 'monthly' | 'weekly' | 'yearly';
@@ -11,7 +12,10 @@ export interface RecurringExpense {
   is_active: boolean;
   last_generated_date: string | null;
   created_at: string;
+  updated_at: string;
   categories?: { id: string; name: string; icon: string | null } | null;
+  creator?: { id: string; full_name: string | null } | null;
+  editor?: { id: string; full_name: string | null } | null;
 }
 
 export interface RecurringInput {

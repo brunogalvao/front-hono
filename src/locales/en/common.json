@@ -14,6 +14,13 @@
   "noData": "No data found.",
   "error": "Error",
   "success": "Success",
+  "audit": {
+    "createdBy": "Created by {{name}} on {{date}}",
+    "editedBy": "Edited by {{name}} on {{date}}",
+    "automaticallyUpdated": "Automatically updated on {{date}}",
+    "unknownUser": "Unknown user",
+    "unknownDate": "date unavailable"
+  },
   "currency": {
     "brl": "R$",
     "usd": "U$",

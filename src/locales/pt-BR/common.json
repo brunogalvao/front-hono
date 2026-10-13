@@ -14,6 +14,13 @@
   "noData": "Nenhum dado encontrado.",
   "error": "Erro",
   "success": "Sucesso",
+  "audit": {
+    "createdBy": "Criado por {{name}} em {{date}}",
+    "editedBy": "Editado por {{name}} em {{date}}",
+    "automaticallyUpdated": "Atualizado automaticamente em {{date}}",
+    "unknownUser": "Usuário não identificado",
+    "unknownDate": "data não disponível"
+  },
   "currency": {
     "brl": "R$",
     "usd": "U$",

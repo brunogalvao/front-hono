@@ -14,30 +14,37 @@ import {
   TipsSkeleton,
 } from '@/components/SkeletonDashboard';
 import { getNomeMes } from '@/model/mes.enum';
-import { getCurrentMonth, getCurrentYear } from '@/utils/date';
 import { useTranslation } from 'react-i18next';
 import { MonthNavigator } from '@/components/dashboard/MonthNavigator';
 import { SummaryCard } from '@/components/dashboard/SummaryCard';
 import { DollarConversionCard } from '@/components/dashboard/DollarConversionCard';
 import { useDashboard } from '@/hooks/useDashboard';
 import { useWorkspace } from '@/context/WorkspaceContext';
+import { useDollarRate } from '@/hooks/use-dollar-rate';
 
 const Dashboard = () => {
-  const { data: iaData, isLoading, isError: iaIsError } = useIA();
   const { t } = useTranslation('dashboard');
-  const shouldShowSkeleton = isLoading;
-  const { activeWorkspaceId } = useWorkspace();
+  const { activeWorkspaceId, activeWorkspace } = useWorkspace();
 
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
+  const { data: iaData, isLoading } = useIA(month, year, activeWorkspaceId);
+  const dollarRate = useDollarRate();
+  const shouldShowSkeleton = isLoading;
   const { workspaceSummary, individualSummary } = useDashboard(
     activeWorkspaceId,
     month,
     year
   );
 
-  const subtitulo = `${getNomeMes(getCurrentMonth())} ${getCurrentYear()}`;
+  const subtitulo = `${getNomeMes(month)} ${year}`;
+  const workspaceExpenses = workspaceSummary.data?.total_despesas ?? 0;
+  const personalExpenses = individualSummary.data?.total_despesas ?? 0;
+  const personalExpenseShare =
+    workspaceExpenses > 0
+      ? Math.round((personalExpenses / workspaceExpenses) * 100)
+      : undefined;
   const percentualGasto = iaData?.data?.percentualGasto ?? 0;
   const savingTipKeys =
     percentualGasto < 50
@@ -83,21 +90,32 @@ const Dashboard = () => {
       {activeWorkspaceId && (
         <div className="grid gap-4 md:grid-cols-3">
           <SummaryCard
-            title={t('workspaceSummary')}
+            title={activeWorkspace?.name ?? t('workspaceSummary')}
+            context={t('summary.workspaceContext', { period: subtitulo })}
+            scope="workspace"
             summary={workspaceSummary.data}
+            month={month}
+            year={year}
             isLoading={workspaceSummary.isLoading}
           />
           <SummaryCard
             title={t('personalSummary')}
+            context={t('summary.personalContext', { period: subtitulo })}
+            scope="personal"
             summary={individualSummary.data}
+            expenseShare={personalExpenseShare}
+            month={month}
+            year={year}
             isLoading={individualSummary.isLoading}
           />
           <DollarConversionCard
-            isLoading={shouldShowSkeleton}
-            isError={iaIsError}
-            cotacaoDolar={iaData?.data?.cotacaoDolar}
-            quantidadeDolar={iaData?.data?.quantidadeDolar}
-            valorLivre={iaData?.data?.valorLivre}
+            isLoading={dollarRate.isLoading || individualSummary.isLoading}
+            isError={dollarRate.isError || individualSummary.isError}
+            cotacaoDolar={dollarRate.data?.rate}
+            valorLivre={individualSummary.data?.saldo}
+            marketUpdatedAt={dollarRate.data?.marketUpdatedAt}
+            sourceLabel={dollarRate.data?.sourceLabel}
+            sourceUrl={dollarRate.data?.sourceUrl}
           />
         </div>
       )}
@@ -157,6 +175,9 @@ const Dashboard = () => {
         <IARecommendations
           data={iaData.data}
           showDollarCard={!activeWorkspaceId}
+          dollarQuote={dollarRate.data}
+          isDollarQuoteLoading={dollarRate.isLoading}
+          isDollarQuoteError={dollarRate.isError}
         />
       ) : null}
     </div>

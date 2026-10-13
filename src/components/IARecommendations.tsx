@@ -16,24 +16,36 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { DollarConversionCard } from '@/components/dashboard/DollarConversionCard';
 import { useTranslation } from 'react-i18next';
+import type { DollarRateQuote } from '@/service/currency/getDollarQuote';
+import { cn } from '@/lib/utils';
 
 type Props = {
   data: IASimplificada;
   showDollarCard?: boolean;
+  dollarQuote?: DollarRateQuote;
+  isDollarQuoteLoading?: boolean;
+  isDollarQuoteError?: boolean;
 };
 
-const IARecommendations = ({ data, showDollarCard = false }: Props) => {
+const IARecommendations = ({
+  data,
+  showDollarCard = false,
+  dollarQuote,
+  isDollarQuoteLoading,
+  isDollarQuoteError,
+}: Props) => {
   const { t } = useTranslation('dashboard');
   const {
     percentualGasto,
     percentualDisponivel,
     resultadoLiquido,
     quantidadeDolar,
-    cotacaoDolar,
     rendimentoMes,
     despesasPagas,
     despesasPendentes,
+    valorLivre,
   } = data;
+  const hasDeficit = valorLivre < 0;
 
   const statusInfo =
     percentualGasto < 50
@@ -117,7 +129,9 @@ const IARecommendations = ({ data, showDollarCard = false }: Props) => {
                 {t('financialStatus.usdEquivalent')}
               </span>
               <div className="text-foreground font-semibold">
-                {formatToUSD(quantidadeDolar)}
+                {valorLivre > 0
+                  ? formatToUSD(quantidadeDolar)
+                  : t('financialStatus.noUsdBalance')}
               </div>
             </div>
           </div>
@@ -173,16 +187,42 @@ const IARecommendations = ({ data, showDollarCard = false }: Props) => {
           </div>
 
           {/* Saldo */}
-          <div className="flex items-center gap-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
-              <Wallet className="h-5 w-5 text-emerald-500" />
+          <div
+            className={cn(
+              'flex items-center gap-3 rounded-lg border p-3',
+              hasDeficit
+                ? 'border-red-500/20 bg-red-500/5'
+                : 'border-emerald-500/20 bg-emerald-500/5'
+            )}
+          >
+            <div
+              className={cn(
+                'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+                hasDeficit ? 'bg-red-500/10' : 'bg-emerald-500/10'
+              )}
+            >
+              <Wallet
+                className={cn(
+                  'h-5 w-5',
+                  hasDeficit ? 'text-red-500' : 'text-emerald-500'
+                )}
+              />
             </div>
             <div className="min-w-0 flex-1">
               <div className="text-muted-foreground text-xs">
-                {t('financialStatus.remaining')}
+                {t(
+                  hasDeficit
+                    ? 'financialStatus.deficit'
+                    : 'financialStatus.remaining'
+                )}
               </div>
-              <div className="text-lg leading-tight font-bold text-emerald-600">
-                {formatToBRL(resultadoLiquido)}
+              <div
+                className={cn(
+                  'text-lg leading-tight font-bold',
+                  hasDeficit ? 'text-red-600' : 'text-emerald-600'
+                )}
+              >
+                {formatToBRL(valorLivre)}
               </div>
             </div>
           </div>
@@ -191,9 +231,13 @@ const IARecommendations = ({ data, showDollarCard = false }: Props) => {
 
       {showDollarCard && (
         <DollarConversionCard
-          cotacaoDolar={cotacaoDolar}
-          quantidadeDolar={quantidadeDolar}
+          cotacaoDolar={dollarQuote?.rate}
           valorLivre={data.valorLivre}
+          marketUpdatedAt={dollarQuote?.marketUpdatedAt}
+          sourceLabel={dollarQuote?.sourceLabel}
+          sourceUrl={dollarQuote?.sourceUrl}
+          isLoading={isDollarQuoteLoading}
+          isError={isDollarQuoteError}
         />
       )}
     </div>

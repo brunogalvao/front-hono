@@ -1,9 +1,10 @@
 {
   "page": {
+    "title": "Members and access",
     "titleSuperAdmin": "Permissions Management",
     "titleAdmin": "Members Management",
-    "subtitleSuperAdmin": "Manage user access and roles in the workspace",
-    "subtitleAdmin": "Invite and remove workspace members",
+    "subtitleSuperAdmin": "Manage members, invitations and access roles in {{workspace}}.",
+    "subtitleAdmin": "Invite and manage members of {{workspace}}.",
     "accessDenied": "Access restricted"
   },
   "matrix": {
@@ -15,14 +16,17 @@
     "updateError": "Failed to update permission"
   },
   "allUsers": {
-    "title": "Application users",
-    "description": "All registered users — workspace members and users without access",
+    "title": "Workspace members",
+    "description": "People who can access this workspace's data and resources.",
     "inviteByEmail": "Invite by email",
+    "inviteDescription": "The guest receives a secure link and joins with the selected role.",
+    "memberCount_one": "{{count}} member with access",
+    "memberCount_other": "{{count}} members with access",
     "pendingInvite": "Pending invitation",
     "expiredInvite": "Expired invitation",
     "currentSession": "(you)",
     "noAccess": "No access",
-    "empty": "No users found",
+    "empty": "No members found",
     "individualPermissions": "Individual permissions",
     "cannotChangeOwnRole": "You cannot change your own role",
     "onlySuperAdminCanChangeRoles": "Only the Super Admin can change roles",
@@ -33,9 +37,9 @@
     "addDescription": "Select the role for <strong>{{name}}</strong> in the workspace.",
     "add": "Add",
     "pagination": {
-      "label": "User pagination",
-      "total_one": "{{count}} registered user",
-      "total_other": "{{count}} registered users",
+      "label": "Member pagination",
+      "total_one": "{{count}} member",
+      "total_other": "{{count}} members",
       "page": "Page {{page}} of {{total}}",
       "previous": "Previous page",
       "next": "Next page"

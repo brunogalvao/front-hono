@@ -43,6 +43,7 @@ import {
 } from '@/components/ui/mobile-record-list';
 import { CategoryIcon } from '@/lib/category-icons';
 import { TransactionActionsCell } from './TransactionActionsCell';
+import { RecordAuditMeta } from '@/components/RecordAuditMeta';
 
 const STATUS_ORDER: Record<string, number> = {
   pendente: 0,
@@ -337,6 +338,13 @@ export function TransactionTable({
                         </span>
                       </p>
                     )}
+                    <RecordAuditMeta
+                      creator={transaction.creator}
+                      editor={transaction.editor}
+                      createdAt={transaction.created_at}
+                      updatedAt={transaction.updated_at}
+                      className="mt-1"
+                    />
                   </div>
                   <span
                     className={cn(

@@ -1,9 +1,10 @@
 {
   "page": {
+    "title": "Membros e acesso",
     "titleSuperAdmin": "Gerenciamento de Permissões",
     "titleAdmin": "Gerenciamento de Membros",
-    "subtitleSuperAdmin": "Gerencie o acesso e os papéis dos usuários no workspace",
-    "subtitleAdmin": "Convide e remova membros do workspace",
+    "subtitleSuperAdmin": "Gerencie membros, convites e papéis de acesso em {{workspace}}.",
+    "subtitleAdmin": "Convide e administre os membros de {{workspace}}.",
     "accessDenied": "Acesso restrito"
   },
   "matrix": {
@@ -15,14 +16,17 @@
     "updateError": "Erro ao atualizar permissão"
   },
   "allUsers": {
-    "title": "Usuários da aplicação",
-    "description": "Todos os usuários cadastrados — membros do workspace e usuários sem acesso",
+    "title": "Membros do workspace",
+    "description": "Pessoas que têm acesso aos dados e recursos deste workspace.",
     "inviteByEmail": "Convidar por e-mail",
+    "inviteDescription": "O convidado receberá um link seguro e entrará com o papel selecionado.",
+    "memberCount_one": "{{count}} membro com acesso",
+    "memberCount_other": "{{count}} membros com acesso",
     "pendingInvite": "Convite pendente",
     "expiredInvite": "Convite expirado",
     "currentSession": "(você)",
     "noAccess": "Sem acesso",
-    "empty": "Nenhum usuário encontrado",
+    "empty": "Nenhum membro encontrado",
     "individualPermissions": "Permissões individuais",
     "cannotChangeOwnRole": "Você não pode alterar seu próprio papel",
     "onlySuperAdminCanChangeRoles": "Apenas o Super Admin pode alterar papéis",
@@ -33,9 +37,9 @@
     "addDescription": "Selecione o papel de <strong>{{name}}</strong> no workspace.",
     "add": "Adicionar",
     "pagination": {
-      "label": "Paginação de usuários",
-      "total_one": "{{count}} usuário cadastrado",
-      "total_other": "{{count}} usuários cadastrados",
+      "label": "Paginação de membros",
+      "total_one": "{{count}} membro",
+      "total_other": "{{count}} membros",
       "page": "Página {{page}} de {{total}}",
       "previous": "Página anterior",
       "next": "Próxima página"

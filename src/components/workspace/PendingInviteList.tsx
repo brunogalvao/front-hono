@@ -9,6 +9,8 @@ interface PendingInviteListProps {
   busyInviteId?: string;
   onResend: (inviteId: string) => Promise<unknown>;
   onCancel: (inviteId: string) => Promise<unknown>;
+  canResend?: boolean;
+  canCancel?: boolean;
 }
 
 export function PendingInviteList({
@@ -17,6 +19,8 @@ export function PendingInviteList({
   busyInviteId,
   onResend,
   onCancel,
+  canResend = true,
+  canCancel = true,
 }: PendingInviteListProps) {
   const { t } = useTranslation('invite');
 
@@ -57,30 +61,36 @@ export function PendingInviteList({
                 {t(`list.delivery.${invite.delivery_status}`)}
               </p>
             </div>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="min-h-11"
-                disabled={busy}
-                onClick={() => void onResend(invite.id)}
-              >
-                <RotateCw aria-hidden="true" className="h-4 w-4" />
-                {t('form.resend')}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                className="min-h-11"
-                disabled={busy}
-                onClick={() => void onCancel(invite.id)}
-              >
-                <X aria-hidden="true" className="h-4 w-4" />
-                {t('form.cancel')}
-              </Button>
-            </div>
+            {(canResend || canCancel) && (
+              <div className="flex gap-2">
+                {canResend && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="min-h-11"
+                    disabled={busy}
+                    onClick={() => void onResend(invite.id)}
+                  >
+                    <RotateCw aria-hidden="true" className="h-4 w-4" />
+                    {t('form.resend')}
+                  </Button>
+                )}
+                {canCancel && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="min-h-11"
+                    disabled={busy}
+                    onClick={() => void onCancel(invite.id)}
+                  >
+                    <X aria-hidden="true" className="h-4 w-4" />
+                    {t('form.cancel')}
+                  </Button>
+                )}
+              </div>
+            )}
           </li>
         );
       })}

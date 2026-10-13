@@ -67,6 +67,9 @@ interface AllUsersTableProps {
   currentUserId: string;
   workspaceId: string;
   isSuperAdmin?: boolean;
+  canCreateMembers?: boolean;
+  canUpdateMembers?: boolean;
+  canDeleteMembers?: boolean;
   pendingInvites: PendingInvite[];
   busyInviteId?: string;
   onResendInvite: (inviteId: string) => Promise<unknown>;
@@ -83,6 +86,9 @@ export function AllUsersTable({
   currentUserId,
   workspaceId,
   isSuperAdmin = false,
+  canCreateMembers = false,
+  canUpdateMembers = false,
+  canDeleteMembers = false,
   pendingInvites,
   busyInviteId,
   onResendInvite,
@@ -234,7 +240,7 @@ export function AllUsersTable({
 
               {/* Role area */}
               {isMember ? (
-                isSelf || !isSuperAdmin ? (
+                isSelf || !canUpdateMembers ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <span>
@@ -304,65 +310,81 @@ export function AllUsersTable({
                       <Shield className="h-4 w-4" />
                     </Button>
                   )}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive size-11 shrink-0 md:size-8"
-                        aria-label={t('allUsers.remove')}
-                        onClick={() => setRemoveTarget(user)}
-                      >
-                        <UserMinus className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('allUsers.remove')}</TooltipContent>
-                  </Tooltip>
+                  {canDeleteMembers && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive size-11 shrink-0 md:size-8"
+                          aria-label={t('allUsers.remove')}
+                          onClick={() => setRemoveTarget(user)}
+                        >
+                          <UserMinus className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>{t('allUsers.remove')}</TooltipContent>
+                    </Tooltip>
+                  )}
                 </>
               )}
 
-              {!isMember && pendingInvite && (
-                <>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="size-11 shrink-0 md:size-8"
-                        aria-label={t('invite:form.resend')}
-                        disabled={inviteIsBusy}
-                        onClick={() => void onResendInvite(pendingInvite.id)}
-                      >
-                        {inviteIsBusy ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <RotateCw className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('invite:form.resend')}</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive size-11 shrink-0 md:size-8"
-                        aria-label={t('invite:form.cancel')}
-                        disabled={inviteIsBusy}
-                        onClick={() => void onCancelInvite(pendingInvite.id)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('invite:form.cancel')}</TooltipContent>
-                  </Tooltip>
-                </>
-              )}
+              {!isMember &&
+                pendingInvite &&
+                (canCreateMembers || canDeleteMembers) && (
+                  <>
+                    {canCreateMembers && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="size-11 shrink-0 md:size-8"
+                            aria-label={t('invite:form.resend')}
+                            disabled={inviteIsBusy}
+                            onClick={() =>
+                              void onResendInvite(pendingInvite.id)
+                            }
+                          >
+                            {inviteIsBusy ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <RotateCw className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {t('invite:form.resend')}
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                    {canDeleteMembers && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive size-11 shrink-0 md:size-8"
+                            aria-label={t('invite:form.cancel')}
+                            disabled={inviteIsBusy}
+                            onClick={() =>
+                              void onCancelInvite(pendingInvite.id)
+                            }
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {t('invite:form.cancel')}
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </>
+                )}
 
-              {!isMember && !pendingInvite && (
+              {!isMember && !pendingInvite && canCreateMembers && (
                 <Button
                   variant="ghost"
                   size="icon"

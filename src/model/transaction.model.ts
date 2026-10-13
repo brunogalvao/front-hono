@@ -5,6 +5,7 @@ export interface Transaction {
   workspace_id: string;
   category_id: string | null;
   created_by: string;
+  updated_by: string | null;
   type: 'receita' | 'despesa';
   origin: 'manual' | 'recurring' | 'installment';
   status: TransactionStatus;
@@ -14,8 +15,15 @@ export interface Transaction {
   recurring_expense_id: string | null;
   installment_id: string | null;
   created_at: string;
-  categories?: { id: string; name: string; type: string; icon: string | null } | null;
-  profiles?: { id: string; full_name: string | null } | null;
+  updated_at: string;
+  categories?: {
+    id: string;
+    name: string;
+    type: string;
+    icon: string | null;
+  } | null;
+  creator?: { id: string; full_name: string | null } | null;
+  editor?: { id: string; full_name: string | null } | null;
   installments?: { id: string; total_installments: number } | null;
   installment_number?: number;
 }

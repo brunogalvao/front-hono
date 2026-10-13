@@ -3,6 +3,7 @@ export interface Installment {
   workspace_id: string;
   category_id: string | null;
   created_by: string;
+  updated_by: string | null;
   description: string;
   total_amount: number;
   installment_amount: number;
@@ -13,7 +14,10 @@ export interface Installment {
   status: 'active' | 'completed' | 'cancelled';
   last_generated_date: string | null;
   created_at: string;
+  updated_at: string;
   categories?: { id: string; name: string } | null;
+  creator?: { id: string; full_name: string | null } | null;
+  editor?: { id: string; full_name: string | null } | null;
 }
 
 export interface InstallmentInput {

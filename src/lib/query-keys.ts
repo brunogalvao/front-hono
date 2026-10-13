@@ -49,6 +49,8 @@ export const queryKeys = {
 
   ia: {
     all: ['ia'] as const,
+    analysis: (workspaceId: string, month: number, year: number) =>
+      ['ia', 'analysis', workspaceId, month, year] as const,
   },
 
   notifications: {

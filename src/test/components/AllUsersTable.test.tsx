@@ -52,6 +52,9 @@ function renderTable({
         currentUserId="current-user"
         workspaceId="workspace-1"
         isSuperAdmin
+        canCreateMembers
+        canUpdateMembers
+        canDeleteMembers
         pendingInvites={pendingInvites}
         onResendInvite={onResendInvite}
         onCancelInvite={onCancelInvite}

@@ -33,6 +33,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { formatToBRL } from '@/utils/format';
+import { RecordAuditMeta } from '@/components/RecordAuditMeta';
 
 interface InstallmentTableProps {
   highlightId?: string;
@@ -51,7 +52,9 @@ export function InstallmentTable({ highlightId }: InstallmentTableProps) {
     remove,
   } = useInstallments(activeWorkspaceId);
   const [editTarget, setEditTarget] = useState<Installment | null>(null);
-  const canAct = can('installments', 'update') || can('installments', 'delete');
+  const canUpdate = can('installments', 'update');
+  const canDelete = can('installments', 'delete');
+  const canAct = canUpdate || canDelete;
 
   useEffect(() => {
     if (highlightId) {
@@ -81,7 +84,8 @@ export function InstallmentTable({ highlightId }: InstallmentTableProps) {
   const columns = useMemo(
     () =>
       getInstallmentColumns(t, {
-        canAct,
+        canUpdate,
+        canDelete,
         onEdit: setEditTarget,
         onPayoff: handlePayoff,
         onDelete: handleDelete,
@@ -150,6 +154,13 @@ export function InstallmentTable({ highlightId }: InstallmentTableProps) {
                         </Badge>
                       )}
                     </div>
+                    <RecordAuditMeta
+                      creator={item.creator}
+                      editor={item.editor}
+                      createdAt={item.created_at}
+                      updatedAt={item.updated_at}
+                      className="mt-1"
+                    />
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="font-semibold text-red-500 tabular-nums">
@@ -183,6 +194,8 @@ export function InstallmentTable({ highlightId }: InstallmentTableProps) {
                     onEdit={setEditTarget}
                     onPayoff={handlePayoff}
                     onDelete={handleDelete}
+                    canUpdate={canUpdate}
+                    canDelete={canDelete}
                   />
                 )}
               </MobileRecordListItem>

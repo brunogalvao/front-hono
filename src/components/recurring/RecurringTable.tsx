@@ -30,6 +30,7 @@ import { Badge } from '@/components/ui/badge';
 import { CategoryIcon } from '@/lib/category-icons';
 import { formatToBRL } from '@/utils/format';
 import { cn } from '@/lib/utils';
+import { RecordAuditMeta } from '@/components/RecordAuditMeta';
 
 export function RecurringTable() {
   const { t } = useTranslation('recurring');
@@ -44,7 +45,9 @@ export function RecurringTable() {
     remove,
   } = useRecurring(activeWorkspaceId);
   const [editTarget, setEditTarget] = useState<RecurringExpense | null>(null);
-  const canAct = can('recurring', 'update') || can('recurring', 'delete');
+  const canUpdate = can('recurring', 'update');
+  const canDelete = can('recurring', 'delete');
+  const canAct = canUpdate || canDelete;
 
   const handleToggle = async (id: string, current: boolean) => {
     try {
@@ -67,7 +70,8 @@ export function RecurringTable() {
   const columns = useMemo(
     () =>
       getRecurringColumns(t, {
-        canAct,
+        canUpdate,
+        canDelete,
         onEdit: setEditTarget,
         onDelete: handleDelete,
         onToggle: handleToggle,
@@ -133,6 +137,13 @@ export function RecurringTable() {
                       <span className="truncate">{item.categories.name}</span>
                     </p>
                   )}
+                  <RecordAuditMeta
+                    creator={item.creator}
+                    editor={item.editor}
+                    createdAt={item.created_at}
+                    updatedAt={item.updated_at}
+                    className="mt-1"
+                  />
                 </div>
                 <span className="shrink-0 font-semibold text-red-500 tabular-nums">
                   - {formatToBRL(item.amount)}
@@ -153,6 +164,8 @@ export function RecurringTable() {
                     onEdit={setEditTarget}
                     onDelete={handleDelete}
                     onToggle={handleToggle}
+                    canUpdate={canUpdate}
+                    canDelete={canDelete}
                   />
                 )}
               </div>

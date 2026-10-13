@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
+import { isMissingAuditRelation } from '@/lib/supabase-errors';
 import type { RecurringExpense, RecurringInput } from '@/model/recurring.model';
 
 export type { RecurringExpense, RecurringInput };
@@ -8,14 +9,25 @@ export type { RecurringExpense, RecurringInput };
 async function fetchRecurring(
   workspaceId: string
 ): Promise<RecurringExpense[]> {
-  const { data, error } = await supabase
-    .from('recurring_expenses')
-    .select('*, categories(id, name, icon)')
-    .eq('workspace_id', workspaceId)
-    .order('created_at', { ascending: false });
+  const runQuery = (selection: string) =>
+    supabase
+      .from('recurring_expenses')
+      .select(selection)
+      .eq('workspace_id', workspaceId)
+      .order('created_at', { ascending: false });
+
+  let { data, error } = await runQuery(
+    '*, categories(id, name, icon), creator:profiles!recurring_expenses_created_by_fkey(id, full_name), editor:profiles!recurring_expenses_updated_by_fkey(id, full_name)'
+  );
+
+  if (isMissingAuditRelation(error)) {
+    ({ data, error } = await runQuery(
+      '*, categories(id, name, icon), creator:profiles!recurring_expenses_created_by_fkey(id, full_name)'
+    ));
+  }
 
   if (error) throw error;
-  return (data ?? []) as RecurringExpense[];
+  return (data ?? []) as unknown as RecurringExpense[];
 }
 
 export function useRecurring(workspaceId: string | null) {
@@ -43,7 +55,7 @@ export function useRecurring(workspaceId: string | null) {
       // Gera as transações imediatamente para o mês atual, sem esperar o cron
       await supabase.rpc('generate_recurring_transactions');
 
-      return data[0];
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: qKey });
@@ -61,7 +73,7 @@ export function useRecurring(workspaceId: string | null) {
     }) => {
       const { error } = await supabase
         .from('recurring_expenses')
-        .update({ is_active, updated_at: new Date().toISOString() })
+        .update({ is_active })
         .eq('id', id);
       if (error) throw error;
     },
@@ -75,7 +87,7 @@ export function useRecurring(workspaceId: string | null) {
     }: Partial<RecurringInput> & { id: string }) => {
       const { data, error } = await supabase
         .from('recurring_expenses')
-        .update({ ...input, updated_at: new Date().toISOString() })
+        .update(input)
         .eq('id', id)
         .select();
       if (error) throw error;

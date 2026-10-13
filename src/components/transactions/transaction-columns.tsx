@@ -9,6 +9,7 @@ import { formatToBRL } from '@/utils/format';
 import { CategoryIcon } from '@/lib/category-icons';
 import { usePermissions } from '@/hooks/usePermissions';
 import { TransactionActionsCell } from './TransactionActionsCell';
+import { RecordAuditMeta } from '@/components/RecordAuditMeta';
 import type { Transaction, TransactionStatus } from '@/hooks/useTransactions';
 
 declare module '@tanstack/react-table' {
@@ -25,7 +26,13 @@ function StatusCell({
   table,
 }: {
   row: { original: Transaction };
-  table: { options: { meta?: { onToggleStatus: (id: string, status: TransactionStatus) => void } } };
+  table: {
+    options: {
+      meta?: {
+        onToggleStatus: (id: string, status: TransactionStatus) => void;
+      };
+    };
+  };
 }) {
   const { t } = useTranslation('transactions');
   const { can } = usePermissions();
@@ -36,7 +43,7 @@ function StatusCell({
   // 'recebido' is auto-set for income — not togglable
   if (status === 'recebido') {
     return (
-      <span className="rounded-full px-2 py-0.5 text-xs font-medium bg-green-500/15 text-green-600 dark:text-green-400 cursor-default">
+      <span className="cursor-default rounded-full bg-green-500/15 px-2 py-0.5 text-xs font-medium text-green-600 dark:text-green-400">
         {t('status.recebido')}
       </span>
     );
@@ -49,14 +56,17 @@ function StatusCell({
       type="button"
       disabled={!canUpdate}
       aria-label={isPago ? t('status.markPending') : t('status.markPaid')}
-      onClick={() => canUpdate && meta?.onToggleStatus(row.original.id, isPago ? 'pendente' : 'pago')}
+      onClick={() =>
+        canUpdate &&
+        meta?.onToggleStatus(row.original.id, isPago ? 'pendente' : 'pago')
+      }
       className={cn(
         'rounded-full px-2 py-0.5 text-xs font-medium transition-colors',
         isPago
           ? 'bg-green-500/15 text-green-600 dark:text-green-400'
           : 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
         canUpdate && 'cursor-pointer hover:opacity-80',
-        !canUpdate && 'cursor-default',
+        !canUpdate && 'cursor-default'
       )}
     >
       {isPago ? t('status.pago') : t('status.pendente')}
@@ -64,7 +74,9 @@ function StatusCell({
   );
 }
 
-export function getTransactionColumns(t: TFunction<'transactions'>): ColumnDef<Transaction>[] {
+export function getTransactionColumns(
+  t: TFunction<'transactions'>
+): ColumnDef<Transaction>[] {
   return [
     {
       id: 'icon',
@@ -78,10 +90,14 @@ export function getTransactionColumns(t: TFunction<'transactions'>): ColumnDef<T
               'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
               isReceita
                 ? 'bg-green-100 text-green-600 dark:bg-green-900/20'
-                : 'bg-red-100 text-red-600 dark:bg-red-900/20',
+                : 'bg-red-100 text-red-600 dark:bg-red-900/20'
             )}
           >
-            {isReceita ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
+            {isReceita ? (
+              <TrendingUp className="h-5 w-5" />
+            ) : (
+              <TrendingDown className="h-5 w-5" />
+            )}
           </div>
         );
       },
@@ -90,18 +106,28 @@ export function getTransactionColumns(t: TFunction<'transactions'>): ColumnDef<T
       id: 'name',
       enableSorting: false,
       header: t('table.name'),
-      accessorFn: (row) => row.description ?? row.categories?.name ?? t('table.noDescription'),
+      accessorFn: (row) =>
+        row.description ?? row.categories?.name ?? t('table.noDescription'),
       cell: ({ row, getValue }) => {
         const category = row.original.categories;
         return (
           <div className="flex flex-col gap-0.5">
-            <span className="leading-tight font-medium">{getValue<string>()}</span>
+            <span className="leading-tight font-medium">
+              {getValue<string>()}
+            </span>
             {category && (
               <span className="text-muted-foreground flex items-center gap-1 text-xs">
                 <CategoryIcon name={category.icon} className="h-3 w-3" />
                 {category.name}
               </span>
             )}
+            <RecordAuditMeta
+              creator={row.original.creator}
+              editor={row.original.editor}
+              createdAt={row.original.created_at}
+              updatedAt={row.original.updated_at}
+              className="mt-1"
+            />
           </div>
         );
       },
@@ -112,11 +138,15 @@ export function getTransactionColumns(t: TFunction<'transactions'>): ColumnDef<T
       header: t('table.colType'),
       cell: ({ row }) => {
         const { origin, installment_number, installments } = row.original;
-        if (origin === 'recurring') return <Badge variant="outline">{t('origin.recurring')}</Badge>;
+        if (origin === 'recurring')
+          return <Badge variant="outline">{t('origin.recurring')}</Badge>;
         if (origin === 'installment') {
           const label =
             installment_number && installments?.total_installments
-              ? t('origin.installmentCount', { current: installment_number, total: installments.total_installments })
+              ? t('origin.installmentCount', {
+                  current: installment_number,
+                  total: installments.total_installments,
+                })
               : t('origin.installment');
           return <Badge variant="outline">{label}</Badge>;
         }
@@ -136,7 +166,12 @@ export function getTransactionColumns(t: TFunction<'transactions'>): ColumnDef<T
       cell: ({ row }) => {
         const isReceita = row.original.type === 'receita';
         return (
-          <span className={cn('font-semibold tabular-nums', isReceita ? 'text-green-600' : 'text-red-500')}>
+          <span
+            className={cn(
+              'font-semibold tabular-nums',
+              isReceita ? 'text-green-600' : 'text-red-500'
+            )}
+          >
             {isReceita ? '+' : '-'} {formatToBRL(row.original.amount)}
           </span>
         );

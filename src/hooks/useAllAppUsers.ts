@@ -27,7 +27,7 @@ async function fetchAllAppUsers(
     .from('workspace_members')
     .select('id, user_id, role', { count: 'exact' })
     .eq('workspace_id', workspaceId)
-    .order('joined_at', { ascending: true })
+    .order('created_at', { ascending: true })
     .range(from, to);
 
   if (membersError) throw membersError;
