@@ -122,4 +122,17 @@ describe('Vercel frontend routing and security headers', () => {
       })
     );
   });
+
+  it('allows the secure workspace invite redirect chain in form-action', () => {
+    const globalHeaders = vercelConfig.headers.find(
+      (entry: { source: string }) => entry.source === '/(.*)'
+    );
+    const policy = globalHeaders?.headers.find(
+      (header: { key: string }) => header.key === 'Content-Security-Policy'
+    )?.value;
+
+    expect(policy).toContain(
+      "form-action 'self' https://api.aivision.app.br https://*.supabase.co;"
+    );
+  });
 });
