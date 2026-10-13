@@ -23,6 +23,7 @@ import { useWorkspace } from '@/context/WorkspaceContext';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
 import { Clock3, ShieldCheck, UserPlus, Users } from 'lucide-react';
+import { useRolePermissions } from '@/hooks/useRolePermissions';
 
 const USERS_PAGE_SIZE = 10;
 
@@ -45,8 +46,12 @@ export default function PermissionsPage() {
   const { data: currentUserId } = useCurrentUserId();
   const { data: usersResult, isLoading: isUsersLoading } = useAllAppUsers(
     activeWorkspace?.id ?? null,
+    activeWorkspace?.superuser_id ?? '',
     usersPage,
     USERS_PAGE_SIZE
+  );
+  const { data: rolePermissions } = useRolePermissions(
+    activeWorkspace?.id ?? null
   );
   const { inviteMember, pendingInvites, resendInvite, cancelInvite } =
     useWorkspaceMembers(activeWorkspace?.id ?? null);
@@ -153,7 +158,10 @@ export default function PermissionsPage() {
                 <p className="text-muted-foreground text-xs">
                   {t('allUsers.inviteDescription')}
                 </p>
-                <InviteForm onInvite={handleInvite} />
+                <InviteForm
+                  onInvite={handleInvite}
+                  rolePermissions={rolePermissions}
+                />
               </section>
 
               <Separator />
@@ -202,6 +210,7 @@ export default function PermissionsPage() {
               onCancel={handleCancel}
               canResend={canInviteMembers}
               canCancel={canDeleteMembers}
+              rolePermissions={rolePermissions}
             />
           </section>
         </CardContent>

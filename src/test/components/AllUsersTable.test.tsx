@@ -112,10 +112,18 @@ describe('AllUsersTable', () => {
         profile,
         role: 'visualizador',
         memberId: 'member-1',
+        access: {
+          readableResources: ['transactions', 'installments', 'recurring'],
+          writableResources: [],
+          overrideCount: 1,
+        },
       },
     });
 
     expect(screen.getByRole('button', { name: 'Remover' })).toBeInTheDocument();
+    expect(
+      screen.getByText(/3 de 6 áreas visíveis.*1 ajuste individual/)
+    ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Reenviar' })
     ).not.toBeInTheDocument();

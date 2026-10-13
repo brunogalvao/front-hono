@@ -33,6 +33,31 @@
   },
   "workspaces": "Workspaces",
   "newWorkspace": "Novo workspace",
+  "createWorkspace": {
+    "title": "Criar novo workspace",
+    "description": "O novo ambiente começa sem transações, recorrências ou parcelamentos. Categorias padrão e controles de acesso são preparados automaticamente.",
+    "name": "Nome do workspace",
+    "namePlaceholder": "Ex.: Financeiro da empresa",
+    "inviteNow": "Convidar uma pessoa agora",
+    "inviteDescription": "Você poderá convidar mais pessoas e ajustar os acessos depois.",
+    "cancel": "Cancelar",
+    "submit": "Criar workspace",
+    "creating": "Criando...",
+    "success": "Workspace criado e ativado.",
+    "successWithInvite": "Workspace criado, ativado e convite enviado.",
+    "inviteWarning": "O workspace foi criado, mas o convite precisa ser revisado.",
+    "validation": {
+      "nameRequired": "Informe ao menos 3 caracteres.",
+      "nameTooLong": "Use no máximo 60 caracteres."
+    },
+    "errors": {
+      "workspace_creation_forbidden": "Sua conta não tem permissão para criar outro workspace.",
+      "workspace_limit_reached": "O limite de workspaces desta conta foi atingido.",
+      "workspace_name_taken": "Você já possui um workspace com esse nome.",
+      "invalid_workspace_name": "Revise o nome informado.",
+      "workspace_creation_failed": "Não foi possível criar o workspace. Tente novamente."
+    }
+  },
   "roles": {
     "owner": "Proprietário",
     "administrador": "Administrador",

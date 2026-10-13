@@ -1,4 +1,13 @@
-import type { WorkspaceRole } from '@/model/workspace.model';
+import type {
+  PermissionResource,
+  WorkspaceRole,
+} from '@/model/workspace.model';
+
+export interface PermissionAccessSummary {
+  readableResources: PermissionResource[];
+  writableResources: PermissionResource[];
+  overrideCount: number;
+}
 
 /** Perfil do usuário logado (contexto de sessão) */
 export interface UserProfile {
@@ -31,4 +40,5 @@ export interface AppUser {
   profile: AppUserProfile;
   role: WorkspaceRole | null;
   memberId: string | null;
+  access?: PermissionAccessSummary;
 }

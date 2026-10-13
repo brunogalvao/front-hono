@@ -2,6 +2,12 @@ import { useTranslation } from 'react-i18next';
 import { Loader2, RotateCw, X } from 'lucide-react';
 import type { PendingInvite } from '@/model/workspace-member.model';
 import { Button } from '@/components/ui/button';
+import type { RolePermission } from '@/model/workspace-member.model';
+import {
+  resolvePermissionMatrix,
+  summarizePermissionMatrix,
+} from '@/lib/permissions';
+import { AccessSummary } from '@/components/workspace/AccessSummary';
 
 interface PendingInviteListProps {
   invites: PendingInvite[];
@@ -11,6 +17,7 @@ interface PendingInviteListProps {
   onCancel: (inviteId: string) => Promise<unknown>;
   canResend?: boolean;
   canCancel?: boolean;
+  rolePermissions?: RolePermission[];
 }
 
 export function PendingInviteList({
@@ -21,6 +28,7 @@ export function PendingInviteList({
   onCancel,
   canResend = true,
   canCancel = true,
+  rolePermissions,
 }: PendingInviteListProps) {
   const { t } = useTranslation('invite');
 
@@ -46,6 +54,16 @@ export function PendingInviteList({
             new Date(invite.expires_at).getTime() <= Date.now());
         const role =
           invite.role === 'super_administrador' ? 'administrador' : invite.role;
+        const access = rolePermissions
+          ? summarizePermissionMatrix(
+              resolvePermissionMatrix(
+                rolePermissions.filter(
+                  (permission) => permission.role === role
+                ),
+                []
+              )
+            )
+          : null;
         return (
           <li
             key={invite.id}
@@ -60,6 +78,7 @@ export function PendingInviteList({
                 {t(`list.status.${hasExpired ? 'expired' : 'pending'}`)} ·{' '}
                 {t(`list.delivery.${invite.delivery_status}`)}
               </p>
+              {access && <AccessSummary summary={access} />}
             </div>
             {(canResend || canCancel) && (
               <div className="flex gap-2">

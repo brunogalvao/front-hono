@@ -41,6 +41,10 @@
   "validation": {
     "emailInvalid": "Informe um e-mail válido."
   },
+  "preview": {
+    "title": "Acesso previsto",
+    "description": "Resumo das páginas e ações liberadas pelo papel selecionado."
+  },
   "mutation": {
     "sent": "Convite enviado com segurança.",
     "delivery_failed": "Não foi possível entregar o convite. Tente reenviar.",

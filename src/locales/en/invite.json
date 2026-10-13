@@ -41,6 +41,10 @@
   "validation": {
     "emailInvalid": "Enter a valid email address."
   },
+  "preview": {
+    "title": "Expected access",
+    "description": "Summary of pages and actions enabled by the selected role."
+  },
   "mutation": {
     "sent": "Invitation sent securely.",
     "delivery_failed": "The invitation could not be delivered. Try resending it.",

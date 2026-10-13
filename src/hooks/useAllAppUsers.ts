@@ -4,6 +4,14 @@ import { queryKeys } from '@/lib/query-keys';
 import type { AppUser, AppUserProfile } from '@/model/user.model';
 import type { WorkspaceRole } from '@/model/workspace.model';
 import i18n from '@/lib/i18n';
+import type {
+  MemberPermission,
+  RolePermission,
+} from '@/model/workspace-member.model';
+import {
+  resolvePermissionMatrix,
+  summarizePermissionMatrix,
+} from '@/lib/permissions';
 
 export type { AppUser };
 
@@ -14,6 +22,7 @@ export interface PaginatedAppUsers {
 
 async function fetchAllAppUsers(
   workspaceId: string,
+  superuserId: string,
   page: number,
   pageSize: number
 ): Promise<PaginatedAppUsers> {
@@ -33,14 +42,36 @@ async function fetchAllAppUsers(
   if (membersError) throw membersError;
 
   const profileIds = (members ?? []).map((member) => member.user_id);
-  const { data: profiles, error: profilesError } = profileIds.length
-    ? await supabase
-        .from('profiles')
-        .select('id, email, full_name, avatar_url')
-        .in('id', profileIds)
-    : { data: [], error: null };
+  const [profilesResult, rolePermissionsResult, overridesResult] =
+    await Promise.all([
+      profileIds.length
+        ? supabase
+            .from('profiles')
+            .select('id, email, full_name, avatar_url')
+            .in('id', profileIds)
+        : Promise.resolve({ data: [], error: null }),
+      supabase
+        .from('workspace_role_permissions')
+        .select('*')
+        .eq('workspace_id', workspaceId),
+      profileIds.length
+        ? supabase
+            .from('workspace_member_permissions')
+            .select('*')
+            .eq('workspace_id', workspaceId)
+            .in('user_id', profileIds)
+        : Promise.resolve({ data: [], error: null }),
+    ]);
+
+  const { data: profiles, error: profilesError } = profilesResult;
 
   if (profilesError) throw profilesError;
+  if (rolePermissionsResult.error) throw rolePermissionsResult.error;
+  if (overridesResult.error) throw overridesResult.error;
+
+  const rolePermissions = (rolePermissionsResult.data ??
+    []) as RolePermission[];
+  const overrides = (overridesResult.data ?? []) as MemberPermission[];
 
   const profileMap = new Map(
     (profiles ?? []).map((profile) => [profile.id, profile as AppUserProfile])
@@ -55,6 +86,20 @@ async function fetchAllAppUsers(
         profile,
         role: membership.role as WorkspaceRole,
         memberId: membership.id,
+        access: summarizePermissionMatrix(
+          resolvePermissionMatrix(
+            rolePermissions.filter(
+              (permission) => permission.role === membership.role
+            ),
+            overrides.filter(
+              (permission) => permission.user_id === membership.user_id
+            ),
+            membership.user_id === superuserId
+          ),
+          overrides.filter(
+            (permission) => permission.user_id === membership.user_id
+          ).length
+        ),
       });
       return result;
     }, [])
@@ -72,12 +117,13 @@ async function fetchAllAppUsers(
 
 export function useAllAppUsers(
   workspaceId: string | null,
+  superuserId: string,
   page: number,
   pageSize: number
 ) {
   return useQuery({
     queryKey: queryKeys.appUsers.page(workspaceId ?? '', page, pageSize),
-    queryFn: () => fetchAllAppUsers(workspaceId!, page, pageSize),
+    queryFn: () => fetchAllAppUsers(workspaceId!, superuserId, page, pageSize),
     enabled: !!workspaceId,
     placeholderData: keepPreviousData,
     staleTime: 15_000,

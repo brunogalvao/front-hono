@@ -15,6 +15,15 @@
     "permissionLabel": "{{action}} em {{resource}} para {{role}}",
     "updateError": "Erro ao atualizar permissão"
   },
+  "accessSummary": {
+    "visible": "{{count}} de {{total}} áreas visíveis",
+    "writable": "{{count}} com edição",
+    "overrides_one": "{{count}} ajuste individual",
+    "overrides_other": "{{count}} ajustes individuais",
+    "areas": "Áreas com acesso",
+    "more": "+{{count}}",
+    "none": "Nenhuma área liberada"
+  },
   "allUsers": {
     "title": "Membros do workspace",
     "description": "Pessoas que têm acesso aos dados e recursos deste workspace.",

@@ -22,6 +22,10 @@ export const PERMISSION_RESOURCES: PermissionResource[] = [
   'permissions',
 ];
 
+export const USER_FACING_PERMISSION_RESOURCES = PERMISSION_RESOURCES.filter(
+  (resource) => resource !== 'permissions'
+);
+
 const DENY_ALL: ResourcePermission = {
   can_read: false,
   can_create: false,
@@ -76,6 +80,24 @@ export function resolvePermissionMatrix(
     };
   }
   return matrix;
+}
+
+export function summarizePermissionMatrix(
+  matrix: PermissionMatrix,
+  overrideCount = 0
+) {
+  return {
+    readableResources: USER_FACING_PERMISSION_RESOURCES.filter(
+      (resource) => matrix[resource].can_read
+    ),
+    writableResources: USER_FACING_PERMISSION_RESOURCES.filter((resource) => {
+      const permission = matrix[resource];
+      return (
+        permission.can_create || permission.can_update || permission.can_delete
+      );
+    }),
+    overrideCount,
+  };
 }
 
 export function canWrite(role: WorkspaceRole | null | undefined): boolean {

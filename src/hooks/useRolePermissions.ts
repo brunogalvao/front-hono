@@ -23,7 +23,9 @@ export function useRolePermissions(workspaceId: string | null) {
   });
 
   const upsert = useMutation({
-    mutationFn: async (permission: Omit<RolePermission, 'id'> & { updated_by: string }) => {
+    mutationFn: async (
+      permission: Omit<RolePermission, 'id'> & { updated_by: string }
+    ) => {
       const { error } = await supabase
         .from('workspace_role_permissions')
         .upsert(permission, { onConflict: 'workspace_id,role,resource' });
@@ -31,6 +33,7 @@ export function useRolePermissions(workspaceId: string | null) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.permissions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.appUsers.all });
     },
   });
 

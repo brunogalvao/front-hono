@@ -53,6 +53,7 @@ import { useWorkspaceMembers } from '@/hooks/useWorkspaceMembers';
 import type { AppUser } from '@/hooks/useAllAppUsers';
 import type { PendingInvite } from '@/model/workspace-member.model';
 import type { WorkspaceRole } from '@/context/WorkspaceContext';
+import { AccessSummary } from '@/components/workspace/AccessSummary';
 
 const ROLE_KEYS: WorkspaceRole[] = [
   'super_administrador',
@@ -218,13 +219,13 @@ export function AllUsersTable({
           return (
             <div
               key={profile.id}
-              className="flex items-center gap-3 rounded-lg border p-3"
+              className="flex flex-wrap items-center gap-3 rounded-lg border p-3 sm:flex-nowrap"
             >
               <Avatar className="h-9 w-9 shrink-0">
                 <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
 
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 basis-[calc(100%-3rem)] sm:basis-auto">
                 <p className="truncate text-sm font-medium">
                   {name}
                   {isSelf && (
@@ -236,6 +237,12 @@ export function AllUsersTable({
                 <p className="text-muted-foreground truncate text-xs">
                   {profile.email}
                 </p>
+                {user.access && (
+                  <AccessSummary
+                    summary={user.access}
+                    showOverrides={isSuperAdmin}
+                  />
+                )}
               </div>
 
               {/* Role area */}

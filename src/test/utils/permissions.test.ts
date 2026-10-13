@@ -5,6 +5,7 @@ import {
   canManageCategories,
   isSuperuser,
   resolvePermissionMatrix,
+  summarizePermissionMatrix,
 } from '@/lib/permissions';
 
 describe('canWrite', () => {
@@ -90,5 +91,17 @@ describe('resolvePermissionMatrix', () => {
         Object.values(permission).every(Boolean)
       )
     ).toBe(true);
+  });
+});
+
+describe('summarizePermissionMatrix', () => {
+  it('resume áreas visíveis, editáveis e overrides sem contar a tela interna de permissões', () => {
+    const matrix = resolvePermissionMatrix([], [], true);
+    const summary = summarizePermissionMatrix(matrix, 2);
+
+    expect(summary.readableResources).toHaveLength(6);
+    expect(summary.writableResources).toHaveLength(6);
+    expect(summary.readableResources).not.toContain('permissions');
+    expect(summary.overrideCount).toBe(2);
   });
 });

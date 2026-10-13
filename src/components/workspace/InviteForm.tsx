@@ -23,6 +23,12 @@ import { Button } from '@/components/ui/button';
 import type { WorkspaceRole } from '@/context/WorkspaceContext';
 import type { InviteMutationResult } from '@/model/invite.model';
 import { toast } from 'sonner';
+import type { RolePermission } from '@/model/workspace-member.model';
+import {
+  resolvePermissionMatrix,
+  summarizePermissionMatrix,
+} from '@/lib/permissions';
+import { AccessSummary } from '@/components/workspace/AccessSummary';
 
 const buildSchema = (emailInvalid: string) =>
   z.object({
@@ -37,9 +43,10 @@ interface InviteFormProps {
     email: string,
     role: WorkspaceRole
   ) => Promise<InviteMutationResult | unknown>;
+  rolePermissions?: RolePermission[];
 }
 
-export function InviteForm({ onInvite }: InviteFormProps) {
+export function InviteForm({ onInvite, rolePermissions }: InviteFormProps) {
   const { t } = useTranslation('invite');
   const [submitting, setSubmitting] = useState(false);
   const schema = useMemo(() => buildSchema(t('validation.emailInvalid')), [t]);
@@ -48,6 +55,18 @@ export function InviteForm({ onInvite }: InviteFormProps) {
     resolver: zodResolver(schema),
     defaultValues: { email: '', role: 'visualizador' },
   });
+  const selectedRole = form.watch('role');
+  const permissionPreview = useMemo(() => {
+    if (!rolePermissions) return null;
+    return summarizePermissionMatrix(
+      resolvePermissionMatrix(
+        rolePermissions.filter(
+          (permission) => permission.role === selectedRole
+        ),
+        []
+      )
+    );
+  }, [rolePermissions, selectedRole]);
 
   const handleSubmit = async (values: FormValues) => {
     setSubmitting(true);
@@ -143,6 +162,15 @@ export function InviteForm({ onInvite }: InviteFormProps) {
           </Button>
         </form>
       </Form>
+      {permissionPreview && (
+        <div className="bg-muted/40 rounded-lg border p-3">
+          <p className="text-sm font-medium">{t('preview.title')}</p>
+          <p className="text-muted-foreground text-xs">
+            {t('preview.description')}
+          </p>
+          <AccessSummary summary={permissionPreview} />
+        </div>
+      )}
     </div>
   );
 }

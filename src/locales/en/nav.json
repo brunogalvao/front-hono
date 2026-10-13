@@ -33,6 +33,31 @@
   },
   "workspaces": "Workspaces",
   "newWorkspace": "New workspace",
+  "createWorkspace": {
+    "title": "Create a new workspace",
+    "description": "The new environment starts with no transactions, recurring expenses, or installments. Default categories and access controls are prepared automatically.",
+    "name": "Workspace name",
+    "namePlaceholder": "E.g. Company finances",
+    "inviteNow": "Invite someone now",
+    "inviteDescription": "You can invite more people and adjust access later.",
+    "cancel": "Cancel",
+    "submit": "Create workspace",
+    "creating": "Creating...",
+    "success": "Workspace created and activated.",
+    "successWithInvite": "Workspace created, activated, and invitation sent.",
+    "inviteWarning": "The workspace was created, but the invitation needs review.",
+    "validation": {
+      "nameRequired": "Enter at least 3 characters.",
+      "nameTooLong": "Use no more than 60 characters."
+    },
+    "errors": {
+      "workspace_creation_forbidden": "Your account cannot create another workspace.",
+      "workspace_limit_reached": "This account has reached its workspace limit.",
+      "workspace_name_taken": "You already have a workspace with this name.",
+      "invalid_workspace_name": "Review the workspace name.",
+      "workspace_creation_failed": "The workspace could not be created. Try again."
+    }
+  },
   "roles": {
     "owner": "Owner",
     "administrador": "Administrator",

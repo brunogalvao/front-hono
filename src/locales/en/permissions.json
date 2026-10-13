@@ -15,6 +15,15 @@
     "permissionLabel": "{{action}} on {{resource}} for {{role}}",
     "updateError": "Failed to update permission"
   },
+  "accessSummary": {
+    "visible": "{{count}} of {{total}} visible areas",
+    "writable": "{{count}} editable",
+    "overrides_one": "{{count}} individual adjustment",
+    "overrides_other": "{{count}} individual adjustments",
+    "areas": "Accessible areas",
+    "more": "+{{count}}",
+    "none": "No areas available"
+  },
   "allUsers": {
     "title": "Workspace members",
     "description": "People who can access this workspace's data and resources.",

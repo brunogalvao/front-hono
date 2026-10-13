@@ -6,11 +6,17 @@ import type { PermissionResource } from '@/model/workspace.model';
 
 export type { MemberPermission };
 
-export function useMemberPermissions(workspaceId: string | null, userId: string | null) {
+export function useMemberPermissions(
+  workspaceId: string | null,
+  userId: string | null
+) {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: queryKeys.permissions.memberOverrides(workspaceId ?? '', userId ?? ''),
+    queryKey: queryKeys.permissions.memberOverrides(
+      workspaceId ?? '',
+      userId ?? ''
+    ),
     enabled: !!workspaceId && !!userId,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -25,7 +31,9 @@ export function useMemberPermissions(workspaceId: string | null, userId: string 
   });
 
   const upsert = useMutation({
-    mutationFn: async (permission: Omit<MemberPermission, 'id'> & { updated_by: string }) => {
+    mutationFn: async (
+      permission: Omit<MemberPermission, 'id'> & { updated_by: string }
+    ) => {
       const { error } = await supabase
         .from('workspace_member_permissions')
         .upsert(permission, { onConflict: 'workspace_id,user_id,resource' });
@@ -33,9 +41,18 @@ export function useMemberPermissions(workspaceId: string | null, userId: string 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.permissions.memberOverrides(workspaceId ?? '', userId ?? ''),
+        queryKey: queryKeys.permissions.memberOverrides(
+          workspaceId ?? '',
+          userId ?? ''
+        ),
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.permissions.current(workspaceId ?? '', userId ?? '') });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.permissions.current(
+          workspaceId ?? '',
+          userId ?? ''
+        ),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.appUsers.all });
     },
   });
 
@@ -51,6 +68,7 @@ export function useMemberPermissions(workspaceId: string | null, userId: string 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.permissions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.appUsers.all });
     },
   });
 
@@ -65,6 +83,7 @@ export function useMemberPermissions(workspaceId: string | null, userId: string 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.permissions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.appUsers.all });
     },
   });
 

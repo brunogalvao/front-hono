@@ -40,7 +40,7 @@ async function fetchPendingInvites(
   return (data ?? []) as PendingInvite[];
 }
 
-function activeInviteLocale(): InviteLocale {
+export function activeInviteLocale(): InviteLocale {
   return i18n.resolvedLanguage === 'en' ? 'en' : 'pt-BR';
 }
 
@@ -49,7 +49,7 @@ function isInviteApiResult(value: unknown): value is { status: string } {
   return typeof value.status === 'string';
 }
 
-async function inviteApi<T extends { status: string }>(
+export async function inviteApi<T extends { status: string }>(
   path: string,
   method: 'POST' | 'DELETE',
   body?: Record<string, unknown>
@@ -67,6 +67,22 @@ async function inviteApi<T extends { status: string }>(
   if (isInviteApiResult(result)) return result as T;
   throw new Error(
     response.ok ? 'invalid_invite_response' : 'invite_request_failed'
+  );
+}
+
+export function inviteWorkspaceMember(
+  workspaceId: string,
+  email: string,
+  role: WorkspaceRole
+): Promise<InviteMutationResult> {
+  return inviteApi<InviteMutationResult>(
+    `/api/workspaces/${workspaceId}/invites`,
+    'POST',
+    {
+      email: email.trim().toLowerCase(),
+      role,
+      locale: activeInviteLocale(),
+    }
   );
 }
 
@@ -132,15 +148,7 @@ export function useWorkspaceMembers(workspaceId: string | null) {
       email: string;
       role: WorkspaceRole;
     }): Promise<InviteMutationResult> => {
-      return inviteApi<InviteMutationResult>(
-        `/api/workspaces/${workspaceId}/invites`,
-        'POST',
-        {
-          email: email.trim().toLowerCase(),
-          role,
-          locale: activeInviteLocale(),
-        }
-      );
+      return inviteWorkspaceMember(workspaceId!, email, role);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
