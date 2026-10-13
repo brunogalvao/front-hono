@@ -9,10 +9,12 @@ import { NavMain, type NavItem } from '@/components/nav/nav-main';
 import { SidebarUser } from '@/components/nav/sidebar-user';
 import { WorkspaceSwitcher } from '@/components/nav/WorkspaceSwitcher';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useWorkspace } from '@/context/WorkspaceContext';
 import { useTranslation } from 'react-i18next';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { can } = usePermissions();
+  const { activeWorkspace } = useWorkspace();
   const { t } = useTranslation('nav');
   const canReadTransactions = can('transactions', 'read');
 
@@ -58,7 +60,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           },
         ]
       : []),
-    ...(can('settings', 'read')
+    ...(activeWorkspace
       ? [
           {
             title: t('settings'),

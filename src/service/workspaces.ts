@@ -1,6 +1,7 @@
 import { API_BASE_URL } from '@/config/api';
 import { getAuthToken } from '@/lib/supabase';
 import type { WorkspaceInfo } from '@/model/workspace.model';
+import { fetchWithAuth } from '@/lib/fetch-api';
 
 type CreateWorkspaceResponse = {
   status: 'created';
@@ -50,4 +51,26 @@ export async function createWorkspace(name: string): Promise<WorkspaceInfo> {
       ? result.error_code
       : 'workspace_creation_failed'
   );
+}
+
+type WorkspaceLifecycleResponse = {
+  status: 'deleted' | 'left';
+  workspace_id: string;
+  workspace_name: string;
+};
+
+export function deleteWorkspace(
+  workspaceId: string
+): Promise<WorkspaceLifecycleResponse> {
+  return fetchWithAuth(`/api/workspaces/${workspaceId}`, {
+    method: 'DELETE',
+  });
+}
+
+export function leaveWorkspace(
+  workspaceId: string
+): Promise<WorkspaceLifecycleResponse> {
+  return fetchWithAuth(`/api/workspaces/${workspaceId}/membership`, {
+    method: 'DELETE',
+  });
 }

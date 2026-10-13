@@ -11,6 +11,7 @@ describe('package.json', () => {
   const pkg = JSON.parse(
     readFileSync(resolve(rootDir, 'package.json'), 'utf-8')
   );
+  const nodeVersion = readFileSync(resolve(rootDir, '.nvmrc'), 'utf-8').trim();
 
   it('usa pnpm como packageManager', () => {
     expect(pkg.packageManager).toMatch(/^pnpm@/);
@@ -18,6 +19,11 @@ describe('package.json', () => {
 
   it('define versão mínima de pnpm nos engines', () => {
     expect(pkg.engines?.pnpm).toBeDefined();
+  });
+
+  it('fixa uma versão do Node compatível com a engine do projeto', () => {
+    expect(nodeVersion).toMatch(/^24\./);
+    expect(pkg.engines?.node).toBe('24.x');
   });
 
   it('tem script preinstall bloqueando npm/yarn', () => {
@@ -54,6 +60,8 @@ describe('pnpm-workspace.yaml', () => {
     expect(yaml).toContain('  picomatch: ^4.0.4');
     expect(yaml).toContain('  postcss: ^8.5.26');
     expect(yaml).toContain('  rollup: ^4.59.0');
+    expect(yaml).toContain('  source-map-js: 1.2.2');
+    expect(yaml).toContain('  - source-map-js@1.2.2');
   });
 
   it('não contém placeholders não preenchidos', () => {

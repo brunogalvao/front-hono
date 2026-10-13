@@ -148,18 +148,20 @@ export function PermissionMatrix({
                       key={`${role}-${resource}-${action}`}
                       className="border-l text-center first:border-l-0"
                     >
-                      <Checkbox
-                        aria-label={t('matrix.permissionLabel', {
-                          action: t(`actionsLong.${action}`),
-                          resource: t(`resources.${resource}`),
-                          role: t(`roles.${role}`),
-                        })}
-                        checked={checked}
-                        disabled={locked || upsert.isPending}
-                        onCheckedChange={(value) =>
-                          handleToggle(role, resource, action, value === true)
-                        }
-                      />
+                      <div className="flex items-center justify-center">
+                        <Checkbox
+                          aria-label={t('matrix.permissionLabel', {
+                            action: t(`actionsLong.${action}`),
+                            resource: t(`resources.${resource}`),
+                            role: t(`roles.${role}`),
+                          })}
+                          checked={checked}
+                          disabled={locked || upsert.isPending}
+                          onCheckedChange={(value) =>
+                            handleToggle(role, resource, action, value === true)
+                          }
+                        />
+                      </div>
                     </TableCell>
                   );
                 })

@@ -19,7 +19,6 @@ const WORKSPACE_ROUTE_REQUIREMENTS: readonly WorkspaceRouteRequirement[] = [
   { path: '/admin/transactions', resource: 'transactions' },
   { path: '/admin/installments', resource: 'installments' },
   { path: '/admin/recurring', resource: 'recurring' },
-  { path: '/admin/settings', resource: 'settings' },
   { path: '/admin/dashboard', resource: 'transactions' },
   { path: '/admin/advisor', resource: 'transactions' },
 ];
@@ -29,7 +28,6 @@ const WORKSPACE_ROUTE_PRIORITY: readonly WorkspaceRouteRequirement[] = [
   { path: '/admin/transactions', resource: 'transactions' },
   { path: '/admin/recurring', resource: 'recurring' },
   { path: '/admin/installments', resource: 'installments' },
-  { path: '/admin/settings', resource: 'settings' },
   { path: '/admin/settings/members', resource: 'members' },
 ];
 

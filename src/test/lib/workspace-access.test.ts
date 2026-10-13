@@ -22,6 +22,7 @@ describe('workspace access routing', () => {
   });
 
   it('mantém páginas pessoais fora da matriz do workspace', () => {
+    expect(getWorkspaceRouteRequirement('/admin/settings')).toBeNull();
     expect(getWorkspaceRouteRequirement('/admin/profile')).toBeNull();
     expect(getWorkspaceRouteRequirement('/admin/account')).toBeNull();
   });

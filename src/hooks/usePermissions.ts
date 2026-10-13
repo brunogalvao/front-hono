@@ -16,7 +16,7 @@ import type {
 export function usePermissions() {
   const { activeWorkspace, activeRole } = useWorkspace();
 
-  const { data: currentUserId } = useQuery({
+  const { data: currentUserId, isLoading: isCurrentUserLoading } = useQuery({
     queryKey: queryKeys.auth.session,
     queryFn: async () => {
       const { data } = await supabase.auth.getUser();
@@ -93,7 +93,8 @@ export function usePermissions() {
     getPermission,
     can,
     matrix: effectiveMatrix,
+    currentUserId,
     isSuperAdmin,
-    isLoading: !isSuperAdmin && isLoading,
+    isLoading: isCurrentUserLoading || (!isSuperAdmin && isLoading),
   };
 }

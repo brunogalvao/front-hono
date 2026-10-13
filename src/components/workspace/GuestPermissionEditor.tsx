@@ -153,20 +153,22 @@ export function GuestPermissionEditor({
                   </TableCell>
                   {ACTIONS.map((action) => (
                     <TableCell key={action} className="text-center">
-                      <Checkbox
-                        aria-label={t('matrix.permissionLabel', {
-                          action: t(`actionsLong.${action}`),
-                          resource: t(`resources.${resource}`),
-                          role: t(`roles.${role}`),
-                        })}
-                        checked={
-                          override?.[action] ?? inherited?.[action] ?? false
-                        }
-                        disabled={upsert.isPending}
-                        onCheckedChange={(value) =>
-                          handleToggle(resource, action, value === true)
-                        }
-                      />
+                      <div className="flex items-center justify-center">
+                        <Checkbox
+                          aria-label={t('matrix.permissionLabel', {
+                            action: t(`actionsLong.${action}`),
+                            resource: t(`resources.${resource}`),
+                            role: t(`roles.${role}`),
+                          })}
+                          checked={
+                            override?.[action] ?? inherited?.[action] ?? false
+                          }
+                          disabled={upsert.isPending}
+                          onCheckedChange={(value) =>
+                            handleToggle(resource, action, value === true)
+                          }
+                        />
+                      </div>
                     </TableCell>
                   ))}
                 </TableRow>

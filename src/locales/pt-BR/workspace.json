@@ -3,8 +3,42 @@
     "title": "Configurações",
     "subtitle": "Configurações do workspace",
     "activeWorkspace": "Workspace ativo",
+    "workspacesCard": "Seus workspaces",
+    "workspacesCardDesc": "Alterne entre os ambientes aos quais você tem acesso e administre o workspace ativo.",
+    "active": "Ativo",
+    "manage": "Gerenciar",
+    "membersCard": "Membros e acesso",
+    "membersCardDesc": "Convide pessoas, remova membros e configure funções e permissões.",
+    "manageMembers": "Gerenciar membros",
     "categoriesCard": "Categorias",
-    "categoriesCardDesc": "Gerencie categorias personalizadas do workspace"
+    "categoriesCardDesc": "Gerencie categorias personalizadas do workspace",
+    "lifecycle": {
+      "title": "Zona de perigo",
+      "deleteSummary": "A exclusão remove definitivamente os dados financeiros, membros, convites e configurações deste workspace.",
+      "leaveSummary": "Ao sair, você perde o acesso aos dados e permissões deste workspace.",
+      "deleteAction": "Excluir workspace",
+      "leaveAction": "Sair do workspace",
+      "lastOwnedHint": "Crie outro workspace próprio antes de excluir este ambiente.",
+      "deleteTitle": "Excluir workspace?",
+      "leaveTitle": "Sair do workspace?",
+      "deleteDescription": "Esta ação exclui permanentemente o workspace “{{workspace}}” e todos os seus dados. Ela não pode ser desfeita.",
+      "leaveDescription": "Você perderá o acesso ao workspace “{{workspace}}”. Um administrador poderá convidar você novamente.",
+      "confirmLabel": "Digite {{workspace}} para confirmar",
+      "cancel": "Cancelar",
+      "confirmDelete": "Excluir definitivamente",
+      "confirmLeave": "Sair do workspace",
+      "processing": "Processando...",
+      "deleteSuccess": "Workspace excluído.",
+      "leaveSuccess": "Você saiu do workspace.",
+      "errors": {
+        "workspace_not_found": "O workspace não foi encontrado ou já foi removido.",
+        "workspace_delete_forbidden": "Somente o proprietário pode excluir este workspace.",
+        "last_owned_workspace": "O seu último workspace próprio não pode ser excluído. Crie outro workspace antes de continuar.",
+        "workspace_owner_cannot_leave": "O proprietário não pode sair do próprio workspace.",
+        "workspace_membership_not_found": "Seu acesso a este workspace já foi removido.",
+        "workspace_management_failed": "Não foi possível concluir a operação. Tente novamente."
+      }
+    }
   },
   "category": {
     "customTitle": "Categorias personalizadas",

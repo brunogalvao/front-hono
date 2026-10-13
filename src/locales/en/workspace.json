@@ -3,8 +3,42 @@
     "title": "Settings",
     "subtitle": "Workspace settings",
     "activeWorkspace": "Active workspace",
+    "workspacesCard": "Your workspaces",
+    "workspacesCardDesc": "Switch between environments you can access and manage the active workspace.",
+    "active": "Active",
+    "manage": "Manage",
+    "membersCard": "Members and access",
+    "membersCardDesc": "Invite people, remove members, and configure roles and permissions.",
+    "manageMembers": "Manage members",
     "categoriesCard": "Categories",
-    "categoriesCardDesc": "Manage custom workspace categories"
+    "categoriesCardDesc": "Manage custom workspace categories",
+    "lifecycle": {
+      "title": "Danger zone",
+      "deleteSummary": "Deleting permanently removes this workspace's financial data, members, invites, and settings.",
+      "leaveSummary": "Leaving removes your access to this workspace's data and permissions.",
+      "deleteAction": "Delete workspace",
+      "leaveAction": "Leave workspace",
+      "lastOwnedHint": "Create another workspace you own before deleting this environment.",
+      "deleteTitle": "Delete workspace?",
+      "leaveTitle": "Leave workspace?",
+      "deleteDescription": "This permanently deletes “{{workspace}}” and all of its data. This action cannot be undone.",
+      "leaveDescription": "You will lose access to “{{workspace}}”. An administrator can invite you again.",
+      "confirmLabel": "Type {{workspace}} to confirm",
+      "cancel": "Cancel",
+      "confirmDelete": "Delete permanently",
+      "confirmLeave": "Leave workspace",
+      "processing": "Processing...",
+      "deleteSuccess": "Workspace deleted.",
+      "leaveSuccess": "You left the workspace.",
+      "errors": {
+        "workspace_not_found": "The workspace was not found or has already been removed.",
+        "workspace_delete_forbidden": "Only the owner can delete this workspace.",
+        "last_owned_workspace": "Your last owned workspace cannot be deleted. Create another workspace first.",
+        "workspace_owner_cannot_leave": "The owner cannot leave their own workspace.",
+        "workspace_membership_not_found": "Your access to this workspace has already been removed.",
+        "workspace_management_failed": "The operation could not be completed. Try again."
+      }
+    }
   },
   "category": {
     "customTitle": "Custom categories",

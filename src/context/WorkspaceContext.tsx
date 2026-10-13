@@ -7,7 +7,7 @@ import {
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { WorkspaceRole, WorkspaceInfo } from '@/model/workspace.model';
-import { isQueryForWorkspace } from '@/lib/query-keys';
+import { isQueryForWorkspace, queryKeys } from '@/lib/query-keys';
 
 export type { WorkspaceRole, WorkspaceInfo };
 
@@ -19,6 +19,7 @@ interface WorkspaceContextType {
   setWorkspaces: (workspaces: WorkspaceInfo[]) => void;
   switchWorkspace: (workspaceId: string) => void;
   activateWorkspace: (workspace: WorkspaceInfo) => void;
+  removeWorkspace: (workspaceId: string) => void;
 }
 
 const STORAGE_KEY = 'active_workspace_id';
@@ -78,6 +79,31 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     [queryClient]
   );
 
+  const removeWorkspace = useCallback(
+    (workspaceId: string) => {
+      const remaining = workspaces.filter(
+        (workspace) => workspace.id !== workspaceId
+      );
+      const nextWorkspace = remaining[0] ?? null;
+
+      setWorkspaces(remaining);
+      queryClient.setQueryData(queryKeys.workspaces.list, remaining);
+      void queryClient.removeQueries({
+        predicate: (query) => isQueryForWorkspace(query.queryKey, workspaceId),
+      });
+
+      if (activeWorkspaceId !== workspaceId) return;
+
+      setActiveWorkspaceId(nextWorkspace?.id ?? null);
+      if (nextWorkspace) {
+        localStorage.setItem(STORAGE_KEY, nextWorkspace.id);
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    },
+    [activeWorkspaceId, queryClient, workspaces]
+  );
+
   return (
     <WorkspaceContext.Provider
       value={{
@@ -88,6 +114,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         setWorkspaces,
         switchWorkspace,
         activateWorkspace,
+        removeWorkspace,
       }}
     >
       {children}
