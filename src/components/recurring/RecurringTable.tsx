@@ -1,10 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { flexRender, useTable } from '@tanstack/react-table';
 import { Power } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -31,6 +27,7 @@ import { CategoryIcon } from '@/lib/category-icons';
 import { formatToBRL } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import { RecordAuditMeta } from '@/components/RecordAuditMeta';
+import { basicTableFeatures } from '@/lib/table-features';
 
 export function RecurringTable() {
   const { t } = useTranslation('recurring');
@@ -80,10 +77,10 @@ export function RecurringTable() {
     [t]
   );
 
-  const table = useReactTable({
+  const table = useTable({
+    features: basicTableFeatures,
     data: items,
     columns,
-    getCoreRowModel: getCoreRowModel(),
   });
 
   if (isLoading) {

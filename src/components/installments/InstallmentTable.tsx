@@ -1,10 +1,6 @@
 import { useMemo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { flexRender, useTable } from '@tanstack/react-table';
 import { CreditCard } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -34,6 +30,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { formatToBRL } from '@/utils/format';
 import { RecordAuditMeta } from '@/components/RecordAuditMeta';
+import { basicTableFeatures } from '@/lib/table-features';
 
 interface InstallmentTableProps {
   highlightId?: string;
@@ -94,10 +91,10 @@ export function InstallmentTable({ highlightId }: InstallmentTableProps) {
     [t]
   );
 
-  const table = useReactTable({
+  const table = useTable({
+    features: basicTableFeatures,
     data: items,
     columns,
-    getCoreRowModel: getCoreRowModel(),
   });
 
   if (isLoading) {

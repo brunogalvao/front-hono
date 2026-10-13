@@ -21,6 +21,7 @@ import { formatToBRL } from '@/utils/format';
 import { CategoryIcon } from '@/lib/category-icons';
 import type { RecurringExpense } from '@/hooks/useRecurring';
 import { RecordAuditMeta } from '@/components/RecordAuditMeta';
+import { basicTableFeatures } from '@/lib/table-features';
 
 interface ColumnOpts {
   canUpdate: boolean;
@@ -113,11 +114,10 @@ export function RecurringActionsCell({
 export function getRecurringColumns(
   t: TFunction<['recurring', 'common']>,
   opts: ColumnOpts
-): ColumnDef<RecurringExpense>[] {
+): ColumnDef<typeof basicTableFeatures, RecurringExpense>[] {
   return [
     {
       id: 'icon',
-      enableSorting: false,
       header: () => null,
       cell: () => (
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/20">
@@ -127,7 +127,6 @@ export function getRecurringColumns(
     },
     {
       id: 'name',
-      enableSorting: false,
       header: t('table.colName'),
       accessorKey: 'description',
       cell: ({ row }) => {
@@ -161,7 +160,6 @@ export function getRecurringColumns(
     },
     {
       id: 'amount',
-      enableSorting: false,
       header: t('table.colAmount'),
       cell: ({ row }) => (
         <span className="font-semibold text-red-500 tabular-nums">
@@ -171,7 +169,6 @@ export function getRecurringColumns(
     },
     {
       id: 'frequency',
-      enableSorting: false,
       header: t('table.colFrequency'),
       cell: ({ row }) => (
         <Badge variant="outline">
@@ -181,7 +178,6 @@ export function getRecurringColumns(
     },
     {
       id: 'status',
-      enableSorting: false,
       header: t('table.colStatus'),
       cell: ({ row }) => {
         const { is_active } = row.original;
@@ -203,7 +199,6 @@ export function getRecurringColumns(
       ? [
           {
             id: 'actions',
-            enableSorting: false,
             header: t('table.colActions'),
             cell: ({ row }: { row: { original: RecurringExpense } }) => (
               <RecurringActionsCell
@@ -215,7 +210,7 @@ export function getRecurringColumns(
                 canDelete={opts.canDelete}
               />
             ),
-          } satisfies ColumnDef<RecurringExpense>,
+          } satisfies ColumnDef<typeof basicTableFeatures, RecurringExpense>,
         ]
       : []),
   ];

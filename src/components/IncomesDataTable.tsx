@@ -4,14 +4,21 @@ import * as React from 'react';
 import {
   type ColumnDef,
   type ColumnFiltersState,
+  type ColumnVisibilityState,
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  createFilteredRowModel,
+  createPaginatedRowModel,
+  createSortedRowModel,
+  filterFn_includesString,
   flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
+  rowPaginationFeature,
+  rowSortingFeature,
+  sortFn_alphanumeric,
+  sortFn_text,
   type SortingState,
-  useReactTable,
-  type VisibilityState,
+  tableFeatures,
+  useTable,
 } from '@tanstack/react-table';
 import { ArrowUpDown, ChevronDown } from 'lucide-react';
 
@@ -56,6 +63,23 @@ interface IncomesDataTableProps {
   onDelete: (id: string) => void;
   isLoading?: boolean;
 }
+
+const incomeTableFeatures = tableFeatures({
+  columnFilteringFeature,
+  filterFns: {
+    includesString: filterFn_includesString,
+  },
+  filteredRowModel: createFilteredRowModel(),
+  rowSortingFeature,
+  sortFns: {
+    alphanumeric: sortFn_alphanumeric,
+    text: sortFn_text,
+  },
+  sortedRowModel: createSortedRowModel(),
+  rowPaginationFeature,
+  paginatedRowModel: createPaginatedRowModel(),
+  columnVisibilityFeature,
+});
 
 // Componente Skeleton para a tabela de rendimentos
 const IncomesDataTableSkeleton = () => (
@@ -106,7 +130,9 @@ const IncomesDataTableSkeleton = () => (
   </div>
 );
 
-function getIncomeColumns(t: TFunction<'income'>): ColumnDef<Income>[] {
+function getIncomeColumns(
+  t: TFunction<'income'>
+): ColumnDef<typeof incomeTableFeatures, Income>[] {
   return [
     {
       accessorKey: 'descricao',
@@ -233,7 +259,7 @@ export function IncomesDataTable({
     []
   );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+    React.useState<ColumnVisibilityState>({});
   const columns = React.useMemo(() => getIncomeColumns(t), [t]);
 
   // Adiciona as funções de callback aos dados
@@ -245,15 +271,12 @@ export function IncomesDataTable({
     }));
   }, [data, onEdit, onDelete]);
 
-  const table = useReactTable({
+  const table = useTable({
+    features: incomeTableFeatures,
     data: dataWithCallbacks,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
@@ -398,18 +421,13 @@ export function IncomesDataTable({
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                  >
+                  <TableRow key={row.id}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {cell.getIsPlaceholder()
-                          ? null
-                          : flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                       </TableCell>
                     ))}
                   </TableRow>

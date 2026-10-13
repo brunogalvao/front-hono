@@ -1,10 +1,6 @@
 import { useEffect, useState, useMemo, Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { flexRender, useTable } from '@tanstack/react-table';
 import {
   Select,
   SelectContent,
@@ -22,7 +18,10 @@ import {
 } from '@/components/ui/table';
 import { TransactionTableSkeleton } from './TransactionTableSkeleton';
 import { TransactionForm } from './TransactionForm';
-import { getTransactionColumns } from './transaction-columns';
+import {
+  getTransactionColumns,
+  transactionTableFeatures,
+} from './transaction-columns';
 import { TrendingUp, TrendingDown, CircleCheck, Clock } from 'lucide-react';
 import {
   useTransactions,
@@ -182,10 +181,10 @@ export function TransactionTable({
     }
   };
 
-  const table = useReactTable({
+  const table = useTable({
+    features: transactionTableFeatures,
     data: sortedFiltered,
     columns,
-    getCoreRowModel: getCoreRowModel(),
     meta: {
       onEdit: setEditTarget,
       onDelete: handleDelete,

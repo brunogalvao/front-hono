@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import { formatToBRL } from '@/utils/format';
 import type { Installment } from '@/hooks/useInstallments';
 import { RecordAuditMeta } from '@/components/RecordAuditMeta';
+import { basicTableFeatures } from '@/lib/table-features';
 
 interface ColumnOpts {
   canUpdate: boolean;
@@ -175,11 +176,10 @@ const statusVariant = {
 export function getInstallmentColumns(
   t: TFunction<['installments', 'common']>,
   opts: ColumnOpts
-): ColumnDef<Installment>[] {
+): ColumnDef<typeof basicTableFeatures, Installment>[] {
   return [
     {
       id: 'icon',
-      enableSorting: false,
       header: () => null,
       cell: () => (
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/20">
@@ -189,7 +189,6 @@ export function getInstallmentColumns(
     },
     {
       id: 'name',
-      enableSorting: false,
       header: t('table.colName'),
       cell: ({ row }) => {
         const { description, categories, status } = row.original;
@@ -221,7 +220,6 @@ export function getInstallmentColumns(
     },
     {
       id: 'amount',
-      enableSorting: false,
       header: t('table.colAmount'),
       cell: ({ row }) => {
         const { installment_amount, total_amount } = row.original;
@@ -240,7 +238,6 @@ export function getInstallmentColumns(
     },
     {
       id: 'progress',
-      enableSorting: false,
       header: t('table.colProgress'),
       cell: ({ row }) => {
         const { paid_installments, total_installments } = row.original;
@@ -268,7 +265,6 @@ export function getInstallmentColumns(
     },
     {
       id: 'status',
-      enableSorting: false,
       header: t('table.colStatus'),
       cell: ({ row }) => {
         const { status } = row.original;
@@ -281,7 +277,6 @@ export function getInstallmentColumns(
       ? [
           {
             id: 'actions',
-            enableSorting: false,
             header: t('table.colActions'),
             cell: ({ row }: { row: { original: Installment } }) => {
               if (row.original.status !== 'active') return null;
@@ -296,7 +291,7 @@ export function getInstallmentColumns(
                 />
               );
             },
-          } satisfies ColumnDef<Installment>,
+          } satisfies ColumnDef<typeof basicTableFeatures, Installment>,
         ]
       : []),
   ];

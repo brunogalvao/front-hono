@@ -1,5 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import type { ColumnDef, RowData } from '@tanstack/react-table';
+import {
+  columnVisibilityFeature,
+  metaHelper,
+  tableFeatures,
+  type ColumnDef,
+} from '@tanstack/react-table';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { TrendingDown, TrendingUp, ExternalLink } from 'lucide-react';
@@ -12,14 +17,16 @@ import { TransactionActionsCell } from './TransactionActionsCell';
 import { RecordAuditMeta } from '@/components/RecordAuditMeta';
 import type { Transaction, TransactionStatus } from '@/hooks/useTransactions';
 
-declare module '@tanstack/react-table' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface TableMeta<TData extends RowData> {
-    onEdit: (transaction: Transaction) => void;
-    onDelete: (id: string) => void;
-    onToggleStatus: (id: string, status: TransactionStatus) => void;
-  }
+interface TransactionTableMeta {
+  onEdit: (transaction: Transaction) => void;
+  onDelete: (id: string) => void;
+  onToggleStatus: (id: string, status: TransactionStatus) => void;
 }
+
+export const transactionTableFeatures = tableFeatures({
+  columnVisibilityFeature,
+  tableMeta: metaHelper<TransactionTableMeta>(),
+});
 
 function StatusCell({
   row,
@@ -76,11 +83,10 @@ function StatusCell({
 
 export function getTransactionColumns(
   t: TFunction<'transactions'>
-): ColumnDef<Transaction>[] {
+): ColumnDef<typeof transactionTableFeatures, Transaction>[] {
   return [
     {
       id: 'icon',
-      enableSorting: false,
       header: () => null,
       cell: ({ row }) => {
         const isReceita = row.original.type === 'receita';
@@ -104,7 +110,6 @@ export function getTransactionColumns(
     },
     {
       id: 'name',
-      enableSorting: false,
       header: t('table.name'),
       accessorFn: (row) =>
         row.description ?? row.categories?.name ?? t('table.noDescription'),
@@ -134,7 +139,6 @@ export function getTransactionColumns(
     },
     {
       id: 'type',
-      enableSorting: false,
       header: t('table.colType'),
       cell: ({ row }) => {
         const { origin, installment_number, installments } = row.original;
@@ -155,13 +159,11 @@ export function getTransactionColumns(
     },
     {
       id: 'status',
-      enableSorting: false,
       header: t('table.colStatus'),
       cell: ({ row, table }) => <StatusCell row={row} table={table} />,
     },
     {
       id: 'amount',
-      enableSorting: false,
       header: t('table.colAmount'),
       cell: ({ row }) => {
         const isReceita = row.original.type === 'receita';
@@ -179,7 +181,6 @@ export function getTransactionColumns(
     },
     {
       id: 'actions',
-      enableSorting: false,
       header: t('table.colActions'),
       cell: ({ row, table }) => {
         const meta = table.options.meta;
