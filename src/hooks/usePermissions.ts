@@ -34,26 +34,31 @@ export function usePermissions() {
   const { data: matrix, isLoading } = useQuery({
     queryKey: queryKeys.permissions.current(
       activeWorkspace?.id ?? '',
-      currentUserId ?? ''
+      currentUserId ?? '',
+      activeRole ?? undefined
     ),
     enabled: !!activeWorkspace && !!currentUserId && !isSuperAdmin,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 15_000,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: 'always',
     queryFn: async (): Promise<PermissionMatrix> => {
       if (!activeWorkspace || !currentUserId) return createPermissionMatrix();
 
       // 1. Fetch individual overrides
-      const { data: overrides } = await supabase
+      const { data: overrides, error: overridesError } = await supabase
         .from('workspace_member_permissions')
         .select('*')
         .eq('workspace_id', activeWorkspace.id)
         .eq('user_id', currentUserId);
+      if (overridesError) throw overridesError;
 
       // 2. Fetch role-based permissions
-      const { data: rolePerms } = await supabase
+      const { data: rolePerms, error: rolePermissionsError } = await supabase
         .from('workspace_role_permissions')
         .select('*')
         .eq('workspace_id', activeWorkspace.id)
         .eq('role', activeRole ?? '');
+      if (rolePermissionsError) throw rolePermissionsError;
 
       return resolvePermissionMatrix(rolePerms, overrides);
     },

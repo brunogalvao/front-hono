@@ -547,6 +547,7 @@ export function AllUsersTable({
               workspaceId={workspaceId}
               userId={permissionsTarget.profile.id}
               currentUserId={currentUserId}
+              role={permissionsTarget.role!}
             />
           )}
         </DialogContent>

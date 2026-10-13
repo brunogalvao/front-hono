@@ -135,8 +135,14 @@ export const queryKeys = {
       ['permissions', 'role-matrix', workspaceId] as const,
     memberOverrides: (workspaceId: string, userId: string) =>
       ['permissions', 'member-overrides', workspaceId, userId] as const,
-    current: (workspaceId: string, userId: string) =>
-      ['permissions', 'current', workspaceId, userId] as const,
+    current: (workspaceId: string, userId: string, role?: string) =>
+      [
+        'permissions',
+        'current',
+        workspaceId,
+        userId,
+        ...(role ? [role] : []),
+      ] as const,
   },
 } as const;
 

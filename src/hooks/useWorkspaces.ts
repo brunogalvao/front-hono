@@ -29,6 +29,9 @@ export function useWorkspaces() {
   const query = useQuery({
     queryKey: queryKeys.workspaces.list,
     queryFn: fetchWorkspaces,
+    staleTime: 15_000,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: 'always',
   });
 
   useEffect(() => {

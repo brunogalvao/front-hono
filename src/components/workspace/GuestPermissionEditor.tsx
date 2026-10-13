@@ -16,7 +16,12 @@ import {
   useMemberPermissions,
   type MemberPermission,
 } from '@/hooks/useMemberPermissions';
+import {
+  useRolePermissions,
+  type RolePermission,
+} from '@/hooks/useRolePermissions';
 import type { PermissionResource } from '@/lib/permissions';
+import type { WorkspaceRole } from '@/model/workspace.model';
 
 const RESOURCE_KEYS: PermissionResource[] = [
   'transactions',
@@ -33,12 +38,14 @@ interface GuestPermissionEditorProps {
   workspaceId: string;
   userId: string;
   currentUserId: string;
+  role: WorkspaceRole;
 }
 
 export function GuestPermissionEditor({
   workspaceId,
   userId,
   currentUserId,
+  role,
 }: GuestPermissionEditorProps) {
   const { t } = useTranslation(['permissions', 'common']);
   const {
@@ -47,6 +54,8 @@ export function GuestPermissionEditor({
     upsert,
     resetAll,
   } = useMemberPermissions(workspaceId, userId);
+  const { data: rolePermissions = [], isLoading: isLoadingRolePermissions } =
+    useRolePermissions(workspaceId);
 
   const overrideMap = useMemo(() => {
     const map = new Map<PermissionResource, MemberPermission>();
@@ -54,20 +63,29 @@ export function GuestPermissionEditor({
     return map;
   }, [overrides]);
 
+  const rolePermissionMap = useMemo(() => {
+    const map = new Map<PermissionResource, RolePermission>();
+    for (const permission of rolePermissions) {
+      if (permission.role === role) map.set(permission.resource, permission);
+    }
+    return map;
+  }, [role, rolePermissions]);
+
   const handleToggle = async (
     resource: PermissionResource,
     action: (typeof ACTIONS)[number],
     nextValue: boolean
   ) => {
     const existing = overrideMap.get(resource);
+    const inherited = rolePermissionMap.get(resource);
     const base = existing ?? {
       workspace_id: workspaceId,
       user_id: userId,
       resource,
-      can_read: false,
-      can_create: false,
-      can_update: false,
-      can_delete: false,
+      can_read: inherited?.can_read ?? false,
+      can_create: inherited?.can_create ?? false,
+      can_update: inherited?.can_update ?? false,
+      can_delete: inherited?.can_delete ?? false,
     };
 
     try {
@@ -90,7 +108,9 @@ export function GuestPermissionEditor({
     }
   };
 
-  if (isLoading) return <Skeleton className="h-64 w-full" />;
+  if (isLoading || isLoadingRolePermissions) {
+    return <Skeleton className="h-64 w-full" />;
+  }
 
   const hasOverrides = overrides.length > 0;
 
@@ -120,6 +140,7 @@ export function GuestPermissionEditor({
           <TableBody>
             {RESOURCE_KEYS.map((resource) => {
               const override = overrideMap.get(resource);
+              const inherited = rolePermissionMap.get(resource);
               return (
                 <TableRow key={resource}>
                   <TableCell className="font-medium">
@@ -136,9 +157,11 @@ export function GuestPermissionEditor({
                         aria-label={t('matrix.permissionLabel', {
                           action: t(`actionsLong.${action}`),
                           resource: t(`resources.${resource}`),
-                          role: t('roles.visualizador'),
+                          role: t(`roles.${role}`),
                         })}
-                        checked={override?.[action] ?? false}
+                        checked={
+                          override?.[action] ?? inherited?.[action] ?? false
+                        }
                         disabled={upsert.isPending}
                         onCheckedChange={(value) =>
                           handleToggle(resource, action, value === true)
