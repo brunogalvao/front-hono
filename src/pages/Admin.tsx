@@ -17,11 +17,19 @@ import { useSessionGuard } from '@/hooks/useSessionGuard';
 import { WorkspaceProvider } from '@/context/WorkspaceContext';
 import { useTranslation } from 'react-i18next';
 import { InvitePasswordSetupDialog } from '@/components/workspace/InvitePasswordSetupDialog';
+import { WorkspaceRouteGuard } from '@/components/workspace/WorkspaceRouteGuard';
+import { useWorkspaces } from '@/hooks/useWorkspaces';
+import { useWorkspace } from '@/context/WorkspaceContext';
 
-function Admin() {
+function AdminContent() {
   const { t } = useTranslation('nav');
   const navigate = useNavigate();
   const { sessionReady } = useSessionGuard();
+  const { activeWorkspace } = useWorkspace();
+  const workspacesQuery = useWorkspaces();
+  const isWorkspaceLoading =
+    workspacesQuery.isPending ||
+    (!!workspacesQuery.data?.length && !activeWorkspace);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
@@ -41,7 +49,7 @@ function Admin() {
   };
 
   return (
-    <WorkspaceProvider>
+    <>
       {sessionReady && <InvitePasswordSetupDialog />}
       <SidebarProvider>
         <AppSidebar />
@@ -79,12 +87,24 @@ function Admin() {
               className="bg-muted/50 min-h-0 flex-1 overflow-auto rounded-xl px-4 py-4 sm:px-6 sm:py-5 md:min-h-min md:px-8 md:py-6"
             >
               <div className="h-full w-full">
-                {sessionReady ? <Outlet /> : null}
+                {sessionReady ? (
+                  <WorkspaceRouteGuard isWorkspaceLoading={isWorkspaceLoading}>
+                    <Outlet />
+                  </WorkspaceRouteGuard>
+                ) : null}
               </div>
             </div>
           </div>
         </SidebarInset>
       </SidebarProvider>
+    </>
+  );
+}
+
+function Admin() {
+  return (
+    <WorkspaceProvider>
+      <AdminContent />
     </WorkspaceProvider>
   );
 }

@@ -14,18 +14,23 @@ import { useTranslation } from 'react-i18next';
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { can } = usePermissions();
   const { t } = useTranslation('nav');
+  const canReadTransactions = can('transactions', 'read');
 
   const navItems: NavItem[] = [
-    {
-      title: t('dashboard'),
-      url: '/admin/dashboard',
-      icon: 'dashboard' as const,
-    },
-    {
-      title: t('transactions'),
-      url: '/admin/transactions',
-      icon: 'list' as const,
-    },
+    ...(canReadTransactions
+      ? [
+          {
+            title: t('dashboard'),
+            url: '/admin/dashboard',
+            icon: 'dashboard' as const,
+          },
+          {
+            title: t('transactions'),
+            url: '/admin/transactions',
+            icon: 'list' as const,
+          },
+        ]
+      : []),
     ...(can('recurring', 'read')
       ? [
           {
@@ -44,11 +49,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           },
         ]
       : []),
-    {
-      title: t('insights'),
-      url: '/admin/advisor',
-      icon: 'advisor' as const,
-    },
+    ...(canReadTransactions
+      ? [
+          {
+            title: t('insights'),
+            url: '/admin/advisor',
+            icon: 'advisor' as const,
+          },
+        ]
+      : []),
     ...(can('settings', 'read')
       ? [
           {

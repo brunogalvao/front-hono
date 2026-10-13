@@ -14,7 +14,6 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useWorkspace } from '@/context/WorkspaceContext';
-import { useWorkspaces } from '@/hooks/useWorkspaces';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -22,7 +21,6 @@ export function WorkspaceSwitcher() {
   const { t } = useTranslation('nav');
   const { isMobile } = useSidebar();
   const { activeWorkspace, workspaces, switchWorkspace } = useWorkspace();
-  useWorkspaces(); // loads workspaces into context
 
   if (!activeWorkspace) return null;
 
