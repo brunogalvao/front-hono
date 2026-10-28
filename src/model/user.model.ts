@@ -18,6 +18,8 @@ export interface UserProfile {
   displayName: string;
 }
 
+export type PlanTier = 'free' | 'pro';
+
 /** Perfil de usuário do banco de dados (tabela profiles) */
 export interface AppUserProfile {
   id: string;
@@ -28,6 +30,9 @@ export interface AppUserProfile {
   signup_origin?: 'self_signup' | 'workspace_invite';
   onboarding_status?: 'incomplete' | 'complete';
   onboarding_completed_at?: string | null;
+  plan_tier?: PlanTier;
+  is_platform_superuser?: boolean;
+  max_workspaces?: number;
 }
 
 export interface ProfileOnboardingUpdate {

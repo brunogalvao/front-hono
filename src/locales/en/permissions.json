@@ -55,14 +55,33 @@
     },
     "guestDialogTitle": "Individual permissions — {{name}}",
     "guestDialogDescription": "Configure specific permissions for this user, overriding the default role.",
+    "platformSuperuserBadge": "Superuser",
+    "planSelectLabel": "User plan",
+    "grantSuperuser": "Promote to Superuser",
+    "revokeSuperuser": "Revoke Superuser",
+    "plan": {
+      "free": "Starter (Free)",
+      "pro": "Paid (Pro)"
+    },
     "toast": {
       "roleUpdated": "Role updated",
       "roleUpdateError": "Failed to update role",
       "memberRemoved": "Member removed from workspace",
       "memberRemoveError": "Failed to remove member",
       "userAdded": "User added to workspace",
-      "userAddError": "Failed to add user"
+      "userAddError": "Failed to add user",
+      "planUpdated": "User plan updated",
+      "planUpdateError": "Failed to update user plan",
+      "superuserGranted": "User promoted to Platform Superuser",
+      "superuserRevoked": "Platform Superuser access revoked",
+      "superuserUpdateError": "Failed to update Superuser status"
     }
+  },
+  "platformUsers": {
+    "title": "Platform accounts and plans (Superuser)",
+    "description": "Manage the plan (Starter Free vs Paid Pro) of any account registered via Sign-Up, Google, or GitHub and assign Platform Superusers.",
+    "searchPlaceholder": "Search user by name or email...",
+    "empty": "No accounts found."
   },
   "guestEditor": {
     "hint": "Individual permissions override the default role. Screens without an override use the assigned role's permissions.",

@@ -4,6 +4,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   Building2,
+  Crown,
+  Lock,
   LogOut,
   MoreHorizontal,
   Plus,
@@ -40,6 +42,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CategoryManager } from '@/components/workspace/CategoryManager';
 import { CreateWorkspaceDialog } from '@/components/workspace/CreateWorkspaceDialog';
+import { UpgradePlanDialog } from '@/components/workspace/UpgradePlanDialog';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import { ApiError } from '@/lib/api-error';
@@ -61,9 +64,15 @@ export default function WorkspaceSettingsPage() {
   const {
     can,
     currentUserId,
+    isSuperAdmin,
+    planTier,
+    maxWorkspaces,
     isLoading: isPermissionLoading,
   } = usePermissions();
   const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
+  const [upgradeFeature, setUpgradeFeature] = useState<
+    'workspaces' | 'members' | 'categories' | null
+  >(null);
   const [lifecycleAction, setLifecycleAction] = useState<LifecycleAction>(null);
   const [confirmationName, setConfirmationName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,12 +86,15 @@ export default function WorkspaceSettingsPage() {
     );
   }
 
-  const canManageCategories =
-    can('settings', 'read') && can('categories', 'read');
+  const canViewCategories = can('categories', 'read');
+  const canReadMembers = can('members', 'read');
   const ownedWorkspaceCount = workspaces.filter(
     (workspace) => workspace.superuser_id === currentUserId
   ).length;
-  const canCreateWorkspace = ownedWorkspaceCount > 0;
+  const isOwnerOfAnyWorkspace = isSuperAdmin || ownedWorkspaceCount > 0;
+  const canCreateWorkspace =
+    isSuperAdmin ||
+    (ownedWorkspaceCount > 0 && ownedWorkspaceCount < maxWorkspaces);
   const confirmationMatches =
     lifecycleAction?.type === 'delete' &&
     confirmationName === lifecycleAction.workspace.name;
@@ -149,6 +161,10 @@ export default function WorkspaceSettingsPage() {
   };
 
   const handleManageMembers = async (workspace: WorkspaceInfo) => {
+    if (!canReadMembers) {
+      setUpgradeFeature('members');
+      return;
+    }
     if (workspace.id !== activeWorkspace.id) {
       switchWorkspace(workspace.id);
     }
@@ -157,13 +173,35 @@ export default function WorkspaceSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {t('settings.title')}
-        </h1>
-        <p className="text-muted-foreground text-sm">
-          {t('settings.subtitle')}
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {t('settings.title')}
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            {t('settings.subtitle')}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant={planTier === 'pro' || isSuperAdmin ? 'default' : 'secondary'}>
+            {isSuperAdmin
+              ? t('settings.planBadge.superuser')
+              : planTier === 'pro'
+                ? t('settings.planBadge.pro')
+                : t('settings.planBadge.free')}
+          </Badge>
+          {planTier === 'free' && !isSuperAdmin && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => setUpgradeFeature('workspaces')}
+            >
+              <Crown className="mr-1.5 size-4 text-amber-500" aria-hidden="true" />
+              {t('upgrade.ctaShort')}
+            </Button>
+          )}
+        </div>
       </div>
 
       <Card>
@@ -177,26 +215,46 @@ export default function WorkspaceSettingsPage() {
               {t('settings.workspacesCardDesc')}
             </CardDescription>
           </div>
-          {canCreateWorkspace && (
+          {isOwnerOfAnyWorkspace && (
             <Button
               type="button"
               size="sm"
+              variant={canCreateWorkspace ? 'default' : 'outline'}
               className="w-full sm:w-auto"
-              onClick={() => setCreateWorkspaceOpen(true)}
+              onClick={() => {
+                if (canCreateWorkspace) {
+                  setCreateWorkspaceOpen(true);
+                } else {
+                  setUpgradeFeature('workspaces');
+                }
+              }}
             >
-              <Plus className="size-4" aria-hidden="true" />
+              {canCreateWorkspace ? (
+                <Plus className="size-4" aria-hidden="true" />
+              ) : (
+                <Lock className="size-4" aria-hidden="true" />
+              )}
               {t('settings.createWorkspace')}
+              {!canCreateWorkspace && (
+                <Badge variant="secondary" className="ml-1 text-[10px]">
+                  Pro
+                </Badge>
+              )}
             </Button>
           )}
         </CardHeader>
         <CardContent className="space-y-3">
-          {canCreateWorkspace && (
+          {isOwnerOfAnyWorkspace && (
             <div className="bg-primary/5 text-muted-foreground flex gap-2 rounded-lg px-3 py-2 text-xs">
               <ShieldCheck
                 className="text-primary mt-0.5 size-4 shrink-0"
                 aria-hidden="true"
               />
-              <p>{t('settings.ownerControlsHint')}</p>
+              <p>
+                {canCreateWorkspace
+                  ? t('settings.ownerControlsHint')
+                  : t('settings.freePlanControlsHint')}
+              </p>
             </div>
           )}
           {workspaces.map((workspace) => {
@@ -227,7 +285,7 @@ export default function WorkspaceSettingsPage() {
                     {isOwned && (
                       <ShieldCheck className="size-3" aria-hidden="true" />
                     )}
-                    {isOwned
+                    {isSuperAdmin && isOwned
                       ? t('settings.superuser')
                       : t(`nav:roles.${workspace.role}`, {
                           defaultValue: workspace.role,
@@ -269,12 +327,23 @@ export default function WorkspaceSettingsPage() {
                           ? t('settings.ownerActions')
                           : t('settings.memberActions')}
                       </DropdownMenuLabel>
-                      {isOwned && (
+                      {(isOwned || canReadMembers) && (
                         <DropdownMenuItem
                           onSelect={() => void handleManageMembers(workspace)}
                         >
-                          <ShieldCheck className="size-4" aria-hidden="true" />
-                          {t('settings.manageMembers')}
+                          {canReadMembers ? (
+                            <ShieldCheck className="size-4" aria-hidden="true" />
+                          ) : (
+                            <Lock className="size-4" aria-hidden="true" />
+                          )}
+                          <span className="flex-1">
+                            {t('settings.manageMembers')}
+                          </span>
+                          {!canReadMembers && (
+                            <Badge variant="secondary" className="text-[10px]">
+                              Pro
+                            </Badge>
+                          )}
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
@@ -317,7 +386,7 @@ export default function WorkspaceSettingsPage() {
         </CardContent>
       </Card>
 
-      {canManageCategories && (
+      {canViewCategories && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
@@ -328,7 +397,9 @@ export default function WorkspaceSettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <CategoryManager />
+            <CategoryManager
+              onRequestUpgrade={() => setUpgradeFeature('categories')}
+            />
           </CardContent>
         </Card>
       )}
@@ -336,6 +407,12 @@ export default function WorkspaceSettingsPage() {
       <CreateWorkspaceDialog
         open={createWorkspaceOpen}
         onOpenChange={setCreateWorkspaceOpen}
+      />
+
+      <UpgradePlanDialog
+        open={upgradeFeature !== null}
+        onOpenChange={(open) => !open && setUpgradeFeature(null)}
+        feature={upgradeFeature ?? undefined}
       />
 
       <Dialog

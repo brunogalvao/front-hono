@@ -16,6 +16,7 @@ import { AllUsersTable } from '@/components/workspace/AllUsersTable';
 import { InviteForm } from '@/components/workspace/InviteForm';
 import { PendingInviteList } from '@/components/workspace/PendingInviteList';
 import { PermissionMatrix } from '@/components/workspace/PermissionMatrix';
+import { PlatformUsersCard } from '@/components/workspace/PlatformUsersCard';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useAllAppUsers } from '@/hooks/useAllAppUsers';
 import { useWorkspaceMembers } from '@/hooks/useWorkspaceMembers';
@@ -217,21 +218,24 @@ export default function PermissionsPage() {
       </Card>
 
       {isSuperAdmin && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <ShieldCheck className="text-primary size-5" />
-              {t('matrix.title')}
-            </CardTitle>
-            <CardDescription>{t('matrix.description')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <PermissionMatrix
-              workspaceId={activeWorkspace.id}
-              currentUserId={currentUserId ?? ''}
-            />
-          </CardContent>
-        </Card>
+        <>
+          <PlatformUsersCard currentUserId={currentUserId ?? ''} />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <ShieldCheck className="text-primary size-5" />
+                {t('matrix.title')}
+              </CardTitle>
+              <CardDescription>{t('matrix.description')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PermissionMatrix
+                workspaceId={activeWorkspace.id}
+                currentUserId={currentUserId ?? ''}
+              />
+            </CardContent>
+          </Card>
+        </>
       )}
     </div>
   );

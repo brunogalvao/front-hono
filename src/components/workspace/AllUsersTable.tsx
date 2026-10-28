@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import {
   ChevronLeft,
   ChevronRight,
+  Crown,
   Loader2,
   RotateCw,
   Shield,
@@ -142,6 +143,63 @@ export function AllUsersTable({
       queryKey: queryKeys.workspaces.members(workspaceId),
     });
     queryClient.invalidateQueries({ queryKey: queryKeys.workspaces.list });
+    queryClient.invalidateQueries({ queryKey: queryKeys.user.profile });
+  };
+
+  const updateUserAccess = useMutation({
+    mutationFn: async ({
+      targetUserId,
+      planTier,
+      isPlatformSuperuser,
+    }: {
+      targetUserId: string;
+      planTier?: 'free' | 'pro';
+      isPlatformSuperuser?: boolean;
+    }) => {
+      const { error } = await supabase.rpc('admin_update_user_access', {
+        p_target_user_id: targetUserId,
+        p_plan_tier: planTier ?? null,
+        p_is_platform_superuser:
+          isPlatformSuperuser === undefined ? null : isPlatformSuperuser,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      invalidateAll();
+    },
+  });
+
+  const handlePlanChange = async (
+    targetUserId: string,
+    planTier: 'free' | 'pro'
+  ) => {
+    try {
+      await updateUserAccess.mutateAsync({ targetUserId, planTier });
+      toast.success(t('allUsers.toast.planUpdated'));
+    } catch {
+      toast.error(t('allUsers.toast.planUpdateError'));
+    }
+  };
+
+  const handleToggleSuperuser = async (
+    targetUserId: string,
+    nextValue: boolean
+  ) => {
+    try {
+      await updateUserAccess.mutateAsync({
+        targetUserId,
+        isPlatformSuperuser: nextValue,
+      });
+      toast.success(
+        t(
+          nextValue
+            ? 'allUsers.toast.superuserGranted'
+            : 'allUsers.toast.superuserRevoked'
+        )
+      );
+    } catch {
+      toast.error(t('allUsers.toast.superuserUpdateError'));
+    }
   };
 
   const handleUpdateRole = async (memberId: string, role: WorkspaceRole) => {
@@ -226,14 +284,32 @@ export function AllUsersTable({
               </Avatar>
 
               <div className="min-w-0 flex-1 basis-[calc(100%-3rem)] sm:basis-auto">
-                <p className="truncate text-sm font-medium">
-                  {name}
-                  {isSelf && (
-                    <span className="text-muted-foreground ml-1 font-normal">
-                      {t('allUsers.currentSession')}
-                    </span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <p className="truncate text-sm font-medium">
+                    {name}
+                    {isSelf && (
+                      <span className="text-muted-foreground ml-1 font-normal">
+                        {t('allUsers.currentSession')}
+                      </span>
+                    )}
+                  </p>
+                  {profile.is_platform_superuser && (
+                    <Badge className="gap-1 text-[10px]">
+                      <Crown className="size-3" aria-hidden="true" />
+                      {t('allUsers.platformSuperuserBadge')}
+                    </Badge>
                   )}
-                </p>
+                  {!profile.is_platform_superuser && profile.plan_tier && (
+                    <Badge
+                      variant={
+                        profile.plan_tier === 'pro' ? 'default' : 'outline'
+                      }
+                      className="text-[10px]"
+                    >
+                      {t(`allUsers.plan.${profile.plan_tier}`)}
+                    </Badge>
+                  )}
+                </div>
                 <p className="text-muted-foreground truncate text-xs">
                   {profile.email}
                 </p>
@@ -244,6 +320,81 @@ export function AllUsersTable({
                   />
                 )}
               </div>
+
+              {/* Superuser Plan & Platform Admin Controls */}
+              {isSuperAdmin && !isSelf && (
+                <div className="flex items-center gap-1.5">
+                  {!profile.is_platform_superuser && (
+                    <Select
+                      value={profile.plan_tier ?? 'free'}
+                      onValueChange={(value) =>
+                        void handlePlanChange(
+                          profile.id,
+                          value as 'free' | 'pro'
+                        )
+                      }
+                    >
+                      <SelectTrigger
+                        className="min-h-11 w-28 text-xs md:min-h-8"
+                        aria-label={t('allUsers.planSelectLabel')}
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="free" className="text-xs">
+                          {t('allUsers.plan.free')}
+                        </SelectItem>
+                        <SelectItem value="pro" className="text-xs">
+                          {t('allUsers.plan.pro')}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                  {profile.email.toLowerCase() !==
+                    'bruno_galvao@outlook.com' && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant={
+                            profile.is_platform_superuser
+                              ? 'secondary'
+                              : 'ghost'
+                          }
+                          size="icon"
+                          className="size-11 shrink-0 md:size-8"
+                          aria-label={t(
+                            profile.is_platform_superuser
+                              ? 'allUsers.revokeSuperuser'
+                              : 'allUsers.grantSuperuser'
+                          )}
+                          onClick={() =>
+                            void handleToggleSuperuser(
+                              profile.id,
+                              !profile.is_platform_superuser
+                            )
+                          }
+                        >
+                          <Crown
+                            className={`h-4 w-4 ${
+                              profile.is_platform_superuser
+                                ? 'text-amber-500'
+                                : 'text-muted-foreground'
+                            }`}
+                          />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {t(
+                          profile.is_platform_superuser
+                            ? 'allUsers.revokeSuperuser'
+                            : 'allUsers.grantSuperuser'
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
+              )}
 
               {/* Role area */}
               {isMember ? (

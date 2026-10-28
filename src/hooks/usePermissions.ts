@@ -12,6 +12,13 @@ import type {
   ResourcePermission,
   PermissionMatrix,
 } from '@/lib/permissions';
+import type { PlanTier } from '@/model/user.model';
+
+interface UserAccessProfile {
+  plan_tier: PlanTier;
+  is_platform_superuser: boolean;
+  max_workspaces: number;
+}
 
 export function usePermissions() {
   const { activeWorkspace, activeRole } = useWorkspace();
@@ -25,11 +32,40 @@ export function usePermissions() {
     staleTime: 10 * 60 * 1000,
   });
 
-  const isSuperAdmin = !!(
+  const { data: accessProfile, isLoading: isProfileLoading } = useQuery({
+    queryKey: [...queryKeys.user.profile, 'access', currentUserId ?? ''],
+    enabled: !!currentUserId,
+    staleTime: 30_000,
+    queryFn: async (): Promise<UserAccessProfile | null> => {
+      if (!currentUserId) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('plan_tier, is_platform_superuser, max_workspaces')
+        .eq('id', currentUserId)
+        .maybeSingle();
+      if (error || !data) return null;
+      return {
+        plan_tier: (data.plan_tier === 'pro' ? 'pro' : 'free') as PlanTier,
+        is_platform_superuser: Boolean(data.is_platform_superuser),
+        max_workspaces:
+          typeof data.max_workspaces === 'number' ? data.max_workspaces : 1,
+      };
+    },
+  });
+
+  const isWorkspaceOwner = !!(
     activeWorkspace &&
     currentUserId &&
     isSuperuser(activeWorkspace.superuser_id, currentUserId)
   );
+
+  const isSuperAdmin = Boolean(accessProfile?.is_platform_superuser);
+  const planTier: PlanTier = isSuperAdmin
+    ? 'pro'
+    : (accessProfile?.plan_tier ?? 'free');
+  const maxWorkspaces = isSuperAdmin
+    ? Math.max(accessProfile?.max_workspaces ?? 100, 100)
+    : (accessProfile?.max_workspaces ?? (planTier === 'pro' ? 20 : 1));
 
   const { data: matrix, isLoading } = useQuery({
     queryKey: queryKeys.permissions.current(
@@ -37,7 +73,11 @@ export function usePermissions() {
       currentUserId ?? '',
       activeRole ?? undefined
     ),
-    enabled: !!activeWorkspace && !!currentUserId && !isSuperAdmin,
+    enabled:
+      !!activeWorkspace &&
+      !!currentUserId &&
+      !isProfileLoading &&
+      !isSuperAdmin,
     staleTime: 15_000,
     refetchInterval: 30_000,
     refetchOnWindowFocus: 'always',
@@ -95,6 +135,12 @@ export function usePermissions() {
     matrix: effectiveMatrix,
     currentUserId,
     isSuperAdmin,
-    isLoading: isCurrentUserLoading || (!isSuperAdmin && isLoading),
+    isWorkspaceOwner,
+    planTier,
+    maxWorkspaces,
+    isLoading:
+      isCurrentUserLoading ||
+      isProfileLoading ||
+      (!isSuperAdmin && isLoading),
   };
 }

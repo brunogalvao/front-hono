@@ -1,4 +1,4 @@
-import { ChevronsUpDown, Plus } from 'lucide-react';
+import { ChevronsUpDown, Lock, Plus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,22 +13,32 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { Badge } from '@/components/ui/badge';
 import { useWorkspace } from '@/context/WorkspaceContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useCurrentUser } from '@/hooks/use-user-profile';
 import { CreateWorkspaceDialog } from '@/components/workspace/CreateWorkspaceDialog';
+import { UpgradePlanDialog } from '@/components/workspace/UpgradePlanDialog';
 
 export function WorkspaceSwitcher() {
   const { t } = useTranslation('nav');
   const { isMobile } = useSidebar();
   const { activeWorkspace, workspaces, switchWorkspace } = useWorkspace();
   const { data: currentUser } = useCurrentUser();
+  const { currentUserId, isSuperAdmin, maxWorkspaces } = usePermissions();
   const [createOpen, setCreateOpen] = useState(false);
-  const canCreateWorkspace = workspaces.some(
-    (workspace) => workspace.superuser_id === currentUser?.id
-  );
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+
+  const effectiveUserId = currentUserId ?? currentUser?.id;
+  const ownedWorkspaceCount = workspaces.filter(
+    (workspace) => workspace.superuser_id === effectiveUserId
+  ).length;
+  const isOwnerOfAnyWorkspace = isSuperAdmin || ownedWorkspaceCount > 0;
+  const canCreateWorkspace =
+    isSuperAdmin || (ownedWorkspaceCount > 0 && ownedWorkspaceCount < maxWorkspaces);
 
   if (!activeWorkspace) return null;
 
@@ -86,17 +96,32 @@ export function WorkspaceSwitcher() {
                   </span>
                 </DropdownMenuItem>
               ))}
-              {canCreateWorkspace && (
+              {isOwnerOfAnyWorkspace && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="gap-2 p-2"
-                    onSelect={() => setCreateOpen(true)}
+                    onSelect={() => {
+                      if (canCreateWorkspace) {
+                        setCreateOpen(true);
+                      } else {
+                        setUpgradeOpen(true);
+                      }
+                    }}
                   >
                     <div className="bg-background flex size-6 items-center justify-center rounded-md border">
-                      <Plus className="size-4" />
+                      {canCreateWorkspace ? (
+                        <Plus className="size-4" />
+                      ) : (
+                        <Lock className="size-3.5" />
+                      )}
                     </div>
-                    <div className="font-medium">{t('newWorkspace')}</div>
+                    <div className="flex-1 font-medium">{t('newWorkspace')}</div>
+                    {!canCreateWorkspace && (
+                      <Badge variant="secondary" className="text-[10px]">
+                        Pro
+                      </Badge>
+                    )}
                   </DropdownMenuItem>
                 </>
               )}
@@ -107,6 +132,11 @@ export function WorkspaceSwitcher() {
       {canCreateWorkspace && (
         <CreateWorkspaceDialog open={createOpen} onOpenChange={setCreateOpen} />
       )}
+      <UpgradePlanDialog
+        open={upgradeOpen}
+        onOpenChange={setUpgradeOpen}
+        feature="workspaces"
+      />
     </>
   );
 }

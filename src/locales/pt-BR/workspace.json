@@ -9,9 +9,15 @@
     "openWorkspace": "Acessar",
     "workspaceActions": "Ações do workspace {{workspace}}",
     "superuser": "Superusuário",
-    "ownerActions": "Administração do superusuário",
+    "ownerActions": "Administração do proprietário",
     "memberActions": "Ações do workspace",
-    "ownerControlsHint": "Como proprietário, você pode criar ambientes e administrar membros ou excluir cada workspace neste card.",
+    "ownerControlsHint": "Como assinante Pro / Superusuário, você pode criar múltiplos ambientes, convidar membros e personalizar categorias.",
+    "freePlanControlsHint": "Você está no Plano Inicial (Gratuito) com 1 workspace pessoal. Faça upgrade para o Plano Pro para criar múltiplos workspaces, convidar membros e criar categorias personalizadas.",
+    "planBadge": {
+      "free": "Plano Inicial (Gratuito)",
+      "pro": "Plano Pro",
+      "superuser": "Superusuário da Plataforma"
+    },
     "active": "Ativo",
     "manage": "Gerenciar",
     "membersCard": "Membros e acesso",
@@ -79,5 +85,25 @@
       "deleted": "Categoria excluída.",
       "deleteError": "Erro ao excluir categoria."
     }
+  },
+  "upgrade": {
+    "badge": "Plano Pro",
+    "title": "Desbloqueie recursos completos com o Plano Pro",
+    "description": "Sua conta está na permissão inicial gratuita. Faça o upgrade para liberar gestão de membros, múltiplos workspaces e categorias personalizadas.",
+    "featureReason": {
+      "workspaces": "A criação de múltiplos workspaces é exclusiva do Plano Pro. No plano inicial você possui 1 workspace pessoal.",
+      "members": "Convidar e gerenciar membros no seu workspace é um recurso exclusivo do Plano Pro.",
+      "categories": "A criação e edição de categorias personalizadas está disponível no Plano Pro."
+    },
+    "includedTitle": "O que está incluído no Plano Pro",
+    "benefits": {
+      "workspaces": "Crie e gerencie até 20 workspaces independentes",
+      "members": "Convide membros por e-mail e defina papéis de acesso (Administrador, Operador, Visualizador)",
+      "categories": "Crie, edite e personalize categorias com ícones próprios",
+      "settings": "Controle avançado das configurações dos seus workspaces"
+    },
+    "contactHint": "Após a contratação, o Superusuário libera imediatamente o Plano Pro na sua conta.",
+    "cta": "Solicitar Upgrade para Pro",
+    "ctaShort": "Fazer Upgrade Pro"
   }
 }

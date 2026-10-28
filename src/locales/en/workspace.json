@@ -9,9 +9,15 @@
     "openWorkspace": "Open",
     "workspaceActions": "Actions for workspace {{workspace}}",
     "superuser": "Workspace owner",
-    "ownerActions": "Workspace owner administration",
+    "ownerActions": "Owner administration",
     "memberActions": "Workspace actions",
-    "ownerControlsHint": "As an owner, you can create environments and manage members or delete each workspace from this card.",
+    "ownerControlsHint": "As a Pro subscriber / Superuser, you can create multiple environments, invite members, and customize categories.",
+    "freePlanControlsHint": "You are on the Starter Plan (Free) with 1 personal workspace. Upgrade to the Pro Plan to create multiple workspaces, invite members, and create custom categories.",
+    "planBadge": {
+      "free": "Starter Plan (Free)",
+      "pro": "Pro Plan",
+      "superuser": "Platform Superuser"
+    },
     "active": "Active",
     "manage": "Manage",
     "membersCard": "Members and access",
@@ -79,5 +85,25 @@
       "deleted": "Category deleted.",
       "deleteError": "Error deleting category."
     }
+  },
+  "upgrade": {
+    "badge": "Pro Plan",
+    "title": "Unlock full features with the Pro Plan",
+    "description": "Your account is on the free starter tier. Upgrade to unlock member management, multiple workspaces, and custom categories.",
+    "featureReason": {
+      "workspaces": "Creating multiple workspaces is exclusive to the Pro Plan. The starter tier includes 1 personal workspace.",
+      "members": "Inviting and managing members in your workspace is an exclusive Pro Plan feature.",
+      "categories": "Creating and editing custom categories is available on the Pro Plan."
+    },
+    "includedTitle": "What's included in the Pro Plan",
+    "benefits": {
+      "workspaces": "Create and manage up to 20 independent workspaces",
+      "members": "Invite members by email and assign access roles (Administrator, Operator, Viewer)",
+      "categories": "Create, edit, and customize categories with custom icons",
+      "settings": "Advanced control over your workspace settings"
+    },
+    "contactHint": "Once subscribed, the Platform Superuser immediately activates the Pro Plan on your account.",
+    "cta": "Request Pro Upgrade",
+    "ctaShort": "Upgrade to Pro"
   }
 }

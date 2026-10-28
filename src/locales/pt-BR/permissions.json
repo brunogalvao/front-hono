@@ -55,14 +55,33 @@
     },
     "guestDialogTitle": "Permissões individuais — {{name}}",
     "guestDialogDescription": "Configure permissões específicas para este usuário, sobrescrevendo as do papel padrão.",
+    "platformSuperuserBadge": "Superusuário",
+    "planSelectLabel": "Plano do usuário",
+    "grantSuperuser": "Promover a Superusuário",
+    "revokeSuperuser": "Remover Superusuário",
+    "plan": {
+      "free": "Inicial (Free)",
+      "pro": "Pagante (Pro)"
+    },
     "toast": {
       "roleUpdated": "Papel atualizado",
       "roleUpdateError": "Erro ao atualizar papel",
       "memberRemoved": "Membro removido do workspace",
       "memberRemoveError": "Erro ao remover membro",
       "userAdded": "Usuário adicionado ao workspace",
-      "userAddError": "Erro ao adicionar usuário"
+      "userAddError": "Erro ao adicionar usuário",
+      "planUpdated": "Plano do usuário atualizado",
+      "planUpdateError": "Erro ao atualizar plano do usuário",
+      "superuserGranted": "Usuário promovido a Superusuário da Plataforma",
+      "superuserRevoked": "Acesso de Superusuário removido",
+      "superuserUpdateError": "Erro ao atualizar status de Superusuário"
     }
+  },
+  "platformUsers": {
+    "title": "Contas e planos da plataforma (Superusuário)",
+    "description": "Gerencie o plano (Inicial Free vs Pagante Pro) de qualquer conta cadastrada via Sign-Up, Google ou GitHub e defina novos Superusuários.",
+    "searchPlaceholder": "Buscar usuário por nome ou e-mail...",
+    "empty": "Nenhuma conta encontrada."
   },
   "guestEditor": {
     "hint": "Permissões individuais sobrepõem as do papel padrão. Telas sem override usam as permissões do papel atribuído.",

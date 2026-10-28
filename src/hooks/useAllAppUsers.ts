@@ -47,7 +47,9 @@ async function fetchAllAppUsers(
       profileIds.length
         ? supabase
             .from('profiles')
-            .select('id, email, full_name, avatar_url')
+            .select(
+              'id, email, full_name, avatar_url, plan_tier, is_platform_superuser, max_workspaces'
+            )
             .in('id', profileIds)
         : Promise.resolve({ data: [], error: null }),
       supabase
@@ -94,7 +96,7 @@ async function fetchAllAppUsers(
             overrides.filter(
               (permission) => permission.user_id === membership.user_id
             ),
-            membership.user_id === superuserId
+            Boolean(profile.is_platform_superuser)
           ),
           overrides.filter(
             (permission) => permission.user_id === membership.user_id

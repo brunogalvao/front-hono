@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Lock, Plus, Pencil, Trash2 } from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -45,6 +45,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/query-keys';
 import { useWorkspace } from '@/context/WorkspaceContext';
+import { usePermissions } from '@/hooks/usePermissions';
+import { UpgradePlanDialog } from '@/components/workspace/UpgradePlanDialog';
 import { toast } from 'sonner';
 
 const buildSchema = (nameRequired: string) =>
@@ -56,9 +58,14 @@ const buildSchema = (nameRequired: string) =>
 
 type FormValues = z.infer<ReturnType<typeof buildSchema>>;
 
-export function CategoryManager() {
+interface CategoryManagerProps {
+  onRequestUpgrade?: () => void;
+}
+
+export function CategoryManager({ onRequestUpgrade }: CategoryManagerProps = {}) {
   const { t } = useTranslation(['workspace', 'common']);
   const { activeWorkspaceId } = useWorkspace();
+  const { can } = usePermissions();
   const { data: categories = [] } = useCategories(activeWorkspaceId);
   const queryClient = useQueryClient();
   const qKey = queryKeys.categories.list(activeWorkspaceId ?? '');
@@ -68,8 +75,13 @@ export function CategoryManager() {
   );
 
   const [formOpen, setFormOpen] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Category | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+
+  const canCreateCategory = can('categories', 'create');
+  const canUpdateCategory = can('categories', 'update');
+  const canDeleteCategory = can('categories', 'delete');
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -159,8 +171,30 @@ export function CategoryManager() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium">{t('category.customTitle')}</p>
-        <Button size="sm" variant="outline" onClick={openCreate}>
-          <Plus className="mr-1 h-3 w-3" /> {t('category.new')}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            if (canCreateCategory) {
+              openCreate();
+            } else if (onRequestUpgrade) {
+              onRequestUpgrade();
+            } else {
+              setUpgradeOpen(true);
+            }
+          }}
+        >
+          {canCreateCategory ? (
+            <Plus className="mr-1 h-3 w-3" />
+          ) : (
+            <Lock className="mr-1 h-3 w-3" />
+          )}
+          {t('category.new')}
+          {!canCreateCategory && (
+            <Badge variant="secondary" className="ml-1.5 text-[10px]">
+              Pro
+            </Badge>
+          )}
         </Button>
       </div>
 
@@ -187,24 +221,28 @@ export function CategoryManager() {
             >
               {t(`category.type.${cat.type}`)}
             </Badge>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-11 md:size-8"
-              aria-label={t('common:edit')}
-              onClick={() => openEdit(cat)}
-            >
-              <Pencil className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-destructive hover:text-destructive size-11 md:size-8"
-              aria-label={t('common:delete')}
-              onClick={() => setDeleteTarget(cat.id)}
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
+            {canUpdateCategory && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-11 md:size-8"
+                aria-label={t('common:edit')}
+                onClick={() => openEdit(cat)}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+            )}
+            {canDeleteCategory && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-destructive hover:text-destructive size-11 md:size-8"
+                aria-label={t('common:delete')}
+                onClick={() => setDeleteTarget(cat.id)}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            )}
           </div>
         ))}
       </div>
@@ -339,6 +377,12 @@ export function CategoryManager() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <UpgradePlanDialog
+        open={upgradeOpen}
+        onOpenChange={setUpgradeOpen}
+        feature="categories"
+      />
     </div>
   );
 }
