@@ -22,7 +22,7 @@ export interface PaginatedAppUsers {
 
 async function fetchAllAppUsers(
   workspaceId: string,
-  superuserId: string,
+  _superuserId: string,
   page: number,
   pageSize: number
 ): Promise<PaginatedAppUsers> {
