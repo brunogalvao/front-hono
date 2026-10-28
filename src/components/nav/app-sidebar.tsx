@@ -13,10 +13,12 @@ import { useWorkspace } from '@/context/WorkspaceContext';
 import { useTranslation } from 'react-i18next';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { can } = usePermissions();
+  const { can, isSuperAdmin } = usePermissions();
   const { activeWorkspace } = useWorkspace();
   const { t } = useTranslation('nav');
   const canReadTransactions = can('transactions', 'read');
+  const canReadMembers = can('members', 'read');
+  const canReadPermissions = isSuperAdmin || can('permissions', 'read');
 
   const navItems: NavItem[] = [
     ...(canReadTransactions
@@ -63,19 +65,35 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ...(activeWorkspace
       ? [
           {
+            type: 'group' as const,
             title: t('settings'),
-            url: '/admin/settings',
-            icon: 'groups' as const,
-            exact: true,
-          },
-        ]
-      : []),
-    ...(can('members', 'read')
-      ? [
-          {
-            title: t('membersAccess'),
-            url: '/admin/settings/members',
-            icon: 'shield' as const,
+            icon: 'account' as const,
+            children: [
+              {
+                title: t('settingsSubmenu.workspaces'),
+                url: '/admin/settings',
+                icon: 'sliders' as const,
+                exact: true,
+              },
+              ...(canReadMembers
+                ? [
+                    {
+                      title: t('settingsSubmenu.members'),
+                      url: '/admin/settings/members',
+                      icon: 'groups' as const,
+                    },
+                  ]
+                : []),
+              ...(canReadPermissions
+                ? [
+                    {
+                      title: t('settingsSubmenu.permissions'),
+                      url: '/admin/settings/permissions',
+                      icon: 'crown' as const,
+                    },
+                  ]
+                : []),
+            ],
           },
         ]
       : []),

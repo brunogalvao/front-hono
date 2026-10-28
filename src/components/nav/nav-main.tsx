@@ -12,7 +12,16 @@ import {
 import { Link, useLocation } from '@tanstack/react-router';
 import { FaListAlt, FaUserCog, FaHome, FaHistory } from 'react-icons/fa';
 import { MdPaid, MdCreditCard } from 'react-icons/md';
-import { Sparkles, Users, ChevronRight, UserRound, Settings, ShieldCheck } from 'lucide-react';
+import {
+  Sparkles,
+  Users,
+  ChevronRight,
+  UserRound,
+  Settings,
+  ShieldCheck,
+  Crown,
+  SlidersHorizontal,
+} from 'lucide-react';
 
 const iconMap: Record<string, React.ElementType> = {
   list: FaListAlt,
@@ -26,6 +35,8 @@ const iconMap: Record<string, React.ElementType> = {
   profile: UserRound,
   account: Settings,
   shield: ShieldCheck,
+  crown: Crown,
+  sliders: SlidersHorizontal,
 };
 
 type IconKey = keyof typeof iconMap;
@@ -63,7 +74,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
         {items.map((item) => {
           if (item.type === 'group') {
             const Icon = item.icon ? iconMap[item.icon] : null;
-            const anyChildActive = item.children.some((c) => isActive(c.url));
+            const anyChildActive = item.children.some((c) => isActive(c.url, c.exact));
 
             return (
               <Collapsible
@@ -87,7 +98,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
                     <SidebarMenuSub>
                       {item.children.map((child) => {
                         const ChildIcon = child.icon ? iconMap[child.icon] : null;
-                        const childActive = isActive(child.url);
+                        const childActive = isActive(child.url, child.exact);
                         return (
                           <SidebarMenuSubItem key={child.url}>
                             <SidebarMenuSubButton

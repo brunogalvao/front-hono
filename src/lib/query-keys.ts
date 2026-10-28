@@ -125,8 +125,18 @@ export const queryKeys = {
   appUsers: {
     all: ['app-users'] as const,
     byWorkspace: (workspaceId: string) => ['app-users', workspaceId] as const,
-    page: (workspaceId: string, page: number, pageSize: number) =>
-      ['app-users', workspaceId, 'page', { page, pageSize }] as const,
+    page: (
+      workspaceId: string,
+      page: number,
+      pageSize: number,
+      filters?: { search?: string; role?: string }
+    ) =>
+      [
+        'app-users',
+        workspaceId,
+        'page',
+        filters ? { page, pageSize, ...filters } : { page, pageSize },
+      ] as const,
   },
 
   permissions: {

@@ -19,6 +19,7 @@ export interface UserProfile {
 }
 
 export type PlanTier = 'free' | 'pro';
+export type SignupOrigin = 'self_signup' | 'workspace_invite';
 
 /** Perfil de usuário do banco de dados (tabela profiles) */
 export interface AppUserProfile {
@@ -27,7 +28,7 @@ export interface AppUserProfile {
   full_name: string | null;
   avatar_url: string | null;
   email_normalized?: string;
-  signup_origin?: 'self_signup' | 'workspace_invite';
+  signup_origin?: SignupOrigin;
   onboarding_status?: 'incomplete' | 'complete';
   onboarding_completed_at?: string | null;
   plan_tier?: PlanTier;

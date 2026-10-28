@@ -19,6 +19,9 @@ describe('workspace access routing', () => {
     expect(getWorkspaceRouteRequirement('/admin/settings/members')).toBe(
       'members'
     );
+    expect(getWorkspaceRouteRequirement('/admin/settings/permissions')).toBe(
+      'permissions'
+    );
   });
 
   it('mantém páginas pessoais fora da matriz do workspace', () => {

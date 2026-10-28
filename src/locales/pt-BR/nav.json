@@ -10,9 +10,14 @@
   "insights": "Insights IA",
   "groups": "Grupo",
   "settings": "Configurações",
+  "settingsSubmenu": {
+    "workspaces": "Workspaces e categorias",
+    "members": "Membros e convites",
+    "permissions": "Gestão e permissões"
+  },
   "permissions": "Permissões",
   "members": "Membros",
-  "membersAccess": "Membros e acesso",
+  "membersAccess": "Membros e convites",
   "mySpace": "Meu Espaço",
   "profile": "Perfil",
   "account": "Minha Conta",

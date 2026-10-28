@@ -10,9 +10,14 @@
   "insights": "AI Insights",
   "groups": "Group",
   "settings": "Settings",
+  "settingsSubmenu": {
+    "workspaces": "Workspaces & categories",
+    "members": "Members & invitations",
+    "permissions": "Management & permissions"
+  },
   "permissions": "Permissions",
   "members": "Members",
-  "membersAccess": "Members and access",
+  "membersAccess": "Members & invitations",
   "mySpace": "My Space",
   "profile": "Profile",
   "account": "My Account",

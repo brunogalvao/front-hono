@@ -7,7 +7,8 @@ export type WorkspaceRoutePath =
   | '/admin/installments'
   | '/admin/advisor'
   | '/admin/settings'
-  | '/admin/settings/members';
+  | '/admin/settings/members'
+  | '/admin/settings/permissions';
 
 interface WorkspaceRouteRequirement {
   path: WorkspaceRoutePath;
@@ -15,6 +16,7 @@ interface WorkspaceRouteRequirement {
 }
 
 const WORKSPACE_ROUTE_REQUIREMENTS: readonly WorkspaceRouteRequirement[] = [
+  { path: '/admin/settings/permissions', resource: 'permissions' },
   { path: '/admin/settings/members', resource: 'members' },
   { path: '/admin/transactions', resource: 'transactions' },
   { path: '/admin/installments', resource: 'installments' },
@@ -29,6 +31,7 @@ const WORKSPACE_ROUTE_PRIORITY: readonly WorkspaceRouteRequirement[] = [
   { path: '/admin/recurring', resource: 'recurring' },
   { path: '/admin/installments', resource: 'installments' },
   { path: '/admin/settings/members', resource: 'members' },
+  { path: '/admin/settings/permissions', resource: 'permissions' },
 ];
 
 export function getWorkspaceRouteRequirement(

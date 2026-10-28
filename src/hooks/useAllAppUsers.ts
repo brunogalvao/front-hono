@@ -20,22 +20,56 @@ export interface PaginatedAppUsers {
   total: number;
 }
 
+export interface AppUsersFilter {
+  search?: string;
+  role?: WorkspaceRole | 'all';
+}
+
 async function fetchAllAppUsers(
   workspaceId: string,
   _superuserId: string,
   page: number,
-  pageSize: number
+  pageSize: number,
+  filters?: AppUsersFilter
 ): Promise<PaginatedAppUsers> {
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
+  const normalizedSearch = filters?.search?.trim() ?? '';
+  const roleFilter =
+    filters?.role && filters.role !== 'all' ? filters.role : null;
+
+  let matchingSearchProfileIds: string[] | null = null;
+  if (normalizedSearch) {
+    const { data: matchedProfiles, error: searchError } = await supabase
+      .from('profiles')
+      .select('id')
+      .or(
+        `email.ilike.%${normalizedSearch}%,full_name.ilike.%${normalizedSearch}%`
+      );
+    if (searchError) throw searchError;
+    matchingSearchProfileIds = (matchedProfiles ?? []).map((row) => row.id);
+    if (matchingSearchProfileIds.length === 0) {
+      return { users: [], total: 0 };
+    }
+  }
+
+  let membersQuery = supabase
+    .from('workspace_members')
+    .select('id, user_id, role', { count: 'exact' })
+    .eq('workspace_id', workspaceId);
+
+  if (roleFilter) {
+    membersQuery = membersQuery.eq('role', roleFilter);
+  }
+  if (matchingSearchProfileIds) {
+    membersQuery = membersQuery.in('user_id', matchingSearchProfileIds);
+  }
+
   const {
     data: members,
     error: membersError,
     count,
-  } = await supabase
-    .from('workspace_members')
-    .select('id, user_id, role', { count: 'exact' })
-    .eq('workspace_id', workspaceId)
+  } = await membersQuery
     .order('created_at', { ascending: true })
     .range(from, to);
 
@@ -121,11 +155,26 @@ export function useAllAppUsers(
   workspaceId: string | null,
   superuserId: string,
   page: number,
-  pageSize: number
+  pageSize: number,
+  filters?: AppUsersFilter
 ) {
+  const normalizedFilters =
+    filters?.search?.trim() || (filters?.role && filters.role !== 'all')
+      ? {
+          search: filters?.search?.trim().toLowerCase() ?? '',
+          role: filters?.role ?? 'all',
+        }
+      : undefined;
+
   return useQuery({
-    queryKey: queryKeys.appUsers.page(workspaceId ?? '', page, pageSize),
-    queryFn: () => fetchAllAppUsers(workspaceId!, superuserId, page, pageSize),
+    queryKey: queryKeys.appUsers.page(
+      workspaceId ?? '',
+      page,
+      pageSize,
+      normalizedFilters
+    ),
+    queryFn: () =>
+      fetchAllAppUsers(workspaceId!, superuserId, page, pageSize, filters),
     enabled: !!workspaceId,
     placeholderData: keepPreviousData,
     staleTime: 15_000,

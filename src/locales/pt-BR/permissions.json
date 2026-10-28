@@ -1,11 +1,17 @@
 {
   "page": {
-    "title": "Membros e acesso",
+    "title": "Membros e convites",
     "titleSuperAdmin": "Gerenciamento de Permissões",
     "titleAdmin": "Gerenciamento de Membros",
     "subtitleSuperAdmin": "Gerencie membros, convites e papéis de acesso em {{workspace}}.",
     "subtitleAdmin": "Convide e administre os membros de {{workspace}}.",
+    "goToSuperuserManagement": "Gestão e permissões (Superusuário)",
     "accessDenied": "Acesso restrito"
+  },
+  "superuserPage": {
+    "title": "Gestão e permissões (Superusuário)",
+    "subtitle": "Administre contas e planos da plataforma (SaaS) e configure a matriz de permissões por papel em {{workspace}}.",
+    "goToMembers": "Membros e convites"
   },
   "matrix": {
     "title": "Matriz de permissões por papel",
@@ -53,6 +59,11 @@
       "previous": "Página anterior",
       "next": "Próxima página"
     },
+    "filters": {
+      "searchPlaceholder": "Filtrar por nome ou e-mail...",
+      "roleLabel": "Filtrar por papel",
+      "roleAll": "Todos os papéis"
+    },
     "guestDialogTitle": "Permissões individuais — {{name}}",
     "guestDialogDescription": "Configure permissões específicas para este usuário, sobrescrevendo as do papel padrão.",
     "platformSuperuserBadge": "Superusuário",
@@ -81,7 +92,23 @@
     "title": "Contas e planos da plataforma (Superusuário)",
     "description": "Gerencie o plano (Inicial Free vs Pagante Pro) de qualquer conta cadastrada via Sign-Up, Google ou GitHub e defina novos Superusuários.",
     "searchPlaceholder": "Buscar usuário por nome ou e-mail...",
-    "empty": "Nenhuma conta encontrada."
+    "empty": "Nenhuma conta encontrada.",
+    "filters": {
+      "planLabel": "Filtrar por plano",
+      "planAll": "Todos os planos",
+      "originLabel": "Filtrar por origem",
+      "originAll": "Todas as origens",
+      "originSelfSignup": "Cadastro direto (SaaS)",
+      "originInvite": "Convite de workspace",
+      "clear": "Limpar filtros"
+    },
+    "pagination": {
+      "label": "Paginação de contas da plataforma",
+      "total_one": "{{count}} conta",
+      "total_other": "{{count}} contas",
+      "perPageLabel": "Itens por página",
+      "perPage": "{{count}} / pág."
+    }
   },
   "guestEditor": {
     "hint": "Permissões individuais sobrepõem as do papel padrão. Telas sem override usam as permissões do papel atribuído.",

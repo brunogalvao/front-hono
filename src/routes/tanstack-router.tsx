@@ -49,6 +49,9 @@ const WorkspaceSettingsPage = lazyRouteComponent(
 const PermissionsPage = lazyRouteComponent(
   () => import('@/pages/admin/workspace/PermissionsPage')
 );
+const SuperuserManagementPage = lazyRouteComponent(
+  () => import('@/pages/admin/workspace/SuperuserManagementPage')
+);
 const AccountSettingsPage = lazyRouteComponent(
   () => import('@/pages/admin/AccountSettingsPage')
 );
@@ -237,6 +240,12 @@ const permissionsRoute = createRoute({
   component: PermissionsPage,
 });
 
+const superuserManagementRoute = createRoute({
+  getParentRoute: () => adminRoute,
+  path: '/settings/permissions',
+  component: SuperuserManagementPage,
+});
+
 // Invite & Auth Routes
 const inviteRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -310,6 +319,7 @@ const routeTree = rootRoute.addChildren([
     workspaceSettingsRoute,
     accountSettingsRoute,
     permissionsRoute,
+    superuserManagementRoute,
   ]),
 ]);
 

@@ -1,11 +1,17 @@
 {
   "page": {
-    "title": "Members and access",
+    "title": "Members & invitations",
     "titleSuperAdmin": "Permissions Management",
     "titleAdmin": "Members Management",
     "subtitleSuperAdmin": "Manage members, invitations and access roles in {{workspace}}.",
     "subtitleAdmin": "Invite and manage members of {{workspace}}.",
+    "goToSuperuserManagement": "Management & permissions (Superuser)",
     "accessDenied": "Access restricted"
+  },
+  "superuserPage": {
+    "title": "Management & permissions (Superuser)",
+    "subtitle": "Manage platform accounts and plans (SaaS) and configure the role permission matrix in {{workspace}}.",
+    "goToMembers": "Members & invitations"
   },
   "matrix": {
     "title": "Permission matrix by role",
@@ -53,6 +59,11 @@
       "previous": "Previous page",
       "next": "Next page"
     },
+    "filters": {
+      "searchPlaceholder": "Filter by name or email...",
+      "roleLabel": "Filter by role",
+      "roleAll": "All roles"
+    },
     "guestDialogTitle": "Individual permissions — {{name}}",
     "guestDialogDescription": "Configure specific permissions for this user, overriding the default role.",
     "platformSuperuserBadge": "Superuser",
@@ -81,7 +92,23 @@
     "title": "Platform accounts and plans (Superuser)",
     "description": "Manage the plan (Starter Free vs Paid Pro) of any account registered via Sign-Up, Google, or GitHub and assign Platform Superusers.",
     "searchPlaceholder": "Search user by name or email...",
-    "empty": "No accounts found."
+    "empty": "No accounts found.",
+    "filters": {
+      "planLabel": "Filter by plan",
+      "planAll": "All plans",
+      "originLabel": "Filter by origin",
+      "originAll": "All origins",
+      "originSelfSignup": "Direct sign-up (SaaS)",
+      "originInvite": "Workspace invitation",
+      "clear": "Clear filters"
+    },
+    "pagination": {
+      "label": "Platform accounts pagination",
+      "total_one": "{{count}} account",
+      "total_other": "{{count}} accounts",
+      "perPageLabel": "Items per page",
+      "perPage": "{{count}} / page"
+    }
   },
   "guestEditor": {
     "hint": "Individual permissions override the default role. Screens without an override use the assigned role's permissions.",
